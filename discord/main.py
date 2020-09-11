@@ -59,7 +59,7 @@ async def on_message_edit(before, after):
     await bot.process_commands(after)  # se a pessoa editar a mensagem, verifica se ela editou para um comando valido
 
 if __name__ == '__main__':
-    for filename in os.listdir('/cmds'):
+    for filename in os.listdir('discord/cmds'):
         if filename.endswith('.py'):
             bot.load_extension(f'cmds.{filename[:-3]}')
 

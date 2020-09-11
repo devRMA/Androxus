@@ -2,3 +2,4 @@
 *.pyc
 vendor/
 .env
+__pycache__/
