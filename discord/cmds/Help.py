@@ -6,11 +6,12 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 
+
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['ajuda', 'ajudar', 'helper'])
+    @commands.command(aliases=['ajuda'])
     async def help(self, ctx):
         await ctx.send('https://androxus.herokuapp.com/')
 

@@ -19,17 +19,16 @@ class ServidorDao:
                 self.query = 'INSERT INTO servers (serverId, prefixo) VALUES(%s, \'--\');'  # query
                 self.cursor.execute(self.query, (serverId,))  # o cursor, vai colocar o "id" no lugar do "%s" e executar a query
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
-                return True  # vai retornar True se tudo ocorrer bem
             except psycopg2.IntegrityError as e:
                 if str(e).startswith('UNIQUE constraint failed'):
                     raise Exception('Esse id já está registrado!')
                 else:
                     raise e
             finally:
+                self.cursor.close()  # se der erro, ou não, vai fechar o cursor com o banco
                 self.connection.close()  # se der erro, ou não, vai fechar a conexão com o banco
         else:
             raise Exception('Id passado não é do tipo int!')
-        return False  # Se o return True não for executado, vai chegar aqui
 
     def get_all(self):
         try:
@@ -40,6 +39,7 @@ class ServidorDao:
         except Exception as e:
             return [f'error {e}']
         finally:
+            self.cursor.close()
             self.connection.close()
 
     def get_prefix(self, serverId):
@@ -63,10 +63,10 @@ class ServidorDao:
                 self.query = 'UPDATE servers SET prefixo = %s WHERE serverId = %s;'
                 self.cursor.execute(self.query, (prefixo, serverId,))
                 self.connection.commit()
-                return True
             except Exception as e:
                 raise Exception(str(e))
             finally:
+                self.cursor.close()
                 self.connection.close()
         else:
             raise Exception('Erro no tipo dos parametros')
@@ -81,10 +81,10 @@ class ServidorDao:
                 self.query = 'DELETE FROM comandos_desativados WHERE serverId = %s;'
                 self.cursor.execute(self.query, (serverId,))
                 self.connection.commit()
-                return True
             except Exception as e:
                 raise Exception(str(e))
             finally:
+                self.cursor.close()
                 self.connection.close()
         else:
             raise Exception('Erro no tipo dos parametros')

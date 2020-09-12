@@ -4,26 +4,22 @@
 
 __author__ = 'Rafael'
 
-import os
 from discord.dao.ServidorDao import ServidorDao
+from discord.dao.BlacklistDao import BlacklistDao
 from discord.ext import commands
 import discord
-from os import environ
+from os import environ, listdir
 
 
-def get_prefixo(bot, message):
-    prefixo = ServidorDao().get_prefix(message.guild.id)[0]
-    if prefixo != None:
-        return prefixo
-    else:
-        return '--'
+def pegar_o_prefixo(bot, message):
+    if message.guild != None:
+        prefixo = ServidorDao().get_prefix(message.guild.id)[0]
+        if prefixo != None:
+            return prefixo
+    return '--'
 
 
-modulos = [
-    'cmds.Ping',
-]
-
-bot = commands.Bot(command_prefix=get_prefixo, owner_id=305532760083398657)
+bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657)
 bot.remove_command('help')  # remove o comando help que já vem
 
 
@@ -40,8 +36,11 @@ async def on_ready():
 async def on_guild_join(guild):
     if await ServidorDao.create(guild.id):
         print("Server adicionado com sucesso!")
+
+
 @bot.event
 async def on_message(message):
+    if BlacklistDao().get_pessoa(message.author.id) or message.author.bot: return
     channel = message.channel
     mensagem_formatada = message.content
     lixos = '!@#$%*()-_=+[{]}/?ç´~;., <>^\\|\'"'
@@ -49,19 +48,27 @@ async def on_message(message):
         mensagem_formatada = mensagem_formatada.replace(char, '')
     if (f'<@{str(bot.user.id)}>' in message.content) or (f'<@!{str(bot.user.id)}>' in message.content):
         try:
-            await channel.send(f'Use o comando ``{get_prefixo(None, message)}help`` para obter ajuda! xD')
+            await channel.send(f'Use o comando ``{pegar_o_prefixo(None, message)}help`` para obter ajuda! xD')
         except Exception as error:
             await channel.send(f'Ocorreu o erro \n```{error}```na execução do comando ._.')
 
     await bot.process_commands(message)  # caso não tenha passado por nenhuma mensagem a cima, vai para os comandos
+
+
 @bot.event
 async def on_message_edit(before, after):
+    if BlacklistDao().get_pessoa(after.author.id) or (not after.author.bot): return
     await bot.process_commands(after)  # se a pessoa editar a mensagem, verifica se ela editou para um comando valido
 
+
 if __name__ == '__main__':
-    for filename in os.listdir('discord/cmds'):
+    try:
+        listdir('discord/cmds')
+        path_cmds = 'discord/cmds'
+    except FileNotFoundError:
+        path_cmds = './cmds'
+    for filename in listdir(path_cmds):
         if filename.endswith('.py'):
             bot.load_extension(f'cmds.{filename[:-3]}')
 
     bot.run(environ.get('TOKEN'))
-

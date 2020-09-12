@@ -14,11 +14,12 @@ class Change_prefix(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['prefixo', 'prefix'])
-    async def change_prefix(self, ctx, *, prefixo_novo = '--'):
+    async def change_prefix(self, ctx, prefixo_novo='--'):
         try:
             ServidorDao().update(ctx.guild.id, prefixo_novo)
             if prefixo_novo != '--':
-                await ctx.send(f'Agora o meu prefixo é ``{prefixo_novo}``\nCaso queria voltar para o prefixo padrão, basta digitar ``{prefixo_novo}prefixo``')
+                await ctx.send(
+                    f'Agora o meu prefixo é ``{prefixo_novo}``\nCaso queria voltar para o prefixo padrão, basta digitar ``{prefixo_novo}prefixo``')
             else:
                 await ctx.send(f'Agora estou com o prefixo padrão!')
         except Exception as error:
