@@ -29,7 +29,8 @@ async def on_ready():
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
     print(f'link de acesso:\nhttps://discord.com/oauth2/authorize?client_id={bot.user.id}&scope=bot&permissions=8')
-    await bot.change_presence(activity=discord.Game(name='🤔'))
+    await bot.change_presence(activity=discord.Game(
+        name='😁Caso você queira ver minha programação, acesse https://github.com/devRMA/Androxus'))
 
 
 @bot.event

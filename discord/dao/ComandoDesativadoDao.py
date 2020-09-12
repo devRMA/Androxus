@@ -1,50 +1,43 @@
 # coding=utf-8
 # Androxus bot
-# BlacklistDao.py
+# ComandoDesativadoDao.py
 
 __author__ = 'Rafael'
-
 
 import psycopg2
 from discord.dao.Factory import Factory
 
 
-class BlacklistDao:
+class ComandoDesativadoDao:
     def __init__(self):
         self.connection = Factory().getConnection()  # inicia a conexão com o banco
         self.cursor = self.connection.cursor()  # cria o cursor
 
-    def create(self, pessoaId):
-        if isinstance(pessoaId, int):  # verifica se o id é int
+    def create(self, serverId, comando):
+        if isinstance(serverId, int) and isinstance(comando, str):  # verifica se os tipos das variaveis
             try:
-                query = 'INSERT INTO blacklist (pessoaId) VALUES(%s);'  # query
-                self.cursor.execute(query,
-                                    (pessoaId,))  # o cursor, vai colocar o "id" no lugar do "%s" e executar a query
+                query = 'INSERT INTO comandos_desativados(serverId, comando) VALUES(%s, %s);'  # query
+                self.cursor.execute(query, (serverId, comando,))
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
                 return True  # vai retornar True se tudo ocorrer bem
-            except psycopg2.IntegrityError as e:
-                if str(e).startswith('UNIQUE constraint failed'):
-                    raise Exception('duplicate key value violates unique constraint')
-                else:
-                    raise Exception(str(e))
+            except psycopg2.IntegrityError:
+                raise Exception('duplicate key value violates unique constraint')
             except Exception as e:
                 raise Exception(str(e))
             finally:
-                self.cursor.close()  # se der erro, ou não, vai fechar o cursor com o banco
+                self.cursor.close()
                 self.connection.close()  # se der erro, ou não, vai fechar a conexão com o banco
         else:
             raise Exception('Erro no tipo do(s) parametro(s)')
         return False  # Se o return True não for executado, vai chegar aqui
 
-    def get_pessoa(self, pessoaId):
-        if isinstance(pessoaId, int):
+    def get_comandos(self, serverId):
+        if isinstance(serverId, int):
             try:
-                query = 'SELECT * FROM blacklist WHERE pessoaId = %s;'
-                self.cursor.execute(query, (pessoaId,))
-                if self.cursor.fetchone() != None:  # vai fazer o select, se retornal algo, o id passado está na blacklist
-                    return True
-                else:  # se retornou None, é porque a pessoa não está na blacklist
-                    return False
+                query = 'SELECT comando FROM comandos_desativados WHERE serverId = %s;'
+                self.cursor.execute(query, (serverId,))
+                resposta = self.cursor.fetchall()
+                return resposta
             except Exception as e:
                 return f'error: {str(e)}'
             finally:
@@ -53,12 +46,13 @@ class BlacklistDao:
         else:
             raise Exception('Erro no tipo do(s) parametro(s)')
 
-    def delete(self, pessoaId):
-        if isinstance(pessoaId, int):
+    def delete(self, serverId, comando):
+        if isinstance(serverId, int) and isinstance(comando, str):
             try:
-                query = 'DELETE FROM blacklist WHERE pessoaId = %s;'
-                self.cursor.execute(query, (pessoaId,))
+                query = 'DELETE FROM comandos_desativados WHERE serverId = %s AND comando = %s;'
+                self.cursor.execute(query, (serverId, comando,))
                 self.connection.commit()
+                return True
             except Exception as e:
                 raise Exception(str(e))
             finally:
