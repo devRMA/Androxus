@@ -29,37 +29,13 @@ async def on_ready():
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
     print(f'link de acesso:\nhttps://discord.com/oauth2/authorize?client_id={bot.user.id}&scope=bot&permissions=8')
-    await bot.change_presence(activity=discord.Game(name='🤔 como que eu estou "jogando" se eu sou um bot? 🤔'))
+    await bot.change_presence(activity=discord.Game(name='🤔'))
 
 
 @bot.event
 async def on_guild_join(guild):
     if await ServidorDao.create(guild.id):
-        print("Server adicionado com sucesso!")
-
-
-@bot.event
-async def on_message(message):
-    if BlacklistDao().get_pessoa(message.author.id) or message.author.bot: return
-    channel = message.channel
-    mensagem_formatada = message.content
-    lixos = '!@#$%*()-_=+[{]}/?ç´~;., <>^\\|\'"'
-    for char in lixos:
-        mensagem_formatada = mensagem_formatada.replace(char, '')
-    if (f'<@{str(bot.user.id)}>' in message.content) or (f'<@!{str(bot.user.id)}>' in message.content):
-        try:
-            await channel.send(f'Use o comando ``{pegar_o_prefixo(None, message)}help`` para obter ajuda! xD')
-        except Exception as error:
-            await channel.send(f'Ocorreu o erro \n```{error}```na execução do comando ._.')
-
-    await bot.process_commands(message)  # caso não tenha passado por nenhuma mensagem a cima, vai para os comandos
-
-
-@bot.event
-async def on_message_edit(before, after):
-    if BlacklistDao().get_pessoa(after.author.id) or (not after.author.bot): return
-    await bot.process_commands(after)  # se a pessoa editar a mensagem, verifica se ela editou para um comando valido
-
+        print(f'Servidor {guild} adicionado com sucesso!')
 
 if __name__ == '__main__':
     try:

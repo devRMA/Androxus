@@ -8,8 +8,6 @@ __author__ = 'Rafael'
 import psycopg2
 from discord.dao.Factory import Factory
 
-# CRUD da table blacklist
-
 
 class BlacklistDao:
     def __init__(self):
@@ -18,12 +16,14 @@ class BlacklistDao:
 
     def create(self, pessoaId):
         if isinstance(pessoaId, int):  # verifica se o id é int
+
+            self.query = 'INSERT INTO blacklist (pessoaId) VALUES(%s);'  # query
+            self.cursor.execute(self.query,
+                                (pessoaId,))  # o cursor, vai colocar o "id" no lugar do "%s" e executar a query
+            self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
+            return True  # vai retornar True se tudo ocorrer bem
             try:
-                self.query = 'INSERT INTO blacklist (pessoaId) VALUES(%s);'  # query
-                self.cursor.execute(self.query,
-                                    (pessoaId,))  # o cursor, vai colocar o "id" no lugar do "%s" e executar a query
-                self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
-                return True  # vai retornar True se tudo ocorrer bem
+                pass
             except psycopg2.IntegrityError as e:
                 if str(e).startswith('UNIQUE constraint failed'):
                     raise Exception('Esse id já está registrado!')
