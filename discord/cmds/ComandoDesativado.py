@@ -74,12 +74,12 @@ class ComandoDesativado(commands.Cog):
                         value=f"``{prefixo}reativar_comando`` ``say``\n(Esse comando reativa o comando \"say\" no seu servidor!)",
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
-                        value=f"``{prefixo}reativar_comando``, ``{prefixo}rc``", inline=False)
+                        value=f"``{prefixo}reativar_comando``", inline=False)
         embed.add_field(name=":exclamation:Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
-    @commands.command(aliases=['reactivate_command', 'rc'], description='Reativa comando!')
+    @commands.command(aliases=['reactivate_command'], description='Reativa comando!')
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def reativar_comando(self, ctx, comando=None):
