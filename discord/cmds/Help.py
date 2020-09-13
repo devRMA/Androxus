@@ -48,6 +48,8 @@ class Help(commands.Cog):
             for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
                 for command in self.bot.get_cog(cog).get_commands():
                     if (not command.hidden):  # se o comando não estiver privado
+                        emoji = '<:desativado:754819961376997407>'
+                        print(ComandoDesativadoDao().get_comandos(ctx.guild.id))
                         if not (ctx.guild is None):  # se a mensagem foi enviar num server
                             if not (command.name in ComandoDesativadoDao().get_comandos(ctx.guild.id)):  # verifica se o comando está ativo
                                 lista_de_comando.add_field(name=f'<a:check:754719579648950342>``{command.name}``',
