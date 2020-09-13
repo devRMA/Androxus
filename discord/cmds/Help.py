@@ -41,7 +41,7 @@ class Help(commands.Cog):
             embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                             value=f"``{prefixo}ajuda``", inline=False)
             lista_de_comando = discord.Embed(title=f"Lista de comandos:", colour=discord.Colour(cor),
-                                  description="Todos os comandos que eu tenho!",
+                                  description="Esses são os comandos que eu tenho (todos abaixo precisam do prefixo)",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             lista_de_comando.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             lista_de_comando.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
@@ -58,18 +58,23 @@ class Help(commands.Cog):
                                                        value=str(command.description),
                                                        inline=True)
             if not (ctx.guild is None):  # comandos personalizados
-                for comando_personalizado in ComandoPersonalizadoDao().get_comandos(ctx.guild.id):
-                    if comando_personalizado[0] is not None:
-                        resposta = ComandoPersonalizadoDao().get_resposta(ctx.guild.id, comando_personalizado[0])
-                        if resposta[-1]:  # se o inText estiver on:
-                            lista_de_comando.add_field(
-                                name=f'<a:check:754719579648950342>``{comando_personalizado[0]}``',
-                                value=f'Eu irei responder "{resposta[0]}"', inline=True)
-                        else:
-                            lista_de_comando.add_field(
-                                name=f'<a:check:754719579648950342>``{comando_personalizado[0]}``',
-                                value=f'Eu irei responder "{resposta[0]}" **apenas se a mensagem iniciar com o comando**',
-                                inline=True)
+                comandos_personalizados = ComandoPersonalizadoDao().get_comandos(ctx.guild.id)
+                if comandos_personalizados is not None:
+                    lista_de_comando.add_field(name='**Comandos personalizados:**',
+                                               value='Estes sãos os comandos personalizados deste servidor',
+                                               inline=False)
+                    for comando_personalizado in comandos_personalizados:
+                        if comando_personalizado[0] is not None:
+                            resposta = ComandoPersonalizadoDao().get_resposta(ctx.guild.id, comando_personalizado[0])
+                            if resposta[-1]:  # se o inText estiver on:
+                                lista_de_comando.add_field(
+                                    name=f'<a:check:754719579648950342>``{comando_personalizado[0]}``',
+                                    value=f'Eu irei responder "{resposta[0]}"', inline=True)
+                            else:
+                                lista_de_comando.add_field(
+                                    name=f'<a:check:754719579648950342>``{comando_personalizado[0]}``',
+                                    value=f'Eu irei responder "{resposta[0]}" **apenas se a mensagem iniciar com o comando**',
+                                    inline=True)
             await ctx.send(embed=embed)
             await ctx.send(embed=lista_de_comando)
         else:
