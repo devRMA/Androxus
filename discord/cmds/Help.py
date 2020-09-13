@@ -20,7 +20,7 @@ class Help(commands.Cog):
     async def help(self, ctx, comando = None):
         if comando is None:
             cor = random_color()
-            prefixo = pegar_o_prefixo(ctx)
+            prefixo = pegar_o_prefixo(None, ctx)
             embed = discord.Embed(title=f"``{prefixo}help``", colour=discord.Colour(cor),
                                   description="Mostra essa mensagem de ajuda!",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
