@@ -26,7 +26,7 @@ async def on_ready():
     from stopwatch import Stopwatch
     msg = await bot.get_channel(753347222275620903).send('conexão com o banco iniciada')
     stopwatch = Stopwatch()
-    print(pegar_o_prefixo(None, 753347222275620903))  # vai abrir a conexão com o banco, fazer um select, e fechar a conexão
+    print(pegar_o_prefixo(None, bot.get_channel(753347222275620903)))  # vai abrir a conexão com o banco, fazer um select, e fechar a conexão
     stopwatch.stop()
     await msg.edit(content=f'Demorou {str(stopwatch)} para abrir a conexão, fazer um select e fechar a conexao\n' +
                    f'Latência do bot: {int(bot.latency * 1000)}ms')
