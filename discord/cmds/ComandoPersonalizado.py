@@ -8,7 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
-from discord.Utils import pegar_o_prefixo, random_color
+from discord.Utils import random_color, pegar_o_prefixo
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 
 
@@ -41,7 +41,8 @@ class ComandoPersonalizado(commands.Cog):
         embed.add_field(name=":exclamation:Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         if not (ctx.guild is None):  # se a mensagem foi enviar num server
-            if 'adicionar_comando' in ComandoDesativadoDao().get_comandos(ctx.guild.id):  # verifica se o comando está ativo
+            if 'adicionar_comando' in ComandoDesativadoDao().get_comandos(
+                    ctx.guild.id):  # verifica se o comando está ativo
                 embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
                                 value="**Se você usar este comando, o bot não ira responder!**",
                                 inline=False)
@@ -54,7 +55,58 @@ class ComandoPersonalizado(commands.Cog):
             await self.help_adicionar_comando(ctx)
             return
         if ComandoPersonalizadoDao().create(ctx.guild.id, comando, resposta, inText):
-            await ctx.send(f'Comando adicionado com sucesso!\nComando: ``{comando}``\nResposta: ``{resposta}``')
+            embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
+                                  description="<a:aeeee:754779905782448258>",
+                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
+            embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.add_field(name=f"Informações",
+                            value=f"Comando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText}",
+                            inline=False)
+            await ctx.send(embed=embed)
+
+    @commands.command(hidden=True)
+    async def help_remover_comando(self, ctx):
+        prefixo = pegar_o_prefixo(None, ctx)
+        embed = discord.Embed(title=f"``{prefixo}remover_comando``", colour=discord.Colour(random_color()),
+                              description="Remove um comando personalizado!",
+                              timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+        embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
+        embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+        embed.add_field(name="**Como usar?**",
+                        value=f"``{prefixo}remover_comando`` ``\"<comando>\"``",
+                        inline=False)
+        embed.add_field(
+            name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
+            value="<a:jotarodance:754702437901664338>", inline=False)
+        embed.add_field(name="Exemplos:",
+                        value=f"``{prefixo}remover_comando`` ``\"teste\"``\n(Vai tirar o comando personalizado \"teste\")",
+                        inline=False)
+        embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
+                        value=f"``{prefixo}remove_command``, ``{prefixo}rc``", inline=False)
+        embed.add_field(name=":exclamation:Requisitos:",
+                        value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
+        if not (ctx.guild is None):  # se a mensagem foi enviar num server
+            if 'adicionar_comando' in ComandoDesativadoDao().get_comandos(
+                    ctx.guild.id):  # verifica se o comando está ativo
+                embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
+                                value="**Se você usar este comando, o bot não ira responder!**",
+                                inline=False)
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['remove_command', 'rc'], description='Remove um comando personalizado')
+    @commands.guild_only()
+    async def remover_comando(self, ctx, comando=None):
+        if comando is None:
+            await self.help_remover_comando(ctx)
+            return
+        if ComandoPersonalizadoDao().delete(ctx.guild.id, comando):
+            embed = discord.Embed(title=f'Comando removido com sucesso!', colour=discord.Colour(random_color()),
+                                  description="<a:aeeee:754779905782448258>",
+                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
+            embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            await ctx.send(embed=embed)
 
 
 def setup(bot):

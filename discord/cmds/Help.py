@@ -7,7 +7,7 @@ __author__ = 'Rafael'
 from discord.ext import commands
 import discord
 from datetime import datetime
-from discord.Utils import pegar_o_prefixo, random_color
+from discord.Utils import random_color, pegar_o_prefixo
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
 
@@ -20,7 +20,7 @@ class Help(commands.Cog):
     async def help(self, ctx, comando = None):
         if comando is None:
             cor = random_color()
-            prefixo = pegar_o_prefixo(None, ctx)
+            prefixo = pegar_o_prefixo(ctx)
             embed = discord.Embed(title=f"``{prefixo}help``", colour=discord.Colour(cor),
                                   description="Mostra essa mensagem de ajuda!",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
