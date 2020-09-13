@@ -3,3 +3,4 @@ asyncio
 discord.py
 pandas
 psycopg2
+stopwatch.py

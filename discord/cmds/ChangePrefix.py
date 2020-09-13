@@ -1,6 +1,6 @@
 # coding=utf-8
 # Androxus bot
-# Change_prefix.py
+# ChangePrefix.py
 
 __author__ = 'Rafael'
 
@@ -9,11 +9,11 @@ from discord.ext import commands
 from discord.dao.ServidorDao import ServidorDao
 
 
-class Change_prefix(commands.Cog):
+class ChangePrefix(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['prefixo', 'prefix'])
+    @commands.command(aliases=['prefixo', 'prefix'], description='Comando que é usado para mudar o meu prefixo')
     async def change_prefix(self, ctx, prefixo_novo='--'):
         ServidorDao().update(ctx.guild.id, prefixo_novo)
         if prefixo_novo != '--':
@@ -24,4 +24,4 @@ class Change_prefix(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Change_prefix(bot))
+    bot.add_cog(ChangePrefix(bot))

@@ -11,7 +11,7 @@ class ErrorCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
+    """@commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         # font: https://gist.github.com/EvieePy/7822af90858ef65012ea500bcecf1612
 
@@ -36,9 +36,12 @@ class ErrorCommands(commands.Cog):
             return
         elif isinstance(error, commands.errors.NotOwner):
             await ctx.send(f'{ctx.author.mention} você não é meu criador ;-;')
+        elif isinstance(error, commands.errors.NoPrivateMessage):
+            await ctx.send(f'{ctx.author.mention} Este comando só pode ser usado em um servidor!')
         elif isinstance(error, Exception):
             if str(error).startswith('duplicate key value violates unique constraint'):
-                await ctx.send(f'Esse item já existe no banco ;-;')
+                await ctx.send(f'Esse item já existe ;-;')"""
+
 
 
 def setup(bot):

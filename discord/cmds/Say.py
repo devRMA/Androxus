@@ -11,7 +11,7 @@ class Say(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['fale', 'falar'])
+    @commands.command(aliases=['fale', 'falar'], description='Manda o bot falar uma frase xD')
     async def say(self, ctx, *, frase: str):
         try:
             if ctx.guild.me.guild_permissions.manage_messages:

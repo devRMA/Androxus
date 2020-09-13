@@ -12,7 +12,7 @@ class Blacklist(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['blacklisted', 'banido'])
+    @commands.command(aliases=['blacklisted', 'banido'], hidden=True)
     @commands.is_owner()
     async def blacklist(self, ctx, *, pessoaId : int):
         if not BlacklistDao().get_pessoa(pessoaId):
@@ -20,13 +20,13 @@ class Blacklist(commands.Cog):
         else:
             await ctx.send(f'Essa pessoa está banida de usar meus comandos!')
 
-    @commands.command(aliases=['ab'])
+    @commands.command(aliases=['ab'], hidden=True)
     @commands.is_owner()
     async def add_blacklist(self, ctx, *, pessoaId: int):
         BlacklistDao().create(pessoaId)
         await ctx.send('Usuário banido!')
 
-    @commands.command(aliases=['rb', 'whitelist'])
+    @commands.command(aliases=['rb', 'whitelist'], hidden=True)
     @commands.is_owner()
     async def remove_blacklist(self, ctx, *, pessoaId: int):
         BlacklistDao().delete(pessoaId)

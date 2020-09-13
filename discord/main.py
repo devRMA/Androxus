@@ -5,19 +5,11 @@
 __author__ = 'Rafael'
 
 from discord.dao.ServidorDao import ServidorDao
-from discord.dao.BlacklistDao import BlacklistDao
 from discord.ext import commands
 import discord
 from os import environ, listdir
 
-
-def pegar_o_prefixo(bot, message):
-    if message.guild != None:
-        prefixo = ServidorDao().get_prefix(message.guild.id)[0]
-        if prefixo != None:
-            return prefixo
-    return '--'
-
+from discord.Utils import pegar_o_prefixo
 
 bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657)
 bot.remove_command('help')  # remove o comando help que já vem
@@ -28,15 +20,29 @@ async def on_ready():
     print('Bot online :D')
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
-    print(f'link de acesso:\nhttps://discord.com/oauth2/authorize?client_id={bot.user.id}&scope=bot&permissions=8')
+    print(f'Versão do discord.py: {discord.__version__}')
+    print(
+        f'link para adicionar o bot:\nhttps://discord.com/oauth2/authorize?client_id={bot.user.id}&scope=bot&permissions=8')
+    from stopwatch import Stopwatch
+    msg = await bot.get_channel(753347222275620903).send('conexão com o banco iniciada')
+    stopwatch = Stopwatch()
+    print(pegar_o_prefixo(None, 753347222275620903))  # vai abrir a conexão com o banco, fazer um select, e fechar a conexão
+    stopwatch.stop()
+    await msg.edit(content=f'Demorou {str(stopwatch)} para abrir a conexão, fazer um select e fechar a conexao\n' +
+                   f'Latência do bot: {int(bot.latency * 1000)}ms')
     await bot.change_presence(activity=discord.Game(
         name='😁Caso você queira ver minha programação, acesse https://github.com/devRMA/Androxus'))
 
 
 @bot.event
 async def on_guild_join(guild):
-    if await ServidorDao.create(guild.id):
-        print(f'Servidor {guild} adicionado com sucesso!')
+    ServidorDao().create(guild.id)
+
+
+@bot.event
+async def on_guild_remove(guild):
+    ServidorDao().delete(guild.id)
+
 
 if __name__ == '__main__':
     try:

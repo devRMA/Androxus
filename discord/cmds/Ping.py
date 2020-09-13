@@ -12,7 +12,7 @@ class Ping(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['latency', 'latência'])
+    @commands.command(aliases=['latency', 'latência'], description='Mostra a latência do bot')
     async def ping(self, ctx):
         await ctx.send(f'Minha latência atual é de {int(self.bot.latency * 1000)}ms !')
 

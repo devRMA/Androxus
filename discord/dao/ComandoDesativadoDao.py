@@ -17,7 +17,7 @@ class ComandoDesativadoDao:
         if isinstance(serverId, int) and isinstance(comando, str):  # verifica se os tipos das variaveis
             try:
                 query = 'INSERT INTO comandos_desativados(serverId, comando) VALUES(%s, %s);'  # query
-                self.cursor.execute(query, (serverId, comando,))
+                self.cursor.execute(query, (serverId, comando.lower(),))
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
                 return True  # vai retornar True se tudo ocorrer bem
             except psycopg2.IntegrityError:
