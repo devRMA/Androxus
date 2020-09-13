@@ -32,7 +32,7 @@ class Help(commands.Cog):
             embed.add_field(
                 name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
                 value="<a:jotarodance:754702437901664338>", inline=False)
-            embed.add_field(name="Exemplos:",
+            embed.add_field(name="Exemplo:",
                             value=f"``{prefixo}help``\n(Vai mostrar essa mensagem)",
                             inline=False)
             embed.add_field(name="Outro exemplo:",

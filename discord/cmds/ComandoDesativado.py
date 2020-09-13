@@ -86,15 +86,12 @@ class ComandoDesativado(commands.Cog):
         if (comando is None):
             await self.help_desativar_comando(ctx)
             return
-        if ComandoDesativadoDao().create(ctx.guild.id, comando):
-            embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour(random_color()),
+        if ComandoDesativadoDao().delete(ctx.guild.id, comando):
+            embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
                                   description="<a:aeeee:754779905782448258>",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-            embed.add_field(name=f"Comando: {comando}",
-                            value="\uFEFF",
-                            inline=False)
             await ctx.send(embed=embed)
 
 
