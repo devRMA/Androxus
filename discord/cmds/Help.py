@@ -59,7 +59,7 @@ class Help(commands.Cog):
                                                        inline=True)
             if not (ctx.guild is None):  # comandos personalizados
                 comandos_personalizados = ComandoPersonalizadoDao().get_comandos(ctx.guild.id)
-                if len(comandos_personalizados) == 0:
+                if len(comandos_personalizados) != 0:
                     lista_de_comando.add_field(name='**Comandos personalizados:**',
                                                value='Estes sãos os comandos personalizados deste servidor. **Não precisam do prefixo**',
                                                inline=False)
