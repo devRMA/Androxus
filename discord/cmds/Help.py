@@ -49,13 +49,10 @@ class Help(commands.Cog):
             for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
                 for command in self.bot.get_cog(cog).get_commands():
                     if (not command.hidden):  # se o comando não estiver privado
-                        emoji = '<:desativado:754819961376997407>'
+                        emoji = '<a:check:754719579648950342>'
                         for c in comandos_desativados:
-                            await ctx.send(f'command: {command.name}')
-                            await ctx.send(f'todos os comandos: {c}')
-                            await ctx.send(f'comando na lista: {command.name in c}')
                             if command.name in c:
-                                emoji = '<a:check:754719579648950342>'
+                                emoji = '<:desativado:754819961376997407>'
                         if not (ctx.guild is None):  # se a mensagem foi enviar num server
                             lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
                                                        value=str(command.description),
@@ -72,14 +69,18 @@ class Help(commands.Cog):
                                                inline=False)
                     for comando_personalizado in comandos_personalizados:
                         if comando_personalizado[0] is not None:
+                            emoji = '<a:check:754719579648950342>'
+                            for c in comandos_desativados:
+                                if comando_personalizado[0] in c:
+                                    emoji = '<:desativado:754819961376997407>'
                             resposta = ComandoPersonalizadoDao().get_resposta(ctx.guild.id, comando_personalizado[0])
                             if resposta[-1]:  # se o inText estiver on:
                                 lista_de_comando.add_field(
-                                    name=f'<a:check:754719579648950342>``{comando_personalizado[0]}``',
+                                    name=f'{emoji}``{comando_personalizado[0]}``',
                                     value=f'Eu irei responder "{resposta[0]}"', inline=True)
                             else:
                                 lista_de_comando.add_field(
-                                    name=f'<a:check:754719579648950342>``{comando_personalizado[0]}``',
+                                    name=f'{emoji}``{comando_personalizado[0]}``',
                                     value=f'Eu irei responder "{resposta[0]}" **apenas se a mensagem iniciar com o comando**',
                                     inline=True)
             await ctx.send(embed=embed)
