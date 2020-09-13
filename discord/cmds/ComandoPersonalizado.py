@@ -108,7 +108,7 @@ class ComandoPersonalizado(commands.Cog):
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             await ctx.send(embed=embed)
 
-    @commands.command(hidden=True, aliases=['help modificar_comando', 'help update_command', 'help mc'],)
+    @commands.command(hidden=True,)
     async def help_modificar_comando(self, ctx):
         prefixo = pegar_o_prefixo(None, ctx)
         embed = discord.Embed(title=f"``{prefixo}modificar_comando``", colour=discord.Colour(random_color()),
@@ -146,7 +146,7 @@ class ComandoPersonalizado(commands.Cog):
         if (comando is None) or (resposta is None):
             await self.help_modificar_comando(ctx)
             return
-        if ComandoPersonalizadoDao().update(ctx.guild.id, comando):
+        if ComandoPersonalizadoDao().update(ctx.guild.id, comando, resposta, inText):
             embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f"<a:aeeee:754779905782448258>\nComando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText}",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
