@@ -41,7 +41,7 @@ class Help(commands.Cog):
             embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                             value=f"``{prefixo}ajuda``", inline=False)
             lista_de_comando = discord.Embed(title=f"Lista de comandos:", colour=discord.Colour(cor),
-                                  description="Esses são os comandos que eu tenho (todos abaixo precisam do prefixo)",
+                                  description="Estes são os comandos que eu tenho (todos abaixo precisam do prefixo)",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             lista_de_comando.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             lista_de_comando.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
@@ -61,7 +61,7 @@ class Help(commands.Cog):
                 comandos_personalizados = ComandoPersonalizadoDao().get_comandos(ctx.guild.id)
                 if comandos_personalizados is not None:
                     lista_de_comando.add_field(name='**Comandos personalizados:**',
-                                               value='Estes sãos os comandos personalizados deste servidor',
+                                               value='Estes sãos os comandos personalizados deste servidor. **Não precisam do prefixo**',
                                                inline=False)
                     for comando_personalizado in comandos_personalizados:
                         if comando_personalizado[0] is not None:
