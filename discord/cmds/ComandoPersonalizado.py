@@ -50,7 +50,16 @@ class ComandoPersonalizado(commands.Cog):
 
     @commands.command(aliases=['add_command', 'ac'], description='Adiciona comandos personalizados')
     @commands.guild_only()
-    async def adicionar_comando(self, ctx, comando=None, resposta=None, inText=False):
+    @commands.has_permissions(administrator=True)
+    async def adicionar_comando(self, ctx, comando=None, resposta=None, inText='t'):
+        if inText != None:
+            if inText in ['t', 'true', 's', 'sim', '1', 'y', 'yes']:
+                inText = True
+            elif inText in ['f', 'false', 'n', 'não', 'nao', '0', 'n', 'no']:
+                inText = False
+            else:
+                await ctx.send(f'Valor ``{inText}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
+                return
         if (comando is None) or (resposta is None):
             await self.help_adicionar_comando(ctx)
             return
@@ -96,6 +105,7 @@ class ComandoPersonalizado(commands.Cog):
 
     @commands.command(aliases=['remove_command', 'rc'], description='Remove um comando personalizado')
     @commands.guild_only()
+    @commands.has_permissions(administrator=True)
     async def remover_comando(self, ctx, comando=None):
         if comando is None:
             await self.help_remover_comando(ctx)
@@ -142,7 +152,16 @@ class ComandoPersonalizado(commands.Cog):
 
     @commands.command(aliases=['update_command', 'mc'], description='Modifica um comando personalizado')
     @commands.guild_only()
-    async def modificar_comando(self, ctx, comando=None, resposta=None, inText=False):
+    @commands.has_permissions(administrator=True)
+    async def modificar_comando(self, ctx, comando=None, resposta=None, inText='t'):
+        if inText != None:
+            if inText in ['t', 'true', 's', 'sim', '1', 'y', 'yes']:
+                inText = True
+            elif inText in ['f', 'false', 'n', 'não', 'nao', '0', 'n', 'no']:
+                inText = False
+            else:
+                await ctx.send(f'Valor ``{inText}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
+                return
         if (comando is None) or (resposta is None):
             await self.help_modificar_comando(ctx)
             return
