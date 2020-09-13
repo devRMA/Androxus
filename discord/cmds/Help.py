@@ -45,18 +45,19 @@ class Help(commands.Cog):
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             lista_de_comando.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             lista_de_comando.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            comandos_desativados = ComandoDesativadoDao().get_comandos(ctx.guild.id)
             for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
                 for command in self.bot.get_cog(cog).get_commands():
                     if (not command.hidden):  # se o comando não estiver privado
                         emoji = '<:desativado:754819961376997407>'
-                        print(ComandoDesativadoDao().get_comandos(ctx.guild.id))
+                        if command.name in comandos_desativados:
+                            emoji = '<a:check:754719579648950342>'
                         if not (ctx.guild is None):  # se a mensagem foi enviar num server
-                            if not (command.name in ComandoDesativadoDao().get_comandos(ctx.guild.id)):  # verifica se o comando está ativo
-                                lista_de_comando.add_field(name=f'<a:check:754719579648950342>``{command.name}``',
-                                                           value=str(command.description),
-                                                           inline=True)
+                            lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
+                                                       value=str(command.description),
+                                                       inline=True)
                         else:  # se foi enviada no dm, vai enviar todos os comandos
-                            lista_de_comando.add_field(name=f'<a:check:754719579648950342>``{command.name}``',
+                            lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
                                                        value=str(command.description),
                                                        inline=True)
             if not (ctx.guild is None):  # comandos personalizados
