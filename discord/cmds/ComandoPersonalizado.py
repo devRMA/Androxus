@@ -30,7 +30,7 @@ class ComandoPersonalizado(commands.Cog):
         embed.add_field(
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
             value="<a:jotarodance:754702437901664338>", inline=False)
-        embed.add_field(name="Exemplos:",
+        embed.add_field(name="Exemplo:",
                         value=f"``{prefixo}adicionar_comando`` ``\"oi\"`` ``\"oi!\"`` ``True``\n(Se você digitar esse comando, toda vez que alguém digitar \"oi\", o bot vai responder \"oi!\", independete de em qual lugar o \"oi\" estiver)",
                         inline=False)
         embed.add_field(name="Outro exemplo:",
@@ -103,6 +103,52 @@ class ComandoPersonalizado(commands.Cog):
         if ComandoPersonalizadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando removido com sucesso!', colour=discord.Colour(random_color()),
                                   description="<a:aeeee:754779905782448258>",
+                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
+            embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            await ctx.send(embed=embed)
+
+    @commands.command(hidden=True, aliases=['help modificar_comando', 'help update_command', 'help mc'],)
+    async def help_modificar_comando(self, ctx):
+        prefixo = pegar_o_prefixo(None, ctx)
+        embed = discord.Embed(title=f"``{prefixo}modificar_comando``", colour=discord.Colour(random_color()),
+                              description="Modifica um comando personalizado!",
+                              timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+        embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
+        embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+        embed.add_field(name="**Como usar?**",
+                        value=f"``{prefixo}modificar_comando`` ``\"<comando>\"`` ``\"<resposta>\"`` ``[ignorar_posição]``",
+                        inline=False)
+        embed.add_field(
+            name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
+            value="<a:jotarodance:754702437901664338>", inline=False)
+        embed.add_field(name="Exemplos:",
+                        value=f"``{prefixo}modificar_comando`` ``\"oi\"`` ``\"oi!\"`` ``True``\n(Modifica o comando que já existe)",
+                        inline=False)
+        embed.add_field(name="Outro exemplo:",
+                        value=f"``{prefixo}modificar_comando`` ``\"bom dia\"`` ``\"Bom dia!!!\"``\n(Modifica o comando que já existe)",
+                        inline=False)
+        embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
+                        value=f"``{prefixo}update_command``, ``{prefixo}mc``", inline=False)
+        embed.add_field(name=":exclamation:Requisitos:",
+                        value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
+        if not (ctx.guild is None):  # se a mensagem foi enviar num server
+            if 'adicionar_comando' in ComandoDesativadoDao().get_comandos(
+                    ctx.guild.id):  # verifica se o comando está ativo
+                embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
+                                value="**Se você usar este comando, o bot não ira responder!**",
+                                inline=False)
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['update_command', 'mc'], description='Modifica um comando personalizado')
+    @commands.guild_only()
+    async def modificar_comando(self, ctx, comando=None, resposta=None, inText=False):
+        if (comando is None) or (resposta is None):
+            await self.help_modificar_comando(ctx)
+            return
+        if ComandoPersonalizadoDao().update(ctx.guild.id, comando):
+            embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour(random_color()),
+                                  description=f"<a:aeeee:754779905782448258>\nComando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText}",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")

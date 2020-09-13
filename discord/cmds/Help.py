@@ -27,7 +27,7 @@ class Help(commands.Cog):
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             embed.add_field(name="**Como usar?**",
-                            value=f"``{prefixo}help`` ``[comando]``",
+                            value=f"``{prefixo}help`` ``[comando_completo]``",
                             inline=False)
             embed.add_field(
                 name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
