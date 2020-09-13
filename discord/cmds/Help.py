@@ -50,8 +50,12 @@ class Help(commands.Cog):
                 for command in self.bot.get_cog(cog).get_commands():
                     if (not command.hidden):  # se o comando não estiver privado
                         emoji = '<:desativado:754819961376997407>'
-                        if command.name in comandos_desativados:
-                            emoji = '<a:check:754719579648950342>'
+                        for c in comandos_desativados:
+                            await ctx.send(f'command: {command.name}')
+                            await ctx.send(f'todos os comandos: {c}')
+                            await ctx.send(f'comando na lista: {command.name in c}')
+                            if command.name in c:
+                                emoji = '<a:check:754719579648950342>'
                         if not (ctx.guild is None):  # se a mensagem foi enviar num server
                             lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
                                                        value=str(command.description),
