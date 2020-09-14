@@ -17,8 +17,8 @@ class Help(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda')
-    async def help(self, ctx, comando = None):
-        if comando is None:
+    async def help(self, ctx, *comando):
+        if len(comando) == 0:
             cor = random_color()
             prefixo = pegar_o_prefixo(None, ctx)
             embed = discord.Embed(title=f"``{prefixo}help``", colour=discord.Colour(cor),
@@ -86,12 +86,13 @@ class Help(commands.Cog):
             await ctx.send(embed=embed)
             await ctx.send(embed=lista_de_comando)
         else:
+            comando = ' '.join(comando)
             for cog in self.bot.cogs:  # Abre todos os cogs que o bot têm
                 for command in self.bot.get_cog(cog).get_commands(): # pega todos os comandos do cog
                     if (str(command) == f'help_{comando.lower()}') or (f'help_{comando.lower()}' in command.aliases):  # se o comando for help_comando
                         await command(ctx) # chama ele xD
                         return
-            await ctx.send(f'Comando ``{comando}``não encontrado!\nVerifique se você escreveu o comando certo.\nobs:'+
+            await ctx.send(f'Comando ``{comando}`` não encontrado!\nVerifique se você escreveu o comando certo.\nobs:'+
                            'o comando "help" não funciona em comandos personalizados')
             return
 
