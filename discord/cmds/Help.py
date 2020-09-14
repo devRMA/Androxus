@@ -95,6 +95,7 @@ class Help(commands.Cog):
             await ctx.send(f'Comando ``{comando}`` não encontrado!\nVerifique se você escreveu o comando certo.\nobs:'+
                            'o comando "help" não funciona em comandos personalizados')
             return
+        return  # se o comando for executado, vai parar de verificar os comandos
 
 
 def setup(bot):
