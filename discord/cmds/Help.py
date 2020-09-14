@@ -92,10 +92,9 @@ class Help(commands.Cog):
                     if (str(command) == f'help_{comando.lower()}') or (f'help_{comando.lower()}' in command.aliases):  # se o comando for help_comando
                         await command(ctx) # chama ele xD
                         return
-            await ctx.send(f'Comando ``{comando}`` não encontrado!\nVerifique se você escreveu o comando certo.\nobs:'+
+            await ctx.send(f'Não consegui achar a ajuda para o comando ``{comando}``!\nVerifique se você escreveu o comando certo.\nobs:'+
                            'o comando "help" não funciona em comandos personalizados')
             return
-        return  # se o comando for executado, vai parar de verificar os comandos
 
 
 def setup(bot):
