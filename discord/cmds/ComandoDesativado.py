@@ -15,7 +15,7 @@ class ComandoDesativado(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=['help_disable_command', 'help_dc'])
     async def help_desativar_comando(self, ctx):
         prefixo = pegar_o_prefixo(None, ctx)
         embed = discord.Embed(title=f"``{prefixo}desativar_comando``", colour=discord.Colour(random_color()),
@@ -56,7 +56,7 @@ class ComandoDesativado(commands.Cog):
                             inline=False)
             await ctx.send(embed=embed)
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=['help_reactivate_command'])
     async def help_reativar_comando(self, ctx):
         prefixo = pegar_o_prefixo(None, ctx)
         embed = discord.Embed(title=f"``{prefixo}reativar_comando``", colour=discord.Colour(random_color()),
@@ -71,10 +71,10 @@ class ComandoDesativado(commands.Cog):
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
             value="<a:jotarodance:754702437901664338>", inline=False)
         embed.add_field(name="Exemplo:",
-                        value=f"``{prefixo}reativar_comando`` ``say``\n(Esse comando reativa o comando \"say\" no seu servidor!)",
+                        value=f"``{prefixo}reativar_comando`` ``\"say\"``\n(Esse comando reativa o comando \"say\" no seu servidor!)",
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
-                        value=f"``{prefixo}reativar_comando``", inline=False)
+                        value=f"``{prefixo}reactivate_command``", inline=False)
         embed.add_field(name=":exclamation:Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)

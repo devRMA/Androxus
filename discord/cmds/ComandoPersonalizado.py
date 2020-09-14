@@ -16,7 +16,7 @@ class ComandoPersonalizado(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=['help_add_command', 'help_ac'])
     async def help_adicionar_comando(self, ctx):
         prefixo = pegar_o_prefixo(None, ctx)
         embed = discord.Embed(title=f"``{prefixo}adicionar_comando``", colour=discord.Colour(random_color()),
@@ -52,6 +52,7 @@ class ComandoPersonalizado(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def adicionar_comando(self, ctx, comando=None, resposta=None, inText='t'):
+        inText = inText.lower()
         if inText != None:
             if inText in ['t', 'true', 's', 'sim', '1', 'y', 'yes']:
                 inText = True
@@ -74,7 +75,7 @@ class ComandoPersonalizado(commands.Cog):
                             inline=False)
             await ctx.send(embed=embed)
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=['help_remove_command', 'help_rc'])
     async def help_remover_comando(self, ctx):
         prefixo = pegar_o_prefixo(None, ctx)
         embed = discord.Embed(title=f"``{prefixo}remover_comando``", colour=discord.Colour(random_color()),
@@ -118,7 +119,7 @@ class ComandoPersonalizado(commands.Cog):
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             await ctx.send(embed=embed)
 
-    @commands.command(hidden=True,)
+    @commands.command(hidden=True, aliases=['help_update_command', 'help_mc'])
     async def help_modificar_comando(self, ctx):
         prefixo = pegar_o_prefixo(None, ctx)
         embed = discord.Embed(title=f"``{prefixo}modificar_comando``", colour=discord.Colour(random_color()),
@@ -154,6 +155,7 @@ class ComandoPersonalizado(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def modificar_comando(self, ctx, comando=None, resposta=None, inText='t'):
+        inText = inText.lower()
         if inText != None:
             if inText in ['t', 'true', 's', 'sim', '1', 'y', 'yes']:
                 inText = True

@@ -88,10 +88,11 @@ class Help(commands.Cog):
         else:
             for cog in self.bot.cogs:  # Abre todos os cogs que o bot têm
                 for command in self.bot.get_cog(cog).get_commands(): # pega todos os comandos do cog
-                    if str(command) == f'help_{comando.lower()}':  # se o comando for help_comando
+                    if (str(command) == f'help_{comando.lower()}') or (f'help_{comando.lower()}' in command.aliases):  # se o comando for help_comando
                         await command(ctx) # chama ele xD
                         return
-            await ctx.send(f'Comando não encontrado')
+            await ctx.send(f'Comando ``{comando}``não encontrado!\nVerifique se você escreveu o comando certo.\nobs:'+
+                           'o comando "help" não funciona em comandos personalizados')
             return
 
 
