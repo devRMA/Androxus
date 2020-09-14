@@ -30,21 +30,21 @@ class GetEmoji(commands.Cog):
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
             value="<a:jotarodance:754702437901664338>", inline=False)
         embed.add_field(name="Exemplo:",
-                        value=f"``{prefixo}emoji`` ``<a:hello:754111280184295456>``\n(Eu vou enviar o link do emoji)",
+                        value=f"``{prefixo}emoji`` <a:hello:754111280184295456>\n(Eu vou enviar o link do emoji)",
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                         value=f"``{prefixo}get_emoji``", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['emoji'], description='Pega o link de um emoji.')
-    async def get_emoji(self, ctx, emoji = None):
+    async def get_emoji(self, ctx, emoji : discord.Emoji = None):
         if (emoji is None):
             await self.help_get_emoji(ctx)
             return
         if not isinstance(emoji, discord.Emoji):
             await ctx.send(f'Não consegui encontrar o emoji {emoji} ;-;')
             return
-        ctx.send(emoji.url)
+        await ctx.send(emoji.url)
 
 def setup(bot):
     bot.add_cog(GetEmoji(bot))
