@@ -42,7 +42,7 @@ class ComandoDesativado(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def desativar_comando(self, ctx, comando=None):
-        if (comando is None) or (comando.lower() == 'desativar_comando'):
+        if (comando is None) or (comando.lower() == 'desativar_comando') or (comando.lower() == 'reativar_comando'):
             await self.help_desativar_comando(ctx)
             return
         if ComandoDesativadoDao().create(ctx.guild.id, comando):
