@@ -44,9 +44,10 @@ async def on_message(message):
     if BlacklistDao().get_pessoa(message.author.id) or message.author.bot: return
     if message.guild is not None:  # Se foi usado num server, vai ver se o comando está desativado
         for comandos_desativados in ComandoDesativadoDao().get_comandos(message.guild.id):
-            if message.content.lower().replace(prefixo, '') in comandos_desativados:
-                await message.channel.send(f'Este comando foi desativado ;-;')
-                return
+            for palavra in message.content.lower().replace(prefixo, '').split(' '):
+                if palavra in comandos_desativados:
+                    await message.channel.send(f'Este comando foi desativado ;-;')
+                    return
     if message.author.id == bot.user.id: return
     await bot.process_commands(message)  # Vai para os comandos cogs
 
