@@ -45,7 +45,10 @@ class Help(commands.Cog):
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             lista_de_comando.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             lista_de_comando.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-            comandos_desativados = ComandoDesativadoDao().get_comandos(ctx.guild.id)
+            if ctx.guild is not None:
+                comandos_desativados = ComandoDesativadoDao().get_comandos(ctx.guild.id)
+            else:
+                comandos_desativados = []
             for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
                 for command in self.bot.get_cog(cog).get_commands():
                     if (not command.hidden):  # se o comando não estiver privado
@@ -61,7 +64,7 @@ class Help(commands.Cog):
                             lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
                                                        value=str(command.description),
                                                        inline=True)
-            if not (ctx.guild is None):  # comandos personalizados
+            if ctx.guild is not None:  # comandos personalizados
                 comandos_personalizados = ComandoPersonalizadoDao().get_comandos(ctx.guild.id)
                 if len(comandos_personalizados) != 0:
                     lista_de_comando.add_field(name='**Comandos personalizados:**',
