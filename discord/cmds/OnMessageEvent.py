@@ -24,10 +24,15 @@ class OnMessageEvent(commands.Cog):
         if message.author.id == self.bot.user.id: return
         channel = message.channel
         mensagem_formatada = message.content.lower()
+        prefixo = pegar_o_prefixo(None, message)
         lixos = '!@#$%*()-_=+[{]}/?ç´~;.,<>^\\|\'" '
         for char in lixos:
             mensagem_formatada = mensagem_formatada.replace(char, '')
-        if not (message.guild is None):
+        if message.guild is not None:  # se a mensagem foi enviar num servidor
+            for cog in self.bot.cogs:  # verifica se a mensagem, vai ser chamada por algum comando
+                for command in self.bot.get_cog(cog).get_commands():
+                    if message.content.lower().startswith(f'{prefixo}{command.name}'):  # se achar o comando
+                        return  # para
             for comando in ComandoPersonalizadoDao().get_comandos(message.guild.id):
                 if comando[0].lower() in message.content.lower():
                     resposta, inText = ComandoPersonalizadoDao().get_resposta(message.guild.id, comando[0])
@@ -36,8 +41,8 @@ class OnMessageEvent(commands.Cog):
                             return
                     await channel.send(resposta)
                     return
-        if (f'<@{str(self.bot.user.id)}>' in message.content) or (f'<@!{str(self.bot.user.id)}>' in message.content):
-            await channel.send(f'Use o comando ``{pegar_o_prefixo(None, message)}help`` para obter ajuda! xD')
+        if (f'<@{str(self.bot.user.id)}>' == message.content) or (f'<@!{str(self.bot.user.id)}>' == message.content):
+            await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda! xD')
 
 
 def setup(bot):

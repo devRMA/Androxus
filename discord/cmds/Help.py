@@ -92,8 +92,17 @@ class Help(commands.Cog):
                     if (str(command) == f'help_{comando.lower()}') or (f'help_{comando.lower()}' in command.aliases):  # se o comando for help_comando
                         await command(ctx) # chama ele xD
                         return
-            await ctx.send(f'Não consegui achar a ajuda para o comando ``{comando}``!\nVerifique se você escreveu o comando certo.\nobs:'+
-                           'o comando "help" não funciona em comandos personalizados')
+            cor = random_color()
+            prefixo = pegar_o_prefixo(None, ctx)
+            embed = discord.Embed(title='Comando não encontrado <a:sad:755444816757915678>', colour=discord.Colour(cor),
+                                  description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
+                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+            embed.set_author(name="Androxus", icon_url=f'{self.bot.user.avatar_url}')
+            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            embed.add_field(name='**Possiveis soluções:**',
+                            value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para comnados padrões. Comandos personalizados nçao têm ajuda.```',
+                            inline=False)
+            await ctx.send(content=ctx.author.mention, embed=embed)
             return
 
 

@@ -5,6 +5,9 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
+import discord
+from discord.Utils import pegar_o_prefixo, random_color
+from datetime import datetime
 
 
 
@@ -12,7 +15,25 @@ class Ping(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['latency', 'latência'], description='Mostra a latência do bot')
+    @commands.command(hidden=True, aliases=['help_latency', 'help_latência'])
+    async def help_ping(self, ctx):
+        prefixo = pegar_o_prefixo(None, ctx)
+        embed = discord.Embed(title=f"``{prefixo}ping``", colour=discord.Colour(random_color()),
+                              description="Mostra a minha latência atual!",
+                              timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+        embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
+        embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+        embed.add_field(name="**Como usar?**",
+                        value=f"``{prefixo}ping``",
+                        inline=False)
+        embed.add_field(name="Exemplo:",
+                        value=f"``{prefixo}ping``",
+                        inline=False)
+        embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
+                        value=f"``{prefixo}latency``, ``{prefixo}latência``", inline=False)
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['latency', 'latência'], description='Mostra a minha latência atual.')
     async def ping(self, ctx):
         await ctx.send(f'Minha latência atual é de {int(self.bot.latency * 1000)}ms !')
 
