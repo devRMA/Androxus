@@ -38,9 +38,9 @@ class ChangePrefix(commands.Cog):
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
+    # @commands.has_permissions(administrator=True)
     @commands.command(aliases=['prefixo', 'prefix'], description='Comando que é usado para mudar o meu prefixo')
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     async def change_prefix(self, ctx, prefixo_novo='--'):
         ServidorDao().update(ctx.guild.id, prefixo_novo)
         if prefixo_novo != '--':

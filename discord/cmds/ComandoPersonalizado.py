@@ -48,9 +48,9 @@ class ComandoPersonalizado(commands.Cog):
                                 inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
+    #@commands.has_permissions(administrator=True)
     @commands.command(aliases=['add_command', 'ac'], description='Adiciona comandos personalizados')
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     async def adicionar_comando(self, ctx, comando=None, resposta=None, inText='t'):
         inText = inText.lower()
         if inText != None:
@@ -104,9 +104,9 @@ class ComandoPersonalizado(commands.Cog):
                                 inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
+    #@commands.has_permissions(administrator=True)
     @commands.command(aliases=['remove_command', 'rc'], description='Remove um comando personalizado')
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     async def remover_comando(self, ctx, comando=None):
         if comando is None:
             await self.help_remover_comando(ctx)
@@ -151,9 +151,9 @@ class ComandoPersonalizado(commands.Cog):
                                 inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
+    #@commands.has_permissions(administrator=True)
     @commands.command(aliases=['update_command', 'mc'], description='Modifica um comando personalizado')
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     async def modificar_comando(self, ctx, comando=None, resposta=None, inText='t'):
         inText = inText.lower()
         if inText != None:

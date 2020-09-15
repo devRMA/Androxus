@@ -38,9 +38,9 @@ class ComandoDesativado(commands.Cog):
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
+    #@commands.has_permissions(administrator=True)
     @commands.command(aliases=['disable_command', 'dc'], description='Desativa comandos!')
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     async def desativar_comando(self, ctx, comando=None):
         if (comando is None) or (comando.lower() == 'desativar_comando') or (comando.lower() == 'reativar_comando'):
             await self.help_desativar_comando(ctx)
@@ -79,9 +79,9 @@ class ComandoDesativado(commands.Cog):
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
+    #@commands.has_permissions(administrator=True)
     @commands.command(aliases=['reactivate_command'], description='Reativa comando!')
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
     async def reativar_comando(self, ctx, comando=None):
         if (comando is None):
             await self.help_desativar_comando(ctx)
