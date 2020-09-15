@@ -20,15 +20,11 @@ class OnMessageEvent(commands.Cog):
         # A mesma verificação do "main.py", só para garantir
         prefixo = pegar_o_prefixo(None, message)
         if BlacklistDao().get_pessoa(message.author.id) or message.author.bot: return
+        if message.author.id == self.bot.user.id: return
         if message.guild is not None:  # Se foi usado num server, vai ver se o comando está desativado
             for comandos_desativados in ComandoDesativadoDao().get_comandos(message.guild.id):
-                for palavra in message.content.lower().replace(prefixo, '').split(' '):
-                    if (palavra == 'reativar_comando') or (palavra == 'reactivate_command'):
-                        break
-                    if palavra in comandos_desativados:
-                        await message.channel.send(f'Este comando foi desativado ;-;')
-                        return
-        if message.author.id == self.bot.user.id: return
+                if message.content.lower().replace(prefixo, '').split(' ')[0] in comandos_desativados:
+                    return
         channel = message.channel
         mensagem_formatada = message.content.lower()
         prefixo = pegar_o_prefixo(None, message)
