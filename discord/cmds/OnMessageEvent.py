@@ -23,7 +23,6 @@ class OnMessageEvent(commands.Cog):
         if message.guild is not None:  # Se foi usado num server, vai ver se o comando está desativado
             for comandos_desativados in ComandoDesativadoDao().get_comandos(message.guild.id):
                 if message.content.lower().replace(prefixo, '') in comandos_desativados:
-                    await message.channel.send(f'Este comando foi desativado ;-;')
                     return
         if message.author.id == self.bot.user.id: return
         channel = message.channel
