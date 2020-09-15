@@ -17,10 +17,14 @@ class OnMessageEvent(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        # verifica se a pessoa pode usar o comando, verifica se o comando está ativado e verifica se a pessoa é um bot
+        # A mesma verificação do "main.py", só para garantir
+        prefixo = pegar_o_prefixo(None, message)
         if BlacklistDao().get_pessoa(message.author.id) or message.author.bot: return
-        if not (message.guild is None):  # Se foi usado num server, vai ver se o comando está desativado
-            if message.content.lower() in ComandoDesativadoDao().get_comandos(message.guild.id): return
+        if message.guild is not None:  # Se foi usado num server, vai ver se o comando está desativado
+            for comandos_desativados in ComandoDesativadoDao().get_comandos(message.guild.id):
+                if message.content.lower().replace(prefixo, '') in comandos_desativados:
+                    await message.channel.send(f'Este comando foi desativado ;-;')
+                    return
         if message.author.id == self.bot.user.id: return
         channel = message.channel
         mensagem_formatada = message.content.lower()
