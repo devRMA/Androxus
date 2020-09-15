@@ -11,7 +11,7 @@ class ErrorCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
+    """@commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         # font: https://gist.github.com/EvieePy/7822af90858ef65012ea500bcecf1612
 
@@ -45,7 +45,7 @@ class ErrorCommands(commands.Cog):
             try:
                 await ctx.send(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
             except:
-                print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
+                print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')"""
 
 
 def setup(bot):
