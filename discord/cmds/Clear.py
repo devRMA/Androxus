@@ -20,6 +20,7 @@ class Clear(commands.Cog):
         aliases = ['limpar', 'clear']
         embed = discord.Embed(title='WolfZ - Ajuda - Clean', description='', color=0x0000ff, url='https://wolfz-bot.glitch.me', timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
         embed.set_author(name='===By yWolfBR#1330===')
+        embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
         embed.set_thumbnail(url='https://media.discordapp.net/attachments/755521679337455729/755521704800813246/WolfZ.png')
         embed.add_field(name=':duvida: **Como usar?**', value='**`--clean + Quantidade`**', inline=False)
         for c in range(0, len(aliases)):
