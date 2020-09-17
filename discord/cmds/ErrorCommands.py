@@ -39,10 +39,10 @@ class ErrorCommands(commands.Cog):
         elif isinstance(error, commands.errors.NoPrivateMessage):
             await ctx.send(f'{ctx.author.mention} Este comando só pode ser usado num servidor! <a:atencao:755844029333110815>')
         elif isinstance(error, commands.errors.MissingPermissions):
-            await ctx.send(f'{ctx.author.mention} Você precisa ter permissão de {error.missing_perms} para usar este comando!')
+            await ctx.send(f'{ctx.author.mention} Você precisa ter permissão de ``{error.missing_perms[0]}`` para usar este comando!')
         elif isinstance(error, commands.errors.BotMissingPermissions):
             await ctx.send(f'{ctx.author.mention} Eu não posso usar este comando, pois não tenho permissão de ' +
-                           f'{error.missing_perms} neste servidor! <a:sad:755774681008832623>')
+                           f'``{error.missing_perms[0]}`` neste servidor! <a:sad:755774681008832623>')
         elif isinstance(error, Exception):
             if str(error).startswith('duplicate key value violates unique constraint'):
                 await ctx.send(f'Esse item já está cadastrado! <a:atencao:755844029333110815>')
