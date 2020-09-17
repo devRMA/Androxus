@@ -21,7 +21,7 @@ class Clear(commands.Cog):
         embed.set_author(name='===By yWolfBR#1330===')
         embed.set_thumbnail(url='https://media.discordapp.net/attachments/755521679337455729/755521704800813246/WolfZ.png')
         embed.add_field(name=':duvida: **Como usar?**', value='**`--clean + Quantidade`**', inline=False)
-        for c in range(0, aliases):
+        for c in range(0, len(aliases)):
             aliases[c] = f'{self.prefixo}{aliases[c]}'
         embed.add_field(name=':igual: **Sinônimos**', value=', '.join(aliases), inline=False)
         embed.set_footer(text='https://wolfz-bot.glitch.me')
