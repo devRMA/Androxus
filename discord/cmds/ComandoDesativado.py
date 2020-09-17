@@ -7,7 +7,7 @@ __author__ = 'Rafael'
 from datetime import datetime
 from discord.ext import commands
 import discord
-from discord.Utils import random_color, pegar_o_prefixo
+from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 
 
@@ -28,13 +28,13 @@ class ComandoDesativado(commands.Cog):
                         inline=False)
         embed.add_field(
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
-            value="<a:jotarodance:754702437901664338>", inline=False)
+            value=get_emoji_dance(), inline=False)
         embed.add_field(name="Exemplo:",
                         value=f"``{prefixo}desativar_comando`` ``say``\n(Esse comando desativa o comando \"say\" no seu servidor!)",
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                         value=f"``{prefixo}disable_command``, ``{prefixo}dc``", inline=False)
-        embed.add_field(name=":exclamation:Requisitos:",
+        embed.add_field(name="<a:atencao:755844029333110815> Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
@@ -42,16 +42,26 @@ class ComandoDesativado(commands.Cog):
     @commands.command(aliases=['disable_command', 'dc'], description='Desativa comandos!')
     @commands.guild_only()
     async def desativar_comando(self, ctx, comando=None):
-        if (comando is None) or (comando.lower() == 'desativar_comando') or (comando.lower() == 'reativar_comando'):
-            await self.help_desativar_comando(ctx)
+        comandos_que_nao_podem_ser_desativados = ['desativar_comando',
+                                                  'disable_command',
+                                                  'dc',
+                                                  'reativar_comando',
+                                                  'reactivate_command',
+                                                  'change_prefix',
+                                                  'prefixo',
+                                                  'prefix'
+                                                  'help',
+                                                  'ajuda']
+        if (comando is None) or (comando.lower() in comandos_que_nao_podem_ser_desativados):
+            await ctx.send('Você não pode desativar este comando! <a:no_no:755774680325029889>')
             return
         if ComandoDesativadoDao().create(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour(random_color()),
-                                  description="<a:aeeee:754779905782448258>",
+                                  description='<a:off:755774680660574268>',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-            embed.add_field(name=f"Comando: {comando}",
+            embed.add_field(name=f"Comando desativado: {comando}",
                             value="\uFEFF",
                             inline=False)
             await ctx.send(embed=embed)
@@ -69,13 +79,13 @@ class ComandoDesativado(commands.Cog):
                         inline=False)
         embed.add_field(
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
-            value="<a:jotarodance:754702437901664338>", inline=False)
+            value=get_emoji_dance(), inline=False)
         embed.add_field(name="Exemplo:",
                         value=f"``{prefixo}reativar_comando`` ``\"say\"``\n(Esse comando reativa o comando \"say\" no seu servidor!)",
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                         value=f"``{prefixo}reactivate_command``", inline=False)
-        embed.add_field(name=":exclamation:Requisitos:",
+        embed.add_field(name="<a:atencao:755844029333110815> Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
@@ -88,8 +98,11 @@ class ComandoDesativado(commands.Cog):
             return
         if ComandoDesativadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
-                                  description="<a:aeeee:754779905782448258>",
+                                  description='<a:on:755774680580882562>',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+            embed.add_field(name=f"Comando reativado: {comando}",
+                            value="\uFEFF",
+                            inline=False)
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             await ctx.send(embed=embed)

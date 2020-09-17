@@ -19,8 +19,7 @@ class OnEditEvent(commands.Cog):
         if not (after.guild is None):  # Se foi usado num server, vai ver se o comando está desativado
             if after.content.lower() in ComandoDesativadoDao().get_comandos(after.guild.id): return
         if after.author.id == self.bot.user.id: return
-        await self.bot.process_commands(
-            after)  # se a pessoa editar a mensagem, verifica se ela editou para um comando valido
+        await self.bot.process_commands(after)  # se a pessoa editar a mensagem, verifica se ela editou para um comando valido
 
 
 def setup(bot):

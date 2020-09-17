@@ -28,9 +28,6 @@ class OnMessageEvent(commands.Cog):
         channel = message.channel
         mensagem_formatada = message.content.lower()
         prefixo = pegar_o_prefixo(None, message)
-        lixos = '!@#$%*()-_=+[{]}/?ç´~;.,<>^\\|\'" '
-        for char in lixos:
-            mensagem_formatada = mensagem_formatada.replace(char, '')
         if message.guild is not None:  # se a mensagem foi enviar num servidor
             for cog in self.bot.cogs:  # verifica se a mensagem, vai ser chamada por algum comando
                 for command in self.bot.get_cog(cog).get_commands():
@@ -45,7 +42,8 @@ class OnMessageEvent(commands.Cog):
                     await channel.send(resposta)
                     return
         if (f'<@{str(self.bot.user.id)}>' == message.content) or (f'<@!{str(self.bot.user.id)}>' == message.content):
-            await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda! xD')
+            await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda!')
+            await channel.send('<a:hello:755774680949850173>')
 
 
 def setup(bot):

@@ -7,7 +7,7 @@ __author__ = 'Rafael'
 from discord.ext import commands
 import discord
 from discord.dao.ServidorDao import ServidorDao
-from discord.Utils import pegar_o_prefixo, random_color
+from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
 from datetime import datetime
 
 
@@ -28,13 +28,13 @@ class ChangePrefix(commands.Cog):
                         inline=False)
         embed.add_field(
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
-            value="<a:jotarodance:754702437901664338>", inline=False)
+            value=get_emoji_dance(), inline=False)
         embed.add_field(name="Exemplo:",
                         value=f"``{prefixo}change_prefix`` ``!!``\n(Muda o prefixo para \"!!\")",
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                         value=f"``{prefixo}prefixo``, ``{prefixo}prefix``", inline=False)
-        embed.add_field(name=":exclamation:Requisitos:",
+        embed.add_field(name="<a:atencao:755844029333110815> Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
@@ -45,9 +45,10 @@ class ChangePrefix(commands.Cog):
         ServidorDao().update(ctx.guild.id, prefixo_novo)
         if prefixo_novo != '--':
             await ctx.send(
-                f'Agora o meu  prefixo é ``{prefixo_novo}``\nCaso queria voltar para o prefixo padrão, basta digitar ``{prefixo_novo}prefixo``')
+                f'Agora o meu  prefixo é ``{prefixo_novo}``\nCaso queria voltar para o prefixo padrão, basta digitar ' +
+                f'``{prefixo_novo}prefixo``\n{get_emoji_dance()}')
         else:
-            await ctx.send(f'Agora estou com o prefixo padrão!')
+            await ctx.send(f'Agora estou com o prefixo padrão! {get_emoji_dance()}')
 
 
 def setup(bot):

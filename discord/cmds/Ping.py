@@ -41,7 +41,7 @@ class Ping(commands.Cog):
         pegar_o_prefixo(None, ctx) # abre uma conexão, faz um select no banco, e fecha
         stopwatch_banco.stop()
         await mensagem_do_bot.edit(content=f'Latência da API do discord: {int(self.bot.latency * 1000)}ms!\n' +
-                                           f'Latência com o banco de dados: {str(stopwatch_banco)}!\n')
+                                           f'Latência com o banco de dados: {str(stopwatch_banco)}!\n<a:hello:755774680949850173>')
 
 
 def setup(bot):

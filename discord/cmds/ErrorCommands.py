@@ -35,15 +35,15 @@ class ErrorCommands(commands.Cog):
         if isinstance(error, ignored):
             return
         elif isinstance(error, commands.errors.NotOwner):
-            await ctx.send(f'{ctx.author.mention} você não é meu criador ;-;')
+            await ctx.send(f'{ctx.author.mention} você não é meu criador <a:no_no:755774680325029889>')
         elif isinstance(error, commands.errors.NoPrivateMessage):
-            await ctx.send(f'{ctx.author.mention} Este comando só pode ser usado em um servidor!')
+            await ctx.send(f'{ctx.author.mention} Este comando só pode ser usado num servidor! <a:atencao:755844029333110815>')
         elif isinstance(error, Exception):
             if str(error).startswith('duplicate key value violates unique constraint'):
-                await ctx.send(f'Esse item já existe ;-;')
+                await ctx.send(f'Esse item já está cadastrado! <a:atencao:755844029333110815>')
         else:
             try:
-                await ctx.send(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
+                await ctx.send(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}\n<a:sad:755774681008832623>')
             except:
                 print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
 

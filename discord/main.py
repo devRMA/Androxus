@@ -46,7 +46,7 @@ async def on_message(message):
     if message.guild is not None:  # Se foi usado num server, vai ver se o comando está desativado
         for comandos_desativados in ComandoDesativadoDao().get_comandos(message.guild.id):
             if message.content.lower().replace(prefixo, '').split(' ')[0] in comandos_desativados:
-                await message.channel.send(f'<a:no_no:755488955994210454> Este comando foi desativado por um administrador do servidor!')
+                await message.channel.send(f'<a:no_no:755774680325029889> Este comando foi desativado por um administrador do servidor!')
                 return
     await bot.process_commands(message)  # Vai para os comandos cogs
 

@@ -8,7 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
-from discord.Utils import random_color, pegar_o_prefixo
+from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 
 
@@ -29,7 +29,7 @@ class ComandoPersonalizado(commands.Cog):
                         inline=False)
         embed.add_field(
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
-            value="<a:jotarodance:754702437901664338>", inline=False)
+            value=get_emoji_dance(), inline=False)
         embed.add_field(name="Exemplo:",
                         value=f"``{prefixo}adicionar_comando`` ``\"oi\"`` ``\"oi!\"`` ``True``\n(Se você digitar esse comando, toda vez que alguém digitar \"oi\", o bot vai responder \"oi!\", independete de em qual lugar o \"oi\" estiver)",
                         inline=False)
@@ -38,14 +38,15 @@ class ComandoPersonalizado(commands.Cog):
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                         value=f"``{prefixo}add_command``, ``{prefixo}ac``", inline=False)
-        embed.add_field(name=":exclamation:Requisitos:",
+        embed.add_field(name="<a:atencao:755844029333110815> Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         if not (ctx.guild is None):  # se a mensagem foi enviar num server
-            if 'adicionar_comando' in ComandoDesativadoDao().get_comandos(
-                    ctx.guild.id):  # verifica se o comando está ativo
-                embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
-                                value="**Se você usar este comando, o bot não ira responder!**",
-                                inline=False)
+            for comando_desativado in ComandoDesativadoDao().get_comandos(ctx.guild.id):
+                if ('adicionar_comando' in comando_desativado) or ('add_command' in comando_desativado) or \
+                        ('ac' in comando_desativado):  # verifica se o comando está desativado
+                    embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
+                                    value="**Se você usar este comando, eu não irei responder!**",
+                                    inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     #@commands.has_permissions(administrator=True)
@@ -66,7 +67,7 @@ class ComandoPersonalizado(commands.Cog):
             return
         if ComandoPersonalizadoDao().create(ctx.guild.id, comando, resposta, inText):
             embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
-                                  description="<a:aeeee:754779905782448258>",
+                                  description=get_emoji_dance(),
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
@@ -88,20 +89,21 @@ class ComandoPersonalizado(commands.Cog):
                         inline=False)
         embed.add_field(
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
-            value="<a:jotarodance:754702437901664338>", inline=False)
+            value=get_emoji_dance(), inline=False)
         embed.add_field(name="Exemplos:",
                         value=f"``{prefixo}remover_comando`` ``\"teste\"``\n(Vai tirar o comando personalizado \"teste\")",
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                         value=f"``{prefixo}remove_command``, ``{prefixo}rc``", inline=False)
-        embed.add_field(name=":exclamation:Requisitos:",
+        embed.add_field(name="<a:atencao:755844029333110815> Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         if not (ctx.guild is None):  # se a mensagem foi enviar num server
-            if 'adicionar_comando' in ComandoDesativadoDao().get_comandos(
-                    ctx.guild.id):  # verifica se o comando está ativo
-                embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
-                                value="**Se você usar este comando, o bot não ira responder!**",
-                                inline=False)
+            for comando_desativado in ComandoDesativadoDao().get_comandos(ctx.guild.id):
+                if ('remover_comando' in comando_desativado) or ('remove_command' in comando_desativado) or \
+                        ('rc' in comando_desativado):  # verifica se o comando está desativado
+                    embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
+                                    value="**Se você usar este comando, eu não irei responder!**",
+                                    inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     #@commands.has_permissions(administrator=True)
@@ -113,7 +115,7 @@ class ComandoPersonalizado(commands.Cog):
             return
         if ComandoPersonalizadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando removido com sucesso!', colour=discord.Colour(random_color()),
-                                  description="<a:aeeee:754779905782448258>",
+                                  description=get_emoji_dance(),
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
@@ -132,7 +134,7 @@ class ComandoPersonalizado(commands.Cog):
                         inline=False)
         embed.add_field(
             name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
-            value="<a:jotarodance:754702437901664338>", inline=False)
+            value=get_emoji_dance(), inline=False)
         embed.add_field(name="Exemplos:",
                         value=f"``{prefixo}modificar_comando`` ``\"oi\"`` ``\"oi!\"`` ``True``\n(Modifica o comando que já existe)",
                         inline=False)
@@ -141,14 +143,15 @@ class ComandoPersonalizado(commands.Cog):
                         inline=False)
         embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
                         value=f"``{prefixo}update_command``, ``{prefixo}mc``", inline=False)
-        embed.add_field(name=":exclamation:Requisitos:",
+        embed.add_field(name="<a:atencao:755844029333110815> Requisitos:",
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         if not (ctx.guild is None):  # se a mensagem foi enviar num server
-            if 'adicionar_comando' in ComandoDesativadoDao().get_comandos(
-                    ctx.guild.id):  # verifica se o comando está ativo
-                embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
-                                value="**Se você usar este comando, o bot não ira responder!**",
-                                inline=False)
+            for comando_desativado in ComandoDesativadoDao().get_comandos(ctx.guild.id):
+                if ('modificar_comando' in comando_desativado) or ('update_command' in comando_desativado) or \
+                        ('mc' in comando_desativado):  # verifica se o comando está desativado
+                    embed.add_field(name="**O comando foi desativado por algum administrador do server!**",
+                                    value="**Se você usar este comando, eu não irei responder!**",
+                                    inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     #@commands.has_permissions(administrator=True)
@@ -169,7 +172,8 @@ class ComandoPersonalizado(commands.Cog):
             return
         if ComandoPersonalizadoDao().update(ctx.guild.id, comando, resposta, inText):
             embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour(random_color()),
-                                  description=f"<a:aeeee:754779905782448258>\nComando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText}",
+                                  description=f"{get_emoji_dance()}\nComando: {comando}\nResposta: {resposta}\n" +
+                                              f"Ignorar a posição do comando: {inText}",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
