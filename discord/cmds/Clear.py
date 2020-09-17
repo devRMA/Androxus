@@ -18,7 +18,7 @@ class Clear(commands.Cog):
     @commands.command(aliases=['limpar', 'clear'])
     async def clean(self, ctx, quantia = None):
         aliases = ['limpar', 'clear']
-        embed = discord.Embed(title='WolfZ - Ajuda - Clean', description='', color=0x0000ff, url='https://wolfz-bot.glitch.me', timestamp=datetime.utcfromtimestamp(datetime.now().timestamp())
+        embed = discord.Embed(title='WolfZ - Ajuda - Clean', description='', color=0x0000ff, url='https://wolfz-bot.glitch.me', timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
         embed.set_author(name='===By yWolfBR#1330===')
         embed.set_thumbnail(url='https://media.discordapp.net/attachments/755521679337455729/755521704800813246/WolfZ.png')
         embed.add_field(name=':duvida: **Como usar?**', value='**`--clean + Quantidade`**', inline=False)
