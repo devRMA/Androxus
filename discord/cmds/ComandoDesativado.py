@@ -20,7 +20,7 @@ class ComandoDesativado(commands.Cog):
         embed = embedHelp(self.bot,
                           ctx,
                           comando='desativar_comando',
-                          descricao='Desativa comandos!',
+                          descricao=self.desativar_comando.description,
                           parametros=['<"comando">'],
                           exemplos=['``{pref}desativar_comando`` ``"say"``'],
                           aliases=self.desativar_comando.aliases,
