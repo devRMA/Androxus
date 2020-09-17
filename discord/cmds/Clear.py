@@ -15,7 +15,7 @@ class Clear(commands.Cog):
     #limpar
     @commands.guild_only()
     @commands.command(aliases=['limpar', 'clear'])
-    async def clean(self, ctx, *, quantia = None):
+    async def clean(self, ctx, quantia = None):
         aliases = ['limpar', 'clear']
         embed = discord.Embed(title='WolfZ - Ajuda - Clean', url='https://wolfz-bot.glitch.me', description='', color=0x0000ff)
         embed.set_author(name='===By yWolfBR#1330===')
