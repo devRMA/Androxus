@@ -52,10 +52,10 @@ class Help(commands.Cog):
             for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
                 for command in self.bot.get_cog(cog).get_commands():
                     if (not command.hidden):  # se o comando não estiver privado
-                        emoji = '<a:ativo:755596083337363616>'
+                        emoji = '<a:ativado:755774682334101615>'
                         for c in comandos_desativados:
                             if command.name in c:
-                                emoji = '<a:desativado:755595795738263654>'
+                                emoji = '<a:desativado:755774682397147226>'
                         if not (ctx.guild is None):  # se a mensagem foi enviar num server
                             lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
                                                        value=str(command.description),
@@ -72,10 +72,10 @@ class Help(commands.Cog):
                                                inline=False)
                     for comando_personalizado in comandos_personalizados:
                         if comando_personalizado[0] is not None:
-                            emoji = '<a:ativo:755596083337363616>'
+                            emoji = '<a:ativado:755774682334101615>'
                             for c in comandos_desativados:
                                 if comando_personalizado[0] in c:
-                                    emoji = '<a:desativado:755595795738263654>'
+                                    emoji = '<a:desativado:755774682397147226>'
                             resposta = ComandoPersonalizadoDao().get_resposta(ctx.guild.id, comando_personalizado[0])
                             if resposta[-1]:  # se o inText estiver on:
                                 lista_de_comando.add_field(
