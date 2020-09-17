@@ -11,6 +11,7 @@ from os import environ, listdir
 from discord.Utils import pegar_o_prefixo
 from discord.dao.BlacklistDao import BlacklistDao
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
+from sys import version
 
 bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657)
 bot.remove_command('help')  # remove o comando help que já vem
@@ -22,6 +23,7 @@ async def on_ready():
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
     print(f'Versão do discord.py: {discord.__version__}')
+    print(f'Versão do python: {version[0:5]}')
     print(
         f'link para adicionar o bot:\nhttps://discord.com/oauth2/authorize?client_id={bot.user.id}&scope=bot&permissions=8')
     await bot.change_presence(activity=discord.Game(
