@@ -31,7 +31,7 @@ class ComandoDesativado(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def desativar_comando(self, ctx, comando=None):
-        if not ctx.author.permissions_in(ctx.message.channel).administrator:  # se o usuário não tiver permissão de adm
+        #if not ctx.author.permissions_in(ctx.message.channel).administrator:  # se o usuário não tiver permissão de adm
         if comando is None:
             await self.help_desativar_comando(ctx)
             return
