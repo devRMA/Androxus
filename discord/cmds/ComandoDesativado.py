@@ -38,10 +38,14 @@ class ComandoDesativado(commands.Cog):
                         value="Você precisa ter permissão de administrador para usar esse comando!", inline=False)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
-    #@commands.has_permissions(administrator=True)
     @commands.command(aliases=['disable_command', 'dc'], description='Desativa comandos!')
     @commands.guild_only()
+    @commands.has_permissions(administrator=True)
     async def desativar_comando(self, ctx, comando=None):
+        #if not ctx.author.permissions_in(ctx.message.channel).administrator:  # se o usuário não tiver permissão de adm
+        if comando is None:
+            await self.help_desativar_comando(ctx)
+            return
         comandos_que_nao_podem_ser_desativados = ['desativar_comando',
                                                   'disable_command',
                                                   'dc',
@@ -52,7 +56,7 @@ class ComandoDesativado(commands.Cog):
                                                   'prefix'
                                                   'help',
                                                   'ajuda']
-        if (comando is None) or (comando.lower() in comandos_que_nao_podem_ser_desativados):
+        if comando.lower() in comandos_que_nao_podem_ser_desativados:
             await ctx.send('Você não pode desativar este comando! <a:no_no:755774680325029889>')
             return
         if ComandoDesativadoDao().create(ctx.guild.id, comando):
