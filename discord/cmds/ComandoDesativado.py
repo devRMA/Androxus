@@ -22,9 +22,9 @@ class ComandoDesativado(commands.Cog):
                           comando='desativar_comando',
                           descricao='Desativa comandos!',
                           parametros=['<"comando">'],
-                          exemplos=['{pref}desativar_comando ``"say"``'],
+                          exemplos=['``{pref}desativar_comando`` ``"say"``'],
                           aliases=self.desativar_comando.aliases,
-                          perm_pessoa=['administrador'])
+                          perm_pessoa='administrador')
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['disable_command', 'dc'], description='Desativa comandos!')
