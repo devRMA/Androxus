@@ -8,7 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
-from discord.modelos.EmbedHelp import EmbedHelp
+from discord.modelos.EmbedHelp import embedHelp
 
 
 class ComandoDesativado(commands.Cog):
@@ -17,7 +17,7 @@ class ComandoDesativado(commands.Cog):
 
     @commands.command(hidden=True, aliases=['help_disable_command', 'help_dc'])
     async def help_desativar_comando(self, ctx):
-        embed = EmbedHelp(self.bot,
+        embed = embedHelp(self.bot,
                           ctx,
                           comando='desativar_comando',
                           descricao='Desativa comandos!',
