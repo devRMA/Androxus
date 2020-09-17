@@ -33,18 +33,18 @@ class ServidorDao:
             raise Exception('Erro no tipo do(s) parametro(s)')
 
     def get_prefix(self, serverId):
-        if isinstance(serverId, int):
-            try:
-                query = 'SELECT prefixo FROM servers WHERE serverId = %s;'
-                self.cursor.execute(query, (serverId,))
-                resposta = self.cursor.fetchone()
-                return resposta
+        if isinstance(serverId, int):  # verifica se o Id passado, é do tipo int
+            try:  # se for, vai tentar fazer o select
+                query = 'SELECT prefixo FROM servers WHERE serverId = %s;'  # select para pegar o prefixo
+                self.cursor.execute(query, (serverId,))  # vai trocar ^ esse %s pelo id do servidor
+                resposta = self.cursor.fetchone()  # e depois, vai pegar o resultado do select
+                return resposta  # e retornar este resultado
             except Exception as e:
-                return f'error: {str(e)}'
-            finally:
-                self.cursor.close()
-                self.connection.close()
-        else:
+                return f'error: {str(e)}'  # se acontecer algum outro erro...
+            finally:  # independete de acontecer ou não erro, vai executar isso
+                self.cursor.close()  # chega a conexão do cursor
+                self.connection.close()  # fecha a conexão com o banco
+        else:  # se o id for de outro tipo, vai disparar um erro
             raise Exception('Erro no tipo do(s) parametro(s)')
 
     def update(self, serverId, prefixo):

@@ -6,12 +6,14 @@ __author__ = 'Rafael'
 
 
 def pegar_o_prefixo(bot, message):
-    from discord.dao.ServidorDao import ServidorDao
-    if message.guild:
-        prefixo = ServidorDao().get_prefix(message.guild.id)[0]
-        if prefixo != None:
+    from discord.dao.ServidorDao import ServidorDao  # pega a classe que mexe com a table dos servidores
+    if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
+        prefixo = ServidorDao().get_prefix(message.guild.id)[0]  # vai no banco de dados, e faz um select para ver qual o prefixo
+        if prefixo != None:  # se achou um prefixo, retorna o que achou
             return prefixo
-    return '--'
+        else:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
+            ServidorDao().create(message.guild.id)  # vai criar o servidor no banco, com o prefixo padrão
+    return '--'  # se ela foi enviada no privado, vai retornar o prefixo padrão
 
 
 def random_color():
