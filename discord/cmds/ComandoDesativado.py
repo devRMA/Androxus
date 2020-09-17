@@ -23,7 +23,7 @@ class ComandoDesativado(commands.Cog):
                           descricao=self.desativar_comando.description,
                           parametros=['<"comando">'],
                           exemplos=['``{pref}desativar_comando`` ``"say"``'],
-                          aliases=self.desativar_comando.aliases,
+                          aliases=self.desativar_comando.aliases.copy(),  # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           perm_pessoa='administrador')
         await ctx.send(content=ctx.author.mention, embed=embed)
 
