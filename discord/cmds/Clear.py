@@ -10,13 +10,13 @@ from discord.ext import commands
 class Clear(commands.Cog):
     def __init__(self, client):
         self.client = client
-        self.aliases = ['limpar', 'clear']
         self.prefixo = '..'
 
     #limpar
     @commands.guild_only()
-    @commands.command(aliases = self.aliases)
+    @commands.command(aliases=['limpar', 'clear'])
     async def clean(self, ctx, *, quantia = None):
+        aliases = ['limpar', 'clear']
         embed = discord.Embed(title='WolfZ - Ajuda - Clean', url='https://wolfz-bot.glitch.me', description='', color=0x0000ff)
         embed.set_author(name='===By yWolfBR#1330===')
         embed.set_thumbnail(url='https://media.discordapp.net/attachments/755521679337455729/755521704800813246/WolfZ.png')
