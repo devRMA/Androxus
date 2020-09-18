@@ -9,8 +9,6 @@ from discord.ext import commands
 import discord
 from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
 from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
-from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
-
 from discord.modelos.EmbedHelp import embedHelp
 
 
@@ -33,8 +31,8 @@ class ComandoPersonalizado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['add_command', 'ac'], description='Adiciona comandos personalizados')
-    @commands.guild_only()
     @commands.has_permissions(administrator=True)
+    @commands.guild_only()
     async def adicionar_comando(self, ctx, comando=None, resposta=None, inText='t'):
         inText = inText.lower()
         if inText != None:
@@ -74,8 +72,8 @@ class ComandoPersonalizado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['remove_command', 'rc'], description='Remove um comando personalizado')
-    @commands.guild_only()
     @commands.has_permissions(administrator=True)
+    @commands.guild_only()
     async def remover_comando(self, ctx, comando=None):
         if comando is None:
             await self.help_remover_comando(ctx)
@@ -103,8 +101,8 @@ class ComandoPersonalizado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['update_command', 'mc'], description='Modifica um comando personalizado')
-    @commands.guild_only()
     @commands.has_permissions(administrator=True)
+    @commands.guild_only()
     async def modificar_comando(self, ctx, comando=None, resposta=None, inText='t'):
         inText = inText.lower()
         if inText != None:
