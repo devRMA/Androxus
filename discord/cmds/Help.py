@@ -87,7 +87,6 @@ class Help(commands.Cog):
                         await command(ctx)  # chama ele xD
                         return
             cor = random_color()
-            prefixo = pegar_o_prefixo(None, ctx)
             embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>', colour=discord.Colour(cor),
                                   description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
@@ -95,7 +94,7 @@ class Help(commands.Cog):
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             embed.add_field(name='**Possiveis soluções:**',
                             value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para' +
-                                  ' comnados padrões. Comandos personalizados nçao têm ajuda.```',
+                                  ' comandos padrões, ou seja, comandos personalizados não têm ajuda.```',
                             inline=False)
             await ctx.send(content=ctx.author.mention, embed=embed)
 
