@@ -19,7 +19,7 @@ class Avatar(commands.Cog):
                           comando='avatar',
                           descricao=self.avatar.description,
                           parametros=['<"Mencionar uma pessoa ou um id">'],
-                          exemplos=['``{pref}avatar``' + f' ``{ctx.author.mention}``'])
+                          exemplos=['``{pref}avatar``' + f' {ctx.author.mention}'])
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(description='Eu vou mandar a foto de perfil da pessoa que você marcar.')
