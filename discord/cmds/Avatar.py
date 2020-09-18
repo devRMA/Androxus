@@ -28,7 +28,7 @@ class Avatar(commands.Cog):
             await ctx.send(f'{ctx.message.mentions[0].avatar_url}')  # vai pegar a primeira menção, e pega o avatar da pessoa
         else:  # se a pessoa não mencionou ninguém, entra aqui
             if args:  # se a pessoa passou pelo menos alguma coisa
-                if len(args) != 1:  # se a pessoa passou mais de um item
+                if len(args) == 1:  # se a pessoa passou mais de um item
                     try:  # vai tentar converter o argumento para int
                         id_de_quem_ver_o_avatar = int(args[0])  # conversão
                         user = self.bot.get_user(id_de_quem_ver_o_avatar)  # se chegou aqui, vai tentar pegar o usuário com esse id
