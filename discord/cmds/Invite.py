@@ -9,27 +9,25 @@ import discord
 from discord.Utils import pegar_o_prefixo, random_color
 from datetime import datetime
 
+from discord.modelos.EmbedHelp import embedHelp
+
+
 class Invite(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, aliases=['help_convidar', 'help_convite'])
     async def help_invite(self, ctx):
-        prefixo = pegar_o_prefixo(None, ctx)
-        embed = discord.Embed(title=f"``{prefixo}invite``", colour=discord.Colour(random_color()),
-                              description="Mostra o link que você usa para me adicionar em servidores!",
-                              timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
-        embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
-        embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-        embed.add_field(name="**Como usar?**",
-                        value=f"``{prefixo}invite``",
-                        inline=False)
-        embed.add_field(name="Exemplo:",
-                        value=f"``{prefixo}invite``",
-                        inline=False)
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando='invite',
+                          descricao=self.invite.description,
+                          exemplos=['``{pref}invite``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.invite.aliases.copy())
         await ctx.send(content=ctx.author.mention, embed=embed)
 
-    @commands.command(description='Mostra o link que você usa para me adicionar em servidores')
+    @commands.command(aliases=['convidar', 'convite'], description='Mostra o link que você usa para me adicionar em seu servidor')
     async def invite(self, ctx):
         await ctx.send(f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=8')
 

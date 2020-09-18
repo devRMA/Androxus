@@ -5,10 +5,6 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
-import discord
-from discord.Utils import pegar_o_prefixo, random_color, get_emoji_dance
-from datetime import datetime
-from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord.modelos.EmbedHelp import embedHelp
 
 

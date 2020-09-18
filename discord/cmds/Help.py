@@ -10,6 +10,7 @@ from datetime import datetime
 from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
+from discord.modelos.EmbedHelp import embedHelp
 
 
 class Help(commands.Cog):
@@ -20,26 +21,15 @@ class Help(commands.Cog):
     async def help(self, ctx, *comando):
         if len(comando) == 0:
             cor = random_color()
-            prefixo = pegar_o_prefixo(None, ctx)
-            embed = discord.Embed(title=f"``{prefixo}help``", colour=discord.Colour(cor),
-                                  description="Mostra essa mensagem de ajuda!",
-                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
-            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
-            embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-            embed.add_field(name="**Como usar?**",
-                            value=f"``{prefixo}help`` ``[comando]``",
-                            inline=False)
-            embed.add_field(
-                name="Tudo que estiver entre **<>** são obrigatorio, e tudo que estiver entre **[]** são opcionais.",
-                value=get_emoji_dance(), inline=False)
-            embed.add_field(name="Exemplo:",
-                            value=f"``{prefixo}help``\n(Vai mostrar essa mensagem)",
-                            inline=False)
-            embed.add_field(name="Outro exemplo:",
-                            value=f"``{prefixo}help`` ``adicionar_comando``\n(Vai mostrar a mensagem de ajuda, do comando \"adicionar_comando\")",
-                            inline=False)
-            embed.add_field(name=":twisted_rightwards_arrows: Sinônimos:",
-                            value=f"``{prefixo}ajuda``", inline=False)
+            embed = embedHelp(self.bot,
+                              ctx,
+                              comando='help',
+                              descricao=self.help.description,
+                              parametros=['[comando]'],
+                              exemplos=['``{pref}help``', '``{pref}ajuda`` ``adicionar_comando``'],
+                              # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                              aliases=self.help.aliases.copy(),
+                              cor=cor)
             lista_de_comando = discord.Embed(title=f"Lista de comandos:", colour=discord.Colour(cor),
                                              description="Estes são os comandos que eu tenho (todos abaixo precisam do prefixo)",
                                              timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
