@@ -39,7 +39,7 @@ class Avatar(commands.Cog):
                                            f' <@{id_de_quem_ver_o_avatar}>\nEu preciso ter pelo menos 1' +
                                            ' servidor em comum com a pessoa, para conseguir encontrar ele.')
                     except ValueError:  # se der erro, é porque a pessoa não passou apenas números
-                        await ctx.send(f'<a:atencao:755844029333110815> O valor {args[0]} não é um id!')
+                        await ctx.send(f'<a:atencao:755844029333110815> O valor ``{args[0]}`` não é um id valido!')
                 else:  # se a pessoa passou mais de 1 argumento
                     await ctx.send('<a:atencao:755844029333110815> Você me disse muitas coisas,' +
                                    ' eu só preciso, ou do id da pessoa, ou que você mencione ela.')
