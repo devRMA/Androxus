@@ -8,6 +8,7 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
+
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 
 
@@ -19,25 +20,26 @@ def embedHelp(bot: commands.Bot = None,
               exemplos: list = [],
               aliases: list = [],
               perm_pessoa: str = None,
-              perm_bot: str = None):
+              perm_bot: str = None,
+              cor: int = None):
     prefixo = pegar_o_prefixo(None, ctx)
     exemplo = '\n'.join(exemplos).replace('{pref}', f'{prefixo}')
     como_usar = f'``{prefixo}{comando}`` '
     comando_esta_desativado = False
     if ctx.guild is not None:  # se a mensagem foi enviar de um server
-        for comandos_desativados in ComandoDesativadoDao().get_comandos(ctx.guild.id): # for em todos os comandos desativados
+        for comandos_desativados in ComandoDesativadoDao().get_comandos(ctx.guild.id):  # for em todos os comandos desativados
             if comando_esta_desativado: break  # se, dentro do outro for, achar o comando, vai para o for de fora também
             if comando in comandos_desativados:  # vê se o comando principal, está desativado
                 comando_esta_desativado = True
                 break
             for comando_alias in aliases:  # vai verificar se algum "sinônimo" desse comando, foi desativado
                 if comando_esta_desativado: break
-                if (comando_alias in comandos_desativados) :  # verifica se o comando está desativado
+                if (comando_alias in comandos_desativados):  # verifica se o comando está desativado
                     comando_esta_desativado = True
     if parametros:  # se tiver pelo menos 1 item nos parâmetros
         for c in range(0, len(parametros)):  # vai adicionar `` antes, e depois dos parâmetros, em todos os itens
             parametros[c] = f'``{parametros[c]}``'
-        como_usar += ' '.join(parametros) # adiciona os parâmetros no "como_usar"
+        como_usar += ' '.join(parametros)  # adiciona os parâmetros no "como_usar"
     if aliases:
         for c in range(0, len(aliases)):  # vai adicionar `` antes, e depois de alias
             aliases[c] = f'``{prefixo}{aliases[c]}``'
@@ -45,8 +47,12 @@ def embedHelp(bot: commands.Bot = None,
             alias = aliases[0]
         else:
             alias = ', '.join(aliases)
+    if cor is None:  # se a cor não for passada, vai ser usada uma cor aleatória
+        cor_a_usar = random_color()
+    else:  # se passou a cor, usa a cor passada
+        cor_a_usar = cor
     embed = discord.Embed(title=f'``{prefixo}{comando}``',
-                          colour=discord.Colour(random_color()),
+                          colour=discord.Colour(cor_a_usar),
                           description=descricao,
                           timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
     embed.set_author(name='Androxus',
@@ -76,7 +82,8 @@ def embedHelp(bot: commands.Bot = None,
                         value=requisito,
                         inline=False)
     if comando_esta_desativado:  # se o comando estiver desativado
-        embed.add_field(name="<a:atencao:755844029333110815> **O comando foi desativado por algum administrador do server!**",
-                        value="**Se você usar este comando, eu não irei responder!**",
-                        inline=False)
+        embed.add_field(
+            name="<a:atencao:755844029333110815> **O comando foi desativado por algum administrador do server!**",
+            value="**Se você usar este comando, eu não irei responder!**",
+            inline=False)
     return embed
