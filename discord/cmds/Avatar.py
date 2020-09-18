@@ -25,7 +25,7 @@ class Avatar(commands.Cog):
     @commands.command(description='Eu vou mandar a foto de perfil da pessoa que você marcar.')
     async def avatar(self, ctx, *args):
         if ctx.message.mentions:  # se tiver alguma menção na mensagem
-            await ctx.send(f'{ctx.mentions[0].avatar_url}')  # vai pegar a primeira menção, e pega o avatar da pessoa
+            await ctx.send(f'{ctx.message.mentions[0].avatar_url}')  # vai pegar a primeira menção, e pega o avatar da pessoa
         else:  # se a pessoa não mencionou ninguém, entra aqui
             if args:  # se a pessoa passou pelo menos alguma coisa
                 if len(args) != 1:  # se a pessoa passou mais de um item
