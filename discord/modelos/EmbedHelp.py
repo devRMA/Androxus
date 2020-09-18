@@ -69,9 +69,10 @@ def embedHelp(bot: commands.Bot = None,
     embed.add_field(name='Exemplo:',
                     value=exemplo,
                     inline=False)
-    embed.add_field(name=':twisted_rightwards_arrows: Sinônimos:',
-                    value=alias,
-                    inline=False)
+    if aliases:
+        embed.add_field(name=':twisted_rightwards_arrows: Sinônimos:',
+                        value=alias,
+                        inline=False)
     if perm_pessoa or perm_bot:
         requisito = ''
         if perm_pessoa:
