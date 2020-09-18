@@ -29,7 +29,7 @@ class Source(commands.Cog):
 
     @commands.command(aliases=['github', 'programação'], description='Mostra o meu código fonte!')
     async def source(self, ctx):
-        embed = discord.Embed(title=f'Olá {ctx.author.mention}, eu sou um bot, feito em python, usa' +
+        embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot, feito em python, usa' +
                                     'ndo a API do discord e banco de dados!',
                               colour=discord.Colour(random_color()),
                               description='Caso você queira ver o meu código fonte, clique [aqui]' +
