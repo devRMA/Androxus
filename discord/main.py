@@ -64,9 +64,9 @@ async def change_status():  # loop que vai ficar alterando o status do bot
               '🤔 como que eu estou "jogando" se eu sou um bot? 🤔']
     status_escolhido = choice(status)  # escolhe um status "aleatório"
     # vai substituir pela quantidade de servidores que o bot está
-    status_escolhido = status_escolhido.replace('{servers}', len(bot.guilds))
+    status_escolhido = status_escolhido.replace('{servers}', f'{len(bot.guilds}'))
     # vai substituir, por um emoji aleatório
-    status_escolhido = status_escolhido.replace('{dance}', get_emoji_dance())
+    status_escolhido = status_escolhido.replace('{dance}', f'{get_emoji_dance()}')
     await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
 
 
