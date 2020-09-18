@@ -10,10 +10,10 @@ from discord.ext import commands, tasks  # outros imports do discord
 from os import environ  # função responsável por pegas o token do bot
 from os import listdir  # função responsável por pegar todos os cogs
 from discord.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
+from discord.Utils import get_emoji_dance  # função que vai pegar um emoji "aleatório"
 from sys import version  # função para pegar a versão do python
 from discord.events.OnMessageEvent import on_message_event  # evento que vai ser chamado, toda vez que enviarem uma menasgem
 from random import choice  # função que vai ser usada para escolher "aleatóriamente" qual status do bot
-
 # instanciamento do bot em si, passando a função "pegar_o_prefixo" no prefixo
 bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657)
 bot.remove_command('help')  # remove o comando help default
@@ -63,6 +63,10 @@ async def change_status():  # loop que vai ficar alterando o status do bot
               'Caso você precise de ajuda, basta me mencionar.',
               '🤔 como que eu estou "jogando" se eu sou um bot? 🤔']
     status_escolhido = choice(status)  # escolhe um status "aleatório"
+    # vai substituir pela quantidade de servidores que o bot está
+    status_escolhido = status_escolhido.replace('{servers}', len(bot.guilds))
+    # vai substituir, por um emoji aleatório
+    status_escolhido = status_escolhido.replace('{dance}', get_emoji_dance())
     await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
 
 
