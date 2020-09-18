@@ -54,10 +54,7 @@ class ComandoDesativado(commands.Cog):
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            embed.add_field(name='<a:off:755774680660574268>',
-                            value='\uFEFF',
-                            inline=False)
-            await ctx.send(embed=embed)
+            await ctx.send(content='<a:off:755774680660574268>', embed=embed)
 
     @commands.command(hidden=True, aliases=['help_reactivate_command'])
     async def help_reativar_comando(self, ctx):
@@ -83,12 +80,9 @@ class ComandoDesativado(commands.Cog):
             embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando reativado: {comando}',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
-            embed.add_field(name='<a:on:755774680580882562>',
-                            value='\uFEFF',
-                            inline=False)
             embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            await ctx.send(embed=embed)
+            await ctx.send(content='<a:on:755774680580882562>', embed=embed)
 
 
 def setup(bot):
