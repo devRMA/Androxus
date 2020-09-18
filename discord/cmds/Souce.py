@@ -29,14 +29,14 @@ class Source(commands.Cog):
 
     @commands.command(aliases=['github', 'programação'], description='Mostra o meu código fonte!')
     async def source(self, ctx):
-        embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot, feito em python, usa' +
-                                    'ndo a API do discord e banco de dados!',
+        embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot feito em python, e uso ' +
+                                    'a API do discord e um banco de dados!',
                               colour=discord.Colour(random_color()),
                               description='Caso você queira ver o meu código fonte, clique [aqui]' +
                                           '(https://github.com/devRMA/Androxus/tree/master/discord)\n' +
-                                          'Caso você queira ver a documentação da API do discord,' +
-                                          ' clique [aqui](https://discordpy.readthedocs.io/en/late' +
-                                          'st/index.html).',
+                                          'Caso você queira ver a documentação da API do discord ' +
+                                          'para python, clique [aqui](https://discordpy.readthedo' +
+                                          'cs.io/en/latest/index.html).',
                               timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
         embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
