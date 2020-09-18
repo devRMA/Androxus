@@ -62,7 +62,7 @@ class Help(commands.Cog):
                                                inline=False)
                     for comando_personalizado in comandos_personalizados:
                         if comando_personalizado[0] is not None:
-                            emoji = '<a:ativado:755774682334101615>'
+                            emoji = '<a:check:755775267275931799>'
                             for c in comandos_desativados:
                                 if comando_personalizado[0] in c:
                                     emoji = '<a:desativado:755774682397147226>'
