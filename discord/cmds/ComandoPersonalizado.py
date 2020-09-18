@@ -48,14 +48,14 @@ class ComandoPersonalizado(commands.Cog):
             return
         if ComandoPersonalizadoDao().create(ctx.guild.id, comando, resposta, inText):
             embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
-                                  description=get_emoji_dance(),
+                                  description='\uFEFF',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             embed.add_field(name=f"Informações",
                             value=f"Comando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText}",
                             inline=False)
-            await ctx.send(embed=embed)
+            await ctx.send(content=get_emoji_dance(), embed=embed)
 
     @commands.command(hidden=True, aliases=['help_remove_command', 'help_rc'])
     async def help_remover_comando(self, ctx):
@@ -80,11 +80,11 @@ class ComandoPersonalizado(commands.Cog):
             return
         if ComandoPersonalizadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando removido com sucesso!', colour=discord.Colour(random_color()),
-                                  description=get_emoji_dance(),
+                                  description='\uFEFF',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-            await ctx.send(embed=embed)
+            await ctx.send(content=get_emoji_dance(), embed=embed)
 
     @commands.command(hidden=True, aliases=['help_update_command', 'help_mc'])
     async def help_modificar_comando(self, ctx):
@@ -117,13 +117,14 @@ class ComandoPersonalizado(commands.Cog):
             await self.help_modificar_comando(ctx)
             return
         if ComandoPersonalizadoDao().update(ctx.guild.id, comando, resposta, inText):
+            inText_str = str(inText).replace('True', 'Sim').replace('False', 'Não')
             embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour(random_color()),
-                                  description=f"{get_emoji_dance()}\nComando: {comando}\nResposta: {resposta}\n" +
-                                              f"Ignorar a posição do comando: {inText}",
+                                  description=f"Comando: {comando}\nResposta: {resposta}\n" +
+                                              f"Ignorar a posição do comando: {inText_str}",
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-            await ctx.send(embed=embed)
+            await ctx.send(content=get_emoji_dance(), embed=embed)
 
 
 def setup(bot):
