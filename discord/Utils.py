@@ -13,13 +13,16 @@ def pegar_o_prefixo(bot, message):
             return prefixo[0]
         else:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
             ServidorDao().create(message.guild.id)  # vai criar o servidor no banco, com o prefixo padrão
-    return '--'  # se ela foi enviada no privado, vai retornar o prefixo padrão
+            return '--'  # se acabou de criar o registro, o prefixo vai ser o padrão
+    return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
 
 
 def random_color():
     from random import randint  # função que pega números aleatórios
     r = lambda: randint(0, 255)  # lambda que vai pegar os números
-    return int(f'0x{r():02x}{r():02x}{r():02x}', 16)  # vai escolher os números, e depois transformar em hexadecial 0x000000
+    return int(f'0x{r():02x}{r():02x}{r():02x}',
+               16)  # vai escolher os números, e depois transformar em hexadecial 0x000000
+
 
 def get_emoji_dance():  # função que vai escolher um emoji de dança aleatório
     from random import choice
