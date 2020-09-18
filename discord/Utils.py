@@ -8,21 +8,22 @@ __author__ = 'Rafael'
 def pegar_o_prefixo(bot, message):
     from discord.dao.ServidorDao import ServidorDao  # pega a classe que mexe com a table dos servidores
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
-        prefixo = ServidorDao().get_prefix(message.guild.id)[0]  # vai no banco de dados, e faz um select para ver qual o prefixo
-        if prefixo != None:  # se achou um prefixo, retorna o que achou
-            return prefixo
+        prefixo = ServidorDao().get_prefix(message.guild.id)  # vai no banco de dados, e faz um select para ver qual o prefixo
+        if prefixo is not None:  # se achou um prefixo, retorna o que achou
+            return prefixo[0]
         else:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
             ServidorDao().create(message.guild.id)  # vai criar o servidor no banco, com o prefixo padrão
     return '--'  # se ela foi enviada no privado, vai retornar o prefixo padrão
 
 
 def random_color():
-    from random import randint
-    r = lambda: randint(0, 255)
-    return int(f'0x{r():02x}{r():02x}{r():02x}', 16)
+    from random import randint  # função que pega números aleatórios
+    r = lambda: randint(0, 255)  # lambda que vai pegar os números
+    return int(f'0x{r():02x}{r():02x}{r():02x}', 16)  # vai escolher os números, e depois transformar em hexadecial 0x000000
 
-def get_emoji_dance():
+def get_emoji_dance():  # função que vai escolher um emoji de dança aleatório
     from random import choice
+    # lista com os emojis
     emojis = ['<a:doguinho2:755843996437446686>',
               '<a:dance_bear:755843929592692886>',
               '<a:whitewobble:755843847619346433>',
@@ -41,4 +42,4 @@ def get_emoji_dance():
               '<a:penguim_doidao:755774679557603360>',
               '<a:pepo_dance:755774680291344454>',
               '<a:SquidwardMilos:755774682174586890>']
-    return choice(emojis)
+    return choice(emojis)  # retorna o emoji escolhido da lista
