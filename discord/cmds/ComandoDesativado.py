@@ -50,12 +50,12 @@ class ComandoDesativado(commands.Cog):
             return
         if ComandoDesativadoDao().create(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour(random_color()),
-                                  description='<a:off:755774680660574268>',
+                                  description=f'Comando desativado: {comando}',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
-            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
-            embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-            embed.add_field(name=f"Comando desativado: {comando}",
-                            value="\uFEFF",
+            embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            embed.add_field(name='<a:off:755774680660574268>',
+                            value='\uFEFF',
                             inline=False)
             await ctx.send(embed=embed)
 
@@ -81,13 +81,13 @@ class ComandoDesativado(commands.Cog):
             return
         if ComandoDesativadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
-                                  description='<a:on:755774680580882562>',
+                                  description=f'Comando reativado: {comando}',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
-            embed.add_field(name=f"Comando reativado: {comando}",
-                            value="\uFEFF",
+            embed.add_field(name='<a:on:755774680580882562>',
+                            value='\uFEFF',
                             inline=False)
-            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
-            embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
+            embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             await ctx.send(embed=embed)
 
 
