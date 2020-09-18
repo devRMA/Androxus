@@ -62,18 +62,18 @@ class Help(commands.Cog):
                                                inline=False)
                     for comando_personalizado in comandos_personalizados:
                         if comando_personalizado[0] is not None:
-                            emoji = '<a:check:755775267275931799>'
+                            emoji_personalizado = '<a:check:755775267275931799>'
                             for c in comandos_desativados:
                                 if comando_personalizado[0] in c:
-                                    emoji = '<a:desativado:755774682397147226>'
+                                    emoji_personalizado = '<a:desativado:755774682397147226>'
                             resposta = ComandoPersonalizadoDao().get_resposta(ctx.guild.id, comando_personalizado[0])
                             if resposta[-1]:  # se o inText estiver on:
                                 lista_de_comando.add_field(
-                                    name=f'{emoji}``{comando_personalizado[0]}``',
+                                    name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
                                     value=f'Eu irei responder "{resposta[0]}"', inline=True)
                             else:
                                 lista_de_comando.add_field(
-                                    name=f'{emoji}``{comando_personalizado[0]}``',
+                                    name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
                                     value=f'Eu irei responder "{resposta[0]}" **apenas se a mensagem iniciar com o comando**',
                                     inline=True)
             await ctx.send(embed=embed)

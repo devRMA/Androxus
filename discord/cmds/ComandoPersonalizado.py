@@ -47,13 +47,14 @@ class ComandoPersonalizado(commands.Cog):
             await self.help_adicionar_comando(ctx)
             return
         if ComandoPersonalizadoDao().create(ctx.guild.id, comando, resposta, inText):
+            inText_str = str(inText).replace('True', 'Sim').replace('False', 'Não')
             embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
                                   description='\uFEFF',
                                   timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             embed.add_field(name=f"Informações",
-                            value=f"Comando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText}",
+                            value=f"Comando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText_str}",
                             inline=False)
             await ctx.send(content=get_emoji_dance(), embed=embed)
 
