@@ -8,7 +8,8 @@ __author__ = 'Rafael'
 def pegar_o_prefixo(bot, message):
     from discord.dao.ServidorDao import ServidorDao  # pega a classe que mexe com a table dos servidores
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
-        prefixo = ServidorDao().get_prefix(message.guild.id)  # vai no banco de dados, e faz um select para ver qual o prefixo
+        prefixo = ServidorDao().get_prefix(
+            message.guild.id)  # vai no banco de dados, e faz um select para ver qual o prefixo
         if prefixo is not None:  # se achou um prefixo, retorna o que achou
             return prefixo[0]
         else:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
@@ -46,3 +47,20 @@ def get_emoji_dance():  # função que vai escolher um emoji de dança aleatóri
               '<a:pepo_dance:755774680291344454>',
               '<a:SquidwardMilos:755774682174586890>']
     return choice(emojis)  # retorna o emoji escolhido da lista
+
+
+
+def get_last_update():
+    # função que vai pegar o último update que o bot teve
+    # como o bot está no github, a ultima atualização que teve no github, vai ser a ultima atualização do bot
+    from requests import get  # dunção que vai pegar o html da página
+    from json import loads  # função que vai converter de json pra dicionario
+    from datetime import datetime  # como vai vim uma str do site, vamos converter para um objeto datetime
+    url = 'https://api.github.com/repositories/294764564'  # url do repositório do bot
+    html = get(url).text
+    json = loads(html)
+    data_do_update = json['updated_at']  # aqui, ainda vai estar como string
+    # esse é um exemplo de como vai chegar a string: 2020-09-19T04:37:37Z
+    # da para observer que a formatação é: ano-mes-diaThora:minuto:segundoZ
+    data_do_update = datetime.strptime(data_do_update, '%Y-%m-%dT%H:%M:%SZ')  # conversão de string para datetime
+    return data_do_update  # retorna o objeto datetime
