@@ -50,7 +50,7 @@ class Botinfo(commands.Cog):
         embed.add_field(name=':ping_pong: Latência da API:',
                         value=f'``{int(self.bot.latency * 1000)}ms``',
                         inline=True)
-        embed.add_field(name='<:DatabaseCheck:756712226303508530> Tempo fazer se conectar ao banco:',
+        embed.add_field(name='<:DatabaseCheck:756712226303508530> Tempo para se conectar ao banco:',
                         value=f'``{stopwatch_banco}``',
                         inline=True)
         embed.add_field(name='<a:loading:756715436149702806> Uso da CPU:',
