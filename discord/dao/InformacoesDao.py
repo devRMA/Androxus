@@ -77,3 +77,15 @@ class InformacoesDao:
         else:
             raise Exception('Erro no tipo do(s) parametro(s)')
         return False
+
+    def get_version(self):
+        try:
+            query = 'SELECT version()'
+            self.cursor.execute(query)
+            resposta = self.cursor.fetchone()
+            return resposta[0]
+        except Exception as e:
+            return f'error: {str(e)}'
+        finally:
+            self.cursor.close()
+            self.connection.close()
