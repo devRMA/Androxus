@@ -51,12 +51,8 @@ class OwnerOnly(commands.Cog):
 
     @commands.command(aliases=['pv'], hidden=True)
     @commands.is_owner()
-    async def dm(self, ctx, id: int = None, *args):
-        user = None
-        if ctx.message.mentions:
-            user = ctx.message.mentions[0]
-        else:
-            user = self.bot.get_user(id)
+    async def dm(self, ctx, id: int, *args):
+        user = self.bot.get_user(id)
         if user is not None:
             if ctx.guild.id != 405826835793051649:
                 try:
