@@ -66,10 +66,10 @@ class OwnerOnly(commands.Cog):
             user_dm_criado = user.dm_channel
             try:
                 if user_dm_criado != None:
-                    await user_dm_criado.send(args)
+                    await user_dm_criado.send(" ".join(args))
                 else:
                     await user.create_dm()
-                    await user.dm_channel.send(args)
+                    await user.dm_channel.send(" ".join(args))
                 foi = True
             except discord.errors.Forbidden as error:
                 foi = False
@@ -77,7 +77,7 @@ class OwnerOnly(commands.Cog):
                 if foi and ctx.guild.id == 405826835793051649:
                     embed = discord.Embed(title=f'Mensagem enviada!',
                                           colour=discord.Colour(random_color()),
-                                          description=f'Mensagem:\n{" ".join(args)}',
+                                          description=f'{" ".join(args)}',
                                           timestamp=datetime.utcnow())
                     embed.set_author(name='Androxus', icon_url=self.bot.user.avatar_url)
                     embed.set_thumbnail(url=user.avatar_url)
