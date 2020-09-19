@@ -18,11 +18,13 @@ class OwnerOnly(commands.Cog):
     @commands.command(aliases=['desativar_tratamento_de_erro', 'erros_off'], hidden=True)
     @commands.is_owner()
     async def desativar_erros(self, ctx):
+        print(f'Comando desativar_erro, {self.bot.tratar_erros}')
         self.bot.tratar_erros = False
 
     @commands.command(aliases=['ativar_tratamento_de_erro', 'erros_on'], hidden=True)
     @commands.is_owner()
     async def ativar_erros(self, ctx):
+        print(f'Comando ativar_erros, {self.bot.tratar_erros}')
         self.bot.tratar_erros = True
 
     @commands.command(aliases=['jogar', 'status'], hidden=True)
@@ -38,7 +40,7 @@ class OwnerOnly(commands.Cog):
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         else:
             self.bot.mudar_status = False
-            await self.bot.change_presence(activity=discord.Game(name=args))
+            await self.bot.change_presence(activity=discord.Game(name=" ".join(args)))
             embed = discord.Embed(title=f'Status alterado!',
                                   colour=discord.Colour(random_color()),
                                   description=f'Agora eu estou jogando ``{" ".join(args)}``',
