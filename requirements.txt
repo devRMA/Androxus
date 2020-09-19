@@ -5,3 +5,4 @@ pandas
 psycopg2
 stopwatch.py
 psutil
+requests
