@@ -60,6 +60,8 @@ class ErrorCommands(commands.Cog):
                     await ctx.send(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}\n<a:sad:755774681008832623>')
                 except:
                     print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
+        else:
+            print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
 
 
 def setup(bot):
