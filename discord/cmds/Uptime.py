@@ -49,7 +49,7 @@ class Uptime(commands.Cog):
             minutos_on = f'{minutes} minutos e '
         elif minutes == 1:
             minutos_on = f'{minutes} minuto e '
-        embed = discord.Embed(title=f':timer: A quanto tempo estou online:',
+        embed = discord.Embed(title=f':timer:',
                               description=f'Estou on-line há {dias_on}{horas_on}{minutos_on}{seconds} segundos.',
                               colour=discord.Colour(random_color()),
                               timestamp=datetime.utcnow())

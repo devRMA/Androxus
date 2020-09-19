@@ -80,7 +80,7 @@ class Botinfo(commands.Cog):
         hours_att, remainder_att = divmod(int(atualizado_ha.total_seconds()), 3600)
         minutes_att, seconds_att = divmod(remainder_att, 60)
         days_att, hours_att = divmod(hours_att, 24)
-        embed.add_field(name=':stopwatch: Ultima atualização há:',
+        embed.add_field(name=':watch: Ultima atualização há:',
                         value=f'``{days_att} D, {hours_att} H, {minutes_att} M, {seconds_att} S``',
                         inline=True)
         await ctx.send(embed=embed)
