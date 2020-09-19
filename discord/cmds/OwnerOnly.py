@@ -51,7 +51,7 @@ class OwnerOnly(commands.Cog):
 
     @commands.command(aliases=['pv'], hidden=True)
     @commands.is_owner()
-    async def dm(self, ctx, id: int, *args):
+    async def dm(self, ctx, id: int = None, *args):
         user = None
         if ctx.message.mentions:
             user = ctx.message.mentions[0]
