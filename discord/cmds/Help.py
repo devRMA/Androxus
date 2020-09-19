@@ -17,6 +17,18 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.command(hidden=True, aliases=['help_ajuda'])
+    async def help_help(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando='help',
+                          descricao=self.help.description,
+                          parametros=['[comando]'],
+                          exemplos=['``{pref}help``', '``{pref}ajuda`` ``adicionar_comando``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.help.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
     @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda de um comando.')
     async def help(self, ctx, *comando):
         if len(comando) == 0:
