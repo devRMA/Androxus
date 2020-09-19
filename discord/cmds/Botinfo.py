@@ -12,6 +12,7 @@ from discord.Utils import random_color, pegar_o_prefixo, get_last_update
 from stopwatch import Stopwatch
 import psutil
 from sys import version
+from discord.dao.InformacoesDao import InformacoesDao
 
 
 class Botinfo(commands.Cog):
@@ -67,7 +68,7 @@ class Botinfo(commands.Cog):
                         value=f'``{version[0:5]}``',
                         inline=True)
         embed.add_field(name=':bank: Banco de dados que estou usando:',
-                        value=f'``Postgresql``',
+                        value=f'``{InformacoesDao().get_version()[:15]}``',
                         inline=True)
         uptime = datetime.utcnow() - self.bot.uptime
         hours_bot, remainder_bot = divmod(int(uptime.total_seconds()), 3600)
