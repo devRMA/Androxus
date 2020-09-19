@@ -56,13 +56,7 @@ class OwnerOnly(commands.Cog):
         if ctx.message.mentions:
             user = ctx.message.mentions[0]
         else:
-            if args:
-                if len(args) == 1:
-                    try:
-                        id_de_quem_ver_o_avatar = int(args[0])
-                        user = self.bot.get_user(id_de_quem_ver_o_avatar)
-                    except ValueError:
-                        await ctx.send(f'<a:atencao:755844029333110815> O valor ``{args[0]}`` não é um id valido!')
+            user = self.bot.get_user(id)
         if user is not None:
             if ctx.guild.id != 405826835793051649:
                 try:
@@ -90,6 +84,9 @@ class OwnerOnly(commands.Cog):
                     await ctx.send(embed=embed)
             except:
                 pass
+        else:
+            if ctx.guild.id == 405826835793051649:
+                await ctx.send('Não achei o usuário')
 
 
 def setup(bot):
