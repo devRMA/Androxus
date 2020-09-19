@@ -50,7 +50,7 @@ class ComandoPersonalizado(commands.Cog):
             inText_str = str(inText).replace('True', 'Sim').replace('False', 'Não')
             embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
                                   description='\uFEFF',
-                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                                  timestamp=datetime.utcnow())
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             embed.add_field(name=f"Informações",
@@ -82,7 +82,7 @@ class ComandoPersonalizado(commands.Cog):
         if ComandoPersonalizadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando removido com sucesso!', colour=discord.Colour(random_color()),
                                   description='\uFEFF',
-                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                                  timestamp=datetime.utcnow())
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             await ctx.send(content=get_emoji_dance(), embed=embed)
@@ -122,7 +122,7 @@ class ComandoPersonalizado(commands.Cog):
             embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f"Comando: {comando}\nResposta: {resposta}\n" +
                                               f"Ignorar a posição do comando: {inText_str}",
-                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                                  timestamp=datetime.utcnow())
             embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             await ctx.send(content=get_emoji_dance(), embed=embed)

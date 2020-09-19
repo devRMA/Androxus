@@ -54,7 +54,7 @@ def embedHelp(bot: commands.Bot = None,
     embed = discord.Embed(title=f'``{prefixo}{comando}``',
                           colour=discord.Colour(cor_a_usar),
                           description=descricao,
-                          timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                          timestamp=datetime.utcnow())
     embed.set_author(name='Androxus',
                      icon_url=bot.user.avatar_url)
     embed.set_footer(text=f'{ctx.author}',

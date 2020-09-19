@@ -17,7 +17,7 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda')
+    @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda de um comando.')
     async def help(self, ctx, *comando):
         if len(comando) == 0:
             cor = random_color()
@@ -32,7 +32,7 @@ class Help(commands.Cog):
                               cor=cor)
             lista_de_comando = discord.Embed(title=f"Lista de comandos:", colour=discord.Colour(cor),
                                              description="Estes são os comandos que eu tenho (todos abaixo precisam do prefixo)",
-                                             timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                                             timestamp=datetime.utcnow())
             lista_de_comando.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             lista_de_comando.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             if ctx.guild is not None:
@@ -89,7 +89,7 @@ class Help(commands.Cog):
             cor = random_color()
             embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>', colour=discord.Colour(cor),
                                   description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
-                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                                  timestamp=datetime.utcnow())
             embed.set_author(name="Androxus", icon_url=f'{self.bot.user.avatar_url}')
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             embed.add_field(name='**Possiveis soluções:**',

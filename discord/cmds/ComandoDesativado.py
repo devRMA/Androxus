@@ -51,7 +51,7 @@ class ComandoDesativado(commands.Cog):
         if ComandoDesativadoDao().create(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando desativado: {comando}',
-                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                                  timestamp=datetime.utcnow())
             embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             await ctx.send(content='<a:off:755774680660574268>', embed=embed)
@@ -79,7 +79,7 @@ class ComandoDesativado(commands.Cog):
         if ComandoDesativadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando reativado: {comando}',
-                                  timestamp=datetime.utcfromtimestamp(datetime.now().timestamp()))
+                                  timestamp=datetime.utcnow())
             embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             await ctx.send(content='<a:on:755774680580882562>', embed=embed)
