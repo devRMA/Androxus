@@ -30,6 +30,10 @@ async def on_ready():
     print(f'Versão do python: {version[0:5]}')
     if not hasattr(bot, 'uptime'):  # se o bot não tiver o atributo "uptime"
         bot.uptime = datetime.utcnow()  # vai criar o atributo, com a data e hora atual
+    if not hasattr(bot, 'tratar_erros'):  # se o bot não tiver o atributo "tratar_erros"
+        bot.tratar_erros = True  # atributo que vai controlar o tratamento de erros
+    if not hasattr(bot, 'mudar_status'):  # se o bot não tiver o atributo "mudar_status"
+        bot.mudar_status = True  # atributo que vai ficar responsável por controlar a mudança de status
     change_status.start()  # inicia o loop para mudar o status
 
 
@@ -59,17 +63,18 @@ async def on_message_edit(before, after):
 
 @tasks.loop(seconds=10)
 async def change_status():  # loop que vai ficar alterando o status do bot
-    # lista com os status
-    status = ['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
-              'Eu estou divertindo {servers} servidores!',
-              'Caso você precise de ajuda, basta me mencionar!',
-              '🤔 como que eu estou "jogando" se eu sou um bot?',
-              'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
-              'Caso você queira ver meu código fonte, use o comando "source"!']
-    status_escolhido = choice(status)  # escolhe um status "aleatório"
-    # vai substituir pela quantidade de servidores que o bot está
-    status_escolhido = status_escolhido.replace('{servers}', f'{len(bot.guilds)}')
-    await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
+    if bot.mudar_status:
+        # lista com os status
+        status = ['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
+                  'Eu estou divertindo {servers} servidores!',
+                  'Caso você precise de ajuda, basta me mencionar!',
+                  '🤔 como que eu estou "jogando" se eu sou um bot?',
+                  'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
+                  'Caso você queira ver meu código fonte, use o comando "source"!']
+        status_escolhido = choice(status)  # escolhe um status "aleatório"
+        # vai substituir pela quantidade de servidores que o bot está
+        status_escolhido = status_escolhido.replace('{servers}', f'{len(bot.guilds)}')
+        await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
 
 
 if __name__ == '__main__':
