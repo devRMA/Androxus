@@ -55,11 +55,13 @@ async def on_message_edit(before, after):
 
 @tasks.loop(seconds=10)
 async def change_status():  # loop que vai ficar alterando o status do bot
-    status = ['Para me adicionar em um servidor, basta enviar a mensagem ``invite`` no meu privado!',
-              # lista com os status
+    # lista com os status
+    status = ['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
               'Eu estou divertindo {servers} servidores!',
-              'Caso você precise de ajuda, basta me mencionar.',
-              '🤔 como que eu estou "jogando" se eu sou um bot? 🤔']
+              'Caso você precise de ajuda, basta me mencionar!',
+              '🤔 como que eu estou "jogando" se eu sou um bot?',
+              'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
+              'Caso você queira ver meu código fonte, use o comando "source"!']
     status_escolhido = choice(status)  # escolhe um status "aleatório"
     # vai substituir pela quantidade de servidores que o bot está
     status_escolhido = status_escolhido.replace('{servers}', f'{len(bot.guilds)}')
