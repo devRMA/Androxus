@@ -8,7 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord.modelos.EmbedHelp import embedHelp
-from discord.Utils import random_color, pegar_o_prefixo
+from discord.Utils import random_color, pegar_o_prefixo, get_last_update
 from stopwatch import Stopwatch
 import psutil
 from sys import version
@@ -56,8 +56,9 @@ class Botinfo(commands.Cog):
         embed.add_field(name='<a:loading:756715436149702806> Uso da CPU:',
                         value=f'``{psutil.cpu_percent()}%``',
                         inline=True)
-        embed.add_field(name=':frog: Quantidade de RAM disponível:',
-                        value=f'``{(psutil.virtual_memory().total / (1e+9)):.2f}Gbs``',
+        embed.add_field(name=':frog: Memória RAM:',
+                        value=f'``{(psutil.virtual_memory().total / (1e+9)):.2f}Gbs' +
+                              f'(usando {psutil.virtual_memory().percent}%)``',
                         inline=True)
         embed.add_field(name='<:WumpusPizza:756712226710356122> Versão da API do discord:',
                         value=f'``{discord.__version__}``',
@@ -67,6 +68,20 @@ class Botinfo(commands.Cog):
                         inline=True)
         embed.add_field(name=':bank: Banco de dados que estou usando:',
                         value=f'``Postgresql``',
+                        inline=True)
+        uptime = datetime.utcnow() - self.bot.uptime
+        hours_bot, remainder_bot = divmod(int(uptime.total_seconds()), 3600)
+        minutes_bot, seconds_bot = divmod(remainder_bot, 60)
+        days_bot, hours_bot = divmod(hours_bot, 24)
+        embed.add_field(name=':stopwatch: Estou online há:',
+                        value=f'``{days_bot} D, {hours_bot} H, {minutes_bot} M, {seconds_bot} S``',
+                        inline=True)
+        atualizado_ha = datetime.utcnow() - get_last_update()
+        hours_att, remainder_att = divmod(int(atualizado_ha.total_seconds()), 3600)
+        minutes_att, seconds_att = divmod(remainder_att, 60)
+        days_att, hours_att = divmod(hours_att, 24)
+        embed.add_field(name=':stopwatch: Ultima atualização há:',
+                        value=f'``{days_att} D, {hours_att} H, {minutes_att} M, {seconds_att} S``',
                         inline=True)
         await ctx.send(embed=embed)
 def setup(bot):
