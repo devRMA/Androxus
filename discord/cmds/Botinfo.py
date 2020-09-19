@@ -23,14 +23,13 @@ class Botinfo(commands.Cog):
         embed = embedHelp(self.bot,
                           ctx,
                           comando='desativar_comando',
-                          descricao=self.desativar_comando.description,
-                          parametros=['<"comando">'],
-                          exemplos=['``{pref}desativar_comando`` ``"say"``'],
-                          aliases=self.desativar_comando.aliases.copy(),  # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          perm_pessoa='administrador')
+                          descricao=self.botinfo.description,
+                          exemplos=['``{pref}botinfo``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.botinfo.aliases.copy())
         await ctx.send(content=ctx.author.mention, embed=embed)
 
-    @commands.command(aliases=['info', 'detalhes'], description='Mostra algumas informações minhas!')
+    @commands.command(aliases=['info', 'detalhes'], description='Mostra algumas informações sobre mim!')
     async def botinfo(self, ctx):
         stopwatch_banco = Stopwatch()
         prefixo = pegar_o_prefixo(None, ctx)
@@ -58,7 +57,7 @@ class Botinfo(commands.Cog):
                         value=f'``{psutil.cpu_percent()}%``',
                         inline=True)
         embed.add_field(name=':frog: Quantidade de RAM disponível:',
-                        value=f'``{((psutil.virtual_memory().total) / (1024 ** 2)):.2f}mb``',
+                        value=f'``{((psutil.virtual_memory().total) / (1024 ** 3)):.2f}Gbs``',
                         inline=True)
         embed.add_field(name='<:WumpusPizza:756712226710356122> Versão da API do discord:',
                         value=f'``{discord.__version__}``',
