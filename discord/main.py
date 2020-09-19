@@ -9,10 +9,12 @@ import discord  # import da API do discord
 from discord.ext import commands, tasks  # outros imports do discord
 from os import environ  # função responsável por pegas o token do bot
 from os import listdir  # função responsável por pegar todos os cogs
-from discord.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
+from discord.Utils import pegar_o_prefixo, get_last_update  # função que vai ser usada toda vez que enviarem uma mensagem
 from sys import version  # função para pegar a versão do python
 from discord.events.OnMessageEvent import on_message_event  # evento que vai ser chamado, toda vez que enviarem uma menasgem
-from random import choice  # função que vai ser usada para escolher "aleatóriamente" qual status do bot
+from random import choice  # função que vai ser usada para escolher "aleatoriamente" qual status do bot
+from datetime import datetime  # Esse módulo vai ser usado para definir a hora que o bot iniciou
+
 # instanciamento do bot em si, passando a função "pegar_o_prefixo" no prefixo
 bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657)
 bot.remove_command('help')  # remove o comando help default
@@ -20,12 +22,14 @@ bot.remove_command('help')  # remove o comando help default
 
 @bot.event
 async def on_ready():
-    # esse evento só vai ser chamado uma vez, que é quando o bot iniciar
+    # esse evento vai ser quando o bot iniciar
     print('Bot online!')
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
     print(f'Versão do discord.py: {discord.__version__}')
     print(f'Versão do python: {version[0:5]}')
+    if not hasattr(bot, 'uptime'):  # se o bot não tiver o atributo "uptime"
+        bot.uptime = datetime.utcnow()  # vai criar o atributo, com a data e hora atual
     change_status.start()  # inicia o loop para mudar o status
 
 
