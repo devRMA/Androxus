@@ -74,14 +74,14 @@ class Botinfo(commands.Cog):
         minutes_bot, seconds_bot = divmod(remainder_bot, 60)
         days_bot, hours_bot = divmod(hours_bot, 24)
         embed.add_field(name=':stopwatch: Estou online há:',
-                        value=f'``{days_bot} D, {hours_bot} H, {minutes_bot} M, {seconds_bot} S``',
+                        value=f'``{days_bot} d, {hours_bot} h, {minutes_bot} m, {seconds_bot} s``',
                         inline=True)
         atualizado_ha = datetime.utcnow() - get_last_update()
         hours_att, remainder_att = divmod(int(atualizado_ha.total_seconds()), 3600)
         minutes_att, seconds_att = divmod(remainder_att, 60)
         days_att, hours_att = divmod(hours_att, 24)
         embed.add_field(name=':watch: Ultima atualização há:',
-                        value=f'``{days_att} D, {hours_att} H, {minutes_att} M, {seconds_att} S``',
+                        value=f'``{days_att} d, {hours_att} h, {minutes_att} m, {seconds_att} s``',
                         inline=True)
         await ctx.send(embed=embed)
 def setup(bot):
