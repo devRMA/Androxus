@@ -90,11 +90,10 @@ class Botinfo(commands.Cog):
                         value=f'``{(psutil.virtual_memory().total / (1e+9)):.2f}Gbs' +
                               f'(usando {psutil.virtual_memory().percent}%)``',
                         inline=True)
-        embed.add_field(name='<:WumpusPizza:756712226710356122> Versão do [discord.py]' +
-                             '(https://discordpy.readthedocs.io/en/latest/index.html):',
+        embed.add_field(name='<:WumpusPizza:756712226710356122> Versão do discord.py:',
                         value=f'``{discord.__version__}``',
                         inline=True)
-        embed.add_field(name='<:python:756712226210971660> Versão do [python](https://www.python.org/):',
+        embed.add_field(name='<:python:756712226210971660> Versão do python:',
                         value=f'``{version[0:5]}``',
                         inline=True)
         embed.add_field(name=':bank: Banco de dados que estou usando:',
