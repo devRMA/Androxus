@@ -32,13 +32,7 @@ class Calc(commands.Cog):
 
     @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
     async def calc(self, ctx, *args):
-        chars_aceitaveis = list(range(0, 10))
-        chars_aceitaveis.append(' ')
-        chars_aceitaveis.append('+')
-        chars_aceitaveis.append('/')
-        chars_aceitaveis.append('%')
-        chars_aceitaveis.append('*')
-        chars_aceitaveis.append('-')
+        chars_aceitaveis = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '+', '/', '%', '*', '-']
         if len(args) == 0:
             await self.help_calc(ctx)
             return
