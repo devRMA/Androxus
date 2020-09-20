@@ -43,8 +43,8 @@ class Calc(commands.Cog):
             await self.help_calc(ctx)
             return
         for char in args:
-            if not char in chars_aceitaveis:
-                await ctx.send(f'O caracter {char} não é nem um número, nem uma operação!')
+            if not (char in chars_aceitaveis):
+                await ctx.send(f'O caracter ``{char}`` não é nem um número, nem uma operação!')
                 return
         embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
                               colour=discord.Colour(random_color()),
