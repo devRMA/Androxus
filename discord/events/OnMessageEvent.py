@@ -9,7 +9,6 @@ from discord.Utils import pegar_o_prefixo
 from discord.dao.BlacklistDao import BlacklistDao
 from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
-from random import choice
 
 
 async def on_message_event(bot, message):
@@ -59,6 +58,5 @@ async def on_message_event(bot, message):
                             return
     if (f'<@{str(bot.user.id)}>' == message.content) or (f'<@!{str(bot.user.id)}>' == message.content):
         await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda!')
-        emojis_help = ['<a:help:755774680064983221>', '<a:hello:755774680949850173>']
-        await channel.send(choice(emojis_help))
+        await channel.send('<a:hello:755774680949850173>')
     await bot.process_commands(message)
