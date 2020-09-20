@@ -63,7 +63,7 @@ class Botinfo(commands.Cog):
         elif months == 1:
             meses_formatado = f', {months} mês '
         embed.add_field(name=':older_adult: Idade:',
-                        value=f'``{years} anos {meses_formatado}{dias_formatados}``',
+                        value=f'``{years} anos{meses_formatado}{dias_formatados}``',
                         inline=True)
         embed.add_field(name=':robot: Meu perfil:',
                         value=f'``{str(self.bot.user)}``',
