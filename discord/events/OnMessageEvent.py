@@ -52,11 +52,14 @@ async def on_message_event(bot, message):
                         if not inText:  # se não for para ignorar a posição, vai ver se a mensagem inicia com o comando
                             if not message.content.lower().startswith(comando[0]):
                                 # se for obrigatorio que a mensagem comesse com o comando, e ela não estiver começando
-                                enviar_mensagem = False # não vai responder
+                                enviar_mensagem = False  # não vai responder
                         if enviar_mensagem:
                             await channel.send(resposta)
                             return
     if (f'<@{str(bot.user.id)}>' == message.content) or (f'<@!{str(bot.user.id)}>' == message.content):
         await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda!')
         await channel.send('<a:hello:755774680949850173>')
+    elif message.mention_everyone:  # verifica se marcou here ou everyone
+        emoji = bot.get_emoji(755774680220172340)  # emoji de ping pistola
+        await message.add_reaction(emoji)  # adiciona a reação com o emoji
     await bot.process_commands(message)

@@ -32,10 +32,12 @@ class Say(commands.Cog):
                 await ctx.message.delete()
             if not ctx.author.permissions_in(ctx.message.channel).manage_messages:
                 frase += f'\n\n- {ctx.author}'
+            # se a pessoa não tiver perm de marca everyone
+            if not ctx.author.permissions_in(ctx.message.channel).mention_everyone:
+                frase = frase.replace('@everyone', '<a:no_no:755774680325029889>')
+                frase = frase.replace('@here', '<a:no_no:755774680325029889>')
         except:  # se der algum erro, provavelmente é porque o comando foi usado no dm
             pass
-        frase = frase.replace('@everyone', '<a:no_no:755774680325029889>')
-        frase = frase.replace('@here', '<a:no_no:755774680325029889>')
         await ctx.send(frase)
 
 
