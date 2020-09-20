@@ -87,7 +87,7 @@ class Botinfo(commands.Cog):
                         value=f'``{psutil.cpu_percent()}%``',
                         inline=True)
         embed.add_field(name=':frog: Memória RAM:',
-                        value=f'``{(psutil.virtual_memory().total / (1e+9)):.2f}Gbs' +
+                        value=f'``{(psutil.virtual_memory().total / (1e+9)):.2f}Gb' +
                               f'(usando {psutil.virtual_memory().percent}%)``',
                         inline=True)
         embed.add_field(name='<:WumpusPizza:756712226710356122> Versão do discord.py:',
