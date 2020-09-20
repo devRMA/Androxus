@@ -48,7 +48,7 @@ class Botinfo(commands.Cog):
                         value=f'``{self.bot.user.created_at.strftime("%d/%m/%Y")}``',
                         inline=True)
         # years months days hours minutes seconds
-        idade = relativedelta(datetime.utcnow(), self.user.bot.created_at)
+        idade = relativedelta(datetime.utcnow(), self.bot.user.created_at)
         days = idade.days
         months = idade.months
         years = idade.years
