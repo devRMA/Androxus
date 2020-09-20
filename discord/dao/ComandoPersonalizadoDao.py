@@ -14,11 +14,11 @@ class ComandoPersonalizadoDao:
         self.cursor = self.connection.cursor()  # cria o cursor
 
     def create(self, serverId, comando, resposta, inText=False):
+        # verifica se os tipos dos parametros
         if isinstance(serverId, int) and isinstance(comando, str) and isinstance(resposta, str) and isinstance(inText,
-                                                                                                               bool):  # verifica se os tipos dos parametros
+                                                                                                               bool):
             try:
-                query = 'INSERT INTO comandos_personalizados(serverId, comando, resposta, inText) VALUES(%s,' + \
-                        '%s, %s, %s);'
+                query = 'CALL cmd_personalizado_add (%s, %s, %s, %s);'
                 self.cursor.execute(query, (serverId, comando, resposta, inText,))
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
                 return True  # vai retornar True se tudo ocorrer bem
@@ -36,7 +36,7 @@ class ComandoPersonalizadoDao:
     def get_comandos(self, serverId):
         if isinstance(serverId, int):
             try:
-                query = 'SELECT comando FROM comandos_personalizados WHERE serverId = %s;'
+                query = 'SELECT * FROM cmd_personalizado_get_comandos(%s);'
                 self.cursor.execute(query, (serverId,))
                 resposta = self.cursor.fetchall()
                 return resposta
@@ -51,7 +51,7 @@ class ComandoPersonalizadoDao:
     def get_resposta(self, serverId, comando):
         if isinstance(serverId, int) and isinstance(comando, str):
             try:
-                query = 'SELECT resposta, inText FROM comandos_personalizados WHERE serverId = %s AND comando = %s;'
+                query = 'SELECT * FROM cmd_personalizado_get_resp(%s, %s);'
                 self.cursor.execute(query, (serverId, comando,))
                 resposta = self.cursor.fetchone()
                 return resposta
@@ -67,7 +67,7 @@ class ComandoPersonalizadoDao:
         if isinstance(serverId, int) and isinstance(comando, str) and isinstance(resposta, str) and isinstance(inText,
                                                                                                                bool):
             try:
-                query = 'UPDATE comandos_personalizados SET resposta = %s, inText = %s WHERE serverId = %s AND comando = %s;'
+                query = 'CALL cmd_personalizado_update(%s, %s, %s, %s);'
                 self.cursor.execute(query, (resposta, inText, serverId, comando))
                 self.connection.commit()
                 return True
@@ -83,7 +83,7 @@ class ComandoPersonalizadoDao:
     def delete(self, serverId, comando):
         if isinstance(serverId, int) and isinstance(comando, str):
             try:
-                query = 'DELETE FROM comandos_personalizados WHERE serverId = %s AND comando = %s;'
+                query = 'CALL cmd_personalizado_remove(%s, %s);'
                 self.cursor.execute(query, (serverId, comando,))
                 self.connection.commit()
                 return True

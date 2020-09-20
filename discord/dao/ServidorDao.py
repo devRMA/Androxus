@@ -16,7 +16,7 @@ class ServidorDao:
     def create(self, serverId):
         if isinstance(serverId, int):  # verifica se o id é int
             try:
-                query = 'INSERT INTO servers (serverId, prefixo) VALUES(%s, \'--\');'  # query
+                query = 'CALL server_add(%s);'  # query
                 self.cursor.execute(query, (serverId,))  # o cursor, vai colocar o "id" no lugar do "%s" e executar a query
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
             except psycopg2.IntegrityError as e:
@@ -35,7 +35,7 @@ class ServidorDao:
     def get_prefix(self, serverId):
         if isinstance(serverId, int):  # verifica se o Id passado, é do tipo int
             try:  # se for, vai tentar fazer o select
-                query = 'SELECT prefixo FROM servers WHERE serverId = %s;'  # select para pegar o prefixo
+                query = 'SELECT * FROM server_get_prefix(%s);'  # select para pegar o prefixo
                 self.cursor.execute(query, (serverId,))  # vai trocar ^ esse %s pelo id do servidor
                 resposta = self.cursor.fetchone()  # e depois, vai pegar o resultado do select
                 return resposta  # e retornar este resultado
@@ -50,7 +50,7 @@ class ServidorDao:
     def update(self, serverId, prefixo):
         if isinstance(serverId, int) and isinstance(prefixo, str):
             try:
-                query = 'UPDATE servers SET prefixo = %s WHERE serverId = %s;'
+                query = 'CALL server_update(%s, %s);'
                 self.cursor.execute(query, (prefixo, serverId,))
                 self.connection.commit()
                 return True
@@ -66,11 +66,7 @@ class ServidorDao:
     def delete(self, serverId):
         if isinstance(serverId, int):
             try:
-                query = 'DELETE FROM servers WHERE serverId = %s;'
-                self.cursor.execute(query, (serverId,))
-                query = 'DELETE FROM comandos_personalizados WHERE serverId = %s;'
-                self.cursor.execute(query, (serverId,))
-                query = 'DELETE FROM comandos_desativados WHERE serverId = %s;'
+                query = 'CALL server_remove(%s)'
                 self.cursor.execute(query, (serverId,))
                 self.connection.commit()
             except Exception as e:

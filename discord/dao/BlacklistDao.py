@@ -17,12 +17,13 @@ class BlacklistDao:
     def create(self, pessoaId):
         if isinstance(pessoaId, int):  # verifica se o id é int
             try:
-                query = 'INSERT INTO blacklist (pessoaId) VALUES(%s);'  # query
+                # function do banco
+                query = 'CALL blacklist_add( %s )'  # query
                 self.cursor.execute(query,
                                     (pessoaId,))  # o cursor, vai colocar o "id" no lugar do "%s" e executar a query
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
                 return True  # vai retornar True se tudo ocorrer bem
-            except psycopg2.IntegrityError as e:
+            except psycopg2.IntegrityError as e:  # se esse item já existir
                 if str(e).startswith('UNIQUE constraint failed'):
                     raise Exception('duplicate key value violates unique constraint')
                 else:
@@ -39,9 +40,10 @@ class BlacklistDao:
     def get_pessoa(self, pessoaId):
         if isinstance(pessoaId, int):
             try:
-                query = 'SELECT * FROM blacklist WHERE pessoaId = %s;'
+                query = 'SELECT * FROM blacklist_get_pessoa ( %s );'
                 self.cursor.execute(query, (pessoaId,))
-                if self.cursor.fetchone() != None:  # vai fazer o select, se retornal algo, o id passado está na blacklist
+                # vai fazer o select, se retornal algo, o id passado está na blacklist
+                if self.cursor.fetchone() is not None:
                     return True
                 else:  # se retornou None, é porque a pessoa não está na blacklist
                     return False
@@ -56,7 +58,7 @@ class BlacklistDao:
     def delete(self, pessoaId):
         if isinstance(pessoaId, int):
             try:
-                query = 'DELETE FROM blacklist WHERE pessoaId = %s;'
+                query = 'CALL blacklist_remove( %s );;'
                 self.cursor.execute(query, (pessoaId,))
                 self.connection.commit()
             except Exception as e:

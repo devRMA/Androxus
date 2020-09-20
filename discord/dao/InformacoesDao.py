@@ -16,7 +16,7 @@ class InformacoesDao:
     def create(self, informacao, dado):
         if isinstance(informacao, str) and isinstance(dado, str):  # verifica se os tipos das variaveis
             try:
-                query = 'INSERT INTO informacoes_do_bot(informacao, dado) VALUES(%s, %s);'  # query
+                query = 'CALL info_add(%s, %s);'  # query
                 self.cursor.execute(query, (informacao, dado,))
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
                 return True  # vai retornar True se tudo ocorrer bem
@@ -34,7 +34,7 @@ class InformacoesDao:
     def get(self, informacao):
         if isinstance(informacao, str):
             try:
-                query = 'SELECT dado FROM informacoes_do_bot WHERE informacao = %s;'
+                query = 'SELECT * FROM info_get(%s);'
                 self.cursor.execute(query, (informacao,))
                 resposta = self.cursor.fetchone()
                 return resposta
@@ -49,7 +49,7 @@ class InformacoesDao:
     def update(self, informacao, dado):
         if isinstance(informacao, str) and isinstance(dado, str):
             try:
-                query = 'UPDATE informacoes_do_bot SET dado = %s WHERE informacao = %s;'
+                query = 'CALL info_update(%s, %s);'
                 self.cursor.execute(query, (dado, informacao,))
                 self.connection.commit()
                 return True
@@ -65,7 +65,7 @@ class InformacoesDao:
     def delete(self, informacao):
         if isinstance(informacao, str):
             try:
-                query = 'DELETE FROM informacoes_do_bot WHERE informacao = %s;'
+                query = 'CALL info_remove(%s);'
                 self.cursor.execute(query, (informacao,))
                 self.connection.commit()
                 return True

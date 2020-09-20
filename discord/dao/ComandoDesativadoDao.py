@@ -16,7 +16,7 @@ class ComandoDesativadoDao:
     def create(self, serverId, comando):
         if isinstance(serverId, int) and isinstance(comando, str):  # verifica se os tipos das variaveis
             try:
-                query = 'INSERT INTO comandos_desativados(serverId, comando) VALUES(%s, %s);'  # query
+                query = 'CALL cmd_desativado_add(%s, %s);'  # query
                 self.cursor.execute(query, (serverId, comando.lower(),))
                 self.connection.commit()  # se tudo ocorrer bem, ele vai salvar as alterações
                 return True  # vai retornar True se tudo ocorrer bem
@@ -34,8 +34,8 @@ class ComandoDesativadoDao:
     def get_comandos(self, serverId):
         if isinstance(serverId, int):
             try:
-                query = 'SELECT comando FROM comandos_desativados WHERE serverId = %s;'
-                self.cursor.execute(query, (serverId,))
+                query = 'SELECT * FROM cmd_desativado_get_comandos(%s);'  # funcion que está banco
+                self.cursor.execute(query, (serverId,))  # vai coloc
                 resposta = self.cursor.fetchall()
                 return resposta
             except Exception as e:
@@ -49,7 +49,7 @@ class ComandoDesativadoDao:
     def delete(self, serverId, comando):
         if isinstance(serverId, int) and isinstance(comando, str):
             try:
-                query = 'DELETE FROM comandos_desativados WHERE serverId = %s AND comando = %s;'
+                query = 'CALL cmd_desativado_remove(%s, %s);'
                 self.cursor.execute(query, (serverId, comando,))
                 self.connection.commit()
                 return True
