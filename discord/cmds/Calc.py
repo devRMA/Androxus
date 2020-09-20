@@ -40,13 +40,14 @@ class Calc(commands.Cog):
         if len(args) == 0:
             await self.help_calc(ctx)
             return
+        args = ' '.join(args)
         for char in args:
             if not (char in chars_aceitaveis):
                 await ctx.send(f'O caracter ``{char}`` não é nem um número, nem uma operação!')
                 return
         embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
                               colour=discord.Colour(random_color()),
-                              description=f'{eval(" ".join(args))}',
+                              description=f'{eval(args)}',
                               timestamp=datetime.utcnow())
         embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
