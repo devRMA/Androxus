@@ -9,6 +9,7 @@ from discord.ext import commands
 import discord
 from discord.modelos.EmbedHelp import embedHelp
 from discord.Utils import random_color
+from dateutil.relativedelta import relativedelta  # módulo que vai ser usado para subtrair datetime
 
 
 class Uptime(commands.Cog):
@@ -28,11 +29,11 @@ class Uptime(commands.Cog):
 
     @commands.command(aliases=['tempo_on'], description='Mostra a quanto tempo eu estou online!')
     async def uptime(self, ctx):
-        # uptime feito pelo mr. self destruct#8086
-        uptime = datetime.utcnow() - self.bot.uptime
-        hours, remainder = divmod(int(uptime.total_seconds()), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        days, hours = divmod(hours, 24)
+        uptime = relativedelta(datetime.utcnow(), self.bot.uptime)
+        seconds = uptime.seconds
+        minutes = uptime.minutes
+        hours = uptime.hours
+        days = uptime.days
         dias_on = ''
         horas_on = ''
         minutos_on = ''
