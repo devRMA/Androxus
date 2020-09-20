@@ -72,7 +72,7 @@ class Botinfo(commands.Cog):
                         value=f'``{self.bot.user.id}``',
                         inline=True)
         embed.add_field(name='<:WumpusCrown:756712226978660392> Meu dono:',
-                        value=f'``{self.bot.appinfo.owner}``',
+                        value=f'``{self.bot.get_user(self.bot.owner_id)}``',
                         inline=True)
         embed.add_field(name='<a:pato:755774683348992060> Quantos servidores estão me usando:',
                         value=f'``{len(self.bot.guilds)}``',
