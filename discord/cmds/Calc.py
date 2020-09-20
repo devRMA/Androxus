@@ -21,18 +21,22 @@ class Calc(commands.Cog):
                           ctx,
                           comando='calc',
                           descricao='Para multiplicar, use ``*``. Para dividir use ``/``. Para usar potência, ' +
-                                    'use ``**``. Use () para dar preferencia na hora de fazer os calculos!',
+                                    'use ``**``. Coloque números decimais com ponto em vez de virgula' +
+                                    '. Você **não** deve fazer isso: ``3,14``, e **sim**: ``3.14``.Use ' +
+                                    '() para dar preferencia na ' +
+                                    'hora de fazer os calculos!',
                           parametros=['<Operação(ões)>'],
                           exemplos=['``{pref}calc`` ``2 + 5 * 2``',
-                                    '{pref}calcular ``(2 + 5) * 2``',
-                                    '{pref}calc ``5 ** 5``'],
+                                    '``{pref}calcular`` ``(2 + 5) * 2``',
+                                    '``{pref}calc`` ``5 ** 5``',
+                                    '``{pref}calc`` ``2.5 * 4``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.calc.aliases.copy())
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
     async def calc(self, ctx, *args):
-        chars_aceitaveis = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '+', '/', '%', '*', '-']
+        chars_aceitaveis = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '+', '/', '%', '*', '-', '(', ')', '.']
         if len(args) == 0:
             await self.help_calc(ctx)
             return
