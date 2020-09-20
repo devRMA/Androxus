@@ -32,9 +32,20 @@ class Calc(commands.Cog):
 
     @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
     async def calc(self, ctx, *args):
+        chars_aceitaveis = list(range(0, 10))
+        chars_aceitaveis.append(' ')
+        chars_aceitaveis.append('+')
+        chars_aceitaveis.append('/')
+        chars_aceitaveis.append('%')
+        chars_aceitaveis.append('*')
+        chars_aceitaveis.append('-')
         if len(args) == 0:
             await self.help_calc(ctx)
             return
+        for char in args:
+            if not char in chars_aceitaveis:
+                await ctx.send(f'O caracter {char} não é nem um número, nem uma operação!')
+                return
         embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
                               colour=discord.Colour(random_color()),
                               description=f'{eval(" ".join(args))}',
