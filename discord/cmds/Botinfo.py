@@ -72,10 +72,16 @@ class Botinfo(commands.Cog):
                         value=f'``{self.bot.user.id}``',
                         inline=True)
         embed.add_field(name='<:WumpusCrown:756712226978660392> Meu dono:',
-                        value=f'``{self.bot.get_user(self.bot.owner_id)}``',
+                        value=f'``{self.bot.appinfo.owner}``',
                         inline=True)
         embed.add_field(name='<a:pato:755774683348992060> Quantos servidores estão me usando:',
                         value=f'``{len(self.bot.guilds)}``',
+                        inline=True)
+        embed.add_field(name='<a:parrot_dancando:755774679670718575> Quantas pessoas tem acesso a mim:',
+                        # observer, que aqui, estamos pegando a lista de membros e jogando para um set
+                        # pois, o "set" não permite que haja itens duplicados, ou seja, fazendo desta forma
+                        # cada item vai ser único
+                        value=f'``{str(len(set(self.bot.get_all_members())))}``',
                         inline=True)
         embed.add_field(name=':ping_pong: Latência da API:',
                         value=f'``{int(self.bot.latency * 1000)}ms``',
