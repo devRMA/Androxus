@@ -16,6 +16,9 @@ class Calc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def __calcular(self, x):  # declaração de um método privado
+        return await eval(x)
+
     @commands.command(hidden=True, aliases=['help_calcular'])
     async def help_calc(self, ctx):
         embed = embedHelp(self.bot,
@@ -50,12 +53,9 @@ class Calc(commands.Cog):
                 await ctx.send(f'O caracter ``{char}`` não é nem um número, nem uma operação!')
                 return
 
-        async def calcular(x):
-            return await eval(x)
-
         try:
             # o tempo limite para executar a equação, é 5 vezes a latência do bot
-            resultado = await asyncio.wait_for(calcular(args), timeout=(self.bot.latency * 5))
+            resultado = await asyncio.wait_for(self.__calcular(args), timeout=(self.bot.latency * 5))
         except asyncio.TimeoutError:
             # se passar mais de 5 vezes, a latencia do bot, sem segundos, para fazer a equação:
             await ctx.send(f'Está equação é muito grande para mim! <a:sad:755774681008832623>')
