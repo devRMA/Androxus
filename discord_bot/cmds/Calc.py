@@ -41,7 +41,10 @@ class Calc(commands.Cog):
         if len(args) == 0:
             await self.help_calc(ctx)
             return
-        args = (' '.join(args)).replace('**', '')  # potencia temporariamente removida
+        args = ' '.join(args)
+        if args.find('**'):  # potencia temporariamente removida
+            await ctx.send('A operação ``**`` foi desativada temporariamente.')
+            return
         for char in args:
             if not (char in chars_aceitaveis):
                 await ctx.send(f'O caracter ``{char}`` não é nem um número, nem uma operação!')
