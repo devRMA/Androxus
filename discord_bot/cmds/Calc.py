@@ -51,13 +51,13 @@ class Calc(commands.Cog):
                 return
 
         async def calcular(x):
-            return eval(x)
+            return await eval(x)
 
         try:
-            # o tempo limite para executar a equação, é 10 vezes a latência do bot
-            resultado = await asyncio.wait_for(calcular(args), timeout=(self.bot.latency * 10))
+            # o tempo limite para executar a equação, é 5 vezes a latência do bot
+            resultado = await asyncio.wait_for(calcular(args), timeout=(self.bot.latency * 5))
         except asyncio.TimeoutError:
-            # se passar mais de 10 vezes, a latencia do bot, sem segundos, para fazer a equação:
+            # se passar mais de 5 vezes, a latencia do bot, sem segundos, para fazer a equação:
             await ctx.send(f'Está equação é muito grande para mim! <a:sad:755774681008832623>')
             return
         except SyntaxError as error:
