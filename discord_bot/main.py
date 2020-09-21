@@ -73,9 +73,7 @@ async def change_status():  # loop que vai ficar alterando o status do bot
                   'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
                   'Caso você queira ver meu código fonte, use o comando "source"!']
         status_escolhido = choice(status)  # escolhe um status "aleatório"
-        # vai substituir pela quantidade de servidores que o bot está
-        status_escolhido = status_escolhido.replace('{servers}', f'{len(bot.guilds)}')
-        status_escolhido = status_escolhido.replace('{pessoas}', f'{len(set(bot.get_all_members()))}')
+        status_escolhido = status_escolhido.format(servers=len(bot.guilds), pessoas=len(bot.users))
         await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
 
 
