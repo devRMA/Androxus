@@ -48,9 +48,9 @@ class Calc(commands.Cog):
         try:
             resultado = eval(args)
         except SyntaxError as error:
-            onde_foi_o_erro = '.'
+            onde_foi_o_erro = ''
             for c in range(0, (error.offset - 1)):
-                onde_foi_o_erro = ' '
+                onde_foi_o_erro += ' '
             onde_foi_o_erro += '↑'
             await ctx.send(f'Equação inválida!\n```{error.text}\n{onde_foi_o_erro}```')
             return
