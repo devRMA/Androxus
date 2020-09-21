@@ -11,6 +11,7 @@ from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.Utils import random_color, pegar_o_prefixo, get_last_update
 from stopwatch import Stopwatch
 import psutil
+from os import getpid
 from sys import version
 from discord_bot.dao.InformacoesDao import InformacoesDao
 from dateutil.relativedelta import relativedelta  # módulo que vai ser usado para subtrair datetime
@@ -93,8 +94,8 @@ class Botinfo(commands.Cog):
                         value=f'``{psutil.cpu_percent()}%``',
                         inline=True)
         embed.add_field(name=':frog: Memória RAM:',
-                        value=f'``{(psutil.virtual_memory().total / (1e+9)):.2f}Gb' +
-                              f'(usando {psutil.virtual_memory().percent}%)``',
+                        value=f'``{(psutil.Process(getpid()).memory_info().rss / (1e+6)):.2f}Mb' +
+                              '/500Mb',
                         inline=True)
         embed.add_field(name='<:WumpusPizza:756712226710356122> Versão do discord.py:',
                         value=f'``{discord.__version__}``',
