@@ -45,9 +45,24 @@ class Calc(commands.Cog):
             if not (char in chars_aceitaveis):
                 await ctx.send(f'O caracter ``{char}`` não é nem um número, nem uma operação!')
                 return
+        try:
+            resultado = eval(args)
+        except SyntaxError as error:
+            onde_foi_o_erro = ''
+            for c in range(0, (error.offset - 1)):
+                onde_foi_o_erro = ' '
+            onde_foi_o_erro += '↑'
+            await ctx.send(f'Equação inválida!\n```{error.text}\n{onde_foi_o_erro}```')
+            return
+        except ZeroDivisionError:
+            await ctx.send('Equação inválida! Ainda não sou capaz de resolver divisões por 0.\n<a:sad:755774681008832623>!')
+            return
+        if len(str(resultado)) >= 6000:
+            await ctx.send('O resultado desta equação é tão grande que não consigo enviar\n<a:sad:755774681008832623>')
+            return
         embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
                               colour=discord.Colour(random_color()),
-                              description=f'{eval(args)}',
+                              description=f'{resultado}',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
