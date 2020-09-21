@@ -5,9 +5,11 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
-from discord.dao.ServidorDao import ServidorDao
-from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
-from discord.modelos.EmbedHelp import embedHelp
+import discord
+from discord_bot.dao.ServidorDao import ServidorDao
+from discord_bot.Utils import random_color, pegar_o_prefixo, get_emoji_dance
+from discord_bot.modelos.EmbedHelp import embedHelp
+from datetime import datetime
 
 
 class ChangePrefix(commands.Cog):
@@ -32,11 +34,19 @@ class ChangePrefix(commands.Cog):
     @commands.has_permissions(administrator=True)
     @commands.guild_only()
     async def change_prefix(self, ctx, prefixo_novo='--'):
+        prefixo_antigo = pegar_o_prefixo(None, ctx)
         ServidorDao().update(ctx.guild.id, prefixo_novo)
         if prefixo_novo != '--':
-            await ctx.send(
-                f'Agora o meu  prefixo é ``{prefixo_novo}``\nCaso queria voltar para o prefixo padrão, basta digitar ' +
-                f'``{prefixo_novo}prefixo``\n{get_emoji_dance()}')
+            embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour(random_color()),
+                                  description=f'Prefixo antigo: {prefixo_antigo}\n'+
+                                              f'Prefixo novo: {prefixo_novo}',
+                                  timestamp=datetime.utcnow())
+            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            embed.add_field(name='\uFEFF',
+                            value=f'Caso queria voltar para o prefixo padrão, basta digitar ``{prefixo_novo}prefixo``!' +
+                                  f'\n{get_emoji_dance()}',
+                            inline=False)
+            await ctx.send(embed=embed)
         else:
             await ctx.send(f'Agora estou com o prefixo padrão! {get_emoji_dance()}')
 

@@ -6,7 +6,7 @@ __author__ = 'Rafael'
 
 
 import psycopg2
-from discord.dao.Factory import Factory
+from .Factory import Factory
 
 
 class BlacklistDao:

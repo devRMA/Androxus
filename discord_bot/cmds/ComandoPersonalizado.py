@@ -5,11 +5,11 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
-from discord.ext import commands
 import discord
-from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
-from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
-from discord.modelos.EmbedHelp import embedHelp
+from discord.ext import commands
+from discord_bot.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
+from discord_bot.Utils import random_color, get_emoji_dance
+from discord_bot.modelos.EmbedHelp import embedHelp
 
 
 class ComandoPersonalizado(commands.Cog):
@@ -51,7 +51,6 @@ class ComandoPersonalizado(commands.Cog):
             embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
                                   description='\uFEFF',
                                   timestamp=datetime.utcnow())
-            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             embed.add_field(name=f"Informações",
                             value=f"Comando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText_str}",
@@ -83,7 +82,6 @@ class ComandoPersonalizado(commands.Cog):
             embed = discord.Embed(title=f'Comando removido com sucesso!', colour=discord.Colour(random_color()),
                                   description='\uFEFF',
                                   timestamp=datetime.utcnow())
-            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             await ctx.send(content=get_emoji_dance(), embed=embed)
 
@@ -123,7 +121,6 @@ class ComandoPersonalizado(commands.Cog):
                                   description=f"Comando: {comando}\nResposta: {resposta}\n" +
                                               f"Ignorar a posição do comando: {inText_str}",
                                   timestamp=datetime.utcnow())
-            embed.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             await ctx.send(content=get_emoji_dance(), embed=embed)
 

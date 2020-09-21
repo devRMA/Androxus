@@ -6,7 +6,7 @@ __author__ = 'Rafael'
 
 
 def pegar_o_prefixo(bot, message):
-    from discord.dao.ServidorDao import ServidorDao  # pega a classe que mexe com a table dos servidores
+    from discord_bot.dao.ServidorDao import ServidorDao  # pega a classe que mexe com a table dos servidores
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
         prefixo = ServidorDao().get_prefix(
             message.guild.id)  # vai no banco de dados, e faz um select para ver qual o prefixo
@@ -47,7 +47,6 @@ def get_emoji_dance():  # função que vai escolher um emoji de dança aleatóri
               '<a:pepo_dance:755774680291344454>',
               '<a:SquidwardMilos:755774682174586890>']
     return choice(emojis)  # retorna o emoji escolhido da lista
-
 
 
 def get_last_update():

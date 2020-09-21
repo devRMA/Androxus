@@ -5,10 +5,10 @@
 __author__ = 'Rafael'
 
 
-from discord.Utils import pegar_o_prefixo
-from discord.dao.BlacklistDao import BlacklistDao
-from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
-from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
+from discord_bot.Utils import pegar_o_prefixo
+from discord_bot.dao.BlacklistDao import BlacklistDao
+from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
+from discord_bot.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
 
 
 async def on_message_event(bot, message):

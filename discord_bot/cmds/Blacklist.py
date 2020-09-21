@@ -5,8 +5,8 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
-from discord.dao.BlacklistDao import BlacklistDao
-from discord.Utils import get_emoji_dance
+from discord_bot.dao.BlacklistDao import BlacklistDao
+from discord_bot.Utils import get_emoji_dance
 
 
 class Blacklist(commands.Cog):

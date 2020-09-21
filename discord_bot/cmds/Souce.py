@@ -7,8 +7,8 @@ __author__ = 'Rafael'
 from datetime import datetime
 from discord.ext import commands
 import discord
-from discord.modelos.EmbedHelp import embedHelp
-from discord.Utils import random_color
+from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.Utils import random_color
 
 
 class Source(commands.Cog):

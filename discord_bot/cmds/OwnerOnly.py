@@ -6,7 +6,7 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 import discord
-from discord.Utils import get_emoji_dance, random_color
+from discord_bot.Utils import get_emoji_dance, random_color
 from datetime import datetime
 
 

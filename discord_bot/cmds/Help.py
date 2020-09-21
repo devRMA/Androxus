@@ -7,10 +7,10 @@ __author__ = 'Rafael'
 from discord.ext import commands
 import discord
 from datetime import datetime
-from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
-from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
-from discord.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
-from discord.modelos.EmbedHelp import embedHelp
+from discord_bot.Utils import random_color
+from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
+from discord_bot.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
+from discord_bot.modelos.EmbedHelp import embedHelp
 
 
 class Help(commands.Cog):

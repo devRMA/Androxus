@@ -7,9 +7,8 @@ __author__ = 'Rafael'
 import discord
 from discord.ext import commands
 from datetime import datetime
-from discord.Utils import random_color, pegar_o_prefixo, get_emoji_dance
-
-from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
+from discord_bot.Utils import random_color, pegar_o_prefixo, get_emoji_dance
+from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
 
 
 def embedHelp(bot: commands.Bot = None,

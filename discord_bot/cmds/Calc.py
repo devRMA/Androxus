@@ -7,8 +7,8 @@ __author__ = 'Rafael'
 from datetime import datetime
 from discord.ext import commands
 import discord
-from discord.modelos.EmbedHelp import embedHelp
-from discord.Utils import random_color
+from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.Utils import random_color
 
 
 class Calc(commands.Cog):
@@ -49,7 +49,6 @@ class Calc(commands.Cog):
                               colour=discord.Colour(random_color()),
                               description=f'{eval(args)}',
                               timestamp=datetime.utcnow())
-        embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
 

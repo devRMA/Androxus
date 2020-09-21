@@ -5,11 +5,11 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
-from discord.ext import commands
 import discord
-from discord.dao.ComandoDesativadoDao import ComandoDesativadoDao
-from discord.modelos.EmbedHelp import embedHelp
-from discord.Utils import random_color
+from discord.ext import commands
+from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
+from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.Utils import random_color
 
 
 class ComandoDesativado(commands.Cog):
@@ -52,7 +52,6 @@ class ComandoDesativado(commands.Cog):
             embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando desativado: {comando}',
                                   timestamp=datetime.utcnow())
-            embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             await ctx.send(content='<a:off:755774680660574268>', embed=embed)
 
@@ -73,14 +72,13 @@ class ComandoDesativado(commands.Cog):
     @commands.has_permissions(administrator=True)
     @commands.guild_only()
     async def reativar_comando(self, ctx, comando=None):
-        if (comando is None):
+        if comando is None:
             await self.help_desativar_comando(ctx)
             return
         if ComandoDesativadoDao().delete(ctx.guild.id, comando):
             embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando reativado: {comando}',
                                   timestamp=datetime.utcnow())
-            embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             await ctx.send(content='<a:on:755774680580882562>', embed=embed)
 

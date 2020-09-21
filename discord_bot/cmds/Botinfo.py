@@ -7,12 +7,12 @@ __author__ = 'Rafael'
 from datetime import datetime
 from discord.ext import commands
 import discord
-from discord.modelos.EmbedHelp import embedHelp
-from discord.Utils import random_color, pegar_o_prefixo, get_last_update
+from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.Utils import random_color, pegar_o_prefixo, get_last_update
 from stopwatch import Stopwatch
 import psutil
 from sys import version
-from discord.dao.InformacoesDao import InformacoesDao
+from discord_bot.dao.InformacoesDao import InformacoesDao
 from dateutil.relativedelta import relativedelta  # módulo que vai ser usado para subtrair datetime
 
 

@@ -5,7 +5,7 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
-from discord.modelos.EmbedHelp import embedHelp
+from discord_bot.modelos.EmbedHelp import embedHelp
 
 
 class Say(commands.Cog):
