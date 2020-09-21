@@ -67,7 +67,7 @@ class OwnerOnly(commands.Cog):
                     await user.create_dm()
                     await user.dm_channel.send(" ".join(args))
                 foi = True
-            except discord.errors.Forbidden as error:
+            except discord.errors.Forbidden:
                 foi = False
             try:
                 if foi and ctx.guild.id == 405826835793051649:
