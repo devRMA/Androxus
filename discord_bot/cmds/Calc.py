@@ -42,7 +42,7 @@ class Calc(commands.Cog):
             await self.help_calc(ctx)
             return
         args = ' '.join(args)
-        if args.find('**'):  # potencia temporariamente removida
+        if args.find('**') != -1:  # potencia temporariamente removida
             await ctx.send('A operação ``**`` foi desativada temporariamente.')
             return
         for char in args:
