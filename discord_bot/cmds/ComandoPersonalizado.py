@@ -20,7 +20,7 @@ class ComandoPersonalizado(commands.Cog):
     async def help_adicionar_comando(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='adicionar_comando',
+                          comando=self.adicionar_comando.name,
                           descricao=self.adicionar_comando.description,
                           parametros=['<"comando">', '<"resposta">', '[ignorar a posição do comando (sim/nao)]'],
                           exemplos=['``{pref}adicionar_comando`` ``"bom dia"`` ``"bom dia!"``',
@@ -61,7 +61,7 @@ class ComandoPersonalizado(commands.Cog):
     async def help_remover_comando(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='remover_comando',
+                          comando=self.remover_comando.name,
                           descricao=self.remover_comando.description,
                           parametros=['<"comando">'],
                           exemplos=['``{pref}remover_comando`` ``"bom dia"``',
@@ -89,7 +89,7 @@ class ComandoPersonalizado(commands.Cog):
     async def help_modificar_comando(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='modificar_comando',
+                          comando=self.modificar_comando.name,
                           descricao=self.modificar_comando.description,
                           parametros=['<"comando">', '<"resposta">', '[ignorar a posição do comando na mensagem (sim/nao). O padrão é sim]'],
                           exemplos=['``{pref}modificar_comando`` ``"bom dia"`` ``"boa noite!"``',

@@ -24,7 +24,7 @@ class Botinfo(commands.Cog):
     async def help_botinfo(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='desativar_comando',
+                          comando=self.botinfo.name,
                           descricao=self.botinfo.description,
                           exemplos=['``{pref}botinfo``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm

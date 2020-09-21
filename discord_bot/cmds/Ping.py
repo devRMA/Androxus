@@ -17,7 +17,7 @@ class Ping(commands.Cog):
     async def help_ping(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='ping',
+                          comando=self.ping.name,
                           descricao=self.ping.description,
                           exemplos=['``{pref}ping``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm

@@ -20,7 +20,7 @@ class ComandoDesativado(commands.Cog):
     async def help_desativar_comando(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='desativar_comando',
+                          comando=self.desativar_comando.name,
                           descricao=self.desativar_comando.description,
                           parametros=['<"comando">'],
                           exemplos=['``{pref}desativar_comando`` ``"say"``'],
@@ -59,7 +59,7 @@ class ComandoDesativado(commands.Cog):
     async def help_reativar_comando(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='reativar_comando',
+                          comando=self.reativar_comando.name,
                           descricao=self.reativar_comando.description,
                           parametros=['<"comando">'],
                           exemplos=['``{pref}reativar_comando`` ``"say"``'],

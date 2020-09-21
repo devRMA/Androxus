@@ -16,7 +16,7 @@ class Say(commands.Cog):
     async def help_say(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='say',
+                          comando=self.say.name,
                           descricao=self.say.description,
                           parametros=['<frase>'],
                           exemplos=['``{pref}say`` ``Hello World!!``', '``{pref}fale`` ``Olá Mundo!``'],

@@ -19,7 +19,7 @@ class Source(commands.Cog):
     async def help_source(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='source',
+                          comando=self.source.name,
                           descricao=self.source.description,
                           exemplos=['``{pref}source``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm

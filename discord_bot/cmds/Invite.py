@@ -16,7 +16,7 @@ class Invite(commands.Cog):
     async def help_invite(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='invite',
+                          comando=self.invite.name,
                           descricao=self.invite.description,
                           exemplos=['``{pref}invite``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm

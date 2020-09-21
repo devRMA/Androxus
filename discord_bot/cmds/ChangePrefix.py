@@ -20,7 +20,7 @@ class ChangePrefix(commands.Cog):
     async def help_change_prefix(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='change_prefix',
+                          comando=self.change_prefix.name,
                           descricao=self.change_prefix.description,
                           parametros=['``[prefixo (padrão: "--")]``'],
                           exemplos=['``{pref}change_prefix`` ``!!``',

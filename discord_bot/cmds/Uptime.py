@@ -20,7 +20,7 @@ class Uptime(commands.Cog):
     async def help_uptime(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='uptime',
+                          comando=self.uptime.name,
                           descricao=self.uptime.description,
                           exemplos=['``{pref}uptime``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm

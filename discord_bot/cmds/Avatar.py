@@ -16,7 +16,7 @@ class Avatar(commands.Cog):
     async def help_avatar(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='avatar',
+                          comando=self.avatar.name,
                           descricao=self.avatar.description,
                           parametros=['<"Mencionar uma pessoa ou um id">'],
                           exemplos=['``{pref}avatar``' + f' {ctx.author.mention}'])

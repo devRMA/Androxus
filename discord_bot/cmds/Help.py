@@ -21,7 +21,7 @@ class Help(commands.Cog):
     async def help_help(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='help',
+                          comando=self.help.name,
                           descricao=self.help.description,
                           parametros=['[comando]'],
                           exemplos=['``{pref}help``', '``{pref}ajuda`` ``adicionar_comando``'],
@@ -35,7 +35,7 @@ class Help(commands.Cog):
             cor = random_color()
             embed = embedHelp(self.bot,
                               ctx,
-                              comando='help',
+                              comando=self.help.name,
                               descricao=self.help.description,
                               parametros=['[comando]'],
                               exemplos=['``{pref}help``', '``{pref}ajuda`` ``adicionar_comando``'],
@@ -53,7 +53,7 @@ class Help(commands.Cog):
                 comandos_desativados = []
             for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
                 for command in self.bot.get_cog(cog).get_commands():
-                    if (not command.hidden):  # se o comando não estiver privado
+                    if not command.hidden:  # se o comando não estiver privado
                         emoji = '<a:ativado:755774682334101615>'
                         for c in comandos_desativados:
                             if command.name in c:
