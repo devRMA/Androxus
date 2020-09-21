@@ -21,7 +21,8 @@ class Calc(commands.Cog):
                           ctx,
                           comando=self.calc.name,
                           descricao='Para multiplicar, use ``*``. Para dividir use ``/``. Para usar potência, ' +
-                                    'use ``**``. Coloque números decimais com ponto em vez de virgula' +
+                                    'use ``**`` (desativado temporariamente). Coloque números decimais com pon' +
+                                    'to em vez de virgula' +
                                     '. Você **não** deve fazer isso: ``3,14``, e **sim**: ``3.14``.Use ' +
                                     '**()** para dar preferencia na ' +
                                     'hora de fazer os calculos!',
