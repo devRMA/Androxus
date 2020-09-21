@@ -9,6 +9,7 @@ from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.Utils import random_color
+import asyncio
 
 
 class Calc(commands.Cog):
@@ -21,7 +22,7 @@ class Calc(commands.Cog):
                           ctx,
                           comando=self.calc.name,
                           descricao='Para multiplicar, use ``*``. Para dividir use ``/``. Para usar potência, ' +
-                                    'use ``**`` (desativado temporariamente). Coloque números decimais com pon' +
+                                    'use ``**``. Coloque números decimais com pon' +
                                     'to em vez de virgula' +
                                     '. Você **não** deve fazer isso: ``3,14``, e **sim**: ``3.14``.Use ' +
                                     '**()** para dar preferencia na ' +
@@ -37,26 +38,35 @@ class Calc(commands.Cog):
 
     @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
     async def calc(self, ctx, *args):
-        chars_aceitaveis = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '+', '/', '%', '*', '-', '(', ')', '.']
+        chars_aceitaveis = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '+', '/', '%', '*', '-', '(', ')',
+                            '.']
         if len(args) == 0:
             await self.help_calc(ctx)
             return
         args = ' '.join(args)
-        if args.find('**') != -1:  # potencia temporariamente removida
-            await ctx.send('A operação ``**`` foi desativada temporariamente.')
-            return
+
         for char in args:
             if not (char in chars_aceitaveis):
                 await ctx.send(f'O caracter ``{char}`` não é nem um número, nem uma operação!')
                 return
+
+        async def calcular(x):
+            return eval(x)
+
         try:
-            resultado = eval(args)
+            # o tempo limite para executar a equação, é 10 vezes a latência do bot
+            resultado = await asyncio.wait_for(calcular(args), timeout=(self.bot.latency * 10))
+        except asyncio.TimeoutError:
+            # se passar mais de 10 vezes, a latencia do bot, sem segundos, para fazer a equação:
+            await ctx.send(f'Está equação é muito grande para mim! <a:sad:755774681008832623>')
+            return
         except SyntaxError as error:
             onde_foi_o_erro = ' ' * (error.offset - 1) + '👆'
             await ctx.send(f'Equação inválida!\n```{error.text}\n{onde_foi_o_erro}```')
             return
         except ZeroDivisionError:
-            await ctx.send('Equação inválida! Ainda não sou capaz de resolver divisões por 0!\n<a:sad:755774681008832623>')
+            await ctx.send(
+                'Equação inválida! Ainda não sou capaz de resolver divisões por 0!\n<a:sad:755774681008832623>')
             return
         if len(str(resultado)) >= 6000:
             await ctx.send('O resultado desta equação é tão grande que não consigo enviar\n<a:sad:755774681008832623>')
