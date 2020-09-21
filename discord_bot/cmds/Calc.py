@@ -17,7 +17,7 @@ class Calc(commands.Cog):
         self.bot = bot
 
     async def __calcular(self, x):  # declaração de um método privado
-        return await eval(x)
+        return eval(x)
 
     @commands.command(hidden=True, aliases=['help_calcular'])
     async def help_calc(self, ctx):
