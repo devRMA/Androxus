@@ -55,6 +55,7 @@ class Calc(commands.Cog):
 
         try:
             # o tempo limite para executar a equação, é 5 vezes a latência do bot
+            await ctx.send(f'Chamando o eval.\ntimeout=``{self.bot.latency * 5}``\nargs=``{args}``')
             resultado = await asyncio.wait_for(self.__calcular(args), timeout=(self.bot.latency * 5))
         except asyncio.TimeoutError:
             # se passar mais de 5 vezes, a latencia do bot, sem segundos, para fazer a equação:
