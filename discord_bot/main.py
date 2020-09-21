@@ -81,8 +81,8 @@ async def change_status():  # loop que vai ficar alterando o status do bot
 
 if __name__ == '__main__':
     try:
-        listdir('discord/cmds')  # vai tentar achar a pasta "discord/cmd"
-        path_cmds = 'discord/cmds'  # se achar, salva o path
+        listdir('discord_bot/cmds')  # vai tentar achar a pasta "discord/cmd"
+        path_cmds = 'discord_bot/cmds'  # se achar, salva o path
     except FileNotFoundError:  # se não achar, salva o path como "./cmds"
         path_cmds = './cmds'
     for filename in listdir(path_cmds):  # vai listar todas os arquivos que tem na pasta "cmds"
