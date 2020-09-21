@@ -32,7 +32,7 @@ class Source(commands.Cog):
                                     'a API do discord e um banco de dados!',
                               colour=discord.Colour(random_color()),
                               description='Caso você queira ver o meu código fonte, clique [aqui]' +
-                                          '(https://github.com/devRMA/Androxus/tree/master/discord)\n' +
+                                          '(https://github.com/devRMA/Androxus/tree/master/discord_bot)\n' +
                                           'Caso você queira ver a documentação da API do discord ' +
                                           'para python, clique [aqui](https://discordpy.readthedo' +
                                           'cs.io/en/latest/index.html).',
