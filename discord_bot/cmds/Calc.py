@@ -19,7 +19,7 @@ class Calc(commands.Cog):
     async def help_calc(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
-                          comando='calc',
+                          comando=self.calc.name,
                           descricao='Para multiplicar, use ``*``. Para dividir use ``/``. Para usar potência, ' +
                                     'use ``**``. Coloque números decimais com ponto em vez de virgula' +
                                     '. Você **não** deve fazer isso: ``3,14``, e **sim**: ``3.14``.Use ' +
@@ -36,11 +36,11 @@ class Calc(commands.Cog):
 
     @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
     async def calc(self, ctx, *args):
-        chars_aceitaveis = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '+', '/', '%', '*', '-', '(', ')', '.', 'e']
+        chars_aceitaveis = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ' ', '+', '/', '%', '*', '-', '(', ')', '.']
         if len(args) == 0:
             await self.help_calc(ctx)
             return
-        args = ' '.join(args)
+        args = (' '.join(args)).replace('**', '')  # potencia temporariamente removida
         for char in args:
             if not (char in chars_aceitaveis):
                 await ctx.send(f'O caracter ``{char}`` não é nem um número, nem uma operação!')
