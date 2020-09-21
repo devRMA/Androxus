@@ -48,14 +48,14 @@ class Calc(commands.Cog):
         try:
             resultado = eval(args)
         except SyntaxError as error:
-            onde_foi_o_erro = ''
+            onde_foi_o_erro = '.'
             for c in range(0, (error.offset - 1)):
                 onde_foi_o_erro = ' '
             onde_foi_o_erro += '↑'
             await ctx.send(f'Equação inválida!\n```{error.text}\n{onde_foi_o_erro}```')
             return
         except ZeroDivisionError:
-            await ctx.send('Equação inválida! Ainda não sou capaz de resolver divisões por 0.\n<a:sad:755774681008832623>!')
+            await ctx.send('Equação inválida! Ainda não sou capaz de resolver divisões por 0!\n<a:sad:755774681008832623>')
             return
         if len(str(resultado)) >= 6000:
             await ctx.send('O resultado desta equação é tão grande que não consigo enviar\n<a:sad:755774681008832623>')
