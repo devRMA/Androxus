@@ -55,8 +55,8 @@ class Calc(commands.Cog):
 
         try:
             # o tempo limite para executar a equação, é 5 vezes a latência do bot
-            await ctx.send(f'Chamando o eval.\ntimeout=``{self.bot.latency * 5}``\nargs=``{args}``')
-            resultado = await asyncio.wait_for(self.__calcular(args), timeout=(self.bot.latency * 5))
+            await ctx.send(f'Chamando o eval.\ntimeout=``{self.bot.latency / 10}``\nargs=``{args}``')
+            resultado = await asyncio.wait_for(self.__calcular(args), timeout=(self.bot.latency / 10))
         except asyncio.TimeoutError:
             # se passar mais de 5 vezes, a latencia do bot, sem segundos, para fazer a equação:
             await ctx.send(f'Está equação é muito grande para mim! <a:sad:755774681008832623>')
@@ -69,7 +69,7 @@ class Calc(commands.Cog):
             await ctx.send(
                 'Equação inválida! Ainda não sou capaz de resolver divisões por 0!\n<a:sad:755774681008832623>')
             return
-        if len(str(resultado)) >= 6000:
+        if len(str(resultado)) >= 200:
             await ctx.send('O resultado desta equação é tão grande que não consigo enviar\n<a:sad:755774681008832623>')
             return
         embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
