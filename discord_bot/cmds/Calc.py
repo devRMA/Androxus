@@ -16,7 +16,7 @@ class Calc(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True, aliases=['help_operações'])
+    @commands.command(hidden=True, aliases=['help_operações', 'help_operacoes', 'help_ops'])
     async def help_operators(self, ctx):
         embed = embedHelp(self.bot,
                           ctx,
@@ -27,7 +27,7 @@ class Calc(commands.Cog):
                           aliases=self.operators.aliases.copy())
         await ctx.send(content=ctx.author.mention, embed=embed)
 
-    @commands.command(name='operações', aliases=['operações'],
+    @commands.command(name='operações', aliases=['operators', 'operacoes', 'ops'],
                       description='Todas as operações que eu suporto no comando ``calc``!')
     async def operators(self, ctx):
         operators = {
