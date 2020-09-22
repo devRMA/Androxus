@@ -95,11 +95,6 @@ class Calc(commands.Cog):
                 # aqui, vai pegar o que estiver entre aspas
                 erro = exception.args[0][exception.args[0].find('"')+1:exception.args[0].rfind('"')]
                 onde_deu_erro = (' ' * args.find(erro)) + '👆'
-                print('unexpected')
-                print(f'args= {args}')
-                print(f'erro= {erro}')
-                print(f'pos= {args.find(erro)}')
-                print(f'onde= "{onde_deu_erro}"')
                 await ctx.send(
                     f'Parece que há um erro de digitação!\n```{args}\n{onde_deu_erro}```<:ah_nao:758003636822474887>')
                 return
@@ -115,15 +110,7 @@ class Calc(commands.Cog):
                 await ctx.send(f'Pare que você esqueceu de abrir ou fechar algum parêntese! <:ah_nao:758003636822474887>')
                 return
             elif 'parity' in exception.args[0]:
-                erro = exception.args[0][exception.args[0].find('parity') + 6:exception.args[0].find('expression') - 1]
-                onde_deu_erro = ' ' * args.find(erro) + '👆'
-                print('parity')
-                print(f'args= {args}')
-                print(f'erro= {erro}')
-                print(f'pos= {args.find(erro)}')
-                print(f'onde= "{onde_deu_erro}"')
-                await ctx.send('Não consigo resolver está equação, verifique se você digitou tudo certo!' +
-                               f'\nPossível erro:```{args}\n{onde_deu_erro}```')
+                await ctx.send('Não consigo resolver está equação, verifique se você digitou tudo certo!')
                 return
             else:
                 await ctx.send('<a:sad:755774681008832623> Ocorreu um erro na hora de executar este comando,' +
