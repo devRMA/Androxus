@@ -18,6 +18,18 @@ class Calc(commands.Cog):
 
     @commands.command(hidden=True, aliases=['help_operações'])
     async def help_operators(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.operators.name,
+                          descricao=self.operators.description,
+                          exemplos=['``{pref}operações``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.operators.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(name='operações', aliases=['operações'],
+                      description='Todas as operações que eu suporto no comando ``calc``!')
+    async def operators(self, ctx):
         operators = {
             'Operador: ``+``': 'Adição\nEx: ``2 + 2``\nVou responder: ``4``',
             'Operador: ``-``': 'Subtração\nEx: ``3 - 1``\nVou responder: ``2``',
@@ -49,7 +61,7 @@ class Calc(commands.Cog):
                          icon_url=self.bot.user.avatar_url)
         embed.set_footer(text=f'{ctx.author}',
                          icon_url=ctx.author.avatar_url)
-        for ope_ex in operators.items():  # vai transformar de dicionario para lista
+        for ope_ex in operators.items():  # vai converter de dicionario para lista
             embed.add_field(name=ope_ex[0],
                             value=ope_ex[-1],
                             inline=True)
@@ -61,7 +73,7 @@ class Calc(commands.Cog):
                           ctx,
                           comando=self.calc.name,
                           descricao='Eu vou virar uma calculadora! (Caso você queira saber quais operações eu aceito' +
-                                    ', use o comando ``help operações``)',
+                                    ', use o comando ``operações``)',
                           parametros=['<Operação(ões)>'],
                           exemplos=['``{pref}calc`` ``2 + 5 * 2``',
                                     '``{pref}calcular`` ``(2 + 5) * 2``',
@@ -93,21 +105,23 @@ class Calc(commands.Cog):
         except Exception as exception:
             if 'unexpected' in exception.args[0]:
                 # aqui, vai pegar o que estiver entre aspas
-                erro = exception.args[0][exception.args[0].find('"')+1:exception.args[0].rfind('"')]
+                erro = exception.args[0][exception.args[0].find('"') + 1:exception.args[0].rfind('"')]
                 onde_deu_erro = (' ' * args.find(erro)) + '👆'
                 await ctx.send(
                     f'Parece que há um erro de digitação!\n```{args}\n{onde_deu_erro}```<:ah_nao:758003636822474887>')
                 return
             elif 'undefined variable' in exception.args[0]:
                 variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
-                await ctx.send(f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` <a:sad:755774681008832623>')
+                await ctx.send(
+                    f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` <a:sad:755774681008832623>')
                 return
             elif 'unknown character' in exception.args[0]:
                 await ctx.send(
                     f'Desculpe, mas você digitou algum caracter que eu não conheço. <a:sad:755774681008832623>')
                 return
             elif 'unmatched "()"' in exception.args[0]:
-                await ctx.send(f'Pare que você esqueceu de abrir ou fechar algum parêntese! <:ah_nao:758003636822474887>')
+                await ctx.send(
+                    f'Pare que você esqueceu de abrir ou fechar algum parêntese! <:ah_nao:758003636822474887>')
                 return
             elif 'parity' in exception.args[0]:
                 await ctx.send('Não consigo resolver está equação, verifique se você digitou tudo certo!')
