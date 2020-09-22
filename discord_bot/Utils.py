@@ -52,14 +52,24 @@ def get_emoji_dance():  # função que vai escolher um emoji de dança aleatóri
 def get_last_update():
     # função que vai pegar o último update que o bot teve
     # como o bot está no github, a ultima atualização que teve no github, vai ser a ultima atualização do bot
-    from requests import get  # dunção que vai pegar o html da página
+    from requests import get  # função que vai pegar o html da página
     from json import loads  # função que vai converter de json pra dicionario
     from datetime import datetime  # como vai vim uma str do site, vamos converter para um objeto datetime
     url = 'https://api.github.com/repositories/294764564'  # url do repositório do bot
-    html = get(url).text
-    json = loads(html)
+    html = get(url).text  # vai pegar o texto da página
+    json = loads(html)  # transformar de json para dicionario
     data_do_update = json['updated_at']  # aqui, ainda vai estar como string
     # esse é um exemplo de como vai chegar a string: 2020-09-19T04:37:37Z
     # da para observer que a formatação é: ano-mes-diaThora:minuto:segundoZ
     data_do_update = datetime.strptime(data_do_update, '%Y-%m-%dT%H:%M:%SZ')  # conversão de string para datetime
     return data_do_update  # retorna o objeto datetime
+
+
+def get_last_commit():
+    # função que vai pegar o último commit do github do bot
+    from requests import get  # função que vai pegar o html da página
+    from json import loads  # função que vai converter de json pra dicionario
+    url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
+    html = get(url).text  # vai pegar o texto da página
+    json = loads(html)  # transformar de json para dicionario
+    return json[0]['commit']['message']  # vai pegar o último commit que teve, e retornar a mensagem
