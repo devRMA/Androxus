@@ -26,14 +26,15 @@ def embedHelp(bot: commands.Bot = None,
     como_usar = f'``{prefixo}{comando}`` '
     comando_esta_desativado = False
     if ctx.guild is not None:  # se a mensagem foi enviar de um server
-        for comandos_desativados in ComandoDesativadoDao().get_comandos(ctx.guild.id):  # for em todos os comandos desativados
+        # for em todos os comandos desativados
+        for comandos_desativados in ComandoDesativadoDao().get_comandos(ctx.guild.id):
             if comando_esta_desativado: break  # se, dentro do outro for, achar o comando, vai para o for de fora também
             if comando in comandos_desativados:  # vê se o comando principal, está desativado
                 comando_esta_desativado = True
                 break
             for comando_alias in aliases:  # vai verificar se algum "sinônimo" desse comando, foi desativado
                 if comando_esta_desativado: break
-                if (comando_alias in comandos_desativados):  # verifica se o comando está desativado
+                if comando_alias in comandos_desativados:  # verifica se o comando está desativado
                     comando_esta_desativado = True
     if parametros:  # se tiver pelo menos 1 item nos parâmetros
         for c in range(0, len(parametros)):  # vai adicionar `` antes, e depois dos parâmetros, em todos os itens
@@ -77,7 +78,7 @@ def embedHelp(bot: commands.Bot = None,
         if perm_pessoa:
             requisito = f'Você precisa ter permissão de ``{perm_pessoa}`` para usar este comando!'
         if perm_bot:
-            requisito = f'\nEu preciso ter permissão de ``{perm_pessoa}`` para realizar este comando!'
+            requisito = f'\nEu preciso ter permissão de ``{perm_bot}`` para realizar este comando!'
         embed.add_field(name='<a:atencao:755844029333110815> Requisitos:',
                         value=requisito,
                         inline=False)
