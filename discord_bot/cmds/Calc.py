@@ -98,7 +98,7 @@ class Calc(commands.Cog):
                 await ctx.send(f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` <a:sad:755774681008832623>')
                 return
             elif 'unmatched "()"' in exception.args[0]:
-                await ctx.send(f'Pare que você esqueceu de fechar algum parêntese! <:ah_nao:758003636822474887>')
+                await ctx.send(f'Pare que você esqueceu de abrir ou fechar algum parêntese! <:ah_nao:758003636822474887>')
                 return
             else:
                 await ctx.send('<a:sad:755774681008832623> Ocorreu um erro na hora de executar este comando,' +
