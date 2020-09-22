@@ -90,11 +90,12 @@ class Botinfo(commands.Cog):
         embed.add_field(name='<:DatabaseCheck:756712226303508530> Tempo para se conectar ao banco:',
                         value=f'``{stopwatch_banco}``',
                         inline=True)
+        this_process = psutil.Process(getpid())
         embed.add_field(name='<a:loading:756715436149702806> Uso da CPU:',
-                        value=f'``{psutil.cpu_percent()}%``',
+                        value=f'``{this_process.cpu_percent():.2f}%``',
                         inline=True)
         embed.add_field(name=':frog: Memória RAM:',
-                        value=f'``{(psutil.Process(getpid()).memory_info().rss / (1e+6)):.2f}Mb' +
+                        value=f'``{(this_process.memory_info().rss / (1e+6)):.2f}Mb' +
                               '/500Mb``',
                         inline=True)
         embed.add_field(name='<:WumpusPizza:756712226710356122> Versão do discord.py:',
