@@ -86,12 +86,16 @@ class Calc(commands.Cog):
         except OverflowError:
             await ctx.send(f'Está equação é muito grande para mim! <a:sad:755774681008832623>')
             return
+        except ZeroDivisionError:
+            await ctx.send(
+                'Equação inválida! Ainda não sou capaz de resolver divisões por 0!\n<a:sad:755774681008832623>')
+            return
         except Exception as exception:
             if 'unexpected' in exception.args[0]:
                 # aqui, vai pegar o que estiver entre aspas
                 erro = exception.args[0][exception.args[0].find('"')+1:exception.args[0].rfind('"')]
                 onde_deu_erro = ' ' * exception.args[0].find(erro) + '👆'
-                await ctx.send(f'Parece que há um erro de digitação!\n```{args}\n{onde_deu_erro}```')
+                await ctx.send(f'Parece que há um erro de digitação!\n```{args}\n{onde_deu_erro}```<:ah_nao:758003636822474887>')
                 return
             elif 'undefined variable' in exception.args[0]:
                 variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
@@ -100,14 +104,14 @@ class Calc(commands.Cog):
             elif 'unmatched "()"' in exception.args[0]:
                 await ctx.send(f'Pare que você esqueceu de abrir ou fechar algum parêntese! <:ah_nao:758003636822474887>')
                 return
+            elif 'parity' in exception.args[0]:
+                await ctx.send(
+                    'Não consigo resolver está equação, verifique se você digitou tudo certo <a:sad:755774681008832623>')
+                return
             else:
                 await ctx.send('<a:sad:755774681008832623> Ocorreu um erro na hora de executar este comando,' +
                                f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
                 return
-        except ZeroDivisionError:
-            await ctx.send(
-                'Equação inválida! Ainda não sou capaz de resolver divisões por 0!\n<a:sad:755774681008832623>')
-            return
         if len(str(resultado)) >= 200:
             await ctx.send('O resultado desta equação é tão grande que não consigo enviar a resposta!' +
                            '\n<a:sad:755774681008832623>')
