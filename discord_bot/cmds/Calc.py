@@ -107,7 +107,7 @@ class Calc(commands.Cog):
                 return
             elif 'parity' in exception.args[0]:
                 erro = exception.args[0][exception.args[0].find('parity') + 6:exception.args[0].find('expression') - 1]
-                onde_deu_erro = ' ' * exception.args[0].find(erro) + '👆'
+                onde_deu_erro = ' ' * args.find(erro) + '👆'
                 await ctx.send('Não consigo resolver está equação, verifique se você digitou tudo certo!' +
                                f'\nPossível erro:```{args}\n{onde_deu_erro}```')
                 return
