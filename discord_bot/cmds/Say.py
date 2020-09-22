@@ -26,7 +26,11 @@ class Say(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['fale', 'falar'], description='Eu vou repetir o que você falar!')
-    async def say(self, ctx, *, frase: str):
+    async def say(self, ctx, *frase):
+        if len(frase) == 0:
+            await self.help_say(ctx)
+            return
+        frase = ' '.join(frase)
         try:
             if ctx.guild.me.guild_permissions.manage_messages:
                 await ctx.message.delete()
