@@ -7,3 +7,4 @@ stopwatch.py
 psutil
 requests
 python-dateutil
+py_expression_eval
