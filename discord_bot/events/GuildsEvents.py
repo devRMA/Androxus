@@ -16,12 +16,12 @@ class GuildsEvents(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_guild_join(self, ctx, guild):
+    async def on_guild_join(self, ctx):
         # toda vez que adicionarem o bot num servidor, vai adicionar o servidor ao banco
-        ServidorDao().create(guild.id)
+        ServidorDao().create(ctx.guild.id)
         try:
-            for channel in sorted(guild.channels):
-                if channel.permissions_for(guild.me).send_messages and isinstance(channel, discord.TextChannel):
+            for channel in sorted(ctx.guild.channels):
+                if channel.permissions_for(ctx.guild.me).send_messages and isinstance(channel, discord.TextChannel):
                     await channel.send(f'{get_emoji_dance()}\nOlá! Obrigado por me adicionar em seu servidor!\n' +
                                        f'Para saber meus comandos, digite ``{pegar_o_prefixo(None, ctx)}help``!')
                     return
@@ -29,9 +29,9 @@ class GuildsEvents(commands.Cog):
             pass
 
     @commands.Cog.listener()
-    async def on_guild_remove(self, ctx, guild):
+    async def on_guild_remove(self, ctx):
         # toda vez que removerem o bot de um servidor, vai remover o servidor do banco
-        ServidorDao().delete(guild.id)
+        ServidorDao().delete(ctx.guild.id)
 
 
 def setup(bot):
