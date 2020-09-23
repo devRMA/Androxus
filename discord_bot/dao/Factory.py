@@ -4,9 +4,16 @@
 
 __author__ = 'Rafael'
 
+from psycopg2 import connect
+from os import environ
+from discord_bot.utils.Utils import get_configs
+
+
 class Factory:
+
     def getConnection(self):
-        from psycopg2 import connect
-        from os import environ
-        self.path_do_banco = environ.get('DATABASE_URL')
-        return connect(self.path_do_banco)
+        if get_configs()['connection_string'] == 'connection string of db':
+            self.db_path = environ.get('DATABASE_URL')
+        else:
+            self.db_path = get_configs()['connection_string']
+        return connect(self.db_path)

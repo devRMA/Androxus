@@ -10,6 +10,7 @@ from discord.ext import commands, tasks  # outros imports do discord
 from os import environ  # função responsável por pegas o token do bot
 from os import listdir  # função responsável por pegar todos os cogs
 from discord_bot.utils.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
+from discord_bot.utils.Utils import get_configs  # função que pega as configurações do json
 from sys import version  # função para pegar a versão do python
 from discord_bot.events.OnMessageEvent import on_message_event  # evento que vai ser chamado, toda vez que enviarem uma menasgem
 from random import choice  # função que vai ser usada para escolher "aleatoriamente" qual status do bot
@@ -34,6 +35,10 @@ async def on_ready():
         bot.tratar_erros = True  # atributo que vai controlar o tratamento de erros
     if not hasattr(bot, 'mudar_status'):  # se o bot não tiver o atributo "mudar_status"
         bot.mudar_status = True  # atributo que vai ficar responsável por controlar a mudança de status
+    if not hasattr(bot, 'dm_channel_log'):  # se o bot não tiver o atributo "dm_channel_log"
+        # esse atributo vai ser responsável por guardar o chat
+        # que o bot vai usar quando mandarem mensagem no privado dele
+        bot.dm_channel_log = bot.get_channel(get_configs()['dm_channel'])
     change_status.start()  # inicia o loop para mudar o status
 
 
@@ -86,4 +91,8 @@ if __name__ == '__main__':
     for filename in listdir(path_cmds):  # vai listar todas os arquivos que tem na pasta "cmds"
         if filename.endswith('.py'):  # se o arquivo terminar com ".py"
             bot.load_extension(f'cmds.{filename[:-3]}')  # vai adicionar ao bot
-    bot.run(environ.get('TOKEN'))  # inicia o bot
+    if get_configs()['token'] == 'token_bot':
+        token = environ.get('TOKEN')
+    else:
+        token = get_configs()['token']
+    bot.run(token)  # inicia o bot

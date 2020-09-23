@@ -4,17 +4,29 @@
 
 __author__ = 'Rafael'
 
-
 from discord_bot.utils.Utils import pegar_o_prefixo
 from discord_bot.dao.BlacklistDao import BlacklistDao
 from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord_bot.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
+from datetime import datetime
+import discord
 
 
 async def on_message_event(bot, message):
+    if not bot.is_ready(): return
     prefixo = pegar_o_prefixo(None, message)
     if BlacklistDao().get_pessoa(message.author.id) or message.author.bot: return
     if message.author.id == bot.user.id: return
+    if isinstance(message.channel, discord.DMChannel):  # se a mensagem foi enviada no dm
+        embed = discord.Embed(title=f'O(A) {message.author} mandou mensagem no meu dm',
+                              colour=0xfdfd96,
+                              description=f'{message.content}',
+                              timestamp=datetime.utcnow())
+        if len(message.attachments) != 0:
+            for attachment in message.attachments:
+                embed.set_image(url=attachment.url)
+        embed.set_thumbnail(url=message.author.avatar_url)
+        await bot.dm_channel_log.send(embed=embed)
     if message.guild is not None:  # Se foi usado num server, vai ver se o comando está desativado
         # aqui, vai verificar se o comando foi desativado
         for comandos_desativados in ComandoDesativadoDao().get_comandos(message.guild.id):
@@ -31,10 +43,11 @@ async def on_message_event(bot, message):
         try:
             #  como tem 3 for, um dentro do outro, é mais facil força um erro, do que ir dando break em cada um
             for cog in bot.cogs:  # verifica se a mensagem, está chamando algum comando
-                for command in bot.get_cog(cog).get_commands():  # laço que vai passar por todos os comandos que o bot tem
+                for command in bot.get_cog(
+                        cog).get_commands():  # laço que vai passar por todos os comandos que o bot tem
                     if message.content.lower().startswith(f'{prefixo}{command.name}'):  # Se a mensagem tiver o comando
                         usando_comando = True
-                        raise Exception() # para o laço
+                        raise Exception()  # para o laço
                     for aliases in command.aliases:
                         if message.content.lower().startswith(f'{prefixo}{aliases}'):  # se achar o comando
                             usando_comando = True

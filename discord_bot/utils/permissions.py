@@ -4,12 +4,12 @@
 
 # font: https://github.com/AlexFlipnote/discord_bot.py
 
-import discord
 from discord.ext import commands
+from discord_bot.utils.Utils import get_configs
 
 
 def is_owner(ctx):
-    return ctx.author.id == 305532760083398657
+    return ctx.author.id in get_configs()['owners']
 
 
 async def check_permissions(ctx, perms, *, check=all):

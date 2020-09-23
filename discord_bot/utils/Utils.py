@@ -73,3 +73,16 @@ def get_last_commit():
     html = get(url).text  # vai pegar o texto da página
     json = loads(html)  # transformar de json para dicionario
     return json[0]['commit']['message']  # vai pegar o último commit que teve, e retornar a mensagem
+
+
+def get_configs():
+    from json import load, dumps  # função que vai transformar de json para dict e vice versa
+    from os.path import exists  # função que vai verificar se existe o arquivo json
+    import sys
+    if exists('discord_bot/configs.json'):
+        with open('discord_bot/configs.json') as file:
+            configs = load(file)
+        return configs
+    else:
+        raise Exception('Não achei o arquivo de configurações!\nBaixe o arquivo configs.json!\nhttps://github.com/devRMA/Androxus')
+        sys.exit()
