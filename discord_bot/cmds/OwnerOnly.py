@@ -6,7 +6,8 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 import discord
-from discord_bot.Utils import get_emoji_dance, random_color
+from discord_bot.utils.Utils import get_emoji_dance, random_color
+from discord_bot.utils import permissions
 from datetime import datetime
 
 
@@ -16,19 +17,19 @@ class OwnerOnly(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['desativar_tratamento_de_erro', 'erros_off'], hidden=True)
-    @commands.is_owner()
+    @commands.check(permissions.is_owner)
     async def desativar_erros(self, ctx):
         self.bot.tratar_erros = False
         await ctx.send('Tratamento de erro desativado!')
 
     @commands.command(aliases=['ativar_tratamento_de_erro', 'erros_on'], hidden=True)
-    @commands.is_owner()
+    @commands.check(permissions.is_owner)
     async def ativar_erros(self, ctx):
         self.bot.tratar_erros = True
         await ctx.send('Tratamento de erro ativado!')
 
     @commands.command(aliases=['jogar', 'status'], hidden=True)
-    @commands.is_owner()
+    @commands.check(permissions.is_owner)
     async def game(self, ctx, *args):
         if (len(args) == 1) and (args[0] == '-1'):  # se só tiver um item, e for -1
             self.bot.mudar_status = True
@@ -50,7 +51,7 @@ class OwnerOnly(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['pv'], hidden=True)
-    @commands.is_owner()
+    @commands.check(permissions.is_owner)
     async def dm(self, ctx, id: int, *args):
         user = self.bot.get_user(id)
         if user is not None:
