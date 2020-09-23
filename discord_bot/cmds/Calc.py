@@ -105,11 +105,8 @@ class Calc(commands.Cog):
                 return
             except Exception as exception:
                 if 'unexpected' in exception.args[0]:
-                    # aqui, vai pegar o que estiver entre aspas
-                    erro = exception.args[0][exception.args[0].find('"') + 1:exception.args[0].rfind('"')]
-                    onde_deu_erro = (' ' * args.find(erro)) + '👆'
                     await ctx.send(
-                        f'Parece que há um erro de digitação!\n```{args}\n{onde_deu_erro}```<:ah_nao:758003636822474887>')
+                        f'Parece que há um erro de digitação!\n```{args}```<:ah_nao:758003636822474887>')
                     return
                 elif 'undefined variable' in exception.args[0]:
                     variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
