@@ -80,9 +80,11 @@ class GuildOnly(commands.Cog):
                                 return
                         except ValueError:  # se der erro, é porque a pessoa não passou apenas números
                             await ctx.send(f'<a:atencao:755844029333110815> O valor ``{args[0]}`` não é um id valido!')
+                            return
                     else:  # se a pessoa passou mais de 1 argumento
                         await ctx.send('<a:atencao:755844029333110815> Você me disse muitas coisas,' +
                                        ' eu só preciso, ou do id da pessoa, ou que você mencione ela.')
+                        return
                 else:  # se a pessoa não passou nenhum argumento:
                     user = ctx.author
 
