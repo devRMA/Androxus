@@ -9,7 +9,8 @@ import discord
 from discord.ext import commands
 from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.Utils import random_color
+from discord_bot.utils.Utils import random_color
+from discord_bot.utils import permissions
 
 
 class ComandoDesativado(commands.Cog):
@@ -29,7 +30,7 @@ class ComandoDesativado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['disable_command', 'dc'], description='Desativa comandos!')
-    @commands.has_permissions(administrator=True)
+    @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def desativar_comando(self, ctx, comando=None):
         if comando is None:
@@ -69,7 +70,7 @@ class ComandoDesativado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['reactivate_command'], description='Reativa comando!')
-    @commands.has_permissions(administrator=True)
+    @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def reativar_comando(self, ctx, comando=None):
         if comando is None:

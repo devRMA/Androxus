@@ -9,7 +9,7 @@ import discord  # import da API do discord
 from discord.ext import commands, tasks  # outros imports do discord
 from os import environ  # função responsável por pegas o token do bot
 from os import listdir  # função responsável por pegar todos os cogs
-from discord_bot.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
+from discord_bot.utils.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
 from sys import version  # função para pegar a versão do python
 from discord_bot.events.OnMessageEvent import on_message_event  # evento que vai ser chamado, toda vez que enviarem uma menasgem
 from random import choice  # função que vai ser usada para escolher "aleatoriamente" qual status do bot

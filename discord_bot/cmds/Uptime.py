@@ -8,7 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.Utils import random_color
+from discord_bot.utils.Utils import random_color
 from dateutil.relativedelta import relativedelta  # módulo que vai ser usado para subtrair datetime
 
 

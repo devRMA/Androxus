@@ -5,7 +5,7 @@
 __author__ = 'Rafael'
 
 
-from discord_bot.Utils import pegar_o_prefixo
+from discord_bot.utils.Utils import pegar_o_prefixo
 from discord_bot.dao.BlacklistDao import BlacklistDao
 from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord_bot.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao

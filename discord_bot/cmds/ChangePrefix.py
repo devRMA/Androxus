@@ -7,7 +7,8 @@ __author__ = 'Rafael'
 from discord.ext import commands
 import discord
 from discord_bot.dao.ServidorDao import ServidorDao
-from discord_bot.Utils import random_color, pegar_o_prefixo, get_emoji_dance
+from discord_bot.utils.Utils import random_color, pegar_o_prefixo, get_emoji_dance
+from discord_bot.utils import permissions
 from discord_bot.modelos.EmbedHelp import embedHelp
 from datetime import datetime
 
@@ -31,7 +32,7 @@ class ChangePrefix(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['prefixo', 'prefix'], description='Comando que é usado para mudar o meu prefixo')
-    @commands.has_permissions(administrator=True)
+    @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def change_prefix(self, ctx, prefixo_novo='--'):
         prefixo_antigo = pegar_o_prefixo(None, ctx)

@@ -8,7 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.Utils import random_color, pegar_o_prefixo, get_last_update
+from discord_bot.utils.Utils import random_color, pegar_o_prefixo, get_last_update
 from stopwatch import Stopwatch
 import psutil
 from os import getpid
@@ -123,5 +123,7 @@ class Botinfo(commands.Cog):
                             value=f'``{days_att} d, {hours_att} h, {minutes_att} m, {seconds_att} s``',
                             inline=True)
             await ctx.send(embed=embed)
+
+
 def setup(bot):
     bot.add_cog(Botinfo(bot))
