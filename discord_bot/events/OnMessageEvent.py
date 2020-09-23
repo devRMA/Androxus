@@ -59,14 +59,15 @@ async def on_message_event(bot, message):
             pass
         if not usando_comando:  # se não estiver usando um comando do bot
             # vai ver se a pessoa usou algum comando personalizado
-            if message.guild is not None:  # só existem comandos personalizados em servidores, então aqui verifica se está num server
+            # só existem comandos personalizados em servidores, então aqui verifica se está num server
+            if message.guild is not None:
                 for comando in ComandoPersonalizadoDao().get_comandos(message.guild.id):
                     if comando[0].lower() in message.content.lower():  # se identificar o comando, na mensagem
                         enviar_mensagem = True
                         # aqui vai ver a resposta, e se é ou não para ignorar a posição do comando
                         resposta, inText = ComandoPersonalizadoDao().get_resposta(message.guild.id, comando[0])
                         if not inText:  # se não for para ignorar a posição, vai ver se a mensagem inicia com o comando
-                            if not message.content.lower().startswith(comando[0]):
+                            if not message.content.lower().startswith(comando[0].lower()):
                                 # se for obrigatorio que a mensagem comesse com o comando, e ela não estiver começando
                                 enviar_mensagem = False  # não vai responder
                         if enviar_mensagem:
