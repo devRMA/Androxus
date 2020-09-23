@@ -43,7 +43,7 @@ class Fun(commands.Cog):
             except:
                 pass
         seed(asci_value)
-        await ctx.send(f'🎱{choice(respostas)}')
+        await ctx.send(f'{choice(respostas)}')
 
     @commands.command(hidden=True, aliases=['help_cc', 'help_coinflip'])
     async def help_cara_coroa(self, ctx):
