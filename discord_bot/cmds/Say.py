@@ -6,6 +6,7 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 from discord_bot.modelos.EmbedHelp import embedHelp
+import discord
 
 
 class Say(commands.Cog):
@@ -38,8 +39,7 @@ class Say(commands.Cog):
                 frase += f'\n\n- {ctx.author}'
             # se a pessoa não tiver perm de marca everyone
             if not ctx.author.permissions_in(ctx.message.channel).mention_everyone:
-                frase = frase.replace('@', '@\uFEFF')
-                frase = frase.replace('&', '&\uFEFF')
+                frase = discord.utils.escape_mentions(frase)
         except:  # se der algum erro, provavelmente é porque o comando foi usado no dm
             pass
         await ctx.send(frase)
