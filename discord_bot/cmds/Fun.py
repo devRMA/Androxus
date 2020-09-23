@@ -41,8 +41,8 @@ class Fun(commands.Cog):
                      'Se eu te responder, você não iria acreditar.',
                      '¯\_(ツ)_/¯',
                      'Hmmmm... :thinking:',
-                     'Minhas fontes dizem que sim.'
-                     'Minhas fontes dizem que não.'
+                     'Minhas fontes dizem que sim.',
+                     'Minhas fontes dizem que não.',
                      'Do jeito que eu vejo, não.',
                      'Do jeito que eu vejo, sim.',
                      'Não posso falar sobre isso.',
