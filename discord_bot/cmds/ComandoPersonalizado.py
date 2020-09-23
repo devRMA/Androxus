@@ -48,14 +48,14 @@ class ComandoPersonalizado(commands.Cog):
         if (comando is None) or (resposta is None):
             await self.help_adicionar_comando(ctx)
             return
-        if ComandoPersonalizadoDao().create(ctx.guild.id, comando, resposta, inText):
+        if ComandoPersonalizadoDao().create(ctx.guild.id, comando.lower(), resposta, inText):
             inText_str = str(inText).replace('True', 'Sim').replace('False', 'Não')
             embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
                                   description='\uFEFF',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
             embed.add_field(name=f"Informações",
-                            value=f"Comando: {comando}\nResposta: {resposta}\nIgnorar a posição do comando: {inText_str}",
+                            value=f"Comando: {comando.lower()}\nResposta: {resposta}\nIgnorar a posição do comando: {inText_str}",
                             inline=False)
             await ctx.send(content=get_emoji_dance(), embed=embed)
 
