@@ -104,8 +104,9 @@ class GuildOnly(commands.Cog):
             embed.set_thumbnail(url=user.avatar_url)
             embed.add_field(name="Nome e tag", value=user, inline=True)
             embed.add_field(name="Id: ", value=user.id, inline=True)
-            if user.nick is not None:
-                embed.add_field(name="Nickname", value=user.nick, inline=True)
+            if hasattr(user, 'nick'):
+                if user.nick is not None:
+                    embed.add_field(name="Nickname", value=user.nick, inline=True)
             embed.add_field(name="Conta criada em:", value=user.created_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
             if hasattr(user, 'joined_at'):
                 embed.add_field(name="Entrou no servidor em:", value=user.joined_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
