@@ -92,7 +92,10 @@ class GuildOnly(commands.Cog):
                 roles = ', '.join(
                     [f"<@&{x.id}>" for x in sorted(user.roles, key=lambda x: x.position, reverse=True) if x.id != ctx.guild.default_role.id]
                 ) if len(user.roles) > 1 else None
-            cor = user.top_role.colour.value or discord.Colour(random_color())
+            if hasattr(user, 'top_role'):
+                cor = user.top_role.colour.value
+            else:
+                cor = discord.Colour(random_color())
             embed = discord.Embed(title=f'Informações sobre o(a) {user}!',
                                   colour=cor,
                                   description='O máximo de informação que eu consegui encontrar.',
