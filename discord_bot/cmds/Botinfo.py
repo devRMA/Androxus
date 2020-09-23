@@ -114,7 +114,7 @@ class Botinfo(commands.Cog):
                     if not command.hidden:  # se o comando não estiver privado
                         comandos += 1
             embed.add_field(name='Quantos comandos eu tenho:',
-                            value=f'```{comandos}```')
+                            value=f'``{comandos}``')
             uptime = datetime.utcnow() - self.bot.uptime
             hours_bot, remainder_bot = divmod(int(uptime.total_seconds()), 3600)
             minutes_bot, seconds_bot = divmod(remainder_bot, 60)
