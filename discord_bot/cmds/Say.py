@@ -39,9 +39,15 @@ class Say(commands.Cog):
                 frase += f'\n\n- {ctx.author}'
             # se a pessoa não tiver perm de marca everyone
             if not ctx.author.permissions_in(ctx.message.channel).mention_everyone:
-                frase = discord.utils.escape_mentions(frase)
+                if ctx.message.mentions:  # se tiver alguma menção na mensagem
+                    for mention in ctx.message.mentions:
+                        frase = frase.replace(f'<@{mention.id}>', '')
+                        frase = frase.replace(f'<@!{mention.id}>', '')
+                frase = frase.replace(f'@', '@\uFEFF')
         except:  # se der algum erro, provavelmente é porque o comando foi usado no dm
             pass
+        if len(frase) == 0:  # se após os filtros, a mensagem ficou vazia
+            frase = '.'
         await ctx.send(frase)
 
 
