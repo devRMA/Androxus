@@ -108,6 +108,13 @@ class Botinfo(commands.Cog):
             embed.add_field(name=':bank: Banco de dados que estou usando:',
                             value=f'``{InformacoesDao().get_version()[:15]}``',
                             inline=True)
+            comandos = 0
+            for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
+                for command in self.bot.get_cog(cog).get_commands():
+                    if not command.hidden:  # se o comando não estiver privado
+                        comandos += 1
+            embed.add_field(name='Quantos comandos eu tenho:',
+                            value=f'```{comandos}```')
             uptime = datetime.utcnow() - self.bot.uptime
             hours_bot, remainder_bot = divmod(int(uptime.total_seconds()), 3600)
             minutes_bot, seconds_bot = divmod(remainder_bot, 60)

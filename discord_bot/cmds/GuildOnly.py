@@ -144,7 +144,7 @@ class GuildOnly(commands.Cog):
             embed.add_field(name="Membros", value=ctx.guild.member_count, inline=True)
             embed.add_field(name="Bots", value=bots, inline=True)
             embed.add_field(name="Dono", value=ctx.guild.owner, inline=True)
-            embed.add_field(name="Região", value=ctx.guild.region, inline=True)
+            embed.add_field(name="Região", value=str(ctx.guild.region).capitalize(), inline=True)
             embed.add_field(name="Criado em:", value=ctx.guild.created_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
             await ctx.send(embed=embed)
 
