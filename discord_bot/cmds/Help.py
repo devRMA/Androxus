@@ -31,8 +31,8 @@ class Help(commands.Cog):
 
     @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda de um comando.')
     async def help(self, ctx, *comando):
-        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
-            if len(comando) == 0:
+        if len(comando) == 0:
+            async with ctx.channel.typing():  # vai aparecer "bot está digitando"
                 cor = random_color()
                 embed = embedHelp(self.bot,
                                   ctx,
@@ -89,9 +89,10 @@ class Help(commands.Cog):
                                         name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
                                         value=f'Eu irei responder "{resposta[0]}" **apenas se a mensagem iniciar com o comando**',
                                         inline=True)
-                await ctx.send(embed=embed)
-                await ctx.send(embed=lista_de_comando)
-            else:
+            await ctx.send(embed=embed)
+            await ctx.send(embed=lista_de_comando)
+        else:
+            async with ctx.channel.typing():  # vai aparecer "bot está digitando"
                 comando = ' '.join(comando)
                 for cog in self.bot.cogs:  # Abre todos os cogs que o bot têm
                     for command in self.bot.get_cog(cog).get_commands():  # pega todos os comandos do cog
@@ -109,7 +110,7 @@ class Help(commands.Cog):
                                 value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para' +
                                       ' comandos padrões, ou seja, comandos personalizados não têm ajuda.```',
                                 inline=False)
-                await ctx.send(content=ctx.author.mention, embed=embed)
+            await ctx.send(content=ctx.author.mention, embed=embed)
 
 
 def setup(bot):

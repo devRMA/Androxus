@@ -137,7 +137,7 @@ class Calc(commands.Cog):
                                   description=f'{resultado}',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

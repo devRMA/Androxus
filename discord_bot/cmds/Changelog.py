@@ -29,15 +29,16 @@ class Changelog(commands.Cog):
     @commands.command(aliases=['ultima_att', 'última_att', 'att_log'],
                       description='Mostra qual foi a última atualização que eu tive!')
     async def changelog(self, ctx):
-        embed = discord.Embed(title=f'Ultima atualização que eu tive:',
-                              colour=discord.Colour(random_color()),
-                              description=f'```{get_last_commit()}```',
-                              timestamp=datetime.utcnow())
-        embed.set_footer(text=f'{ctx.author}',
-                         icon_url=ctx.author.avatar_url)
-        embed.add_field(name='Atualização feita em:',
-                        value=f'``{get_last_update().strftime("%d/%m/%Y às %H:%M:%S")}``',
-                        inline=True)
+        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
+            embed = discord.Embed(title=f'Ultima atualização que eu tive:',
+                                  colour=discord.Colour(random_color()),
+                                  description=f'```{get_last_commit()}```',
+                                  timestamp=datetime.utcnow())
+            embed.set_footer(text=f'{ctx.author}',
+                             icon_url=ctx.author.avatar_url)
+            embed.add_field(name='Atualização feita em:',
+                            value=f'``{get_last_update().strftime("%d/%m/%Y às %H:%M:%S")}``',
+                            inline=True)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
 

@@ -34,7 +34,7 @@ class Botinfo(commands.Cog):
 
     @commands.command(aliases=['info', 'detalhes'], description='Mostra algumas informações sobre mim!')
     async def botinfo(self, ctx):
-        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
+        async with ctx.typing():  # vai aparecer "bot está digitando"
             stopwatch_banco = Stopwatch()
             prefixo = pegar_o_prefixo(None, ctx)
             stopwatch_banco.stop()
@@ -129,7 +129,7 @@ class Botinfo(commands.Cog):
             embed.add_field(name=':watch: Ultima atualização há:',
                             value=f'``{days_att} d, {hours_att} h, {minutes_att} m, {seconds_att} s``',
                             inline=True)
-            await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
