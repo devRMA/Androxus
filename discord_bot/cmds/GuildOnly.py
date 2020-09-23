@@ -87,10 +87,11 @@ class GuildOnly(commands.Cog):
                         return
                 else:  # se a pessoa não passou nenhum argumento:
                     user = ctx.author
-
-            roles = ', '.join(
-                [f"<@&{x.id}>" for x in sorted(user.roles, key=lambda x: x.position, reverse=True) if x.id != ctx.guild.default_role.id]
-            ) if len(user.roles) > 1 else 'None'
+            roles = None
+            if hasattr(user, 'roles'):
+                roles = ', '.join(
+                    [f"<@&{x.id}>" for x in sorted(user.roles, key=lambda x: x.position, reverse=True) if x.id != ctx.guild.default_role.id]
+                ) if len(user.roles) > 1 else None
             cor = user.top_role.colour.value or discord.Colour(random_color())
             embed = discord.Embed(title=f'Informações sobre o(a) {user}!',
                                   colour=cor,
@@ -102,7 +103,7 @@ class GuildOnly(commands.Cog):
             if user.nick is not None:
                 embed.add_field(name="Nickname", value=user.nick, inline=True)
             embed.add_field(name="Conta criada em:", value=user.created_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
-            if user.joined_at is not None:
+            if hasattr(user, 'joined_at'):
                 embed.add_field(name="Entrou no servidor em:", value=user.joined_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
                 embed.add_field(name="Cargos", value=roles, inline=False)
             return await ctx.send(embed=embed)
