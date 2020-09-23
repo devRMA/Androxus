@@ -105,7 +105,7 @@ class GuildOnly(commands.Cog):
             if user.joined_at is not None:
                 embed.add_field(name="Entrou no servidor em:", value=user.joined_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
                 embed.add_field(name="Cargos", value=roles, inline=False)
-            await ctx.send(embed=embed)
+            return await ctx.send(embed=embed)
 
     @commands.command(hidden=True)
     async def help_serverinfo(self, ctx):
