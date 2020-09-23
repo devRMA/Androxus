@@ -151,7 +151,7 @@ class GuildOnly(commands.Cog):
                           aliases=self.server_avatar.aliases.copy())
         await ctx.send(content=ctx.author.mention, embed=embed)
 
-    @commands.command(aliases=["icone"])
+    @commands.command(aliases=["icone"], description='Eu vou enviar o icone do servidor (se tiver).')
     async def server_avatar(self, ctx):
         if not ctx.guild.icon:
             await ctx.send("Este servidor não tem avatar.")
@@ -169,7 +169,7 @@ class GuildOnly(commands.Cog):
                           aliases=self.server_banner.aliases.copy())
         await ctx.send(content=ctx.author.mention, embed=embed)
 
-    @commands.command(aliases=["banner"], description='Eu vou pegar o banner do servidor (se tiver).')
+    @commands.command(aliases=["banner"], description='Eu vou enviar o banner do servidor (se tiver).')
     async def server_banner(self, ctx):
         if not ctx.guild.banner:
             await ctx.send("Este servidor não tem banner.")
