@@ -58,8 +58,8 @@ class Fun(commands.Cog):
 
     @commands.command(aliases=['cc', 'coinflip'], description='Cara ou coroa?')
     async def cara_coroa(self, ctx):
-        respostas = ['Cara.', 'Coroa.']
-        await ctx.send(f'🎱{choice(respostas)}')
+        respostas = ['🙂 Cara.', '👑 Coroa.']
+        await ctx.send(f'{choice(respostas)}')
 
 
 def setup(bot):
