@@ -15,8 +15,8 @@ from discord_bot.events.OnMessageEvent import on_message_event  # evento que vai
 from random import choice  # função que vai ser usada para escolher "aleatoriamente" qual status do bot
 from datetime import datetime  # Esse módulo vai ser usado para definir a hora que o bot iniciou
 
-# instanciamento do bot em si, passando a função "pegar_o_prefixo" no prefixo
-bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657)
+# criação do bot em si, passando a função "pegar_o_prefixo" no prefixo
+bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657, case_insensitive=True)
 bot.remove_command('help')  # remove o comando help default
 
 
