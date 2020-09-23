@@ -5,6 +5,7 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
+from discord.ext.commands import errors
 
 
 class ErrorCommands(commands.Cog):
@@ -35,29 +36,29 @@ class ErrorCommands(commands.Cog):
             # Anything in ignored will return and prevent anything happening.
             if isinstance(error, ignored):
                 return
-            elif isinstance(error, commands.errors.NotOwner):
+            elif isinstance(error, errors.NotOwner):
                 await ctx.send(f'{ctx.author.mention} você não é meu criador <a:no_no:755774680325029889>')
-            elif isinstance(error, commands.errors.NoPrivateMessage):
+            elif isinstance(error, errors.NoPrivateMessage):
                 await ctx.send(f'{ctx.author.mention} Este comando só pode ser usado num servidor! <a:atencao:755844029333110815>')
-            elif isinstance(error, commands.errors.MissingPermissions):
+            elif isinstance(error, errors.MissingPermissions):
                 if len(error.missing_perms) == 1:
                     permissões = error.missing_perms[0]
                 else:
                     permissões = ', '.join(error.missing_perms)
                 await ctx.send(f'{ctx.author.mention} Você precisa ter permissão de ``{permissões}`` para usar este comando!')
-            elif isinstance(error, commands.errors.BotMissingPermissions):
+            elif isinstance(error, errors.BotMissingPermissions):
                 if len(error.missing_perms) == 1:
                     permissões = error.missing_perms[0]
                 else:
                     permissões = ', '.join(error.missing_perms)
                 await ctx.send(f'{ctx.author.mention} Eu não posso executar este comando, pois não tenho permissão de ' +
                                f'``{permissões}`` neste servidor! <a:sad:755774681008832623>')
+            elif isinstance(error, errors.CommandOnCooldown):
+                await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
+                               f'Tente novamente em {error.retry_after:.2f} segundos.')
             elif isinstance(error, Exception):
                 if str(error).startswith('duplicate key value violates unique constraint'):
                     await ctx.send(f'Esse item já está cadastrado! <a:atencao:755844029333110815>')
-            elif isinstance(error, commands.errors.CommandOnCooldown):
-                await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
-                               f'Tente novamente em {error.retry_after:.2f} segundos.')
             else:
                 try:
                     await ctx.send(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}\n<a:sad:755774681008832623>')
