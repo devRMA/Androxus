@@ -30,6 +30,7 @@ class Help(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda de um comando.')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def help(self, ctx, *comando):
         if len(comando) == 0:
             async with ctx.channel.typing():  # vai aparecer "bot está digitando"
@@ -83,11 +84,11 @@ class Help(commands.Cog):
                                 if resposta[-1]:  # se o inText estiver on:
                                     lista_de_comando.add_field(
                                         name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
-                                        value=f'Eu irei responder "{resposta[0]}"', inline=True)
+                                        value=f'Eu irei responder **independente da posição do comando na mensagem**.', inline=True)
                                 else:
                                     lista_de_comando.add_field(
                                         name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
-                                        value=f'Eu irei responder "{resposta[0]}" **apenas se a mensagem iniciar com o comando**',
+                                        value=f'Eu irei responder **apenas se a mensagem iniciar com o comando**',
                                         inline=True)
             await ctx.send(embed=embed)
             await ctx.send(embed=lista_de_comando)

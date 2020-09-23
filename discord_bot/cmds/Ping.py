@@ -25,6 +25,7 @@ class Ping(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['latency', 'latência'], description='Mostra a minha latência atual.')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def ping(self, ctx):
         from stopwatch import Stopwatch
         mensagem_do_bot = await ctx.send(f'Minha latência atual é de {int(self.bot.latency * 1000)}ms !')

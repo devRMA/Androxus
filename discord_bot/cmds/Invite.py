@@ -24,6 +24,7 @@ class Invite(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['convidar', 'convite'], description='Mostra o link que você usa para me adicionar em seu servidor')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def invite(self, ctx):
         await ctx.send(f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=8')
 

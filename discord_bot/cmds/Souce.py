@@ -27,6 +27,7 @@ class Source(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['github', 'programação'], description='Mostra o meu código fonte!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def source(self, ctx):
         embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot feito em python, com ' +
                                     'a API do discord e um banco de dados!',

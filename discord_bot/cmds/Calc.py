@@ -29,6 +29,7 @@ class Calc(commands.Cog):
 
     @commands.command(name='operações', aliases=['operators', 'operacoes', 'ops'],
                       description='Todas as operações que eu suporto no comando ``calc``!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def operators(self, ctx):
         operators = {
             'Operador: ``+``': 'Adição\nEx: ``2 + 2``\nVou responder: ``4``',
@@ -84,6 +85,7 @@ class Calc(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def calc(self, ctx, *args):
         if len(args) == 0:
             await self.help_calc(ctx)

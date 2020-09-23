@@ -32,6 +32,7 @@ class ComandoPersonalizado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['add_command', 'ac'], description='Adiciona comandos personalizados')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def adicionar_comando(self, ctx, comando=None, resposta=None, inText='t'):
@@ -73,6 +74,7 @@ class ComandoPersonalizado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['remove_command', 'rc'], description='Remove um comando personalizado')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def remover_comando(self, ctx, comando=None):
@@ -101,6 +103,7 @@ class ComandoPersonalizado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['update_command', 'mc'], description='Modifica um comando personalizado')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def modificar_comando(self, ctx, comando=None, resposta=None, inText='t'):

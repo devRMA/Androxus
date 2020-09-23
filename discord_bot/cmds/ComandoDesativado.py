@@ -30,6 +30,7 @@ class ComandoDesativado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['disable_command', 'dc'], description='Desativa comandos!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def desativar_comando(self, ctx, comando=None):
@@ -70,6 +71,7 @@ class ComandoDesativado(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['reactivate_command'], description='Reativa comando!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     async def reativar_comando(self, ctx, comando=None):

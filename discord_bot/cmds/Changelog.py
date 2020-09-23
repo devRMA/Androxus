@@ -28,6 +28,7 @@ class Changelog(commands.Cog):
 
     @commands.command(aliases=['ultima_att', 'última_att', 'att_log'],
                       description='Mostra qual foi a última atualização que eu tive!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def changelog(self, ctx):
         async with ctx.channel.typing():  # vai aparecer "bot está digitando"
             embed = discord.Embed(title=f'Ultima atualização que eu tive:',

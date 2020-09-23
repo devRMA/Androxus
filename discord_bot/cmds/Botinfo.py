@@ -33,6 +33,7 @@ class Botinfo(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['info', 'detalhes'], description='Mostra algumas informações sobre mim!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def botinfo(self, ctx):
         async with ctx.typing():  # vai aparecer "bot está digitando"
             stopwatch_banco = Stopwatch()

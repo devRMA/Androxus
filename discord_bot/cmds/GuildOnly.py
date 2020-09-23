@@ -27,6 +27,7 @@ class GuildOnly(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(description='Eu vou mandar a foto de perfil da pessoa que você marcar.')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def avatar(self, ctx, *args):
         if ctx.message.mentions:  # se tiver alguma menção na mensagem
             await ctx.send(
@@ -62,6 +63,7 @@ class GuildOnly(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(description='Eu vou mandar o máximo de informações sobre um usuário.')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def userinfo(self, ctx, *args):
         async with ctx.channel.typing():  # vai aparecer "bot está digitando"
             user = None
@@ -123,6 +125,7 @@ class GuildOnly(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(description='Eu vou mandar o máximo de informações sobre um servidor.')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.guild_only()
     async def serverinfo(self, ctx):
         if ctx.invoked_subcommand is None:
@@ -160,6 +163,8 @@ class GuildOnly(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=["icone"], description='Eu vou enviar o icone do servidor (se tiver).')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    @commands.guild_only()
     async def server_avatar(self, ctx):
         if not ctx.guild.icon:
             await ctx.send("Este servidor não tem avatar.")
@@ -178,6 +183,8 @@ class GuildOnly(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=["banner"], description='Eu vou enviar o banner do servidor (se tiver).')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    @commands.guild_only()
     async def server_banner(self, ctx):
         if not ctx.guild.banner:
             await ctx.send("Este servidor não tem banner.")

@@ -28,6 +28,7 @@ class Uptime(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['tempo_on'], description='Mostra a quanto tempo eu estou online!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
     async def uptime(self, ctx):
         uptime = relativedelta(datetime.utcnow(), self.bot.uptime)
         seconds = uptime.seconds

@@ -22,7 +22,7 @@ async def on_message_event(bot, message):
                               colour=0xfdfd96,
                               description=f'{message.content}',
                               timestamp=datetime.utcnow())
-        embed.set_footer(text=f'{message.author.id}', icon_url='https://media-exp1.licdn.com/dms/image/C510BAQHhOjPujl'+
+        embed.set_footer(text=f'{message.author.id}', icon_url='https://media-exp1.licdn.com/dms/image/C510BAQHhOjPujl' +
                                                                'cgfQ/company-logo_200_200/0?e=2159024400&v=beta&t=49' +
                                                                'Ex7j5UkZroF7-uzYIxMXPCiV7dvtvMNDz3syxcLG8')
         if len(message.attachments) != 0:
