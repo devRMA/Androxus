@@ -30,6 +30,9 @@ async def on_message_event(bot, message):
                 embed.set_image(url=attachment.url)
         embed.set_thumbnail(url=message.author.avatar_url)
         await bot.dm_channel_log.send(embed=embed)
+    if message.mention_everyone:  # verifica se marcou here ou everyone
+        emoji = bot.get_emoji(755774680220172340)  # emoji de ping pistola
+        await message.add_reaction(emoji)  # adiciona a reação com o emoji
     if message.guild is not None:  # Se foi usado num server, vai ver se o comando está desativado
         # aqui, vai verificar se o comando foi desativado
         for comandos_desativados in ComandoDesativadoDao().get_comandos(message.guild.id):
@@ -76,7 +79,4 @@ async def on_message_event(bot, message):
     if (f'<@{str(bot.user.id)}>' == message.content) or (f'<@!{str(bot.user.id)}>' == message.content):
         await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda!')
         await channel.send('<a:hello:755774680949850173>')
-    elif message.mention_everyone:  # verifica se marcou here ou everyone
-        emoji = bot.get_emoji(755774680220172340)  # emoji de ping pistola
-        await message.add_reaction(emoji)  # adiciona a reação com o emoji
     await bot.process_commands(message)
