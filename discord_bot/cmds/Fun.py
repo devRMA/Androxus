@@ -36,7 +36,22 @@ class Fun(commands.Cog):
         args = ''.join(args).lower()
         respostas = ['Sim!', 'Não!', 'Acho que sim.',
                      'Acho que não.', 'Claro!', 'Claro que não!',
-                     'Talvez sim.', 'Talvez não.']
+                     'Talvez sim.', 'Talvez não.',
+                     'Eu responderia, mas não quero ferir seus sentimentos.',
+                     'Se eu te responder, você não iria acreditar.',
+                     '¯\_(ツ)_/¯',
+                     'Hmmmm... :thinking:',
+                     'Minhas fontes dizem que sim.'
+                     'Minhas fontes dizem que não.'
+                     'Do jeito que eu vejo, não.',
+                     'Do jeito que eu vejo, sim.',
+                     'Não posso falar sobre isso.',
+                     'Provavelmente sim.',
+                     'Provavelmente não.',
+                     'A resposta para isso é um grande mistério.',
+                     'Apenas super xandão tem a resposta para isso.',
+                     'Pergunta para o seu professor.',
+                     'Eu tenho cara de google?']
         asci_value = 0  # vai transformar a pergunta em asci, e usar este número como seed para pegar a resposta
         for c in args:
             try:
