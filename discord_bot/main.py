@@ -12,7 +12,8 @@ from os import listdir  # função responsável por pegar todos os cogs
 from discord_bot.utils.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
 from discord_bot.utils.Utils import get_configs  # função que pega as configurações do json
 from sys import version  # função para pegar a versão do python
-from discord_bot.events.OnMessageEvent import on_message_event  # evento que vai ser chamado, toda vez que enviarem uma menasgem
+# evento que vai ser chamado, toda vez que enviarem uma menasgem
+from discord_bot.events.OnMessageEvent import on_message_event
 from random import choice  # função que vai ser usada para escolher "aleatoriamente" qual status do bot
 from datetime import datetime  # Esse módulo vai ser usado para definir a hora que o bot iniciou
 
@@ -40,18 +41,6 @@ async def on_ready():
         # que o bot vai usar quando mandarem mensagem no privado dele
         bot.dm_channel_log = bot.get_channel(get_configs()['dm_channel'])
     change_status.start()  # inicia o loop para mudar o status
-
-
-@bot.event
-async def on_guild_join(guild):
-    # toda vez que adicionarem o bot num servidor, vai adicionar o servidor ao banco
-    ServidorDao().create(guild.id)
-
-
-@bot.event
-async def on_guild_remove(guild):
-    # toda vez que removerem o bot de um servidor, vai remover o servidor do banco
-    ServidorDao().delete(guild.id)
 
 
 @bot.event
@@ -84,13 +73,28 @@ async def change_status():  # loop que vai ficar alterando o status do bot
 
 if __name__ == '__main__':
     try:
-        listdir('discord_bot/cmds')  # vai tentar achar a pasta "discord/cmd"
-        path_cmds = 'discord_bot/cmds'  # se achar, salva o path
+        listdir('discord_bot/')  # vai tentar achar a pasta "discord/cmd"
+        path = 'discord_bot/'  # se achar, salva o path
     except FileNotFoundError:  # se não achar, salva o path como "./cmds"
-        path_cmds = './cmds'
-    for filename in listdir(path_cmds):  # vai listar todas os arquivos que tem na pasta "cmds"
+        path = './'
+    for filename in listdir(f'{path}cmds'):  # vai listar todas os arquivos que tem na pasta "cmds"
         if filename.endswith('.py'):  # se o arquivo terminar com ".py"
-            bot.load_extension(f'cmds.{filename[:-3]}')  # vai adicionar ao bot
+            try:
+                bot.load_extension(f'cmds.{filename[:-3]}')  # vai adicionar ao bot
+                print(f'✅ - Módulo {filename[:-3]} carregado!')
+            except commands.NoEntryPointError:
+                print(f'⚠ - Módulo {filename[:-3]} ignorado! "def setup" não encontrado!!')
+            except:
+                print(f'⚠ - Módulo {filename[:-3]} deu erro na hora de carregar!')
+    for filename in listdir(f'{path}events'):  # vai listar todas os arquivos que tem na pasta "events"
+        if filename.endswith('.py'):  # se o arquivo terminar com ".py"
+            try:  # vai verificar se o arquivo tem o "def setup"
+                bot.load_extension(f'events.{filename[:-3]}')  # vai adicionar ao bot
+                print(f'✅ - Módulo {filename[:-3]} carregado!')
+            except commands.NoEntryPointError:
+                pass  # se não achar o def setup
+            except:
+                print(f'⚠ - Módulo {filename[:-3]} não foi carregado!')
     if get_configs()['token'] == 'token_bot':
         token = environ.get('TOKEN')
     else:
