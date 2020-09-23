@@ -32,7 +32,7 @@ class Fun(commands.Cog):
         if len(args) == 0:
             await self.help_eightball(ctx)
             return
-        args = ' '.join(args)
+        args = ''.join(args).lower()
         respostas = ['Sim!', 'Não!', 'Acho que sim.',
                      'Acho que não.', 'Claro!', 'Claro que não!',
                      'Talvez sim.', 'Talvez não.']
