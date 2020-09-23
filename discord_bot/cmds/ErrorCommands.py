@@ -55,6 +55,9 @@ class ErrorCommands(commands.Cog):
             elif isinstance(error, Exception):
                 if str(error).startswith('duplicate key value violates unique constraint'):
                     await ctx.send(f'Esse item já está cadastrado! <a:atencao:755844029333110815>')
+            elif isinstance(error, commands.errors.CommandOnCooldown):
+                await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
+                               f'Tente novamente em {error.retry_after:.2f} segundos.')
             else:
                 try:
                     await ctx.send(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}\n<a:sad:755774681008832623>')
