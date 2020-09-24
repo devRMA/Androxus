@@ -80,7 +80,13 @@ def get_configs():
     from os.path import exists  # função que vai verificar se existe o arquivo json
     import sys
     if exists('discord_bot/configs.json'):
-        with open('discord_bot/configs.json') as file:
+        path = 'discord_bot/configs.json'  # se achar, salva o path
+    elif exists('./configs.json'):
+        path = './configs.json'
+    else:
+        path = None
+    if path is not None:
+        with open(path) as file:
             configs = load(file)
         return configs
     else:
