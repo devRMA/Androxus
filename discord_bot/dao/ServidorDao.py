@@ -66,7 +66,7 @@ class ServidorDao:
     def delete(self, serverId):
         if isinstance(serverId, int):
             try:
-                query = 'CALL server_remove(%s)'
+                query = 'CALL server_remove(%s);'
                 self.cursor.execute(query, (serverId,))
                 self.connection.commit()
             except Exception as e:
