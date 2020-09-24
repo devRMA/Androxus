@@ -72,7 +72,7 @@ class OwnerOnly(commands.Cog):
                 foi = False
             try:
                 if foi and ctx.guild.id == 405826835793051649:
-                    embed = discord.Embed(title=f'Mensagem enviada!',
+                    embed = discord.Embed(title=f'Mensagem enviada no privado do(a) {str(user)}!',
                                           colour=discord.Colour(random_color()),
                                           description=f'{" ".join(args)}',
                                           timestamp=datetime.utcnow())
