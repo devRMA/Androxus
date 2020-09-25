@@ -188,7 +188,7 @@ class OnReactionEvent(commands.Cog):
             self.bot.msg_traduzidas.append(id_msg)  # evita que a pessoa fique usando o comando na mesma mensagem
             for flag_lang in languages.items():
                 if str(reaction) == flag_lang[0]:
-                    return await self.bot.traduzir(ctx=self.bot.get_context(reaction.message),
+                    return await self.bot.get_cog('Translator').traduzir(ctx=self.bot.get_context(reaction.message),
                                                    dest=flag_lang[-1],
                                                    frase=[reaction.message.content])
 
