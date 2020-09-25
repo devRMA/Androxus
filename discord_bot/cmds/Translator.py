@@ -6,7 +6,7 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 from discord_bot.modelos.EmbedHelp import embedHelp
-from googletrans import Translator
+import googletrans
 
 
 class Translator(commands.Cog):
@@ -49,7 +49,7 @@ class Translator(commands.Cog):
             frase = frase.replace(f'@', '@\uFEFF')  # quebra o @everyone e o @here
             # se após a remoção das menções, não sobrar nada, para a execução
             if len(frase.replace(' ', '')) == 0: return
-            msg = Translator().translate(frase, dest=dest).text.capitalize()
+            msg = googletrans.Translator().translate(frase, dest=dest).text.capitalize()
             await ctx.send(content=f'{ctx.author.mention} {msg}')
         else:
             await self.help_traduzir(ctx)
