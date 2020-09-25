@@ -50,7 +50,7 @@ class Translator(commands.Cog):
                     frase = frase.replace(f'<@!{mention.id}>', '')
             frase = frase.replace(f'@', '@\uFEFF')  # quebra o @everyone e o @here
             # se após a remoção das menções, não sobrar nada, para a execução
-            if len(frase.replace(' ', '')) == 0: return
+            if len(frase.replace(' ', '')) == 0: return await self.help_traduzir(ctx)
             msg = googletrans.Translator().translate(frase, dest=dest).text.capitalize()
             await ctx.send(content=f'{ctx.author.mention} {msg}')
         else:
