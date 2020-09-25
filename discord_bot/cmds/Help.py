@@ -14,6 +14,7 @@ from discord_bot.modelos.EmbedHelp import embedHelp
 
 
 class Help(commands.Cog):
+    # TODO
     def __init__(self, bot):
         self.bot = bot
 
@@ -44,7 +45,8 @@ class Help(commands.Cog):
                                   # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                                   aliases=self.help.aliases.copy(),
                                   cor=cor)
-                lista_de_comando = discord.Embed(title=f"Lista de comandos:", colour=discord.Colour(cor),
+                lista_de_comando = discord.Embed(title=f"Lista de comandos:",
+                                                 colour=discord.Colour(cor),
                                                  description="Estes são os comandos que eu tenho (todos abaixo precisam do prefixo)",
                                                  timestamp=datetime.utcnow())
                 lista_de_comando.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
@@ -84,7 +86,8 @@ class Help(commands.Cog):
                                 if resposta[-1]:  # se o inText estiver on:
                                     lista_de_comando.add_field(
                                         name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
-                                        value=f'Eu irei responder **independente da posição do comando na mensagem**.', inline=True)
+                                        value=f'Eu irei responder **independente da posição do comando na mensagem**.',
+                                        inline=True)
                                 else:
                                     lista_de_comando.add_field(
                                         name=f'{emoji_personalizado}``{comando_personalizado[0]}``',

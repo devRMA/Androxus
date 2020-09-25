@@ -12,6 +12,7 @@ from discord_bot.utils.Utils import get_configs
 class Factory:
 
     def getConnection(self):
+        # TODO
         if get_configs()['connection_string'] == 'connection string of db':
             self.db_path = environ.get('DATABASE_URL')
         else:

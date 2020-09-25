@@ -10,6 +10,7 @@ from .Factory import Factory
 
 
 class BlacklistDao:
+    # TODO
     def __init__(self):
         self.connection = Factory().getConnection()  # inicia a conexão com o banco
         self.cursor = self.connection.cursor()  # cria o cursor
