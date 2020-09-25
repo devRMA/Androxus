@@ -190,7 +190,7 @@ class OnReactionEvent(commands.Cog):
                 if str(reaction) == flag_lang[0]:
                     return await self.bot.get_cog('Translator').traduzir(self.bot.get_context(reaction.message),
                                                    flag_lang[-1],
-                                                   [reaction.message.content])
+                                                   reaction.message.content)
 
 
 def setup(bot):
