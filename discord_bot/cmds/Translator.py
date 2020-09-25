@@ -43,10 +43,15 @@ class Translator(commands.Cog):
                                       'Por favor, verifique se você digitou a abreviação certa!\n' +
                                       '<a:sad:755774681008832623>')
             frase = ' '.join(frase)  # transforma a lista numa string única
+            # anti mention:
+            if ctx.message.mentions:  # se tiver alguma menção na mensagem
+                for mention in ctx.message.mentions:
+                    frase = frase.replace(f'<@{mention.id}>', '')
+                    frase = frase.replace(f'<@!{mention.id}>', '')
+            frase = frase.replace(f'@', '@\uFEFF')  # quebra o @everyone e o @here
             # se após a remoção das menções, não sobrar nada, para a execução
             if len(frase.replace(' ', '')) == 0: return
             msg = googletrans.Translator().translate(frase, dest=dest).text.capitalize()
-            msg = msg.replace(f'@', '@\uFEFF')  # anti mention
             await ctx.send(content=f'{ctx.author.mention} {msg}')
         else:
             await self.help_traduzir(ctx)
