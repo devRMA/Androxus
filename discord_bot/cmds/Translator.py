@@ -40,7 +40,7 @@ class Translator(commands.Cog):
                 dests.append(lang[0])
             if not dest in dests:  # se o "dest" que a pessoa passou não for válido:
                 return await ctx.send(f'Não encontrei nenhuma lingua chamada ``{dest}``!\n' +
-                                      'Por favor, verifique se você digitou a abreviação certa!\n' +'
+                                      'Por favor, verifique se você digitou a abreviação certa!\n' +
                                       '<a:sad:755774681008832623>')
             frase = ' '.join(frase)  # transforma a lista numa string única
             # anti mention:
