@@ -58,7 +58,7 @@ class Fun(commands.Cog):
                 asci_value += ord(c)
             except:
                 pass
-        seed(asci_value)
+        seed(asci_value + ctx.author.id)
         await ctx.send(f'{choice(respostas)}')
 
     @commands.command(hidden=True, aliases=['help_cc', 'help_coinflip'])
