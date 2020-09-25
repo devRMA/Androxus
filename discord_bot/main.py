@@ -36,6 +36,8 @@ async def on_ready():
         bot.tratar_erros = True  # atributo que vai controlar o tratamento de erros
     if not hasattr(bot, 'mudar_status'):  # se o bot não tiver o atributo "mudar_status"
         bot.mudar_status = True  # atributo que vai ficar responsável por controlar a mudança de status
+    if not hasattr(bot, 'msg_traduzidas'):  # se o bot não tiver o atributo "msg_traduzidas"
+        bot.msg_traduzidas = []  # atributo que vai evitar que a pessoa fique pedindo para traduzir a msm mensagem
     if not hasattr(bot, 'dm_channel_log'):  # se o bot não tiver o atributo "dm_channel_log"
         # esse atributo vai ser responsável por guardar o chat
         # que o bot vai usar quando mandarem mensagem no privado dele

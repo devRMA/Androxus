@@ -8,3 +8,4 @@ psutil
 requests
 python-dateutil
 py_expression_eval
+googletrans
