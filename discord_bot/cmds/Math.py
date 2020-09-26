@@ -243,7 +243,7 @@ class Math(commands.Cog):
                                                   f'**{valores_user[0]}x = {valores_user[-1]}×{valores_user[1]}**\n' +
                                                   f'**{valores_user[0]}x = {mult}**\n' +
                                                   f'**x = {mult}/{valores_user[0]}**\n' +
-                                                  f'**x = {resp}**',
+                                                  f'**x = {resp:.2f}**',
                                       timestamp=datetime.utcnow())
                 embed.set_author(name='Androxus',
                                  icon_url=self.bot.user.avatar_url)
@@ -261,7 +261,7 @@ class Math(commands.Cog):
                 text1 = str(valores_user[0])
                 text2 = str(valores_user[1])
                 text3 = str(valores_user[2])
-                x = str(resp)
+                x = f'{resp:.2f}'
                 draw.text(pos1, text1, black, font=font)
                 draw.text(pos2, text2, black, font=font)
                 draw.text(pos3, text3, black, font=font)
@@ -321,7 +321,7 @@ class Math(commands.Cog):
                                                   f'**{valores_user[-1]}x = {valores_user[0]}×{valores_user[1]}**\n' +
                                                   f'**{valores_user[-1]}x = {mult}**\n' +
                                                   f'**x = {mult}/{valores_user[-1]}**\n' +
-                                                  f'**x = {resp}**',
+                                                  f'**x = {resp:.2f}**',
                                       timestamp=datetime.utcnow())
                 embed.set_author(name='Androxus',
                                  icon_url=self.bot.user.avatar_url)
@@ -339,7 +339,7 @@ class Math(commands.Cog):
                 text1 = str(valores_user[0])
                 text2 = str(valores_user[1])
                 text3 = str(valores_user[2])
-                x = str(resp)
+                x = f'{resp:.2f}'
                 draw.text(pos1, text1, black, font=font)
                 draw.text(pos2, text2, black, font=font)
                 draw.text(pos3, text3, black, font=font)
