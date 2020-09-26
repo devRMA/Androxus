@@ -182,17 +182,17 @@ class Math(commands.Cog):
             return await ctx.send('Tempo esgotado!')
         modo = None
         path = ''
-        if msg.content.lower() in ['inversamente', 'i']:
+        if 'inversamente'.startswith(msg.content.lower()):
             modo = 'i'
-        elif msg.content.lower() in ['diretamente', 'd']:
+        elif 'diretamente'.startswith(msg.content.lower()):
             modo = 'd'
         if modo:
-            await ctx.send('Modo selecionado: ``inversamente proporcional``!')
+            await ctx.send('Modo selecionado: ``diretamente proporcional``!')
             if exists('discord_bot/'):
                 path = 'discord_bot/'
             else:
                 path = './'
-            if modo == 'i':
+            if modo == 'd':
                 valores = [
                     ['primeiro', 'v1'],
                     ['segundo', 'v2'],
@@ -276,7 +276,7 @@ class Math(commands.Cog):
                 img.close()
                 await ctx.send(embed=embed,
                                file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
-            elif modo == 'd':
+            elif modo == 'i':
                 pass
         else:
             await ctx.send(f'{ctx.author.mention} eu não sei o que é ' +
