@@ -187,12 +187,12 @@ class Math(commands.Cog):
         elif 'diretamente'.startswith(msg.content.lower()):
             modo = 'd'
         if modo:
-            await ctx.send('Modo selecionado: ``inversamente proporcional``!')
             if exists('discord_bot/'):
                 path = 'discord_bot/'
             else:
                 path = './'
             if modo == 'd':
+                await ctx.send('Modo selecionado: ``diretamente proporcional``!')
                 valores = [
                     ['primeiro', 'v1'],
                     ['segundo', 'v2'],
@@ -270,7 +270,8 @@ class Math(commands.Cog):
                 img.close()
                 await ctx.send(embed=embed,
                                file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
-            elif modo == 'i':
+            else:
+                await ctx.send('Modo selecionado: ``inversamente proporcional``!')
                 valores = [
                     ['primeiro', 'v1'],
                     ['segundo', 'v2'],
