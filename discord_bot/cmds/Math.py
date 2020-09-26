@@ -251,7 +251,8 @@ class Math(commands.Cog):
                 img = Image.open(f'{path}images/regra_de_tres_direta.png')
                 draw = ImageDraw.Draw(img)
                 font = ImageFont.truetype(f'{path}fonts/helvetica-normal.ttf', 25)
-                cor = (255, 0, 0)  # rgb
+                black = (0, 0, 0)  # rgb
+                red = (255, 0, 0)  # rgb
                 pos1 = (115, 210)  # x e y
                 pos2 = (352, 210)  # x e y
                 pos3 = (115, 406)  # x e y
@@ -260,10 +261,10 @@ class Math(commands.Cog):
                 text2 = str(valores_user[1])
                 text3 = str(valores_user[2])
                 x = str(resp)
-                draw.text(pos1, text1, cor, font=font)
-                draw.text(pos2, text2, cor, font=font)
-                draw.text(pos3, text3, cor, font=font)
-                draw.text(posx, x, cor, font=font)
+                draw.text(pos1, text1, black, font=font)
+                draw.text(pos2, text2, black, font=font)
+                draw.text(pos3, text3, black, font=font)
+                draw.text(posx, x, red, font=font)
                 img.save(f'{path}images/regra_de_tres_direta-edited.png')
                 img.close()
                 await ctx.send(embed=embed,
