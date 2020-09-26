@@ -1,18 +1,23 @@
 # coding=utf-8
 # Androxus bot
-# Calc.py
+# Math.py
 
 __author__ = 'Rafael'
 
 from datetime import datetime
+import asyncio
 from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.utils.Utils import random_color
 from py_expression_eval import Parser
+from os.path import exists
+from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
 
 
-class Calc(commands.Cog):
+class Math(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -136,11 +141,113 @@ class Calc(commands.Cog):
                 return
             embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
                                   colour=discord.Colour(random_color()),
-                                  description=f'{resultado}',
+                                  description='\uFEFF',
                                   timestamp=datetime.utcnow())
+            embed.add_field(name=f'Calculo:',
+                            value=f'```{args}```',
+                            inline=False)
+            embed.add_field(name=f'Resposta:',
+                            value=f'```{resultado}```',
+                            inline=False)
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
 
+    @commands.command(hidden=True, aliases=['help_regra_de_3', 'help_r3'])
+    async def help_regra_de_tres(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.regra_de_tres.name,
+                          descricao='Eu vou virar realizar uma regra de 3 simples para você!',
+                          exemplos=['``{pref}regra_de_tres``',
+                                    '``{pref}r3``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.regra_de_tres.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['regra_de_3', 'r3'], description='Eu vou fazer uma regra de três simples!')
+    @commands.cooldown(1, 5, commands.BucketType.channel)
+    async def regra_de_tres(self, ctx):
+        await ctx.send(
+            f'Olá {ctx.author.mention}!\nPrimeiro, qual regra de três você quer que eu faça? ' +
+            '(inversamente/diretamente)'
+        )
+
+        def check(message):
+            return message.author == ctx.author
+
+        try:
+            msg = await self.bot.wait_for('message', check=check, timeout=30)
+        except asyncio.TimeoutError:
+            return await ctx.send('Tempo esgotado!')
+        modo = None
+        path = ''
+        if msg.content.lower() in ['inversamente', 'i']:
+            modo = 'i'
+        elif msg.content.lower() in ['diretamente', 'd']:
+            modo = 'd'
+        if modo:
+            await ctx.send('Modo selecionado: ``inversamente proporcional``!')
+            if exists('discord_bot/'):
+                path = 'discord_bot/'
+            else:
+                path = './'
+            if modo == 'i':
+                valores = [
+                    ['primeiro', 'v1'],
+                    ['segundo', 'v2'],
+                    ['terceiro', 'v3']
+                ]
+                pos_text_list = [
+                    [(115, 210), 'v1'],
+                    [(352, 210), 'v2'],
+                    [(115, 406), 'v3'],
+                    [(363, 406), 'x']
+                ]
+                valores_user = []
+                for valor in valores:
+                    img = Image.open(f'{path}images/regra_de_tres_direta.png')
+                    draw = ImageDraw.Draw(img)
+                    font = ImageFont.truetype(f'{path}fonts/helvetica-normal.ttf', 25)
+                    black = (0, 0, 0)  # rgb
+                    red = (255, 0, 0)  # rgb
+                    for pos_text in pos_text_list:
+                        if pos_text[-1] == valor[-1]:
+                            draw.text(pos_text[0], pos_text[-1], red, font=font)
+                        else:
+                            draw.text(pos_text[0], pos_text[-1], black, font=font)
+                    img.save(f'{path}images/regra_de_tres_direta-edited.png')
+                    img.close()
+                    await ctx.send(f'Agora, eu preciso que você me fale o {valor[0]} valor (**{valor[-1]} na foto**).',
+                                   file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
+                    try:
+                        print('esperando user input')
+                        value = await self.bot.wait_for('message', check=check, timeout=30)
+                        print(f'recebeu, {value.content}')
+                        try:
+                            value = int(value.content)
+                        except ValueError:
+                            value = float(value.content.replace(',', '.'))
+                        except:
+                            return await ctx.send(f'O valor ``{value.content}`` não é um número!')
+                    except asyncio.TimeoutError:
+                        return await ctx.send('Tempo esgotado!')
+                    print('entrou no for pos_text_list')
+                    for c in range(0, len(pos_text_list)):
+                        print('dentro do for')
+                        print(f'pos_text_list[c][-1] == valor[-1]: {pos_text_list[c][-1] == valor[-1]}')
+                        print(f'pos_text_list[c][-1]: {pos_text_list[c][-1]}')
+                        print(f'valor[-1]: {valor[-1]}')
+                        if pos_text_list[c][-1] == valor[-1]:
+                            pos_text_list[c][-1] = value
+                    print(f'valores append({value})')
+                    valores_user.append(value)
+                await ctx.send(f'Valores recebidos: {valores_user}')
+            elif modo == 'd':
+                pass
+        else:
+            await ctx.send(f'{ctx.author.mention} eu não sei o que é ' +
+                           f'``{msg}``! Eu aceito apenas ``inversamente`` ou ``diretamente``')
+
 
 def setup(bot):
-    bot.add_cog(Calc(bot))
+    bot.add_cog(Math(bot))
