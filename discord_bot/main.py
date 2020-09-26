@@ -32,8 +32,6 @@ async def on_ready():
     print(f'Versão do python: {version[0:5]}')
     if not hasattr(bot, 'uptime'):  # se o bot não tiver o atributo "uptime"
         bot.uptime = datetime.utcnow()  # vai criar o atributo, com a data e hora atual
-    if not hasattr(bot, 'tratar_erros'):  # se o bot não tiver o atributo "tratar_erros"
-        bot.tratar_erros = True  # atributo que vai controlar o tratamento de erros
     if not hasattr(bot, 'mudar_status'):  # se o bot não tiver o atributo "mudar_status"
         bot.mudar_status = True  # atributo que vai ficar responsável por controlar a mudança de status
     if not hasattr(bot, 'msg_traduzidas'):  # se o bot não tiver o atributo "msg_traduzidas"

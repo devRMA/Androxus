@@ -19,13 +19,13 @@ class OwnerOnly(commands.Cog):
     @commands.command(aliases=['desativar_tratamento_de_erro', 'erros_off'], hidden=True)
     @commands.check(permissions.is_owner)
     async def desativar_erros(self, ctx):
-        self.bot.tratar_erros = False
+        self.bot.unload_extension('events.ErrorCommands')
         await ctx.send('Tratamento de erro desativado!')
 
     @commands.command(aliases=['ativar_tratamento_de_erro', 'erros_on'], hidden=True)
     @commands.check(permissions.is_owner)
     async def ativar_erros(self, ctx):
-        self.bot.tratar_erros = True
+        self.bot.load_extension('events.ErrorCommands')
         await ctx.send('Tratamento de erro ativado!')
 
     @commands.command(aliases=['jogar', 'status'], hidden=True)
