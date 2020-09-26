@@ -167,9 +167,10 @@ class Math(commands.Cog):
     @commands.command(aliases=['regra_de_3', 'r3'], description='Eu vou fazer uma regra de três simples!')
     @commands.cooldown(1, 5, commands.BucketType.channel)
     async def regra_de_tres(self, ctx):
+        # TODO
         await ctx.send(
             f'Olá {ctx.author.mention}!\nPrimeiro, qual regra de três você quer que eu faça? ' +
-            '(inversamente/diretamente)'
+            '(``inversamente``/``diretamente``)'
         )
 
         def check(message):
@@ -251,15 +252,35 @@ class Math(commands.Cog):
                 embed.add_field(name=f'x = {mult}/{valores_user[0]}',
                                 value='\uFEFF',
                                 inline=False)
+                resp = mult / valores_user[0]
                 embed.add_field(name='Resposta: ',
-                                value=f'x = {(mult / valores_user[0])}',
+                                value=f'x = {resp}',
                                 inline=False)
-                await ctx.send(embed=embed)
+                img = Image.open(f'{path}images/regra_de_tres_direta.png')
+                draw = ImageDraw.Draw(img)
+                font = ImageFont.truetype(f'{path}fonts/helvetica-normal.ttf', 25)
+                cor = (255, 0, 0)  # rgb
+                pos1 = (115, 210)  # x e y
+                pos2 = (352, 210)  # x e y
+                pos3 = (115, 406)  # x e y
+                posx = (363, 406)  # x e y
+                text1 = valores_user[0]
+                text2 = valores_user[1]
+                text3 = valores_user[2]
+                x = valores_user[3]
+                draw.text(pos1, text1, cor, font=font)
+                draw.text(pos2, text2, cor, font=font)
+                draw.text(pos3, text3, cor, font=font)
+                draw.text(posx, x, cor, font=font)
+                img.save(f'{path}images/regra_de_tres_direta-edited.png')
+                img.close()
+                await ctx.send(embed=embed,
+                               file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
             elif modo == 'd':
                 pass
         else:
             await ctx.send(f'{ctx.author.mention} eu não sei o que é ' +
-                           f'``{msg}``! Eu aceito apenas ``inversamente`` ou ``diretamente``')
+                           f'``{msg.content}``! Eu aceito apenas ``inversamente`` ou ``diretamente``')
 
 
 def setup(bot):
