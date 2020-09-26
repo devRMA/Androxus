@@ -211,11 +211,6 @@ class Math(commands.Cog):
                     black = (0, 0, 0)  # rgb
                     red = (255, 0, 0)  # rgb
                     for pos_text in pos_text_list:
-                        print('dentro do pos_text_list')
-                        print(f'pos_text: {pos_text}')
-                        print(f'valor[-1]: {valor[-1]}')
-                        print(f'pos_text[-1]: {pos_text[-1]}')
-                        print(f'pos_text[-1] == valor[-1]: {pos_text[-1] == valor[-1]}')
                         if pos_text[-1] == valor[-1]:
                             draw.text(pos_text[0], pos_text[-1], red, font=font)
                         else:
@@ -238,7 +233,28 @@ class Math(commands.Cog):
                         if pos_text_list[c][-1] == valor[-1]:
                             pos_text_list[c][-1] = f'{value}'
                     valores_user.append(value)
-                await ctx.send(f'Valores recebidos: {valores_user}')
+                embed = discord.Embed(title=f'Regra de 3!',
+                                      colour=discord.Colour(random_color()),
+                                      description='\uFEFF',
+                                      timestamp=datetime.utcnow())
+                embed.set_author(name='Androxus',
+                                 icon_url=self.bot.user.avatar_url)
+                embed.set_footer(text=f'{ctx.author}',
+                                 icon_url=ctx.author.avatar_url)
+                embed.add_field(name='\uFEFF',
+                                value=f'{valores_user[0]}x = {valores_user[-1]}×{valores_user[1]}',
+                                inline=False)
+                mult = valores_user[-1] * valores_user[1]
+                embed.add_field(name='\uFEFF',
+                                value=f'{valores_user[0]}x = {mult}',
+                                inline=False)
+                embed.add_field(name='\uFEFF',
+                                value=f'x = {mult}/{valores_user[0]}',
+                                inline=False)
+                embed.add_field(name='Resposta: ',
+                                value=f'x = {(mult / valores_user[0])}',
+                                inline=False)
+                await ctx.send(embed=embed)
             elif modo == 'd':
                 pass
         else:
