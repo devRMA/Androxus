@@ -227,10 +227,8 @@ class Math(commands.Cog):
                         except ValueError:
                             try:
                                 value = float(value.content.replace(',', '.'))
-                            except:
-                                pass
-                        except:
-                            return await ctx.send(f'O valor ``{value.content}`` não é um número!')
+                            except ValueError:
+                                return await ctx.send(f'O valor ``{value.content}`` não é um número!')
                     except asyncio.TimeoutError:
                         return await ctx.send('Tempo esgotado!')
                     for c in range(0, len(pos_text_list)):
