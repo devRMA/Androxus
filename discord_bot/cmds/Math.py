@@ -267,7 +267,7 @@ class Math(commands.Cog):
                 text1 = valores_user[0]
                 text2 = valores_user[1]
                 text3 = valores_user[2]
-                x = resp
+                x = str(resp)
                 draw.text(pos1, text1, cor, font=font)
                 draw.text(pos2, text2, cor, font=font)
                 draw.text(pos3, text3, cor, font=font)
