@@ -185,7 +185,7 @@ class Math(commands.Cog):
         if 'inversamente'.startswith(msg.content.lower()):
             modo = 'i'
         elif 'diretamente'.startswith(msg.content.lower()):
-            modo = 'd'
+            modo = 'd
         if modo:
             await ctx.send('Modo selecionado: ``inversamente proporcional``!')
             if exists('discord_bot/'):
@@ -225,7 +225,10 @@ class Math(commands.Cog):
                         try:
                             value = int(value.content)
                         except ValueError:
-                            value = float(value.content.replace(',', '.'))
+                            try:
+                                value = float(value.content.replace(',', '.'))
+                            except:
+                                pass
                         except:
                             return await ctx.send(f'O valor ``{value.content}`` não é um número!')
                     except asyncio.TimeoutError:
