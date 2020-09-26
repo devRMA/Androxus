@@ -264,9 +264,9 @@ class Math(commands.Cog):
                 pos2 = (352, 210)  # x e y
                 pos3 = (115, 406)  # x e y
                 posx = (363, 406)  # x e y
-                text1 = valores_user[0]
-                text2 = valores_user[1]
-                text3 = valores_user[2]
+                text1 = str(valores_user[0])
+                text2 = str(valores_user[1])
+                text3 = str(valores_user[2])
                 x = str(resp)
                 draw.text(pos1, text1, cor, font=font)
                 draw.text(pos2, text2, cor, font=font)
