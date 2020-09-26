@@ -235,21 +235,21 @@ class Math(commands.Cog):
                     valores_user.append(value)
                 embed = discord.Embed(title=f'Regra de 3!',
                                       colour=discord.Colour(random_color()),
-                                      description='\uFEFF',
+                                      description='Passo a passo da resolução:',
                                       timestamp=datetime.utcnow())
                 embed.set_author(name='Androxus',
                                  icon_url=self.bot.user.avatar_url)
                 embed.set_footer(text=f'{ctx.author}',
                                  icon_url=ctx.author.avatar_url)
-                embed.add_field(name='\uFEFF',
-                                value=f'{valores_user[0]}x = {valores_user[-1]}×{valores_user[1]}',
+                embed.add_field(name=f'{valores_user[0]}x = {valores_user[-1]}×{valores_user[1]}',
+                                value='\uFEFF',
                                 inline=False)
                 mult = valores_user[-1] * valores_user[1]
-                embed.add_field(name='\uFEFF',
-                                value=f'{valores_user[0]}x = {mult}',
+                embed.add_field(name=f'{valores_user[0]}x = {mult}',
+                                value='\uFEFF',
                                 inline=False)
-                embed.add_field(name='\uFEFF',
-                                value=f'x = {mult}/{valores_user[0]}',
+                embed.add_field(name=f'x = {mult}/{valores_user[0]}',
+                                value='\uFEFF',
                                 inline=False)
                 embed.add_field(name='Resposta: ',
                                 value=f'x = {(mult / valores_user[0])}',
