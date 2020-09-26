@@ -185,7 +185,7 @@ class Math(commands.Cog):
         if 'inversamente'.startswith(msg.content.lower()):
             modo = 'i'
         elif 'diretamente'.startswith(msg.content.lower()):
-            modo = 'd
+            modo = 'd'
         if modo:
             await ctx.send('Modo selecionado: ``inversamente proporcional``!')
             if exists('discord_bot/'):
