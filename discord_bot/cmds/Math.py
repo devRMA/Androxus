@@ -211,6 +211,11 @@ class Math(commands.Cog):
                     black = (0, 0, 0)  # rgb
                     red = (255, 0, 0)  # rgb
                     for pos_text in pos_text_list:
+                        print('dentro do pos_text_list')
+                        print(f'pos_text: {pos_text}')
+                        print(f'valor[-1]: {valor[-1]}')
+                        print(f'pos_text[-1]: {pos_text[-1]}')
+                        print(f'pos_text[-1] == valor[-1]: {pos_text[-1] == valor[-1]}')
                         if pos_text[-1] == valor[-1]:
                             draw.text(pos_text[0], pos_text[-1], red, font=font)
                         else:
@@ -220,9 +225,7 @@ class Math(commands.Cog):
                     await ctx.send(f'Agora, eu preciso que você me fale o {valor[0]} valor (**{valor[-1]} na foto**).',
                                    file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
                     try:
-                        print('esperando user input')
                         value = await self.bot.wait_for('message', check=check, timeout=30)
-                        print(f'recebeu, {value.content}')
                         try:
                             value = int(value.content)
                         except ValueError:
@@ -231,15 +234,9 @@ class Math(commands.Cog):
                             return await ctx.send(f'O valor ``{value.content}`` não é um número!')
                     except asyncio.TimeoutError:
                         return await ctx.send('Tempo esgotado!')
-                    print('entrou no for pos_text_list')
                     for c in range(0, len(pos_text_list)):
-                        print('dentro do for')
-                        print(f'pos_text_list[c][-1] == valor[-1]: {pos_text_list[c][-1] == valor[-1]}')
-                        print(f'pos_text_list[c][-1]: {pos_text_list[c][-1]}')
-                        print(f'valor[-1]: {valor[-1]}')
                         if pos_text_list[c][-1] == valor[-1]:
                             pos_text_list[c][-1] = value
-                    print(f'valores append({value})')
                     valores_user.append(value)
                 await ctx.send(f'Valores recebidos: {valores_user}')
             elif modo == 'd':
