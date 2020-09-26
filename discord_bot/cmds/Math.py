@@ -236,7 +236,7 @@ class Math(commands.Cog):
                         return await ctx.send('Tempo esgotado!')
                     for c in range(0, len(pos_text_list)):
                         if pos_text_list[c][-1] == valor[-1]:
-                            pos_text_list[c][-1] = value
+                            pos_text_list[c][-1] = f'{value}'
                     valores_user.append(value)
                 await ctx.send(f'Valores recebidos: {valores_user}')
             elif modo == 'd':
