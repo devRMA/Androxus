@@ -9,7 +9,9 @@ from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
 from datetime import datetime
-from discord_bot.utils.Utils import random_color
+from discord_bot.utils.Utils import random_color, capitalize
+from googletrans import Translator
+import asyncio
 
 
 class GuildOnly(commands.Cog):
@@ -74,12 +76,14 @@ class GuildOnly(commands.Cog):
                     if len(args) == 1:  # se a pessoa passou mais de um item
                         try:  # vai tentar converter o argumento para int
                             id_user = int(args[0])  # conversão
-                            user = self.bot.get_user(id_user)  # se chegou aqui, vai tentar pegar o usuário com esse id
-                            if user is None:  # se achou uma pessoa
-                                await ctx.send('<a:sad:755774681008832623> Não consegui encontrar o usuário!' +
-                                               f'\nEu preciso ter pelo menos 1' +
-                                               ' servidor em comum com a pessoa, para conseguir encontrar ela.')
-                                return
+                            if ctx.guild:
+                                user = ctx.guild.get_member(id_user)  # vai tentar pegar o user no server
+                            if user is None:  # se não achou na guild, vai ver se o bot acha
+                                user = self.bot.get_user(id_user)
+                            if user is None:  # se a pessoa não está na guild e o bot tbm não achou:
+                                return await ctx.send('<a:sad:755774681008832623> Não consegui encontrar o usuário!' +
+                                                      f'\nEu preciso ter pelo menos 1' +
+                                                      ' servidor em comum com a pessoa, para conseguir encontrar ela.')
                         except ValueError:  # se der erro, é porque a pessoa não passou apenas números
                             await ctx.send(f'<a:atencao:755844029333110815> O valor ``{args[0]}`` não é um id valido!')
                             return
@@ -92,28 +96,82 @@ class GuildOnly(commands.Cog):
             roles = None
             if hasattr(user, 'roles'):
                 roles = ', '.join(
-                    [f"<@&{x.id}>" for x in sorted(user.roles, key=lambda x: x.position, reverse=True) if x.id != ctx.guild.default_role.id]
+                    [f"<@&{x.id}>" for x in sorted(user.roles, key=lambda x: x.position, reverse=True) if
+                     x.id != ctx.guild.default_role.id]
                 ) if len(user.roles) > 1 else None
             if hasattr(user, 'top_role'):
                 cor = user.top_role.colour.value
             else:
                 cor = discord.Colour(random_color())
-            embed = discord.Embed(title=f'Informações sobre o(a) {user}!',
+            info2 = None
+            info1 = discord.Embed(title=f'Informações sobre o(a) {user.name}!',
                                   colour=cor,
                                   description='O máximo de informação que eu consegui encontrar.',
                                   timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            embed.set_thumbnail(url=user.avatar_url)
-            embed.add_field(name="Nome e tag", value=user, inline=True)
-            embed.add_field(name="Id: ", value=user.id, inline=True)
+            info1.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            info1.set_thumbnail(url=user.avatar_url)
+            info1.add_field(name="Nome e tag:", value=f'``{user}``', inline=True)
+            info1.add_field(name="Id: ", value=f'``{user.id}``', inline=True)
             if hasattr(user, 'nick'):
                 if user.nick is not None:
-                    embed.add_field(name="Nickname", value=user.nick, inline=True)
-            embed.add_field(name="Conta criada em:", value=user.created_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
+                    info1.add_field(name="Nickname", value=f'``{user.nick}``', inline=True)
+            info1.add_field(name="Conta criada em:",
+                            value=f'``{user.created_at.strftime("%d/%m/%Y às %H:%M:%S")}``',
+                            inline=True)
             if hasattr(user, 'joined_at'):
-                embed.add_field(name="Entrou no servidor em:", value=user.joined_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
-                embed.add_field(name="Cargos", value=roles, inline=False)
-        return await ctx.send(embed=embed)
+                info1.add_field(name="Entrou no servidor há:",
+                                value=f'``{user.joined_at.strftime("%d/%m/%Y às %H:%M:%S")}``',
+                                inline=True)
+                # só vai mostrar as permissões da pessoa, se ela estiver no server
+                info2 = discord.Embed(title=f'Outras informações sobre o(a) {user.name}!',
+                                      colour=cor,
+                                      description='** **',
+                                      timestamp=datetime.utcnow())
+                info2.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                info2.set_thumbnail(url=user.avatar_url)
+                if roles is not None:
+                    info2.add_field(name=f'Cargos({len(roles.split(", "))}):', value=roles, inline=False)
+                all_perms = user.permissions_in(ctx.message.channel)
+                perms = []
+                for atributo in dir(all_perms):
+                    if isinstance(getattr(all_perms, atributo), bool):
+                        if getattr(all_perms, atributo):
+                            perms.append(atributo)
+                translator = Translator()
+                for c in range(0, len(perms)):
+                    # além de substituir os "_" por espaços, vai traduzir a permissão
+                    perm_filtrada = perms[c].replace('_', ' ')
+                    perm_filtrada = perm_filtrada.replace('ban members', 'banir membros')
+                    perm_filtrada = perm_filtrada.replace('embed links', 'enviar links')
+                    perms[c] = f"``{translator.translate(perm_filtrada, dest='pt').text}``"
+                info2.add_field(name=f'Permissões({len(perms)}):', value=capitalize(', '.join(perms)), inline=False)
+
+        async def menus_user_info(msg):
+            while True:
+                def check_page1(reaction, user):  # fica verificando a pagina 1, para ver se é para ir para a pagina 2
+                    return (user.id == ctx.author.id) and (str(reaction.emoji) == '➡')
+
+                def check_page2(reaction, user):  # fica verificando a pagina 2, para ver se é para ir para a pagina 1
+                    return (user.id == ctx.author.id) and (str(reaction.emoji) == '⬅')
+
+                await self.bot.wait_for('reaction_add', timeout=30.0, check=check_page1)
+                await msg.clear_reactions()
+                await msg_bot.add_reaction('⬅')
+                await msg.edit(embed=info2)
+                await self.bot.wait_for('reaction_add', timeout=30.0, check=check_page2)
+                await msg.clear_reactions()
+                await msg_bot.add_reaction('➡')
+                await msg.edit(embed=info1)
+        msg_bot = await ctx.send(embed=info1)
+        if info2:
+            await msg_bot.add_reaction('➡')
+            try:
+                # vai fica 30 segundos esperando o usuário apertas nos emojis
+                await asyncio.wait_for(menus_user_info(msg_bot), timeout=30.0)
+            except asyncio.TimeoutError:  # se acabar o tempo
+                pass
+        # async with ctx.channel.typing():
+        # pass
 
     @commands.command(hidden=True)
     async def help_serverinfo(self, ctx):
