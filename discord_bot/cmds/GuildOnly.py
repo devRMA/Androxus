@@ -9,7 +9,7 @@ from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
 from datetime import datetime
-from discord_bot.utils.Utils import random_color, capitalize
+from discord_bot.utils.Utils import random_color, capitalize, datetime_format
 from googletrans import Translator
 import asyncio
 
@@ -116,11 +116,11 @@ class GuildOnly(commands.Cog):
                 if user.nick is not None:
                     info1.add_field(name="Nickname", value=f'``{user.nick}``', inline=True)
             info1.add_field(name="Conta criada em:",
-                            value=f'``{user.created_at.strftime("%d/%m/%Y às %H:%M:%S")}``',
+                            value=f'``{user.created_at.strftime("%d/%m/%Y")}({datetime_format(user.created_at)})``',
                             inline=True)
             if hasattr(user, 'joined_at'):
                 info1.add_field(name="Entrou no servidor há:",
-                                value=f'``{user.joined_at.strftime("%d/%m/%Y às %H:%M:%S")}``',
+                                value=f'``{user.joined_at.strftime("%d/%m/%Y")}({datetime_format(user.joined_at)})``',
                                 inline=True)
                 # só vai mostrar as permissões da pessoa, se ela estiver no server
                 info2 = discord.Embed(title=f'Outras informações sobre o(a) {user.name}!',
@@ -206,7 +206,8 @@ class GuildOnly(commands.Cog):
             embed.add_field(name="Bots", value=bots, inline=True)
             embed.add_field(name="Dono", value=ctx.guild.owner, inline=True)
             embed.add_field(name="Região", value=str(ctx.guild.region).capitalize(), inline=True)
-            embed.add_field(name="Criado em:", value=ctx.guild.created_at.strftime("%d/%m/%Y às %H:%M:%S"), inline=True)
+            embed.add_field(name="Criado em:", value=f'{ctx.guild.created_at.strftime("%d/%m/%Y")}' +
+                                                     f'({datetime_format(ctx.guild.created_at)})', inline=True)
             await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=["help_icone"])

@@ -8,13 +8,12 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import random_color, pegar_o_prefixo, get_last_update
+from discord_bot.utils.Utils import random_color, pegar_o_prefixo, get_last_update, datetime_format
 from stopwatch import Stopwatch
 import psutil
 from os import getpid
 from sys import version
 from discord_bot.dao.InformacoesDao import InformacoesDao
-from dateutil.relativedelta import relativedelta  # módulo que vai ser usado para subtrair datetime
 
 
 class Botinfo(commands.Cog):
@@ -50,23 +49,8 @@ class Botinfo(commands.Cog):
             embed.add_field(name=':calendar: Data que fui criado:',
                             value=f'``{self.bot.user.created_at.strftime("%d/%m/%Y")}``',
                             inline=True)
-            # years months days hours minutes seconds
-            idade = relativedelta(datetime.utcnow(), self.bot.user.created_at)
-            days = idade.days
-            months = idade.months
-            years = idade.years
-            meses_formatado = ''
-            dias_formatados = ''
-            if days > 1:
-                dias_formatados = f'e {days} dias!'
-            elif days == 1:
-                dias_formatados = f'e {days} dia!'
-            if months > 1:
-                meses_formatado = f', {months} meses '
-            elif months == 1:
-                meses_formatado = f', {months} mês '
             embed.add_field(name=':older_adult: Idade:',
-                            value=f'``{years} anos{meses_formatado}{dias_formatados}``',
+                            value=f'``{datetime_format(self.bot.user.created_at)}``',
                             inline=True)
             embed.add_field(name=':robot: Meu perfil:',
                             value=f'``{str(self.bot.user)}``',
@@ -116,19 +100,11 @@ class Botinfo(commands.Cog):
                         comandos += 1
             embed.add_field(name=':desktop: Quantos comandos eu tenho:',
                             value=f'``{comandos}``')
-            uptime = datetime.utcnow() - self.bot.uptime
-            hours_bot, remainder_bot = divmod(int(uptime.total_seconds()), 3600)
-            minutes_bot, seconds_bot = divmod(remainder_bot, 60)
-            days_bot, hours_bot = divmod(hours_bot, 24)
             embed.add_field(name=':stopwatch: Estou online há:',
-                            value=f'``{days_bot} d, {hours_bot} h, {minutes_bot} m, {seconds_bot} s``',
+                            value=f'``{datetime_format(self.bot.uptime)}``',
                             inline=True)
-            atualizado_ha = datetime.utcnow() - get_last_update()
-            hours_att, remainder_att = divmod(int(atualizado_ha.total_seconds()), 3600)
-            minutes_att, seconds_att = divmod(remainder_att, 60)
-            days_att, hours_att = divmod(hours_att, 24)
             embed.add_field(name=':watch: Ultima atualização há:',
-                            value=f'``{days_att} d, {hours_att} h, {minutes_att} m, {seconds_att} s``',
+                            value=f'``{datetime_format(get_last_update())}``',
                             inline=True)
         await ctx.send(embed=embed)
 
