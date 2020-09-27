@@ -6,6 +6,14 @@ __author__ = 'Rafael'
 
 
 def pegar_o_prefixo(bot, message):
+    """
+    :param bot: Pode passar None, esse parâmetro não é usado
+    :param message: A mensagem que quer saber o prefixo do bot
+    :type bot: discord.ext.commands.Bot
+    :type message: discord.Message
+    :return: o prefixo do bot, para está mensagem
+    :rtype: discord.ext.commands.Bot
+    """
     from discord_bot.dao.ServidorDao import ServidorDao  # pega a classe que mexe com a table dos servidores
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
         prefixo = ServidorDao().get_prefix(
@@ -19,13 +27,21 @@ def pegar_o_prefixo(bot, message):
 
 
 def random_color():
+    """
+    :return: uma cor "aleatoria "em hexadecimal
+    :rtype: hex
+    """
     from random import randint  # função que pega números aleatórios
     r = lambda: randint(0, 255)  # lambda que vai pegar os números
-    return int(f'0x{r():02x}{r():02x}{r():02x}',
-               16)  # vai escolher os números, e depois transformar em hexadecial 0x000000
+    # vai escolher os números, e depois transformar em hexadecimal 0x000000
+    return int(f'0x{r():02x}{r():02x}{r():02x}', 16)
 
 
-def get_emoji_dance():  # função que vai escolher um emoji de dança aleatório
+def get_emoji_dance():
+    """
+    :return: um emoji de dança aleatório
+    :rtype: str
+    """
     from random import choice
     # lista com os emojis
     emojis = ['<a:doguinho2:755843996437446686>',
@@ -50,6 +66,10 @@ def get_emoji_dance():  # função que vai escolher um emoji de dança aleatóri
 
 
 def get_last_update():
+    """
+    :return: vai retornar o datetime do último commit que teve no github
+    :rtype: datetime.datetime
+    """
     # função que vai pegar o último update que o bot teve
     # como o bot está no github, a ultima atualização que teve no github, vai ser a ultima atualização do bot
     from requests import get  # função que vai pegar o html da página
@@ -66,6 +86,10 @@ def get_last_update():
 
 
 def get_last_commit():
+    """
+    :return: vai retornar a mensagem do último commit que teve no github do bot
+    :rtype: str
+    """
     # função que vai pegar o último commit do github do bot
     from requests import get  # função que vai pegar o html da página
     from json import loads  # função que vai converter de json pra dicionario
@@ -76,6 +100,10 @@ def get_last_commit():
 
 
 def get_configs():
+    """
+    :return: vai retornar um dicionário com as configurações do arquivo configs.json
+    :rtype: dict
+    """
     from json import load, dumps  # função que vai transformar de json para dict e vice versa
     from os.path import exists  # função que vai verificar se existe o arquivo json
     if exists('discord_bot/configs.json'):
@@ -93,6 +121,12 @@ def get_configs():
 
 
 def capitalize(string):
+    """
+    :param string: string que vai ser formatada
+    :type string: str
+    :return: vai deixar apenas a primeira letra em maiúscula da string
+    :rtype: str
+    """
     new_string = ''
     foi = False
     for char in string:
@@ -100,5 +134,75 @@ def capitalize(string):
             new_string += char.upper()
             foi = True
         else:
-            new_string += char
+            new_string += char.lower()
     return new_string
+
+
+def datetime_format(date1, date2=None):
+    """
+    :param date1: objeto datetime que vai ser subtraido pelo date2
+    :param date2: Parâmetro opcional, se não for passado nada, vai pegar o datetime utc atual
+    :type date1: datetime utc
+    :type date2: datetime utc
+    :return: vai retornar a string formatada, da diferença da date2 pela date1
+    :rtype: str
+    """
+    from dateutil.relativedelta import relativedelta
+    from datetime import datetime
+    if date2 is None:
+        date2 = datetime.utcnow()
+    time = relativedelta(date2, date1)
+    years = time.years
+    months = time.months
+    days = time.days
+    hours = time.hours
+    minutes = time.minutes
+    seconds = time.seconds
+    dt_str = ''
+    if years > 1:
+        dt_str += f'{years} anos'
+    elif years == 1:
+        dt_str += f'{years} ano'
+    if months > 1:
+        if years >= 1:
+            dt_str += ', '
+        dt_str += f'{months} meses'
+    elif months == 1:
+        if years >= 1:
+            dt_str += ', '
+        dt_str += f'{months} mês'
+    if days > 1:
+        if years >= 1 or months >= 1:
+            dt_str += ', '
+        dt_str += f'{days} dias'
+    elif days == 1:
+        if years >= 1 or months >= 1:
+            dt_str += ', '
+        dt_str += f'{days} dia'
+    if hours > 1:
+        if years >= 1 or months >= 1 or days >= 1:
+            dt_str += ', '
+        dt_str += f'{hours} horas'
+    elif hours == 1:
+        if years >= 1 or months >= 1 or days >= 1:
+            dt_str += ', '
+        dt_str += f'{hours} hora'
+    if minutes > 1:
+        if years >= 1 or months >= 1 or days >= 1:
+            dt_str += ', '
+        dt_str += f'{minutes} minutos'
+    elif minutes == 1:
+        if years >= 1 or months >= 1 or days >= 1:
+            dt_str += ', '
+        dt_str += f'{minutes} minuto'
+    if seconds > 1:
+        if years >= 1 or months >= 1 or days >= 1:
+            dt_str += ', '
+        dt_str += f'{seconds} segundos'
+    elif seconds == 1:
+        if years >= 1 or months >= 1 or days >= 1:
+            dt_str += ', '
+        dt_str += f'{seconds} segundo'
+    dt_str += '.'
+    dt_str = dt_str[:dt_str.rfind(',')] + ' e' + dt_str[dt_str.rfind(',') + 1:]
+    return dt_str
