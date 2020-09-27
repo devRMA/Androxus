@@ -172,35 +172,35 @@ def datetime_format(date1, date2=None):
             dt_str += ', '
         dt_str += f'{months} mês'
     if days > 1:
-        if years >= 1 or months >= 1:
+        if (years >= 1) or (months >= 1):
             dt_str += ', '
         dt_str += f'{days} dias'
     elif days == 1:
-        if years >= 1 or months >= 1:
+        if (years >= 1) or (months >= 1):
             dt_str += ', '
         dt_str += f'{days} dia'
     if hours > 1:
-        if years >= 1 or months >= 1 or days >= 1:
+        if (years >= 1) or (months >= 1) or (days >= 1):
             dt_str += ', '
         dt_str += f'{hours} horas'
     elif hours == 1:
-        if years >= 1 or months >= 1 or days >= 1:
+        if (years >= 1) or (months >= 1) or (days >= 1):
             dt_str += ', '
         dt_str += f'{hours} hora'
     if minutes > 1:
-        if years >= 1 or months >= 1 or days >= 1:
+        if (years >= 1) or (months >= 1) or (days >= 1):
             dt_str += ', '
         dt_str += f'{minutes} minutos'
     elif minutes == 1:
-        if years >= 1 or months >= 1 or days >= 1:
+        if (years >= 1) or (months >= 1) or (days >= 1):
             dt_str += ', '
         dt_str += f'{minutes} minuto'
     if seconds > 1:
-        if years >= 1 or months >= 1 or days >= 1:
+        if (years >= 1) or (months >= 1) or (days >= 1):
             dt_str += ', '
         dt_str += f'{seconds} segundos'
     elif seconds == 1:
-        if years >= 1 or months >= 1 or days >= 1:
+        if (years >= 1) or (months >= 1) or (days >= 1):
             dt_str += ', '
         dt_str += f'{seconds} segundo'
     dt_str += '.'
