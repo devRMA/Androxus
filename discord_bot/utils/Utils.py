@@ -78,7 +78,6 @@ def get_last_commit():
 def get_configs():
     from json import load, dumps  # função que vai transformar de json para dict e vice versa
     from os.path import exists  # função que vai verificar se existe o arquivo json
-    import sys
     if exists('discord_bot/configs.json'):
         path = 'discord_bot/configs.json'  # se achar, salva o path
     elif exists('./configs.json'):
@@ -90,5 +89,16 @@ def get_configs():
             configs = load(file)
         return configs
     else:
-        raise Exception('Não achei o arquivo de configurações!\nBaixe o arquivo configs.json!\nhttps://github.com/devRMA/Androxus')
-        sys.exit()
+        exit('Não achei o arquivo de configurações!\nBaixe o arquivo configs.json!\nhttps://github.com/devRMA/Androxus')
+
+
+def capitalize(string):
+    new_string = ''
+    foi = False
+    for char in string:
+        if (char.upper() != char) and (not foi):
+            new_string += char.upper()
+            foi = True
+        else:
+            new_string += char
+    return new_string
