@@ -81,7 +81,6 @@ if __name__ == '__main__':
         if filename.endswith('.py'):  # se o arquivo terminar com ".py"
             try:
                 bot.load_extension(f'cmds.{filename[:-3]}')  # vai adicionar ao bot
-                print(f'✅ - Módulo {filename[:-3]} carregado!')
             except commands.NoEntryPointError:
                 print(f'⚠ - Módulo {filename[:-3]} ignorado! "def setup" não encontrado!!')
             except:
