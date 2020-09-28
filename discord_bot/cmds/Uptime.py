@@ -8,8 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import random_color
-from dateutil.relativedelta import relativedelta  # módulo que vai ser usado para subtrair datetime
+from discord_bot.utils.Utils import random_color, datetime_format
 
 
 class Uptime(commands.Cog):
@@ -30,29 +29,8 @@ class Uptime(commands.Cog):
     @commands.command(aliases=['tempo_on'], description='Mostra a quanto tempo eu estou online!')
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def uptime(self, ctx):
-        uptime = relativedelta(datetime.utcnow(), self.bot.uptime)
-        seconds = uptime.seconds
-        minutes = uptime.minutes
-        hours = uptime.hours
-        days = uptime.days
-        dias_on = ''
-        horas_on = ''
-        minutos_on = ''
-        # formatação da frase
-        if days > 1:
-            dias_on = f'{days} dias, '
-        elif days == 1:
-            dias_on = f'{days} dia, '
-        if hours > 1:
-            horas_on = f'{hours} horas, '
-        elif hours == 1:
-            horas_on = f'{hours} hora, '
-        if minutes > 1:
-            minutos_on = f'{minutes} minutos e '
-        elif minutes == 1:
-            minutos_on = f'{minutes} minuto e '
-        embed = discord.Embed(title=f':timer:',
-                              description=f'Estou on-line há {dias_on}{horas_on}{minutos_on}{seconds} segundos.',
+        embed = discord.Embed(title=f':timer: Quando eu liguei:',
+                              description=f'``{datetime_format(self.bot.uptime)}``',
                               colour=discord.Colour(random_color()),
                               timestamp=datetime.utcnow())
         embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')

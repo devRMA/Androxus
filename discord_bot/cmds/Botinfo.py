@@ -100,10 +100,10 @@ class Botinfo(commands.Cog):
                         comandos += 1
             embed.add_field(name=':desktop: Quantos comandos eu tenho:',
                             value=f'``{comandos}``')
-            embed.add_field(name=':stopwatch: Estou online há:',
+            embed.add_field(name=':stopwatch: Quando eu liguei:',
                             value=f'``{datetime_format(self.bot.uptime)}``',
                             inline=True)
-            embed.add_field(name=':watch: Ultima atualização há:',
+            embed.add_field(name=':watch: Última atualização que tive foi:',
                             value=f'``{datetime_format(get_last_update())}``',
                             inline=True)
         await ctx.send(embed=embed)
