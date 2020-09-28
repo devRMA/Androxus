@@ -202,20 +202,21 @@ class GuildOnly(commands.Cog):
             if ctx.guild.banner:
                 embed.set_image(url=ctx.guild.banner_url_as(format="png"))
 
-            embed.add_field(name='Nome do servidor', value=f'``{ctx.guild.name}``', inline=True)
+            embed.add_field(name='Nome do servidor', value=f'{ctx.guild.name}', inline=True)
             if ctx.guild.description:
-                embed.add_field(name='Descrição do servidor', value=f'``{ctx.guild.description}``', inline=True)
-            embed.add_field(name='Id do servidor', value=f'``{ctx.guild.id}``', inline=True)
-            embed.add_field(name='Dono', value=f'``{ctx.guild.owner}\n({ctx.guild.owner_id})``', inline=True)
-            embed.add_field(name='Membros', value=f'``{ctx.guild.member_count}``', inline=True)
-            embed.add_field(name='Bots', value=f'``{bots}``', inline=True)
-            embed.add_field(name='Emojis', value=f'``{len(ctx.guild.emojis)}``', inline=True)
-            embed.add_field(name='Chats', value=f'``{len(ctx.guild.text_channels)}``', inline=True)
-            embed.add_field(name='Calls', value=f'``{len(ctx.guild.voice_channels)}``', inline=True)
-            embed.add_field(name='Cargos', value=f'``{len(ctx.guild.roles)}``', inline=True)
-            embed.add_field(name='Região', value=f'``{str(ctx.guild.region).capitalize()}``', inline=True)
-            embed.add_field(name='Criado em:', value=f'``{ctx.guild.created_at.strftime("%d/%m/%Y")}' +
-                                                     f'({datetime_format(ctx.guild.created_at)})``', inline=True)
+                embed.add_field(name='Descrição do servidor', value=f'{ctx.guild.description}', inline=True)
+            embed.add_field(name='Id do servidor', value=f'{ctx.guild.id}', inline=True)
+            embed.add_field(name='Dono', value=f'{ctx.guild.owner}', inline=True)
+            embed.add_field(name='Id do dono', value=f'{ctx.guild.owner_id}', inline=True)
+            embed.add_field(name='Membros', value=f'{ctx.guild.member_count}', inline=True)
+            embed.add_field(name='Bots', value=f'{bots}', inline=True)
+            embed.add_field(name='Emojis', value=f'{len(ctx.guild.emojis)}', inline=True)
+            embed.add_field(name='Chats', value=f'{len(ctx.guild.text_channels)}', inline=True)
+            embed.add_field(name='Calls', value=f'{len(ctx.guild.voice_channels)}', inline=True)
+            embed.add_field(name='Cargos', value=f'{len(ctx.guild.roles)}', inline=True)
+            embed.add_field(name='Região', value=f'{str(ctx.guild.region).capitalize()}', inline=True)
+            embed.add_field(name='Criado em:', value=f'{ctx.guild.created_at.strftime("%d/%m/%Y")}\n' +
+                                                     f'({datetime_format(ctx.guild.created_at)})', inline=True)
             await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=["help_icone"])
