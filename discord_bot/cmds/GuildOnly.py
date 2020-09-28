@@ -142,6 +142,7 @@ class GuildOnly(commands.Cog):
                     # além de substituir os "_" por espaços, vai traduzir a permissão
                     perm_filtrada = perms[c].replace('_', ' ')
                     perm_filtrada = perm_filtrada.replace('ban members', 'banir membros')
+                    perm_filtrada = perm_filtrada.replace('kick members', 'expulsar membros')
                     perm_filtrada = perm_filtrada.replace('embed links', 'enviar links')
                     perms[c] = f"``{translator.translate(perm_filtrada, dest='pt').text}``"
                 info2.add_field(name=f'Permissões({len(perms)}):', value=capitalize(', '.join(perms)), inline=False)
@@ -170,8 +171,6 @@ class GuildOnly(commands.Cog):
                 await asyncio.wait_for(menus_user_info(msg_bot), timeout=30.0)
             except asyncio.TimeoutError:  # se acabar o tempo
                 pass
-        # async with ctx.channel.typing():
-        # pass
 
     @commands.command(hidden=True)
     async def help_serverinfo(self, ctx):
@@ -187,11 +186,14 @@ class GuildOnly(commands.Cog):
     @commands.guild_only()
     async def serverinfo(self, ctx):
         if ctx.invoked_subcommand is None:
-            bots = sum(1 for member in ctx.guild.members if member.bot)
+            bots = 0
+            for member in ctx.guild.members:
+                if member.bot:
+                    bots += 1
 
             embed = discord.Embed(title=f'Informações sobre este servidor!',
                                   colour=discord.Colour(random_color()),
-                                  description='O máximo de informação que eu consegui encontrar.',
+                                  description='O máximo de informação que eu consegui encontrar sobre este servidor.',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
 
@@ -200,14 +202,20 @@ class GuildOnly(commands.Cog):
             if ctx.guild.banner:
                 embed.set_image(url=ctx.guild.banner_url_as(format="png"))
 
-            embed.add_field(name="Nome do servidor", value=ctx.guild.name, inline=True)
-            embed.add_field(name="Id do servidor", value=ctx.guild.id, inline=True)
-            embed.add_field(name="Membros", value=ctx.guild.member_count, inline=True)
-            embed.add_field(name="Bots", value=bots, inline=True)
-            embed.add_field(name="Dono", value=ctx.guild.owner, inline=True)
-            embed.add_field(name="Região", value=str(ctx.guild.region).capitalize(), inline=True)
-            embed.add_field(name="Criado em:", value=f'{ctx.guild.created_at.strftime("%d/%m/%Y")}' +
-                                                     f'({datetime_format(ctx.guild.created_at)})', inline=True)
+            embed.add_field(name='Nome do servidor', value=f'``{ctx.guild.name}``', inline=True)
+            if ctx.guild.description:
+                embed.add_field(name='Descrição do servidor', value=f'``{ctx.guild.description}``', inline=True)
+            embed.add_field(name='Id do servidor', value=f'``{ctx.guild.id}``', inline=True)
+            embed.add_field(name='Dono', value=f'``{ctx.guild.owner}\n({ctx.guild.owner_id})``', inline=True)
+            embed.add_field(name='Membros', value=f'``{ctx.guild.member_count}``', inline=True)
+            embed.add_field(name='Bots', value=f'``{bots}``', inline=True)
+            embed.add_field(name='Emojis', value=f'``{len(ctx.guild.emojis)}``', inline=True)
+            embed.add_field(name='Chats', value=f'``{len(ctx.guild.text_channels)}``', inline=True)
+            embed.add_field(name='Calls', value=f'``{len(ctx.guild.voice_channels)}``', inline=True)
+            embed.add_field(name='Cargos', value=f'``{len(ctx.guild.roles)}``', inline=True)
+            embed.add_field(name='Região', value=f'``{str(ctx.guild.region).capitalize()}``', inline=True)
+            embed.add_field(name='Criado em:', value=f'``{ctx.guild.created_at.strftime("%d/%m/%Y")}' +
+                                                     f'({datetime_format(ctx.guild.created_at)})``', inline=True)
             await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=["help_icone"])
