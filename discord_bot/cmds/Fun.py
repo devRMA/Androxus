@@ -4,9 +4,7 @@
 
 __author__ = 'Rafael'
 
-from datetime import datetime
 from discord.ext import commands
-import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
 from random import choice, seed
 
