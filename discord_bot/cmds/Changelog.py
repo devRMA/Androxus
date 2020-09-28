@@ -8,7 +8,7 @@ from datetime import datetime
 from discord.ext import commands
 import discord
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import random_color, get_last_commit, get_last_update
+from discord_bot.utils.Utils import random_color, get_last_commit, get_last_update, datetime_format
 
 
 class Changelog(commands.Cog):
@@ -38,7 +38,7 @@ class Changelog(commands.Cog):
             embed.set_footer(text=f'{ctx.author}',
                              icon_url=ctx.author.avatar_url)
             embed.add_field(name='Atualização feita em:',
-                            value=f'``{get_last_update().strftime("%d/%m/%Y às %H:%M:%S")}``',
+                            value=f'{datetime_format(get_last_update())}',
                             inline=True)
         await ctx.send(content=ctx.author.mention, embed=embed)
 
