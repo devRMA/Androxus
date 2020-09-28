@@ -217,7 +217,6 @@ class GuildOnly(commands.Cog):
             embed.add_field(name='Região', value=f'{str(ctx.guild.region).capitalize()}', inline=True)
             embed.add_field(name='Criado em:', value=f'{ctx.guild.created_at.strftime("%d/%m/%Y")}\n' +
                                                      f'({datetime_format(ctx.guild.created_at)})', inline=True)
-        print(ctx.guild.features)
         await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=["help_icone"])
