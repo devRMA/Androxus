@@ -185,7 +185,7 @@ class GuildOnly(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     @commands.guild_only()
     async def serverinfo(self, ctx):
-        if ctx.invoked_subcommand is None:
+        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
             bots = 0
             for member in ctx.guild.members:
                 if member.bot:
@@ -208,7 +208,7 @@ class GuildOnly(commands.Cog):
             embed.add_field(name='Id do servidor', value=f'{ctx.guild.id}', inline=True)
             embed.add_field(name='Dono', value=f'{ctx.guild.owner}', inline=True)
             embed.add_field(name='Id do dono', value=f'{ctx.guild.owner_id}', inline=True)
-            embed.add_field(name='Membros', value=f'{ctx.guild.member_count}', inline=True)
+            embed.add_field(name='Membros', value=f'{ctx.guild.member_count - bots}', inline=True)
             embed.add_field(name='Bots', value=f'{bots}', inline=True)
             embed.add_field(name='Emojis', value=f'{len(ctx.guild.emojis)}', inline=True)
             embed.add_field(name='Chats', value=f'{len(ctx.guild.text_channels)}', inline=True)
@@ -217,7 +217,8 @@ class GuildOnly(commands.Cog):
             embed.add_field(name='Região', value=f'{str(ctx.guild.region).capitalize()}', inline=True)
             embed.add_field(name='Criado em:', value=f'{ctx.guild.created_at.strftime("%d/%m/%Y")}\n' +
                                                      f'({datetime_format(ctx.guild.created_at)})', inline=True)
-            await ctx.send(embed=embed)
+        print(ctx.guild.features)
+        await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=["help_icone"])
     async def help_server_avatar(self, ctx):
