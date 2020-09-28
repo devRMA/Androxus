@@ -158,51 +158,113 @@ def datetime_format(date1, date2=None):
     hours = time.hours
     minutes = time.minutes
     seconds = time.seconds
+    """
+        variável que vai controlar quantos dados já foram mostrados
+        para evitar que a string saia muito grande, como:
+        2 anos, 5 meses, 1 dia, 2 horas, 3 minutos e 2 segundos.
+        com a variável limitando, vai sair assim:
+        2 anos, 5 meses e 1 dia.
+    """
+    dados = 0
     dt_str = ''
+    if (years == 0) and (months == 0) and (days <= 1):
+        if days == 0:
+            d_str = 'Hoje'
+        elif days == 1:
+            d_str = 'Ontem'
+        if hours > 1:
+            h_str = f'{hours} horas'
+        elif hours == 1:
+            h_str = f'{hours} hora'
+        else:
+            h_str = ''
+        if minutes > 1:
+            m_str = f'{minutes} minutos'
+        elif minutes == 1:
+            m_str = f'{minutes} minuto'
+        else:
+            m_str = ''
+        if seconds > 1:
+            s_str = f'{seconds} segundos'
+        elif seconds == 1:
+            s_str = f'{seconds} segundo'
+        else:
+            s_str = ''
+        if h_str and m_str and s_str:
+            dt_str = f'{d_str} há {h_str}, {m_str} e {s_str}.'
+        elif h_str and m_str:
+            dt_str = f'{d_str} há {h_str} e {m_str}.'
+        elif h_str and s_str:
+            dt_str = f'{d_str} há {h_str} e {s_str}.'
+        elif m_str and s_str:
+            dt_str = f'{d_str} há {m_str} e {s_str}.'
+        elif h_str:
+            dt_str = f'{d_str} há {h_str}.'
+        elif m_str:
+            dt_str = f'{d_str} há {m_str}.'
+        elif s_str:
+            dt_str = f'{d_str} há {s_str}.'
+        elif (h_str == '') and (m_str == '') and (s_str == ''):
+            dt_str = f'{d_str}.'
+        return dt_str
     if years > 1:
         dt_str += f'{years} anos'
+        dados += 1
     elif years == 1:
         dt_str += f'{years} ano'
+        dados += 1
     if months > 1:
         if years >= 1:
             dt_str += ', '
         dt_str += f'{months} meses'
+        dados += 1
     elif months == 1:
         if years >= 1:
             dt_str += ', '
         dt_str += f'{months} mês'
+        dados += 1
     if days > 1:
         if (years >= 1) or (months >= 1):
             dt_str += ', '
         dt_str += f'{days} dias'
+        dados += 1
     elif days == 1:
         if (years >= 1) or (months >= 1):
             dt_str += ', '
         dt_str += f'{days} dia'
-    if hours > 1:
-        if (years >= 1) or (months >= 1) or (days >= 1):
-            dt_str += ', '
-        dt_str += f'{hours} horas'
-    elif hours == 1:
-        if (years >= 1) or (months >= 1) or (days >= 1):
-            dt_str += ', '
-        dt_str += f'{hours} hora'
-    if minutes > 1:
-        if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1):
-            dt_str += ', '
-        dt_str += f'{minutes} minutos'
-    elif minutes == 1:
-        if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1):
-            dt_str += ', '
-        dt_str += f'{minutes} minuto'
-    if seconds > 1:
-        if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1) or (minutes >= 1):
-            dt_str += ', '
-        dt_str += f'{seconds} segundos'
-    elif seconds == 1:
-        if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1) or (minutes >= 1):
-            dt_str += ', '
-        dt_str += f'{seconds} segundo'
+        dados += 1
+    if dados < 3:
+        if hours > 1:
+            if (years >= 1) or (months >= 1) or (days >= 1):
+                dt_str += ', '
+            dt_str += f'{hours} horas'
+            dados += 1
+        elif hours == 1:
+            if (years >= 1) or (months >= 1) or (days >= 1):
+                dt_str += ', '
+            dt_str += f'{hours} hora'
+            dados += 1
+        if dados < 3:
+            if minutes > 1:
+                if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1):
+                    dt_str += ', '
+                dt_str += f'{minutes} minutos'
+                dados += 1
+            elif minutes == 1:
+                if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1):
+                    dt_str += ', '
+                dt_str += f'{minutes} minuto'
+                dados += 1
+            if dados < 3:
+                if seconds > 1:
+                    if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1) or (minutes >= 1):
+                        dt_str += ', '
+                    dt_str += f'{seconds} segundos'
+                elif seconds == 1:
+                    if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1) or (minutes >= 1):
+                        dt_str += ', '
+                    dt_str += f'{seconds} segundo'
     dt_str += '.'
-    dt_str = dt_str[:dt_str.rfind(',')] + ' e' + dt_str[dt_str.rfind(',') + 1:]
+    if dt_str.rfind(',') != -1:
+        dt_str = dt_str[:dt_str.rfind(',')] + ' e' + dt_str[dt_str.rfind(',') + 1:]
     return dt_str
