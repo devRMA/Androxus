@@ -85,6 +85,11 @@ class OwnerOnly(commands.Cog):
             if ctx.guild.id == 405826835793051649:
                 await ctx.send('Não achei o usuário')
 
+    @commands.command(aliases=['reboot', 'reiniciar'], hidden=True)
+    @commands.check(permissions.is_owner)
+    async def kill(self, ctx):
+        await ctx.send('Reiniciando <a:loading:756715436149702806>')
+        raise SystemExit('Rebooting...')
 
 def setup(bot):
     bot.add_cog(OwnerOnly(bot))
