@@ -152,12 +152,12 @@ def datetime_format(date1, date2=None):
     if date2 is None:
         date2 = datetime.utcnow()
     time = relativedelta(date2, date1)
-    years = time.years
-    months = time.months
-    days = time.days
-    hours = time.hours
-    minutes = time.minutes
-    seconds = time.seconds
+    years = abs(time.years)
+    months = abs(time.months)
+    days = abs(time.days)
+    hours = abs(time.hours)
+    minutes = abs(time.minutes)
+    seconds = abs(time.seconds)
     """
         variável que vai controlar quantos dados já foram mostrados
         para evitar que a string saia muito grande, como:
