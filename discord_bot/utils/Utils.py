@@ -28,7 +28,7 @@ def pegar_o_prefixo(bot, message):
 
 def random_color():
     """
-    :return: uma cor "aleatoria "em hexadecimal
+    :return: uma cor "aleatoria" em hexadecimal
     :rtype: hex
     """
     from random import randint  # função que pega números aleatórios
@@ -172,6 +172,8 @@ def datetime_format(date1, date2=None):
             d_str = 'Hoje'
         elif days == 1:
             d_str = 'Ontem'
+        else:
+            d_str = ''
         if hours > 1:
             h_str = f'{hours} horas'
         elif hours == 1:
@@ -268,3 +270,70 @@ def datetime_format(date1, date2=None):
     if dt_str.rfind(',') != -1:
         dt_str = dt_str[:dt_str.rfind(',')] + ' e' + dt_str[dt_str.rfind(',') + 1:]
     return dt_str
+
+
+def inverter_string(string):
+    """
+    :param string: a string que vai ser virada de cabeça para baixo
+    :type string: str
+    :return: a string de cabeça para baixo
+    :rtype: str
+    """
+    letras = {
+        'a': 'ɐ',
+        'b': 'q',
+        'c': 'ɔ',
+        'd': 'p',
+        'e': 'ǝ',
+        'f': 'ɟ',
+        'g': 'ƃ',
+        'h': 'ɥ',
+        'i': 'ı',
+        'j': 'ɾ',
+        'k': 'ʞ',
+        'l': 'ן',
+        'm': 'ɯ',
+        'n': 'u',
+        'o': 'o',
+        'p': 'd',
+        'q': 'b',
+        'r': 'ɹ',
+        's': 's',
+        't': 'ʇ',
+        'u': 'n',
+        'v': 'ʌ',
+        'w': 'ʍ',
+        'x': 'x',
+        'y': 'ʎ',
+        'z': 'z',
+        '?': '¿',
+        '!': '¡',
+        '&': '⅋',
+        '(': ')',
+        ')': '(',
+        '_': '‾',
+        "'": ',',
+        '"': '„',
+        '.': '˙',
+        '>': '<',
+        '<': '>',
+        ',': "'",
+        ':': ':',
+        '[': ']',
+        ']': '[',
+        '{': '}',
+        '}': '{'
+    }
+    string = string.lower()
+    string_invertida = ''
+    for c in string:
+        encontrou = False
+        for i in letras.items():
+            if i[0] == c:
+                encontrou = True
+                string_invertida += i[-1]
+                break
+        if not encontrou:
+            string_invertida += c
+            encontrou = True
+    return string_invertida[::-1]
