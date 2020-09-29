@@ -6,7 +6,6 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 from discord_bot.modelos.EmbedHelp import embedHelp
-import discord
 
 
 class Say(commands.Cog):
@@ -45,6 +44,7 @@ class Say(commands.Cog):
                         frase = frase.replace(f'<@{mention.id}>', '')
                         frase = frase.replace(f'<@!{mention.id}>', '')
                 frase = frase.replace(f'@', '@\uFEFF')
+                frase = frase.replace(f'&', '&\uFEFF')
         except:  # se der algum erro, provavelmente é porque o comando foi usado no dm
             pass
         if len(frase) == 0:  # se após os filtros, a mensagem ficou vazia
