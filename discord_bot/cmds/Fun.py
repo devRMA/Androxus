@@ -101,6 +101,8 @@ class Fun(commands.Cog):
                 await ctx.send(f'{ctx.author.mention} 🙃 {inverter_string(args)}')
             else:
                 await ctx.send(f'{ctx.author.mention} você não acha que essa mensagem está grande não? \'-\'')
+        else:
+            await self.help_girar(ctx)
 
 
 def setup(bot):
