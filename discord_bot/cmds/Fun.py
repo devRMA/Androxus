@@ -7,6 +7,7 @@ __author__ = 'Rafael'
 from discord.ext import commands
 from discord_bot.modelos.EmbedHelp import embedHelp
 from random import choice, seed
+from discord_bot.utils.Utils import inverter_string
 
 
 class Fun(commands.Cog):
@@ -75,6 +76,31 @@ class Fun(commands.Cog):
     async def cara_coroa(self, ctx):
         respostas = ['🙂 Cara.', '👑 Coroa.']
         await ctx.send(f'{choice(respostas)}')
+
+    @commands.command(hidden=True, aliases=['help_side-down', 'help_inverter'])
+    async def help_girar(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.girar.name,
+                          descricao=self.girar.description,
+                          parametros=['<frase>'],
+                          exemplos=['``{pref}girar`` ``muito show kkk``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.girar.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['side-down', 'inverter'], description='Eu vou deixar a frase cabeça pra baixo.')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def girar(self, ctx, *args):
+        if args:
+            args = ' '.join(args)
+            # anti mention
+            args = args.replace(f'@', '@\uFEFF')
+            args = args.replace(f'&', '&\uFEFF')
+            if len(args) <= 600:
+                await ctx.send(f'{ctx.author.mention} 🙃 {inverter_string(args)}')
+            else:
+                await ctx.send(f'{ctx.author.mention} você não acha que essa mensagem está grande não? \'-\'')
 
 
 def setup(bot):
