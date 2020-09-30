@@ -10,6 +10,7 @@ from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
 from discord_bot.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
 from datetime import datetime
 import discord
+from stopwatch import Stopwatch
 
 
 async def on_message_event(bot, message):
@@ -30,6 +31,7 @@ async def on_message_event(bot, message):
                 embed.set_image(url=attachment.url)
         embed.set_thumbnail(url=message.author.avatar_url)
         await bot.dm_channel_log.send(embed=embed)
+    tempo_para_executar_comando = Stopwatch()
     if message.mention_everyone:  # verifica se marcou here ou everyone
         emoji = bot.get_emoji(755774680220172340)  # emoji de ping pistola
         await message.add_reaction(emoji)  # adiciona a reação com o emoji
@@ -41,6 +43,7 @@ async def on_message_event(bot, message):
                 # se ela corresponder, a um comando que está desativado:
                 await message.channel.send('<a:no_no:755774680325029889> Este comando ' +
                                            'foi desativado por um administrador do servidor!')
+                tempo_para_executar_comando.stop()
                 return
     channel = message.channel
     prefixo = pegar_o_prefixo(None, message)
@@ -74,9 +77,11 @@ async def on_message_event(bot, message):
                                 # se for obrigatorio que a mensagem comesse com o comando, e ela não estiver começando
                                 enviar_mensagem = False  # não vai responder
                         if enviar_mensagem:
-                            await channel.send(resposta)
+                            tempo_para_executar_comando.stop()
+                            await channel.send(resposta.format(tempo=str(tempo_para_executar_comando)))
                             return
     if (f'<@{str(bot.user.id)}>' == message.content) or (f'<@!{str(bot.user.id)}>' == message.content):
         await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda!')
         await channel.send('<a:hello:755774680949850173>')
+    tempo_para_executar_comando.stop()
     await bot.process_commands(message)
