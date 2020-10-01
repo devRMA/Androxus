@@ -1,6 +1,6 @@
 # coding=utf-8
 # Androxus bot
-# ComandoDesativado.py
+# ComandoDesativadoCog.py
 
 __author__ = 'Rafael'
 
@@ -9,7 +9,7 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-from discord_bot.database import ComandoDesativado
+from discord_bot.database.ComandoDesativado import ComandoDesativado
 from discord_bot.database.Conexao import Conexao
 from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from discord_bot.database.Servidor import Servidor
@@ -18,7 +18,7 @@ from discord_bot.utils import permissions
 from discord_bot.utils.Utils import random_color
 
 
-class ComandoDesativado(commands.Cog):
+class ComandoDesativadoCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -58,7 +58,7 @@ class ComandoDesativado(commands.Cog):
             return
         conexao = Conexao()
         servidor = Servidor(ctx.guild.id, ctx.prefix)
-        comandoDesativado = ComandoDesativado.ComandoDesativado(servidor, comando)
+        comandoDesativado = ComandoDesativado(servidor, comando)
         foi = False
         try:
             foi = ComandoDesativadoRepository().create(conexao, comandoDesativado)
@@ -96,7 +96,7 @@ class ComandoDesativado(commands.Cog):
             return
         conexao = Conexao()
         servidor = Servidor(ctx.guild.id, ctx.prefix)
-        comandoDesativado = ComandoDesativado.ComandoDesativado(servidor, comando)
+        comandoDesativado = ComandoDesativado(servidor, comando)
         foi = False
         try:
             foi = ComandoDesativadoRepository().delete(conexao, comandoDesativado)
@@ -113,4 +113,4 @@ class ComandoDesativado(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(ComandoDesativado(bot))
+    bot.add_cog(ComandoDesativadoCog(bot))

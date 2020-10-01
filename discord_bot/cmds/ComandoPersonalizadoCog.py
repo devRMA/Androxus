@@ -1,6 +1,6 @@
 # coding=utf-8
 # Androxus bot
-# ComandoPersonalizado.py
+# ComandoPersonalizadoCog.py
 
 __author__ = 'Rafael'
 
@@ -9,7 +9,7 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-from discord_bot.database import ComandoPersonalizado
+from discord_bot.database.ComandoPersonalizado import ComandoPersonalizado
 from discord_bot.database.Conexao import Conexao
 from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from discord_bot.database.Servidor import Servidor
@@ -18,7 +18,7 @@ from discord_bot.utils import permissions
 from discord_bot.utils.Utils import random_color, get_emoji_dance
 
 
-class ComandoPersonalizado(commands.Cog):
+class ComandoPersonalizadoCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -55,10 +55,10 @@ class ComandoPersonalizado(commands.Cog):
             return
         conexao = Conexao()
         servidor = Servidor(ctx.guild.id, ctx.prefix)
-        comandoPersonalizado = ComandoPersonalizado.ComandoPersonalizado(servidor,
-                                                                         comando.lower(),
-                                                                         resposta,
-                                                                         inText)
+        comandoPersonalizado = ComandoPersonalizado(servidor,
+                                                    comando.lower(),
+                                                    resposta,
+                                                    inText)
         foi = False
         try:
             foi = ComandoPersonalizadoRepository().create(conexao, comandoPersonalizado)
@@ -101,7 +101,7 @@ class ComandoPersonalizado(commands.Cog):
             return
         conexao = Conexao()
         servidor = Servidor(ctx.guild.id, ctx.prefix)
-        comandoPersonalizado = ComandoPersonalizado.ComandoPersonalizado(servidor, comando.lower(), '', False)
+        comandoPersonalizado = ComandoPersonalizado(servidor, comando.lower(), '', False)
         foi = False
         try:
             foi = ComandoPersonalizadoRepository().delete(conexao, comandoPersonalizado)
@@ -151,10 +151,10 @@ class ComandoPersonalizado(commands.Cog):
             return
         conexao = Conexao()
         servidor = Servidor(ctx.guild.id, ctx.prefix)
-        comandoPersonalizado = ComandoPersonalizado.ComandoPersonalizado(servidor,
-                                                                         comando.lower(),
-                                                                         resposta,
-                                                                         inText)
+        comandoPersonalizado = ComandoPersonalizado(servidor,
+                                                    comando.lower(),
+                                                    resposta,
+                                                    inText)
         foi = False
         try:
             foi = ComandoPersonalizadoRepository().update(conexao, comandoPersonalizado)
@@ -173,4 +173,4 @@ class ComandoPersonalizado(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(ComandoPersonalizado(bot))
+    bot.add_cog(ComandoPersonalizadoCog(bot))
