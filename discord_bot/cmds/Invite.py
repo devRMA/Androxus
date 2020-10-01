@@ -29,7 +29,7 @@ class Invite(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def invite(self, ctx):
         await ctx.send(
-            f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=2147483639')
+            f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=738733207')
 
 
 def setup(bot):
