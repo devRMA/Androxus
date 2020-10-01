@@ -23,7 +23,7 @@ class GuildsEvents(commands.Cog):
         servidor = Servidor(ctx.id)
         conexao = Conexao()
         try:
-            ServidorRepository.create(conexao, servidor)
+            ServidorRepository().create(conexao, servidor)
         except Exception as e:
             raise e
         finally:
@@ -50,7 +50,7 @@ class GuildsEvents(commands.Cog):
         servidor = Servidor(ctx.id)
         conexao = Conexao()
         try:
-            ServidorRepository.delete(conexao, servidor)
+            ServidorRepository().delete(conexao, servidor)
         except Exception as e:
             raise e
         finally:
