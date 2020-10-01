@@ -4,13 +4,17 @@
 
 __author__ = 'Rafael'
 
-from discord.ext import commands
-import discord
-from discord_bot.dao.ServidorDao import ServidorDao
-from discord_bot.utils.Utils import random_color, pegar_o_prefixo, get_emoji_dance
-from discord_bot.utils import permissions
-from discord_bot.modelos.EmbedHelp import embedHelp
 from datetime import datetime
+
+import discord
+from discord.ext import commands
+
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
+from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.utils import permissions
+from discord_bot.utils.Utils import get_configs
+from discord_bot.utils.Utils import random_color, get_emoji_dance
 
 
 class ChangePrefix(commands.Cog):
@@ -35,12 +39,13 @@ class ChangePrefix(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
-    async def change_prefix(self, ctx, prefixo_novo='--'):
-        prefixo_antigo = pegar_o_prefixo(None, ctx)
-        ServidorDao().update(ctx.guild.id, prefixo_novo)
-        if prefixo_novo != '--':
+    async def change_prefix(self, ctx, prefixo_novo=get_configs()['default_prefix']):
+        conexao = Conexao()
+        prefixo_antigo = ctx.prefix
+        ServidorRepository().update(ctx.guild.id, prefixo_novo)
+        if prefixo_novo != get_configs()['default_prefix']:
             embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour(random_color()),
-                                  description=f'Prefixo antigo: {prefixo_antigo}\n'+
+                                  description=f'Prefixo antigo: {prefixo_antigo}\n' +
                                               f'Prefixo novo: {prefixo_novo}',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
@@ -51,6 +56,7 @@ class ChangePrefix(commands.Cog):
             await ctx.send(embed=embed)
         else:
             await ctx.send(f'Agora estou com o prefixo padrão! {get_emoji_dance()}')
+        conexao.fechar()
 
 
 def setup(bot):

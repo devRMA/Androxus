@@ -4,9 +4,11 @@
 
 __author__ = 'Rafael'
 
-from discord.ext import commands
-from discord_bot.modelos.EmbedHelp import embedHelp
 from random import choice, seed
+
+from discord.ext import commands
+
+from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.utils.Utils import inverter_string
 
 

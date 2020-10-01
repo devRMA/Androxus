@@ -4,11 +4,15 @@
 
 __author__ = 'Rafael'
 
+from datetime import datetime
+
 import discord
 from discord.ext import commands
-from datetime import datetime
-from discord_bot.utils.Utils import random_color, pegar_o_prefixo, get_emoji_dance
-from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
+
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
+from discord_bot.database.Servidor import Servidor
+from discord_bot.utils.Utils import random_color, get_emoji_dance
 
 
 def embedHelp(bot: commands.Bot = None,
@@ -21,21 +25,27 @@ def embedHelp(bot: commands.Bot = None,
               perm_pessoa: str = None,
               perm_bot: str = None,
               cor: int = None):
-    prefixo = pegar_o_prefixo(None, ctx)
+    prefixo = ctx.prefix
     exemplo = '\n'.join(exemplos).replace('{pref}', f'{prefixo}')
     como_usar = f'``{prefixo}{comando}`` '
     comando_esta_desativado = False
     if ctx.guild is not None:  # se a mensagem foi enviar de um server
+        conexao = Conexao()
+        servidor = Servidor(ctx.guild.id, prefixo)
+        cmds_desativados = ComandoDesativadoRepository().get_commands(conexao, servidor)
+        conexao.fechar()
         # for em todos os comandos desativados
-        for comandos_desativados in ComandoDesativadoDao().get_comandos(ctx.guild.id):
-            if comando_esta_desativado: break  # se, dentro do outro for, achar o comando, vai para o for de fora também
-            if comando in comandos_desativados:  # vê se o comando principal, está desativado
-                comando_esta_desativado = True
-                break
-            for comando_alias in aliases:  # vai verificar se algum "sinônimo" desse comando, foi desativado
-                if comando_esta_desativado: break
-                if comando_alias in comandos_desativados:  # verifica se o comando está desativado
+        try:
+            for comando_desativado in cmds_desativados:
+                if comando in comando_desativado.comando:  # vê se o comando principal, está desativado
                     comando_esta_desativado = True
+                    break
+                for comando_alias in aliases:  # vai verificar se algum "sinônimo" desse comando, está desativado
+                    if comando_alias in comando_desativado.comando:  # verifica se o comando está desativado
+                        comando_esta_desativado = True
+                        raise Exception()
+        except Exception:  # foi usado raise error, para conseguir parar os dois laços
+            pass
     if parametros:  # se tiver pelo menos 1 item nos parâmetros
         for c in range(0, len(parametros)):  # vai adicionar `` antes, e depois dos parâmetros, em todos os itens
             parametros[c] = f'``{parametros[c]}``'

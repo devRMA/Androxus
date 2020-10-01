@@ -38,13 +38,15 @@ class ErrorCommands(commands.Cog):
         elif isinstance(error, errors.NotOwner):
             await ctx.send(f'{ctx.author.mention} você não é meu criador <a:no_no:755774680325029889>')
         elif isinstance(error, errors.NoPrivateMessage):
-            await ctx.send(f'{ctx.author.mention} Este comando só pode ser usado num servidor! <a:atencao:755844029333110815>')
+            await ctx.send(
+                f'{ctx.author.mention} Este comando só pode ser usado num servidor! <a:atencao:755844029333110815>')
         elif isinstance(error, errors.MissingPermissions):
             if len(error.missing_perms) == 1:
                 permissões = error.missing_perms[0]
             else:
                 permissões = ', '.join(error.missing_perms)
-            await ctx.send(f'{ctx.author.mention} Você precisa ter permissão de ``{permissões}`` para usar este comando!')
+            await ctx.send(
+                f'{ctx.author.mention} Você precisa ter permissão de ``{permissões}`` para usar este comando!')
         elif isinstance(error, errors.BotMissingPermissions):
             if len(error.missing_perms) == 1:
                 permissões = error.missing_perms[0]
@@ -56,11 +58,20 @@ class ErrorCommands(commands.Cog):
             await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
                            f'Tente novamente em {error.retry_after:.2f} segundos.')
         else:
-            if str(error).startswith('duplicate key value violates unique constraint'):
-                await ctx.send(f'Esse item já está cadastrado! <a:atencao:755844029333110815>')
+            if str(error).startswith('duplicate servidor'):
+                pass
+            elif str(error).startswith('duplicate comando desativado'):
+                await ctx.send(f'<a:atencao:755844029333110815> {ctx.author.mention} Esse comando já está desativado!')
+            elif str(error).startswith('Este comando já está ativo!'):
+                await ctx.send(f'<a:atencao:755844029333110815> {ctx.author.mention} Esse comando já está ativado!')
+            elif str(error).startswith('blacklisted'):
+                await ctx.send(f'<a:atencao:755844029333110815> {ctx.author.mention} Essa pessoa já está na blacklist!')
+            elif str(error).startswith('comando personalizado duplicado'):
+                await ctx.send(f'<a:atencao:755844029333110815> {ctx.author.mention} Esse comando já está cadastrado!')
             else:
                 try:
-                    await ctx.send(f'Ocorreu o erro:```{error}```\nNa execução do comando ```{ctx.message.content}```\n<a:sad:755774681008832623>')
+                    await ctx.send(
+                        f'Ocorreu o erro:```{error}```\nNa execução do comando ```{ctx.message.content}```\n<a:sad:755774681008832623>')
                 except:
                     print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
 

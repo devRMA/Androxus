@@ -5,6 +5,7 @@
 # font: https://github.com/AlexFlipnote/discord_bot.py
 
 from discord.ext import commands
+
 from discord_bot.utils.Utils import get_configs
 
 
@@ -25,4 +26,3 @@ def has_permissions(*, check=all, **perms):
         return await check_permissions(ctx, perms, check=check)
 
     return commands.check(pred)
-

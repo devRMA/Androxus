@@ -5,12 +5,17 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
+
 import discord
 from discord.ext import commands
-from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
+
+from discord_bot.database import ComandoDesativado
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
+from discord_bot.database.Servidor import Servidor
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import random_color
 from discord_bot.utils import permissions
+from discord_bot.utils.Utils import random_color
 
 
 class ComandoDesativado(commands.Cog):
@@ -25,7 +30,8 @@ class ComandoDesativado(commands.Cog):
                           descricao=self.desativar_comando.description,
                           parametros=['<"comando">'],
                           exemplos=['``{pref}desativar_comando`` ``"say"``'],
-                          aliases=self.desativar_comando.aliases.copy(),  # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.desativar_comando.aliases.copy(),
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           perm_pessoa='administrador')
         await ctx.send(content=ctx.author.mention, embed=embed)
 
@@ -50,7 +56,17 @@ class ComandoDesativado(commands.Cog):
         if comando.lower() in comandos_que_nao_podem_ser_desativados:
             await ctx.send('Você não pode desativar este comando! <a:no_no:755774680325029889>')
             return
-        if ComandoDesativadoDao().create(ctx.guild.id, comando):
+        conexao = Conexao()
+        servidor = Servidor(ctx.guild.id, ctx.prefix)
+        comandoDesativado = ComandoDesativado.ComandoDesativado(servidor, comando)
+        foi = False
+        try:
+            foi = ComandoDesativadoRepository().create(conexao, comandoDesativado)
+        except Exception as e:
+            raise e
+        finally:
+            conexao.fechar()
+        if foi:
             embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando desativado: {comando}',
                                   timestamp=datetime.utcnow())
@@ -78,7 +94,17 @@ class ComandoDesativado(commands.Cog):
         if comando is None:
             await self.help_desativar_comando(ctx)
             return
-        if ComandoDesativadoDao().delete(ctx.guild.id, comando):
+        conexao = Conexao()
+        servidor = Servidor(ctx.guild.id, ctx.prefix)
+        comandoDesativado = ComandoDesativado.ComandoDesativado(servidor, comando)
+        foi = False
+        try:
+            foi = ComandoDesativadoRepository().delete(conexao, comandoDesativado)
+        except Exception as e:
+            raise e
+        finally:
+            conexao.fechar()
+        if foi:
             embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando reativado: {comando}',
                                   timestamp=datetime.utcnow())

@@ -5,13 +5,15 @@
 
 __author__ = 'Rafael'
 
-from discord.ext import commands
-import discord
-from discord_bot.modelos.EmbedHelp import embedHelp
-from datetime import datetime
-from discord_bot.utils.Utils import random_color, capitalize, datetime_format
-from googletrans import Translator
 import asyncio
+from datetime import datetime
+
+import discord
+from discord.ext import commands
+from googletrans import Translator
+
+from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.utils.Utils import random_color, capitalize, datetime_format
 
 
 class GuildOnly(commands.Cog):
@@ -163,6 +165,7 @@ class GuildOnly(commands.Cog):
                 await msg.clear_reactions()
                 await msg_bot.add_reaction('➡')
                 await msg.edit(embed=info1)
+
         msg_bot = await ctx.send(embed=info1)
         if info2:
             await msg_bot.add_reaction('➡')

@@ -4,27 +4,37 @@
 
 __author__ = 'Rafael'
 
-from discord_bot.dao.ServidorDao import ServidorDao  # classe que vai adicionar/remover servidores no banco
-import discord  # import da API do discord
-from discord.ext import commands, tasks  # outros imports do discord
+from datetime import datetime  # Esse módulo vai ser usado para definir a hora que o bot iniciou
 from os import environ  # função responsável por pegas o token do bot
 from os import listdir  # função responsável por pegar todos os cogs
-from discord_bot.utils.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
-from discord_bot.utils.Utils import get_configs  # função que pega as configurações do json
-from sys import version  # função para pegar a versão do python
-# evento que vai ser chamado, toda vez que enviarem uma menasgem
-from discord_bot.events.OnMessageEvent import on_message_event
 from random import choice  # função que vai ser usada para escolher "aleatoriamente" qual status do bot
-from datetime import datetime  # Esse módulo vai ser usado para definir a hora que o bot iniciou
+from sys import version  # função para pegar a versão do python
+
+import discord  # import da API do discord
+from discord.ext import commands, tasks  # outros imports do discord
+
+# evento que vai ser chamado, toda vez que enviarem uma mensagem
+from discord_bot.events.OnMessageEvent import on_message_event
+from discord_bot.utils.Utils import get_configs  # função que pega as configurações do json
+from discord_bot.utils.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
+
+configs = get_configs()
 
 # criação do bot em si, passando a função "pegar_o_prefixo" no prefixo
-bot = commands.Bot(command_prefix=pegar_o_prefixo, owner_id=305532760083398657, case_insensitive=True)
+if len(configs['owners']) > 1:
+    bot = commands.Bot(command_prefix=pegar_o_prefixo,
+                       owner_ids=configs['owners'],
+                       case_insensitive=True)
+else:
+    bot = commands.Bot(command_prefix=pegar_o_prefixo,
+                       owner_id=configs['owners'][0],
+                       case_insensitive=True)
 bot.remove_command('help')  # remove o comando help default
 
 
 @bot.event
 async def on_ready():
-    # esse evento vai ser quando o bot iniciar
+    # esse evento vai ser chamado quando o bot iniciar
     print('Bot online!')
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
@@ -39,7 +49,7 @@ async def on_ready():
     if not hasattr(bot, 'dm_channel_log'):  # se o bot não tiver o atributo "dm_channel_log"
         # esse atributo vai ser responsável por guardar o chat
         # que o bot vai usar quando mandarem mensagem no privado dele
-        bot.dm_channel_log = bot.get_channel(get_configs()['dm_channel'])
+        bot.dm_channel_log = bot.get_channel(configs['dm_channel'])
     change_status.start()  # inicia o loop para mudar o status
 
 
@@ -93,8 +103,8 @@ if __name__ == '__main__':
                 pass  # se não achar o def setup
             except:
                 print(f'⚠ - Módulo {filename[:-3]} não foi carregado!')
-    if get_configs()['token'] == 'token_bot':
+    if configs['token'] == 'token_bot':
         token = environ.get('TOKEN')
     else:
-        token = get_configs()['token']
+        token = configs['token']
     bot.run(token)  # inicia o bot

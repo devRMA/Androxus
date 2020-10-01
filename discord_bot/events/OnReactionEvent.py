@@ -6,6 +6,9 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.BlacklistRepository import BlacklistRepository
+
 
 class OnReactionEvent(commands.Cog):
     def __init__(self, bot):
@@ -13,6 +16,14 @@ class OnReactionEvent(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
+        if (not self.bot.is_ready()) or user.bot:
+            return
+        if user.id == self.bot.user.id:
+            return
+        conexao = Conexao()
+        banido = BlacklistRepository().get_pessoa(conexao, user.id)
+        if banido:
+            return conexao.fechar()
         # bandeiras com suas respectivas línguas:
         languages = {
             '🇿🇦': 'af',

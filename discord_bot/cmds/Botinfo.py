@@ -5,15 +5,18 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
-from discord.ext import commands
-import discord
-from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import random_color, pegar_o_prefixo, get_last_update, datetime_format
-from stopwatch import Stopwatch
-import psutil
 from os import getpid
 from sys import version
-from discord_bot.dao.InformacoesDao import InformacoesDao
+
+import discord
+import psutil
+from discord.ext import commands
+from stopwatch import Stopwatch
+
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.InformacoesRepository import InformacoesRepository
+from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.utils.Utils import random_color, get_last_update, datetime_format
 
 
 class Botinfo(commands.Cog):
@@ -36,11 +39,11 @@ class Botinfo(commands.Cog):
     async def botinfo(self, ctx):
         async with ctx.typing():  # vai aparecer "bot está digitando"
             stopwatch_banco = Stopwatch()
-            prefixo = pegar_o_prefixo(None, ctx)
+            conexao = Conexao()
             stopwatch_banco.stop()
             embed = discord.Embed(title=f'<:Info:756712227221930102> Detalhes sobre mim!',
                                   colour=discord.Colour(random_color()),
-                                  description=f'Caso você queira saber meus outros comandos, use ``{prefixo}help``!',
+                                  description=f'Caso você queira saber meus outros comandos, use ``{ctx.prefix}help``!',
                                   timestamp=datetime.utcnow())
             embed.set_author(name='Androxus',
                              icon_url=self.bot.user.avatar_url)
@@ -91,7 +94,7 @@ class Botinfo(commands.Cog):
                             value=f'``{version[0:5]}``',
                             inline=True)
             embed.add_field(name=':bank: Banco de dados que estou usando:',
-                            value=f'``{InformacoesDao().get_version()[:15]}``',
+                            value=f'``{InformacoesRepository().get_sql_version(conexao)[:15]}``',
                             inline=True)
             comandos = 0
             for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
@@ -107,6 +110,7 @@ class Botinfo(commands.Cog):
                             value=f'``{datetime_format(get_last_update())}``',
                             inline=True)
         await ctx.send(embed=embed)
+        conexao.fechar()
 
 
 def setup(bot):

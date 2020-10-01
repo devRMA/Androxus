@@ -4,13 +4,17 @@
 
 __author__ = 'Rafael'
 
-from discord.ext import commands
-import discord
 from datetime import datetime
-from discord_bot.utils.Utils import random_color
-from discord_bot.dao.ComandoDesativadoDao import ComandoDesativadoDao
-from discord_bot.dao.ComandoPersonalizadoDao import ComandoPersonalizadoDao
+
+import discord
+from discord.ext import commands
+from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
+from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Servidor import Servidor
+
 from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.utils.Utils import random_color
 
 
 class Help(commands.Cog):
@@ -34,7 +38,10 @@ class Help(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def help(self, ctx, *comando):
         if len(comando) == 0:
+            conexao = Conexao()
             async with ctx.channel.typing():  # vai aparecer "bot está digitando"
+                if ctx.guild:
+                    servidor = Servidor(ctx.guild.id, ctx.prefix)
                 cor = random_color()
                 embed = embedHelp(self.bot,
                                   ctx,
@@ -45,56 +52,56 @@ class Help(commands.Cog):
                                   # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                                   aliases=self.help.aliases.copy(),
                                   cor=cor)
-                lista_de_comando = discord.Embed(title=f"Lista de comandos:",
+                lista_de_comando = discord.Embed(title=f'Lista de comandos:',
                                                  colour=discord.Colour(cor),
-                                                 description="Estes são os comandos que eu tenho (todos abaixo precisam do prefixo)",
+                                                 description='Estes são os comandos que eu tenho (todos abaixo ' +
+                                                             f'precisam do prefixo ``{ctx.prefix}``)',
                                                  timestamp=datetime.utcnow())
-                lista_de_comando.set_author(name="Androxus", icon_url=f"{self.bot.user.avatar_url}")
-                lista_de_comando.set_footer(text=f"{ctx.author}", icon_url=f"{ctx.author.avatar_url}")
-                if ctx.guild is not None:
-                    comandos_desativados = ComandoDesativadoDao().get_comandos(ctx.guild.id)
+                lista_de_comando.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+                lista_de_comando.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                if servidor:
+                    comandos_desativados = ComandoDesativadoRepository().get_commands(conexao, servidor)
                 else:
                     comandos_desativados = []
                 for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
                     for command in self.bot.get_cog(cog).get_commands():
                         if not command.hidden:  # se o comando não estiver privado
                             emoji = '<a:ativado:755774682334101615>'
-                            for c in comandos_desativados:
-                                if command.name in c:
-                                    emoji = '<a:desativado:755774682397147226>'
-                            if not (ctx.guild is None):  # se a mensagem foi enviar num server
-                                lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
-                                                           value=str(command.description),
-                                                           inline=True)
-                            else:  # se foi enviada no dm, vai enviar todos os comandos
-                                lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
-                                                           value=str(command.description),
-                                                           inline=True)
-                if ctx.guild is not None:  # comandos personalizados
-                    comandos_personalizados = ComandoPersonalizadoDao().get_comandos(ctx.guild.id)
+                            if comandos_desativados:
+                                for comando_desativado in comandos_desativados:
+                                    if command.name.lower() in comando_desativado.comando.lower():
+                                        emoji = '<a:desativado:755774682397147226>'
+                                for aliases in command.aliases:  # também verifica os "sinônimos"
+                                    if aliases.lower() in comando_desativado.comando.lower():
+                                        emoji = '<a:desativado:755774682397147226>'
+                            lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
+                                                       value=str(command.description),
+                                                       inline=True)
+                if servidor:  # adiciona os comandos personalizados na lista
+                    comandos_personalizados = ComandoPersonalizadoRepository().get_commands(conexao, servidor)
                     if len(comandos_personalizados) != 0:
                         lista_de_comando.add_field(name='**Comandos personalizados:**',
-                                                   value='Estes sãos os comandos personalizados deste servidor. **Não precisam do prefixo**',
+                                                   value='Estes sãos os comandos personalizados deste servidor.' +
+                                                         ' **Não precisam do prefixo**',
                                                    inline=False)
                         for comando_personalizado in comandos_personalizados:
-                            if comando_personalizado[0] is not None:
-                                emoji_personalizado = '<a:check:755775267275931799>'
-                                for c in comandos_desativados:
-                                    if comando_personalizado[0] in c:
-                                        emoji_personalizado = '<a:desativado:755774682397147226>'
-                                resposta = ComandoPersonalizadoDao().get_resposta(ctx.guild.id, comando_personalizado[0])
-                                if resposta[-1]:  # se o inText estiver on:
-                                    lista_de_comando.add_field(
-                                        name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
-                                        value=f'Eu irei responder **independente da posição do comando na mensagem**.',
-                                        inline=True)
-                                else:
-                                    lista_de_comando.add_field(
-                                        name=f'{emoji_personalizado}``{comando_personalizado[0]}``',
-                                        value=f'Eu irei responder **apenas se a mensagem iniciar com o comando**',
-                                        inline=True)
+                            emoji_personalizado = '<a:check:755775267275931799>'
+                            for comando_desativado in comandos_desativados:
+                                if comando_personalizado.comando.lower() in comando_desativado.comando.lower():
+                                    emoji_personalizado = '<a:desativado:755774682397147226>'
+                            if comando_personalizado.inText:  # se o inText estiver on:
+                                lista_de_comando.add_field(
+                                    name=f'{emoji_personalizado}``{comando_personalizado.comando}``',
+                                    value=f'Eu irei responder **independente da posição do comando na mensagem**.',
+                                    inline=True)
+                            else:
+                                lista_de_comando.add_field(
+                                    name=f'{emoji_personalizado}``{comando_personalizado.comando}``',
+                                    value=f'Eu irei responder **apenas se a mensagem iniciar com o comando**',
+                                    inline=True)
             await ctx.send(embed=embed)
             await ctx.send(embed=lista_de_comando)
+            conexao.fechar()
         else:
             async with ctx.channel.typing():  # vai aparecer "bot está digitando"
                 comando = ' '.join(comando)
@@ -105,10 +112,11 @@ class Help(commands.Cog):
                             await command(ctx)  # chama ele xD
                             return
                 cor = random_color()
-                embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>', colour=discord.Colour(cor),
+                embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>',
+                                      colour=discord.Colour(cor),
                                       description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
                                       timestamp=datetime.utcnow())
-                embed.set_author(name="Androxus", icon_url=f'{self.bot.user.avatar_url}')
+                embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
                 embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
                 embed.add_field(name='**Possiveis soluções:**',
                                 value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para' +

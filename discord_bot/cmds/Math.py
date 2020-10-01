@@ -4,17 +4,19 @@
 
 __author__ = 'Rafael'
 
-from datetime import datetime
 import asyncio
-from discord.ext import commands
+from datetime import datetime
+from os.path import exists
+
 import discord
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
+from discord.ext import commands
+from py_expression_eval import Parser
+
 from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.utils.Utils import random_color
-from py_expression_eval import Parser
-from os.path import exists
-from PIL import Image
-from PIL import ImageFont
-from PIL import ImageDraw
 
 
 class Math(commands.Cog):

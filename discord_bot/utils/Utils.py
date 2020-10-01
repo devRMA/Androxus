@@ -12,17 +12,29 @@ def pegar_o_prefixo(bot, message):
     :type bot: discord.ext.commands.Bot
     :type message: discord.Message
     :return: o prefixo do bot, para está mensagem
-    :rtype: discord.ext.commands.Bot
+    :rtype: str
     """
-    from discord_bot.dao.ServidorDao import ServidorDao  # pega a classe que mexe com a table dos servidores
+    # pega a classe que mexe com a table dos servidores
+    from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
+    # classe servidor em si
+    from discord_bot.database.Servidor import Servidor
+    # classe que vai abrir a conexão com o banco
+    from discord_bot.database.Conexao import Conexao
+    # função que vai ler as informações do json
+    from discord_bot.utils.Utils import get_configs
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
-        prefixo = ServidorDao().get_prefix(
-            message.guild.id)  # vai no banco de dados, e faz um select para ver qual o prefixo
+        conexao = Conexao()
+        # vai no banco de dados, e faz um select para ver qual o prefixo
+        prefixo = ServidorRepository().get_prefix(conexao, message.guild.id)
         if prefixo is not None:  # se achou um prefixo, retorna o que achou
-            return prefixo[0]
+            conexao.fechar()
+            return prefixo
         else:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
-            ServidorDao().create(message.guild.id)  # vai criar o servidor no banco, com o prefixo padrão
-            return '--'  # se acabou de criar o registro, o prefixo vai ser o padrão
+            servidor = Servidor(message.guild.id)  # vai criar um objeto Servidor
+            ServidorRepository().create(conexao, servidor)  # e vai mandar ele para o banco
+            conexao.fechar()
+            # se acabou de criar o registro, o prefixo vai ser o padrão
+            return get_configs()['default_prefix']
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
 
 
@@ -104,15 +116,24 @@ def get_configs():
     :return: vai retornar um dicionário com as configurações do arquivo configs.json
     :rtype: dict
     """
-    from json import load, dumps  # função que vai transformar de json para dict e vice versa
+    from json import load  # função que vai transformar de json para dict e vice versa
     from os.path import exists  # função que vai verificar se existe o arquivo json
-    if exists('discord_bot/configs.json'):
-        path = 'discord_bot/configs.json'  # se achar, salva o path
-    elif exists('./configs.json'):
-        path = './configs.json'
-    else:
-        path = None
-    if path is not None:
+    path = None  # Se não entrar em nenhum if, vai continuar como None
+    # lista de possiveis paths do configs.json
+    paths = [
+        'discord_bot/',
+        './',
+        '../',
+        '../../',
+        '../../../',
+        '../../../../'
+    ]
+    # laço que vai verificar em qual path está o configs.json
+    for c in paths:
+        if exists(f'{c}configs.json'):
+            path = f'{c}configs.json'  # se achar, salva o path
+            break
+    if path:
         with open(path) as file:
             configs = load(file)
         return configs

@@ -4,11 +4,13 @@
 
 __author__ = 'Rafael'
 
-from discord.ext import commands
-import discord
-from discord_bot.utils.Utils import get_emoji_dance, random_color
-from discord_bot.utils import permissions
 from datetime import datetime
+
+import discord
+from discord.ext import commands
+
+from discord_bot.utils import permissions
+from discord_bot.utils.Utils import get_emoji_dance, random_color
 
 
 class OwnerOnly(commands.Cog):
@@ -90,6 +92,7 @@ class OwnerOnly(commands.Cog):
     async def kill(self, ctx):
         await ctx.send('Reiniciando <a:loading:756715436149702806>')
         raise SystemExit('Rebooting...')
+
 
 def setup(bot):
     bot.add_cog(OwnerOnly(bot))

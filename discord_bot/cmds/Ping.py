@@ -5,8 +5,9 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
-from discord_bot.utils.Utils import pegar_o_prefixo
+
 from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.utils.Utils import pegar_o_prefixo
 
 
 class Ping(commands.Cog):

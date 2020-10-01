@@ -5,6 +5,7 @@
 __author__ = 'Rafael'
 
 from discord.ext import commands
+
 from discord_bot.modelos.EmbedHelp import embedHelp
 
 
@@ -27,7 +28,8 @@ class Invite(commands.Cog):
                       description='Mostra o link que você usa para me adicionar em seu servidor')
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def invite(self, ctx):
-        await ctx.send(f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=2147483639')
+        await ctx.send(
+            f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=2147483639')
 
 
 def setup(bot):

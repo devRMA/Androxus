@@ -5,8 +5,10 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
-from discord.ext import commands
+
 import discord
+from discord.ext import commands
+
 from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.utils.Utils import random_color, get_last_commit, get_last_update, datetime_format
 
