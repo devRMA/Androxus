@@ -106,12 +106,9 @@ class Math(commands.Cog):
                 if isinstance(resultado, bool):  # se o resultado veio como True ou False
                     resultado = str(resultado).replace('True', 'Sim').replace('False', 'Não')
             except OverflowError:
-                await ctx.send(f'Está equação é muito grande para mim! <a:sad:755774681008832623>')
-                return
+                resultado = '∞'
             except ZeroDivisionError:
-                await ctx.send(
-                    'Equação inválida! Ainda não sou capaz de resolver divisões por 0!\n<a:sad:755774681008832623>')
-                return
+                resultado = '∞'
             except Exception as exception:
                 if 'unexpected' in exception.args[0]:
                     await ctx.send(
