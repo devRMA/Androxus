@@ -9,6 +9,7 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
+from discord_bot.database.Conexao import Conexao
 from discord_bot.utils import permissions
 from discord_bot.utils.Utils import get_emoji_dance, random_color
 
@@ -92,6 +93,32 @@ class OwnerOnly(commands.Cog):
     async def kill(self, ctx):
         await ctx.send('Reiniciando <a:loading:756715436149702806>')
         raise SystemExit('Rebooting...')
+
+    @commands.command(aliases=['query', 'query_sql'], hidden=True)
+    @commands.check(permissions.is_owner)
+    async def sql(self, ctx, *args):
+        if args:
+            query = ' '.join(args)
+            if query[-1] != ';':
+                query += ';'
+            conexao = Conexao()
+            cursor = conexao.cursor()
+            modo = 'i'
+            try:
+                cursor.execute(query)
+            except Exception as e:
+                return await ctx.send(f'Erro ```{str(e)}``` ao executar a query!')
+            finally:
+                conexao.fechar()
+            if 'select' in query.lower():
+                modo = 's'
+            if modo == 'i':
+                conexao.salvar()
+                await ctx.send(f'Query:```sql\n{query}```Executado com sucesso!')
+            if modo == 's':
+                await ctx.send(f'Query:```sql\n{query}```Resultado:```python\n{cursor.fetchall()}```')
+            conexao.fechar()
+
 
 
 def setup(bot):

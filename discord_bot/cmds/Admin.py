@@ -17,23 +17,33 @@ from discord_bot.utils.Utils import random_color
 
 class BannedMember(commands.Converter):
     async def convert(self, ctx, argument):
-        if argument.isdigit():
-            member_id = int(argument, base=10)
-            try:
-                return await ctx.guild.fetch_ban(discord.Object(id=member_id))
-            except discord.NotFound:
-                erro = commands.BadArgument('Esse id não está banido!')
-                erro.id = member_id
+        if argument:
+            if ctx.message.mentions:
+                try:
+                    return await ctx.guild.fetch_ban(discord.Object(id=ctx.message.mentions[0].id))
+                except discord.NotFound:
+                    erro = commands.BadArgument('Membro mencionado não está banido!')
+                    erro.user = ctx.message.mentions[0]
+                    raise erro
+            if argument.isdigit():
+                member_id = int(argument, base=10)
+                try:
+                    return await ctx.guild.fetch_ban(discord.Object(id=member_id))
+                except discord.NotFound:
+                    erro = commands.BadArgument('Esse id não está banido!')
+                    erro.id = member_id
+                    raise erro
+
+            ban_list = await ctx.guild.bans()
+            entity = discord.utils.find(lambda u: str(u.user) == argument, ban_list)
+
+            if entity is None:
+                erro = commands.BadArgument('Esse membro não está banido!')
+                erro.member = argument
                 raise erro
-
-        ban_list = await ctx.guild.bans()
-        entity = discord.utils.find(lambda u: str(u.user) == argument, ban_list)
-
-        if entity is None:
-            erro = commands.BadArgument('Esse membro não está banido!')
-            erro.member = argument
-            raise erro
-        return entity
+            return entity
+        else:
+            return None
 
 
 class Admin(commands.Cog):
@@ -239,7 +249,7 @@ class Admin(commands.Cog):
     @commands.guild_only()
     async def unban(self, ctx, member: BannedMember = None, *args):
         async with ctx.typing():  # vai aparecer "bot está digitando"
-            if not member.user:
+            if member is None:
                 return await self.help_unban(ctx)
             reason = None
             if args:

@@ -69,9 +69,11 @@ class ErrorCommands(commands.Cog):
             if str(error).startswith('Member') and str(error).endswith('not found'):
                 await ctx.send(f'{ctx.author.mention} não consegui encontrar esse membro.')
             elif str(error) == 'Esse id não está banido!':
-                await ctx.send(f'{ctx.author.mention} não consegui encontrar um membro banido, com este id: `{error.id}`')
+                await ctx.send(f'{ctx.author.mention} não consegui encontrar um membro banido, com este id: `{error.id}`.')
             elif str(error) == 'Esse membro não está banido!':
-                await ctx.send(f'{ctx.author.mention} não consegui encontrar o membro banido `{error.member}`')
+                await ctx.send(f'{ctx.author.mention} não consegui encontrar o membro banido `{error.member}`.')
+            elif str(error) == 'Membro mencionado não está banido!':
+                await ctx.send(f'{ctx.author.mention} não consegui encontrar o membro {error.user.mention} na lista de bans.')
         else:
             if str(error).startswith('duplicate servidor'):
                 pass
