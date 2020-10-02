@@ -30,7 +30,6 @@ class Translator(commands.Cog):
 
     @commands.command(aliases=['tradutor', 'traduza', 'translate', 'translator'],
                       description='Eu vou traduzir alguma frase!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def traduzir(self, ctx, dest=None, *frase):
         if dest and frase:
             from googletrans.constants import LANGUAGES

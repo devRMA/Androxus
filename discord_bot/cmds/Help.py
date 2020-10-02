@@ -35,7 +35,6 @@ class Help(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda de um comando.')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def help(self, ctx, *comando):
         if len(comando) == 0:
             conexao = Conexao()

@@ -29,7 +29,6 @@ class Fun(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['8ball'], description='8ball tem a resposta para tudo!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def eightball(self, ctx, *args):
         if len(args) == 0:
             await self.help_eightball(ctx)
@@ -74,7 +73,6 @@ class Fun(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['cc', 'coinflip'], description='Cara ou coroa?')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def cara_coroa(self, ctx):
         respostas = ['🙂 Cara.', '👑 Coroa.']
         await ctx.send(f'{choice(respostas)}')
@@ -92,7 +90,6 @@ class Fun(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['side-down', 'inverter'], description='Eu vou deixar a frase cabeça pra baixo.')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def girar(self, ctx, *args):
         if args:
             args = ' '.join(args)

@@ -106,4 +106,3 @@ async def on_message_event(bot, message):
     conexao.fechar()
     stopwatch.stop()
     await bot.process_commands(message)
-    

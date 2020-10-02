@@ -55,9 +55,6 @@ class ErrorCommands(commands.Cog):
                 permissoes = ', '.join(error.missing_perms)
             await ctx.send(f'{ctx.author.mention} Eu não posso executar este comando, pois não tenho permissão de ' +
                            f'``{permissoes}`` neste servidor! <a:sad:755774681008832623>')
-        elif isinstance(error, errors.CommandOnCooldown):
-            await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
-                           f'Tente novamente em {error.retry_after:.2f} segundos.')
         elif isinstance(error, errors.CheckFailure):
             await ctx.send(f'{ctx.author.mention} você não tem permissão para usar este comando!\nDigite ' +
                            f'`{ctx.prefix}help {ctx.command}` para ver quais permissões você precisa ter!')

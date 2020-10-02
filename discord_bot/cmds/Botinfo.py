@@ -37,7 +37,6 @@ class Botinfo(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['info', 'detalhes'], description='Mostra algumas informações sobre mim!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def botinfo(self, ctx):
         async with ctx.typing():  # vai aparecer "bot está digitando"
             stopwatch_banco = Stopwatch()
@@ -126,7 +125,6 @@ class Botinfo(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['github', 'programação'], description='Mostra o meu código fonte!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def source(self, ctx):
         embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot feito em python, com ' +
                                     'a API do discord e um banco de dados!',
@@ -153,7 +151,6 @@ class Botinfo(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['latency', 'latência'], description='Mostra a minha latência atual.')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def ping(self, ctx):
         from stopwatch import Stopwatch
         mensagem_do_bot = await ctx.send(f'Minha latência atual é de {int(self.bot.latency * 1000)}ms !')
@@ -177,7 +174,6 @@ class Botinfo(commands.Cog):
 
     @commands.command(aliases=['convidar', 'convite'],
                       description='Mostra o link que você usa para me adicionar em seu servidor')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def invite(self, ctx):
         await ctx.send(
             f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=604892375')
@@ -195,7 +191,6 @@ class Botinfo(commands.Cog):
 
     @commands.command(aliases=['ultima_att', 'última_att', 'att_log'],
                       description='Mostra qual foi a última atualização que eu tive!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def changelog(self, ctx):
         async with ctx.channel.typing():  # vai aparecer "bot está digitando"
             embed = discord.Embed(title=f'Ultima atualização que eu tive:',
@@ -221,7 +216,6 @@ class Botinfo(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['tempo_on'], description='Mostra a quanto tempo eu estou online!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     async def uptime(self, ctx):
         embed = discord.Embed(title=f':timer: Quando eu liguei:',
                               description=f'``{datetime_format(self.bot.uptime)}``',

@@ -158,7 +158,6 @@ class Admin(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['expulsar'], description='Expulsa algum membro!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
     @commands.guild_only()
@@ -243,7 +242,6 @@ class Admin(commands.Cog):
         await ctx.send(content=ctx.author.mention, embed=embed)
 
     @commands.command(aliases=['desbanir', 'revogar_ban'], description='Revoga o banimento de algum membro!')
-    @commands.cooldown(1, 2, commands.BucketType.user)
     @permissions.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
