@@ -42,21 +42,31 @@ class ErrorCommands(commands.Cog):
                 f'{ctx.author.mention} Este comando só pode ser usado num servidor! <a:atencao:755844029333110815>')
         elif isinstance(error, errors.MissingPermissions):
             if len(error.missing_perms) == 1:
-                permissões = error.missing_perms[0]
+                permissoes = error.missing_perms[0]
             else:
-                permissões = ', '.join(error.missing_perms)
+                permissoes = ', '.join(error.missing_perms)
             await ctx.send(
-                f'{ctx.author.mention} Você precisa ter permissão de ``{permissões}`` para usar este comando!')
+                f'{ctx.author.mention} Você precisa ter permissão de ``{permissoes}`` para usar este comando!')
         elif isinstance(error, errors.BotMissingPermissions):
             if len(error.missing_perms) == 1:
-                permissões = error.missing_perms[0]
+                permissoes = error.missing_perms[0]
             else:
-                permissões = ', '.join(error.missing_perms)
+                permissoes = ', '.join(error.missing_perms)
             await ctx.send(f'{ctx.author.mention} Eu não posso executar este comando, pois não tenho permissão de ' +
-                           f'``{permissões}`` neste servidor! <a:sad:755774681008832623>')
+                           f'``{permissoes}`` neste servidor! <a:sad:755774681008832623>')
         elif isinstance(error, errors.CommandOnCooldown):
             await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
                            f'Tente novamente em {error.retry_after:.2f} segundos.')
+        elif isinstance(error, errors.CheckFailure):
+            await ctx.send(f'{ctx.author.mention} você não tem permissão para usar este comando!\nDigite ' +
+                           f'`{ctx.prefix}help {ctx.command}` para ver quais permissões você precisa ter!')
+        elif isinstance(error, errors.BadArgument):
+            if str(error).startswith('Member') and str(error).endswith('not found'):
+                await ctx.send(f'{ctx.author.mention} não consegui encontrar esse membro.')
+            elif str(error) == 'Esse id não está banido!':
+                await ctx.send(f'{ctx.author.mention} não consegui encontrar um membro banido, com este id: `{error.id}`')
+            elif str(error) == 'Esse membro não está banido!':
+                await ctx.send(f'{ctx.author.mention} não consegui encontrar o membro banido `{error.member}`')
         else:
             if str(error).startswith('duplicate servidor'):
                 pass

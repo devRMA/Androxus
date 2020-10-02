@@ -16,7 +16,9 @@ from stopwatch import Stopwatch
 from discord_bot.database.Conexao import Conexao
 from discord_bot.database.Repositories.InformacoesRepository import InformacoesRepository
 from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import random_color, get_last_update, datetime_format
+from discord_bot.utils.Utils import get_last_commit
+from discord_bot.utils.Utils import get_last_update, datetime_format
+from discord_bot.utils.Utils import random_color
 
 
 class Botinfo(commands.Cog):
@@ -111,6 +113,123 @@ class Botinfo(commands.Cog):
                             inline=True)
         await ctx.send(embed=embed)
         conexao.fechar()
+
+    @commands.command(hidden=True, aliases=['help_github', 'help_programação'])
+    async def help_source(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.source.name,
+                          descricao=self.source.description,
+                          exemplos=['``{pref}source``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.source.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['github', 'programação'], description='Mostra o meu código fonte!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def source(self, ctx):
+        embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot feito em python, com ' +
+                                    'a API do discord e um banco de dados!',
+                              colour=discord.Colour(random_color()),
+                              description='Caso você queira ver o meu código fonte, clique [aqui]' +
+                                          '(https://github.com/devRMA/Androxus/tree/master/discord_bot)\n' +
+                                          'Caso você queira ver a documentação da API do discord ' +
+                                          'para python, clique [aqui](https://discordpy.readthedo' +
+                                          'cs.io/en/latest/index.html).',
+                              timestamp=datetime.utcnow())
+        embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        await ctx.send(embed=embed)
+
+    @commands.command(hidden=True, aliases=['help_latency', 'help_latência'])
+    async def help_ping(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.ping.name,
+                          descricao=self.ping.description,
+                          exemplos=['``{pref}ping``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.ping.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['latency', 'latência'], description='Mostra a minha latência atual.')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def ping(self, ctx):
+        from stopwatch import Stopwatch
+        mensagem_do_bot = await ctx.send(f'Minha latência atual é de {int(self.bot.latency * 1000)}ms !')
+        stopwatch_banco = Stopwatch()
+        conexao = Conexao()
+        stopwatch_banco.stop()
+        conexao.fechar()
+        await mensagem_do_bot.edit(content=f'Latência da API do discord: {int(self.bot.latency * 1000)}ms!\n' +
+                                           f'Latência com o banco de dados: {str(stopwatch_banco)}!\n<a:hello:755774680949850173>')
+
+    @commands.command(hidden=True, aliases=['help_convidar', 'help_convite'])
+    async def help_invite(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.invite.name,
+                          descricao=self.invite.description,
+                          exemplos=['``{pref}invite``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.invite.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['convidar', 'convite'],
+                      description='Mostra o link que você usa para me adicionar em seu servidor')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def invite(self, ctx):
+        await ctx.send(
+            f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=738733207')
+
+    @commands.command(hidden=True, aliases=['help_ultima_att', 'help_última_att', 'help_att_log'])
+    async def help_changelog(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.changelog.name,
+                          descricao='Mostra quando foi a minha última atualização e ainda mostra o que foi alterado.',
+                          exemplos=['``{pref}changelog``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.changelog.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['ultima_att', 'última_att', 'att_log'],
+                      description='Mostra qual foi a última atualização que eu tive!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def changelog(self, ctx):
+        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
+            embed = discord.Embed(title=f'Ultima atualização que eu tive:',
+                                  colour=discord.Colour(random_color()),
+                                  description=f'```{get_last_commit()}```',
+                                  timestamp=datetime.utcnow())
+            embed.set_footer(text=f'{ctx.author}',
+                             icon_url=ctx.author.avatar_url)
+            embed.add_field(name='Atualização feita em:',
+                            value=f'{datetime_format(get_last_update())}',
+                            inline=True)
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(hidden=True, aliases=['help_tempo_on'])
+    async def help_uptime(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.uptime.name,
+                          descricao=self.uptime.description,
+                          exemplos=['``{pref}uptime``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.uptime.aliases.copy())
+        await ctx.send(content=ctx.author.mention, embed=embed)
+
+    @commands.command(aliases=['tempo_on'], description='Mostra a quanto tempo eu estou online!')
+    @commands.cooldown(1, 2, commands.BucketType.user)
+    async def uptime(self, ctx):
+        embed = discord.Embed(title=f':timer: Quando eu liguei:',
+                              description=f'``{datetime_format(self.bot.uptime)}``',
+                              colour=discord.Colour(random_color()),
+                              timestamp=datetime.utcnow())
+        embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        await ctx.send(embed=embed)
 
 
 def setup(bot):

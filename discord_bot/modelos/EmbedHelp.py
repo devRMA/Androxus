@@ -84,13 +84,14 @@ def embedHelp(bot: commands.Bot = None,
                         value=alias,
                         inline=False)
     if perm_pessoa or perm_bot:
-        requisito = ''
+        requisito_p = ''
+        requisito_b = ''
         if perm_pessoa:
-            requisito = f'Você precisa ter permissão de ``{perm_pessoa}`` para usar este comando!'
+            requisito_p = f'Você precisa ter permissão de ``{perm_pessoa}`` para usar este comando!'
         if perm_bot:
-            requisito = f'\nEu preciso ter permissão de ``{perm_bot}`` para realizar este comando!'
+            requisito_b = f'\nEu preciso ter permissão de ``{perm_bot}`` para realizar este comando!'
         embed.add_field(name='<a:atencao:755844029333110815> Requisitos:',
-                        value=requisito,
+                        value=f'{requisito_p}{requisito_b}',
                         inline=False)
     if comando_esta_desativado:  # se o comando estiver desativado
         embed.add_field(

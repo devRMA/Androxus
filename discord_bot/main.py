@@ -56,13 +56,19 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     # toda mensagem que for enviada, vai ir para a função "on_message_event"
-    await on_message_event(bot, message)
+    try:
+        await on_message_event(bot, message)
+    except discord.errors.NotFound:
+        pass
 
 
 @bot.event
 async def on_message_edit(before, after):
     # caso a pessoa tinha digitado um comando errado, e depois editado para um comando valido, vai ser verificado também
-    await on_message_event(bot, after)
+    try:
+        await on_message_event(bot, after)
+    except discord.errors.NotFound:
+        pass
 
 
 @tasks.loop(seconds=10)

@@ -23,7 +23,8 @@ async def on_message_event(bot, message):
         return
     stopwatch = Stopwatch()
     ctx = await bot.get_context(message)
-    prefixo = ctx.prefix
+    # se a pessoa não usar um comando do bot, vai chegar None como prefixo
+    prefixo = ctx.prefix or ''
     conexao = Conexao()
     banido = BlacklistRepository().get_pessoa(conexao, message.author.id)
     servidor = None
