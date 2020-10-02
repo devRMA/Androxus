@@ -63,7 +63,7 @@ class ErrorCommands(commands.Cog):
                            f'`{ctx.prefix}help {ctx.command}` para ver quais permissões você precisa ter!')
         elif isinstance(error, Forbidden):
             await ctx.send(f'{ctx.author.mention} eu não tenho permissão para executar esse comando, acho que algum' +
-                           ' administrador deve ter tirado minhas permissões! Com o comando ``invite```você consegue ' +
+                           ' administrador deve ter tirado minhas permissões! Com o comando ``invite``você consegue ' +
                            'ter o link para me adicionar')
         elif isinstance(error, errors.BadArgument):
             if str(error).startswith('Member') and str(error).endswith('not found'):

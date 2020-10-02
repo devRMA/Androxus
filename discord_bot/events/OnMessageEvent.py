@@ -22,6 +22,8 @@ async def on_message_event(bot, message):
         return
     if message.author.id == bot.user.id:
         return
+    if (message.content == '') and (message.clean_content == '') and (message.type.name != 'default'):
+        return
     stopwatch = Stopwatch()
     ctx = await bot.get_context(message)
     # se a pessoa não usar um comando do bot, vai chegar None como prefixo
