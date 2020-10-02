@@ -107,9 +107,8 @@ class OwnerOnly(commands.Cog):
             try:
                 cursor.execute(query)
             except Exception as e:
-                return await ctx.send(f'Erro ```{str(e)}``` ao executar a query!')
-            finally:
                 conexao.fechar()
+                return await ctx.send(f'Erro ```{str(e)}``` ao executar a query!')
             if 'select' in query.lower():
                 modo = 's'
             if modo == 'i':
