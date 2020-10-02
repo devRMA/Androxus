@@ -180,7 +180,7 @@ class Botinfo(commands.Cog):
     @commands.cooldown(1, 2, commands.BucketType.user)
     async def invite(self, ctx):
         await ctx.send(
-            f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=738733207')
+            f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=604892375')
 
     @commands.command(hidden=True, aliases=['help_ultima_att', 'help_última_att', 'help_att_log'])
     async def help_changelog(self, ctx):
