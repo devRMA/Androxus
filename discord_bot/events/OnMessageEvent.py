@@ -26,7 +26,10 @@ async def on_message_event(bot, message):
     ctx = await bot.get_context(message)
     # se a pessoa não usar um comando do bot, vai chegar None como prefixo
     conexao = Conexao()
-    prefixo = ServidorRepository().get_prefix(conexao, message.guild.id)
+    if message.guild:
+        prefixo = ServidorRepository().get_prefix(conexao, message.guild.id)
+    else:
+        prefixo = ''
     banido = BlacklistRepository().get_pessoa(conexao, message.author.id)
     servidor = None
     if message.guild:
