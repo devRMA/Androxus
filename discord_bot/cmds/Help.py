@@ -40,6 +40,7 @@ class Help(commands.Cog):
         if len(comando) == 0:
             conexao = Conexao()
             async with ctx.channel.typing():  # vai aparecer "bot está digitando"
+                servidor = None
                 if ctx.guild:
                     servidor = Servidor(ctx.guild.id, ctx.prefix)
                 cor = random_color()
