@@ -13,6 +13,7 @@ from discord_bot.database.Conexao import Conexao
 from discord_bot.database.Repositories.BlacklistRepository import BlacklistRepository
 from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
+from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
 from discord_bot.database.Servidor import Servidor
 
 
@@ -24,8 +25,8 @@ async def on_message_event(bot, message):
     stopwatch = Stopwatch()
     ctx = await bot.get_context(message)
     # se a pessoa não usar um comando do bot, vai chegar None como prefixo
-    prefixo = ctx.prefix or ''
     conexao = Conexao()
+    prefixo = ServidorRepository().get_prefix(conexao, message.guild.id)
     banido = BlacklistRepository().get_pessoa(conexao, message.author.id)
     servidor = None
     if message.guild:
@@ -100,3 +101,4 @@ async def on_message_event(bot, message):
     conexao.fechar()
     stopwatch.stop()
     await bot.process_commands(message)
+    

@@ -11,6 +11,7 @@ from discord.ext import commands
 
 from discord_bot.database.Conexao import Conexao
 from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
+from discord_bot.database.Servidor import Servidor
 from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.utils import permissions
 from discord_bot.utils.Utils import get_configs
@@ -42,7 +43,8 @@ class ChangePrefix(commands.Cog):
     async def change_prefix(self, ctx, prefixo_novo=get_configs()['default_prefix']):
         conexao = Conexao()
         prefixo_antigo = ctx.prefix
-        ServidorRepository().update(ctx.guild.id, prefixo_novo)
+        servidor = Servidor(ctx.guild.id, prefixo_novo)
+        ServidorRepository().update(conexao, servidor)
         if prefixo_novo != get_configs()['default_prefix']:
             embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Prefixo antigo: {prefixo_antigo}\n' +

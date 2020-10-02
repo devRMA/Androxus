@@ -6,6 +6,7 @@ __author__ = 'Rafael'
 
 from discord.ext import commands
 from discord.ext.commands import errors
+from discord.errors import Forbidden
 
 
 class ErrorCommands(commands.Cog):
@@ -60,6 +61,10 @@ class ErrorCommands(commands.Cog):
         elif isinstance(error, errors.CheckFailure):
             await ctx.send(f'{ctx.author.mention} você não tem permissão para usar este comando!\nDigite ' +
                            f'`{ctx.prefix}help {ctx.command}` para ver quais permissões você precisa ter!')
+        elif isinstance(error, Forbidden):
+            await ctx.send(f'{ctx.author.mention} eu não tenho permissão para executar esse comando, acho que algum' +
+                           ' administrador deve ter tirado minhas permissões! Com o comando ``invite```você consegue ' +
+                           'ter o link para me adicionar')
         elif isinstance(error, errors.BadArgument):
             if str(error).startswith('Member') and str(error).endswith('not found'):
                 await ctx.send(f'{ctx.author.mention} não consegui encontrar esse membro.')
