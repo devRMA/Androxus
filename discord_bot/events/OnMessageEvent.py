@@ -15,6 +15,7 @@ from discord_bot.database.Repositories.ComandoDesativadoRepository import Comand
 from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
 from discord_bot.database.Servidor import Servidor
+from discord_bot.utils import permissions
 
 
 async def on_message_event(bot, message):
@@ -22,10 +23,41 @@ async def on_message_event(bot, message):
         return
     if message.author.id == bot.user.id:
         return
-    if (message.content == '') and (message.clean_content == '') and (message.type.name != 'default'):
+    if message.type.name != 'default':
         return
-    stopwatch = Stopwatch()
     ctx = await bot.get_context(message)
+    if not permissions.can_send(ctx):
+        # se o bot não tiver permissão para enviar mensagens:
+        return
+    if not permissions.can_embed(ctx):
+        if ctx.author.permissions_in(ctx.message.channel).administrator:
+            msg = 'Por favor, me dê permissão de "inserir links", para que eu possa mostrar minhas mensagens ;-;'
+        else:
+            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "inserir links",' \
+                  ' para que eu possa mostrar minhas mensagens ;-;'
+        return await ctx.send(msg)
+    if not permissions.can_upload(ctx):
+        if ctx.author.permissions_in(ctx.message.channel).administrator:
+            msg = 'Por favor, me dê permissão de "anexar arquivos", para que eu possa funcionar corretamente ;-;'
+        else:
+            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "anexar arquivos",' \
+                  ' para que eu possa funcionar corretamente ;-;'
+        return await ctx.send(msg)
+    if not permissions.can_react(ctx):
+        if ctx.author.permissions_in(ctx.message.channel).administrator:
+            msg = 'Por favor, me dê permissão de "adicionar reações", para que eu possa funcionar corretamente ;-;'
+        else:
+            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "adicionar reações",' \
+                  ' para que eu possa funcionar corretamente ;-;'
+        return await ctx.send(msg)
+    if not permissions.can_use_external_emojis(ctx):
+        if ctx.author.permissions_in(ctx.message.channel).administrator:
+            msg = 'Por favor, me dê permissão de "usar emojis externos", para que eu possa funcionar corretamente ;-;'
+        else:
+            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "usar emojis externos",' \
+                  ' para que eu possa funcionar corretamente ;-;'
+        return await ctx.send(msg)
+    stopwatch = Stopwatch()
     # se a pessoa não usar um comando do bot, vai chegar None como prefixo
     conexao = Conexao()
     if message.guild:

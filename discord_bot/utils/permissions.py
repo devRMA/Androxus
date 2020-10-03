@@ -4,6 +4,7 @@
 
 # font: https://github.com/AlexFlipnote/discord_bot.py
 
+import discord
 from discord.ext import commands
 
 from discord_bot.utils.Utils import get_configs
@@ -26,3 +27,22 @@ def has_permissions(*, check=all, **perms):
         return await check_permissions(ctx, perms, check=check)
 
     return commands.check(pred)
+
+
+def can_send(ctx):
+    return isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).send_messages
+
+
+def can_embed(ctx):
+    return isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).embed_links
+
+
+def can_upload(ctx):
+    return isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).attach_files
+
+
+def can_react(ctx):
+    return isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).add_reactions
+
+def can_use_external_emojis(ctx):
+    return isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).external_emojis

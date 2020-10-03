@@ -99,8 +99,8 @@ if __name__ == '__main__':
                 bot.load_extension(f'cmds.{filename[:-3]}')  # vai adicionar ao bot
             except commands.NoEntryPointError:
                 print(f'⚠ - Módulo {filename[:-3]} ignorado! "def setup" não encontrado!!')
-            except:
-                print(f'⚠ - Módulo {filename[:-3]} deu erro na hora de carregar!')
+            except Exception as e:
+                print(f'⚠ - Módulo {filename[:-3]} deu erro na hora de carregar!\nerro: {e}')
     for filename in listdir(f'{path}events'):  # vai listar todas os arquivos que tem na pasta "events"
         if filename.endswith('.py'):  # se o arquivo terminar com ".py"
             try:  # vai verificar se o arquivo tem o "def setup"

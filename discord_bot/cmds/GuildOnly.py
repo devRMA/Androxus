@@ -147,29 +147,48 @@ class GuildOnly(commands.Cog):
                     perms[c] = f"``{translator.translate(perm_filtrada, dest='pt').text}``"
                 info2.add_field(name=f'Permissões({len(perms)}):', value=capitalize(', '.join(perms)), inline=False)
 
-        async def menus_user_info(msg):
-            while True:
-                def check_page1(reaction, user):  # fica verificando a pagina 1, para ver se é para ir para a pagina 2
-                    return (user.id == ctx.author.id) and (str(reaction.emoji) == '➡')
+        async def menus_user_info(ctx, msg):
+            def check_page1(reaction, user):  # fica verificando a pagina 1, para ver se é para ir para a pagina 2
+                return (user.id == ctx.author.id) and (str(reaction.emoji) == '➡')
 
-                def check_page2(reaction, user):  # fica verificando a pagina 2, para ver se é para ir para a pagina 1
-                    return (user.id == ctx.author.id) and (str(reaction.emoji) == '⬅')
+            def check_page2(reaction, user):  # fica verificando a pagina 2, para ver se é para ir para a pagina 1
+                return (user.id == ctx.author.id) and (str(reaction.emoji) == '⬅')
 
-                await self.bot.wait_for('reaction_add', timeout=30.0, check=check_page1)
-                await msg.clear_reactions()
-                await msg_bot.add_reaction('⬅')
-                await msg.edit(embed=info2)
-                await self.bot.wait_for('reaction_add', timeout=30.0, check=check_page2)
-                await msg.clear_reactions()
-                await msg_bot.add_reaction('➡')
-                await msg.edit(embed=info1)
+            async def check_reactions_without_perm(ctx, msg, bot):
+                while True:
+                    await bot.wait_for('reaction_add', timeout=900.0, check=check_page1)
+                    await msg.delete()
+                    msg = await ctx.send(embed=info2)
+                    await msg.add_reaction('⬅')
+                    await bot.wait_for('reaction_add', timeout=900.0, check=check_page2)
+                    await msg.delete()
+                    msg = await ctx.send(embed=info1)
+                    await msg.add_reaction('➡')
+
+            async def check_reactions_with_perm(msg, bot):
+                while True:
+                    await bot.wait_for('reaction_add', timeout=900.0, check=check_page1)
+                    await msg.clear_reactions()
+                    await msg.add_reaction('⬅')
+                    await msg.edit(embed=info2)
+                    await bot.wait_for('reaction_add', timeout=900.0, check=check_page2)
+                    await msg.clear_reactions()
+                    await msg.add_reaction('➡')
+                    await msg.edit(embed=info1)
+
+            # se o bot tiver perm pra usar o "clear_reactions"
+            if ctx.guild.me.guild_permissions.manage_messages:
+                await check_reactions_with_perm(msg, self.bot)
+            else:  # se o bot não tiver permissão:
+                await check_reactions_without_perm(ctx, msg, self.bot)
 
         msg_bot = await ctx.send(embed=info1)
         if info2:
+            # se tiver o info2, significa que foi usado num servidor
             await msg_bot.add_reaction('➡')
             try:
-                # vai fica 30 segundos esperando o usuário apertas nos emojis
-                await asyncio.wait_for(menus_user_info(msg_bot), timeout=30.0)
+                # vai fica 1 minuto e meio esperando o usuário apertas nas reações
+                await asyncio.wait_for(menus_user_info(ctx, msg_bot), timeout=90.0)
             except asyncio.TimeoutError:  # se acabar o tempo
                 pass
 
