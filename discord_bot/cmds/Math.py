@@ -32,7 +32,7 @@ class Math(commands.Cog):
                           exemplos=['``{pref}operações``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.operators.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(name='operações', aliases=['operators', 'operacoes', 'ops'],
                       description='Todas as operações que eu suporto no comando ``calc``!')
@@ -72,7 +72,7 @@ class Math(commands.Cog):
             embed.add_field(name=ope_ex[0],
                             value=ope_ex[-1],
                             inline=True)
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=['help_calcular'])
     async def help_calc(self, ctx):
@@ -88,7 +88,7 @@ class Math(commands.Cog):
                                     '``{pref}calc`` ``2.5 * 4``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.calc.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
     async def calc(self, ctx, *args):
@@ -159,7 +159,7 @@ class Math(commands.Cog):
                                     '``{pref}r3``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.regra_de_tres.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['regra_de_3', 'r3'], description='Eu vou fazer uma regra de três simples!')
     async def regra_de_tres(self, ctx):

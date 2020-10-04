@@ -4,9 +4,11 @@
 
 __author__ = 'Rafael'
 
+from discord.errors import Forbidden
 from discord.ext import commands
 from discord.ext.commands import errors
-from discord.errors import Forbidden
+
+from discord_bot.utils import permissions
 
 
 class ErrorCommands(commands.Cog):
@@ -59,6 +61,27 @@ class ErrorCommands(commands.Cog):
             await ctx.send(f'{ctx.author.mention} você não tem permissão para usar este comando!\nDigite ' +
                            f'`{ctx.prefix}help {ctx.command}` para ver quais permissões você precisa ter!')
         elif isinstance(error, Forbidden):
+            if not permissions.can_embed(ctx):
+                if ctx.author.permissions_in(ctx.message.channel).administrator:
+                    msg = 'Por favor, me dê permissão de "inserir links", para que eu possa mostrar minhas mensagens ;-;'
+                else:
+                    msg = 'Por favor, peça para um administrador do servidor me dar permissão de "inserir links",' \
+                          ' para que eu possa mostrar minhas mensagens ;-;'
+                return await ctx.send(msg)
+            if not permissions.can_upload(ctx):
+                if ctx.author.permissions_in(ctx.message.channel).administrator:
+                    msg = 'Por favor, me dê permissão de "anexar arquivos", para que eu possa funcionar corretamente ;-;'
+                else:
+                    msg = 'Por favor, peça para um administrador do servidor me dar permissão de "anexar arquivos",' \
+                          ' para que eu possa funcionar corretamente ;-;'
+                return await ctx.send(msg)
+            if not permissions.can_react(ctx):
+                if ctx.author.permissions_in(ctx.message.channel).administrator:
+                    msg = 'Por favor, me dê permissão de "adicionar reações", para que eu possa funcionar corretamente ;-;'
+                else:
+                    msg = 'Por favor, peça para um administrador do servidor me dar permissão de "adicionar reações",' \
+                          ' para que eu possa funcionar corretamente ;-;'
+                return await ctx.send(msg)
             await ctx.send(f'{ctx.author.mention} eu não tenho permissão para executar esse comando, acho que algum' +
                            ' administrador deve ter tirado minhas permissões! Com o comando ``invite``você consegue ' +
                            'ter o link para me adicionar')
@@ -66,11 +89,13 @@ class ErrorCommands(commands.Cog):
             if str(error).startswith('Member') and str(error).endswith('not found'):
                 await ctx.send(f'{ctx.author.mention} não consegui encontrar esse membro.')
             elif str(error) == 'Esse id não está banido!':
-                await ctx.send(f'{ctx.author.mention} não consegui encontrar um membro banido, com este id: `{error.id}`.')
+                await ctx.send(
+                    f'{ctx.author.mention} não consegui encontrar um membro banido, com este id: `{error.id}`.')
             elif str(error) == 'Esse membro não está banido!':
                 await ctx.send(f'{ctx.author.mention} não consegui encontrar o membro banido `{error.member}`.')
             elif str(error) == 'Membro mencionado não está banido!':
-                await ctx.send(f'{ctx.author.mention} não consegui encontrar o membro {error.user.mention} na lista de bans.')
+                await ctx.send(
+                    f'{ctx.author.mention} não consegui encontrar o membro {error.user.mention} na lista de bans.')
         else:
             if str(error).startswith('duplicate servidor'):
                 pass

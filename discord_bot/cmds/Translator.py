@@ -26,7 +26,7 @@ class Translator(commands.Cog):
                                     '``{pref}traduza`` ``pt`` ``Здравствуйте!``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.traduzir.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['tradutor', 'traduza', 'translate', 'translator'],
                       description='Eu vou traduzir alguma frase!')

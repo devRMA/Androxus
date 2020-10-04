@@ -63,7 +63,7 @@ class Admin(commands.Cog):
                           perm_bot='banir membros',
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.ban.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['banir'], description='Banir algum membro.')
     @permissions.has_permissions(ban_members=True)
@@ -155,7 +155,7 @@ class Admin(commands.Cog):
                           perm_bot='expulsar membros',
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.ban.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['expulsar'], description='Expulsa algum membro!')
     @permissions.has_permissions(kick_members=True)
@@ -239,7 +239,7 @@ class Admin(commands.Cog):
                           perm_bot='banir membros',
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.unban.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['desbanir', 'revogar_ban'], description='Revoga o banimento de algum membro!')
     @permissions.has_permissions(ban_members=True)

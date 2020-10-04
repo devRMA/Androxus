@@ -33,7 +33,7 @@ class ComandoDesativadoCog(commands.Cog):
                           aliases=self.desativar_comando.aliases.copy(),
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           perm_pessoa='administrador')
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['disable_command', 'dc'], description='Desativa comandos!')
     @permissions.has_permissions(administrator=True)
@@ -83,7 +83,7 @@ class ComandoDesativadoCog(commands.Cog):
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.reativar_comando.aliases.copy(),
                           perm_pessoa='administrador')
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['reactivate_command'], description='Reativa comando!')
     @permissions.has_permissions(administrator=True)

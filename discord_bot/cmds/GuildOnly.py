@@ -28,7 +28,7 @@ class GuildOnly(commands.Cog):
                           descricao=self.avatar.description,
                           parametros=['<"Mencionar uma pessoa ou um id">'],
                           exemplos=['``{pref}avatar``' + f' {ctx.author.mention}'])
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(description='Eu vou mandar a foto de perfil da pessoa que você marcar.')
     async def avatar(self, ctx, *args):
@@ -63,7 +63,7 @@ class GuildOnly(commands.Cog):
                           comando=self.userinfo.name,
                           descricao=self.userinfo.description,
                           exemplos=['``{pref}userinfo``'])
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(description='Eu vou mandar o máximo de informações sobre um usuário.')
     async def userinfo(self, ctx, *args):
@@ -199,7 +199,7 @@ class GuildOnly(commands.Cog):
                           comando=self.serverinfo.name,
                           descricao=self.serverinfo.description,
                           exemplos=['``{pref}serverinfo``'])
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(description='Eu vou mandar o máximo de informações sobre um servidor.')
     @commands.guild_only()
@@ -247,7 +247,7 @@ class GuildOnly(commands.Cog):
                           exemplos=['``{pref}server_avatar``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.server_avatar.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=["icone"], description='Eu vou enviar o icone do servidor (se tiver).')
     @commands.guild_only()
@@ -266,7 +266,7 @@ class GuildOnly(commands.Cog):
                           exemplos=['``{pref}server_banner``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.server_banner.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=["banner"], description='Eu vou enviar o banner do servidor (se tiver).')
     @commands.guild_only()

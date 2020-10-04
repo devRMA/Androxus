@@ -24,7 +24,7 @@ class Say(commands.Cog):
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.say.aliases.copy(),
                           perm_pessoa='gerenciar mensagens')
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['fale', 'falar'], description='Eu vou repetir o que você falar!')
     @commands.cooldown(1, 2, commands.BucketType.user)

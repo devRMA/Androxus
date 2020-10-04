@@ -32,7 +32,7 @@ class Help(commands.Cog):
                           exemplos=['``{pref}help``', '``{pref}ajuda`` ``adicionar_comando``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.help.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda de um comando.')
     async def help(self, ctx, *comando):
@@ -122,7 +122,7 @@ class Help(commands.Cog):
                                 value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para' +
                                       ' comandos padrões, ou seja, comandos personalizados não têm ajuda.```',
                                 inline=False)
-            await ctx.send(content=ctx.author.mention, embed=embed)
+            await ctx.send(embed=embed)
 
 
 def setup(bot):

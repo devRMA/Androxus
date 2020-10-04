@@ -34,12 +34,12 @@ class ComandoPersonalizadoCog(commands.Cog):
                           aliases=self.adicionar_comando.aliases.copy(),
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           perm_pessoa='administrador')
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['add_command', 'ac'], description='Adiciona comandos personalizados')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
-    async def adicionar_comando(self, ctx, comando=None, resposta=None, inText='t'):
+    async def adicionar_comando(self, ctx, comando='', resposta='', inText='t'):
         inText = inText.lower()
         if inText != None:
             if inText in ['t', 'true', 's', 'sim', '1', 'y', 'yes']:
@@ -49,8 +49,11 @@ class ComandoPersonalizadoCog(commands.Cog):
             else:
                 await ctx.send(f'Valor ``{inText}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
                 return
-        if (comando is None) or (resposta is None):
-            await self.help_adicionar_comando(ctx)
+        if ctx.message.content.count('"') != 4:
+            return await ctx.send('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n' +
+                            f'{ctx.prefix}adicionar_comando **"**comando**"** **"**resposta**"**')
+        if (comando.replace(' ', '') == '') or (resposta.replace(' ', '') == ''):
+            await self.help_modificar_comando(ctx)
             return
         conexao = Conexao()
         servidor = Servidor(ctx.guild.id, ctx.prefix)
@@ -88,7 +91,7 @@ class ComandoPersonalizadoCog(commands.Cog):
                           aliases=self.remover_comando.aliases.copy(),
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           perm_pessoa='administrador')
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['remove_command', 'rc'], description='Remove um comando personalizado')
     @permissions.has_permissions(administrator=True)
@@ -128,12 +131,12 @@ class ComandoPersonalizadoCog(commands.Cog):
                           aliases=self.modificar_comando.aliases.copy(),
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           perm_pessoa='administrador')
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['update_command', 'mc'], description='Modifica um comando personalizado')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
-    async def modificar_comando(self, ctx, comando=None, resposta=None, inText='t'):
+    async def modificar_comando(self, ctx, comando='', resposta='', inText='t'):
         inText = inText.lower()
         if inText != None:
             if inText in ['t', 'true', 's', 'sim', '1', 'y', 'yes']:
@@ -143,7 +146,10 @@ class ComandoPersonalizadoCog(commands.Cog):
             else:
                 await ctx.send(f'Valor ``{inText}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
                 return
-        if (comando is None) or (resposta is None):
+        if ctx.message.content.count('"') != 4:
+            return await ctx.send('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n' +
+                            f'{ctx.prefix}modificar_comando **"**comando**"** **"**resposta**"**')
+        if (comando.replace(' ', '') == '') or (resposta.replace(' ', '') == ''):
             await self.help_modificar_comando(ctx)
             return
         conexao = Conexao()

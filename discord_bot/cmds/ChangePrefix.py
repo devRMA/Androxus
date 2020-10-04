@@ -34,7 +34,7 @@ class ChangePrefix(commands.Cog):
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.change_prefix.aliases.copy(),
                           perm_pessoa='administrador')
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['prefixo', 'prefix'], description='Comando que é usado para mudar o meu prefixo')
     @permissions.has_permissions(administrator=True)

@@ -26,7 +26,7 @@ class Fun(commands.Cog):
                           exemplos=['``{pref}eightball`` ``Existe alguém mais lindo do que eu?``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.eightball.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['8ball'], description='8ball tem a resposta para tudo!')
     async def eightball(self, ctx, *args):
@@ -70,7 +70,7 @@ class Fun(commands.Cog):
                           exemplos=['``{pref}cara_coroa``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.cara_coroa.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['cc', 'coinflip'], description='Cara ou coroa?')
     async def cara_coroa(self, ctx):
@@ -87,7 +87,7 @@ class Fun(commands.Cog):
                           exemplos=['``{pref}girar`` ``muito show kkk``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.girar.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['side-down', 'inverter'], description='Eu vou deixar a frase cabeça pra baixo.')
     async def girar(self, ctx, *args):

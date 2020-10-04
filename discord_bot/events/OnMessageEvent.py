@@ -29,34 +29,6 @@ async def on_message_event(bot, message):
     if not permissions.can_send(ctx):
         # se o bot não tiver permissão para enviar mensagens:
         return
-    if not permissions.can_embed(ctx):
-        if ctx.author.permissions_in(ctx.message.channel).administrator:
-            msg = 'Por favor, me dê permissão de "inserir links", para que eu possa mostrar minhas mensagens ;-;'
-        else:
-            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "inserir links",' \
-                  ' para que eu possa mostrar minhas mensagens ;-;'
-        return await ctx.send(msg)
-    if not permissions.can_upload(ctx):
-        if ctx.author.permissions_in(ctx.message.channel).administrator:
-            msg = 'Por favor, me dê permissão de "anexar arquivos", para que eu possa funcionar corretamente ;-;'
-        else:
-            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "anexar arquivos",' \
-                  ' para que eu possa funcionar corretamente ;-;'
-        return await ctx.send(msg)
-    if not permissions.can_react(ctx):
-        if ctx.author.permissions_in(ctx.message.channel).administrator:
-            msg = 'Por favor, me dê permissão de "adicionar reações", para que eu possa funcionar corretamente ;-;'
-        else:
-            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "adicionar reações",' \
-                  ' para que eu possa funcionar corretamente ;-;'
-        return await ctx.send(msg)
-    if not permissions.can_use_external_emojis(ctx):
-        if ctx.author.permissions_in(ctx.message.channel).administrator:
-            msg = 'Por favor, me dê permissão de "usar emojis externos", para que eu possa funcionar corretamente ;-;'
-        else:
-            msg = 'Por favor, peça para um administrador do servidor me dar permissão de "usar emojis externos",' \
-                  ' para que eu possa funcionar corretamente ;-;'
-        return await ctx.send(msg)
     stopwatch = Stopwatch()
     # se a pessoa não usar um comando do bot, vai chegar None como prefixo
     conexao = Conexao()
@@ -94,7 +66,8 @@ async def on_message_event(bot, message):
             # aqui, estamos retirando o prefixo da mensagem, e criando uma lista com todas as palavras
             palavras_formatadas = message.content.lower().replace(prefixo, '').split(' ')
             # se a primeira palavra, for diferente de '' e o comando desativado estiver nela:
-            if (palavras_formatadas[0] != '') and (comando_desativado.comando.lower() in palavras_formatadas[0].lower()):
+            if (palavras_formatadas[0] != '') and (
+                    comando_desativado.comando.lower() in palavras_formatadas[0].lower()):
                 # se ela corresponder, a um comando que está desativado:
                 await message.channel.send('<a:no_no:755774680325029889> Este comando ' +
                                            'foi desativado por um administrador do servidor!')
@@ -136,7 +109,8 @@ async def on_message_event(bot, message):
                             return
     if (f'<@{str(bot.user.id)}>' == message.content) or (f'<@!{str(bot.user.id)}>' == message.content):
         await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda!')
-        await channel.send('<a:hello:755774680949850173>')
+        if permissions.can_use_external_emojis(ctx):
+            await channel.send('<a:hello:755774680949850173>')
     conexao.fechar()
     stopwatch.stop()
     await bot.process_commands(message)

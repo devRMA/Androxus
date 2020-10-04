@@ -34,7 +34,7 @@ class Botinfo(commands.Cog):
                           exemplos=['``{pref}botinfo``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.botinfo.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['info', 'detalhes'], description='Mostra algumas informações sobre mim!')
     async def botinfo(self, ctx):
@@ -122,7 +122,7 @@ class Botinfo(commands.Cog):
                           exemplos=['``{pref}source``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.source.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['github', 'programação'], description='Mostra o meu código fonte!')
     async def source(self, ctx):
@@ -148,7 +148,7 @@ class Botinfo(commands.Cog):
                           exemplos=['``{pref}ping``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.ping.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['latency', 'latência'], description='Mostra a minha latência atual.')
     async def ping(self, ctx):
@@ -170,7 +170,7 @@ class Botinfo(commands.Cog):
                           exemplos=['``{pref}invite``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.invite.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['convidar', 'convite'],
                       description='Mostra o link que você usa para me adicionar em seu servidor')
@@ -187,7 +187,7 @@ class Botinfo(commands.Cog):
                           exemplos=['``{pref}changelog``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.changelog.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['ultima_att', 'última_att', 'att_log'],
                       description='Mostra qual foi a última atualização que eu tive!')
@@ -202,7 +202,7 @@ class Botinfo(commands.Cog):
             embed.add_field(name='Atualização feita em:',
                             value=f'{datetime_format(get_last_update())}',
                             inline=True)
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=['help_tempo_on'])
     async def help_uptime(self, ctx):
@@ -213,7 +213,7 @@ class Botinfo(commands.Cog):
                           exemplos=['``{pref}uptime``'],
                           # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
                           aliases=self.uptime.aliases.copy())
-        await ctx.send(content=ctx.author.mention, embed=embed)
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=['tempo_on'], description='Mostra a quanto tempo eu estou online!')
     async def uptime(self, ctx):
