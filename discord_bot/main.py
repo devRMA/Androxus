@@ -50,7 +50,10 @@ async def on_ready():
         # esse atributo vai ser responsável por guardar o chat
         # que o bot vai usar quando mandarem mensagem no privado dele
         bot.dm_channel_log = bot.get_channel(configs['dm_channel'])
-    change_status.start()  # inicia o loop para mudar o status
+    try:
+        change_status.start()  # inicia o loop para mudar o status
+    except RuntimeError:
+        pass
 
 
 @bot.event

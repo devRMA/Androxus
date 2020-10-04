@@ -91,8 +91,10 @@ async def on_message_event(bot, message):
     if servidor:  # Se foi usado num server, vai ver se o comando está desativado
         # aqui, vai verificar se o comando foi desativado
         for comando_desativado in ComandoDesativadoRepository().get_commands(conexao, servidor):
-            # aqui, estamos retirando o prefixo da mensagem, e pegando apenas a primeira palavra da mensagem
-            if message.content.lower().replace(prefixo, '').split(' ')[0] in comando_desativado.comando:
+            # aqui, estamos retirando o prefixo da mensagem, e criando uma lista com todas as palavras
+            palavras_formatadas = message.content.lower().replace(prefixo, '').split(' ')
+            # se a primeira palavra, for diferente de '' e o comando desativado estiver nela:
+            if (palavras_formatadas[0] != '') and (comando_desativado.comando.lower() in palavras_formatadas[0].lower()):
                 # se ela corresponder, a um comando que está desativado:
                 await message.channel.send('<a:no_no:755774680325029889> Este comando ' +
                                            'foi desativado por um administrador do servidor!')
