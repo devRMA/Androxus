@@ -20,15 +20,21 @@ from discord_bot.utils.Utils import pegar_o_prefixo  # função que vai ser usad
 
 configs = get_configs()
 
+intents = discord.Intents.default()
+intents.members = True 
+intents.presences = True 
+
 # criação do bot em si, passando a função "pegar_o_prefixo" no prefixo
 if len(configs['owners']) > 1:
     bot = commands.Bot(command_prefix=pegar_o_prefixo,
                        owner_ids=configs['owners'],
-                       case_insensitive=True)
+                       case_insensitive=True,
+                       intents=intents)
 else:
     bot = commands.Bot(command_prefix=pegar_o_prefixo,
                        owner_id=configs['owners'][0],
-                       case_insensitive=True)
+                       case_insensitive=True,
+                       intents=intents)
 bot.remove_command('help')  # remove o comando help default
 
 
