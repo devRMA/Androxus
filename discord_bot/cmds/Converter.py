@@ -121,90 +121,89 @@ class Converter(commands.Cog):
         money aud 5 → vai responder 5 dólares australianos em reais
         money eur aud 1 → vai responder 1 euro em dólares australianos
         """
-        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
-            m_from = 'USD'
-            m_to = 'BRL'
-            m_qtd = 1
-            # se a pessoa não passou nada, vai continuar com esses valores padrões
-            if args:  # se a pessoa passou pelo menos 1 argumento:
-                # se a pessoa digitou "money 2" ou "mon 10.57"
-                if isnumber(args[0]):
-                    m_qtd = float(args[0])
-                else:  # se o primeiro valor não for número
-                    def is_valid(value):
-                        # todas as moedas que aceita
-                        currencies = [c.split(' - ')[0] for c in currency_exchange.currencies()]
-                        for currency in currencies:
-                            if value == currency:
-                                return True
-                        return False
+        m_from = 'USD'
+        m_to = 'BRL'
+        m_qtd = 1
+        # se a pessoa não passou nada, vai continuar com esses valores padrões
+        if args:  # se a pessoa passou pelo menos 1 argumento:
+            # se a pessoa digitou "money 2" ou "mon 10.57"
+            if isnumber(args[0]):
+                m_qtd = float(args[0])
+            else:  # se o primeiro valor não for número
+                def is_valid(value):
+                    # todas as moedas que aceita
+                    currencies = [c.split(' - ')[0] for c in currency_exchange.currencies()]
+                    for currency in currencies:
+                        if value == currency:
+                            return True
+                    return False
 
-                    # se a pessoa usar o comando assim: "money eur"
-                    if len(args) == 1:
-                        if is_valid(args[0].upper()):
-                            m_from = args[0].upper()
+                # se a pessoa usar o comando assim: "money eur"
+                if len(args) == 1:
+                    if is_valid(args[0].upper()):
+                        m_from = args[0].upper()
+                    else:
+                        # se não achou o que a pessoa passou:
+                        return await self.help_money(ctx)
+                # se a pessoa usou o comando assim: "money aud 5"
+                elif len(args) == 2:
+                    if is_valid(args[0].upper()):
+                        m_from = args[0].upper()
+                        if isnumber(args[-1]):
+                            m_qtd = float(args[-1])
                         else:
-                            # se não achou o que a pessoa passou:
                             return await self.help_money(ctx)
-                    # se a pessoa usou o comando assim: "money aud 5"
-                    elif len(args) == 2:
-                        if is_valid(args[0].upper()):
-                            m_from = args[0].upper()
+                    else:
+                        return await self.help_money(ctx)
+                # se a pessoa usou o comando assim: "money eur aud 1"
+                elif len(args) == 3:
+                    if is_valid(args[0].upper()):
+                        m_from = args[0].upper()
+                        if is_valid((args[1].upper())):
+                            m_to = args[1].upper()
                             if isnumber(args[-1]):
                                 m_qtd = float(args[-1])
                             else:
                                 return await self.help_money(ctx)
                         else:
                             return await self.help_money(ctx)
-                    # se a pessoa usou o comando assim: "money eur aud 1"
-                    elif len(args) == 3:
-                        if is_valid(args[0].upper()):
-                            m_from = args[0].upper()
-                            if is_valid((args[1].upper())):
-                                m_to = args[1].upper()
-                                if isnumber(args[-1]):
-                                    m_qtd = float(args[-1])
-                                else:
-                                    return await self.help_money(ctx)
-                            else:
-                                return await self.help_money(ctx)
-                        else:
-                            return await self.help_money(ctx)
                     else:
-                        # se a pessoa passou mais de 3 parâmetros:
                         return await self.help_money(ctx)
-            result, _ = currency_exchange.exchange(m_from, m_to, m_qtd, False)[0].split(' ')
-            um_valor, _ = currency_exchange.exchange(m_from, m_to, 1, False)[0].split(' ')
-            result = float(f'{float(result):.2f}')
-            um_valor = float(f'{float(um_valor):.2f}')
-            embed = discord.Embed(title=f'{m_qtd:.2f} {m_from.lower()} = {result:.2f} {m_to.lower()}',
-                                  colour=discord.Colour(random_color()),
-                                  description='** **',
-                                  timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}',
-                             icon_url=ctx.author.avatar_url)
-            conexao = Conexao()
-            info = InformacoesRepository()
-            ultimo_valor = 0.00
-            # se ainda não tiver essa conversão no banco:
-            if info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}') is None:
-                # vai criar
-                info.create(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
-                ultimo_valor = um_valor
-            else:
-                ultimo_valor = float(info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}'))
-                info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
-            msg = ''
-            if ultimo_valor > um_valor:
-                msg = f'O valor diminuiu {(ultimo_valor - result):.2f}! <:diminuiu:730088971077681162>'
-            elif ultimo_valor < um_valor:
-                msg = f'O valor aumentou {(result - ultimo_valor):.2f}! <:aumentou:730088970779623524>'
-            else:
-                msg = 'Não teve alteração no valor.'
-            embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',
-                            value=f'Fonte: [x-rates](https://www.x-rates.com/calculator/?from={m_from}&to='
-                                  f'{m_to}&amount={m_qtd})',
-                            inline=True)
+                else:
+                    # se a pessoa passou mais de 3 parâmetros:
+                    return await self.help_money(ctx)
+        result, _ = currency_exchange.exchange(m_from, m_to, m_qtd, False)[0].split(' ')
+        um_valor, _ = currency_exchange.exchange(m_from, m_to, 1, False)[0].split(' ')
+        result = float(f'{float(result):.2f}')
+        um_valor = float(f'{float(um_valor):.2f}')
+        embed = discord.Embed(title=f'{m_qtd:.2f} {m_from.lower()} = {result:.2f} {m_to.lower()}',
+                              colour=discord.Colour(random_color()),
+                              description='** **',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}',
+                         icon_url=ctx.author.avatar_url)
+        conexao = Conexao()
+        info = InformacoesRepository()
+        ultimo_valor = 0.00
+        # se ainda não tiver essa conversão no banco:
+        if info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}') is None:
+            # vai criar
+            info.create(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
+            ultimo_valor = um_valor
+        else:
+            ultimo_valor = float(info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}'))
+            info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
+        msg = ''
+        if ultimo_valor > um_valor:
+            msg = f'O valor diminuiu {(ultimo_valor - result):.2f}! <:diminuiu:730088971077681162>'
+        elif ultimo_valor < um_valor:
+            msg = f'O valor aumentou {(result - ultimo_valor):.2f}! <:aumentou:730088970779623524>'
+        else:
+            msg = 'Não teve alteração no valor.'
+        embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',
+                        value=f'Fonte: [x-rates](https://www.x-rates.com/calculator/?from={m_from}&to='
+                              f'{m_to}&amount={m_qtd})',
+                        inline=True)
         await ctx.send(embed=embed)
 
 
