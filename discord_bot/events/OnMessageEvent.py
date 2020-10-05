@@ -23,7 +23,7 @@ async def on_message_event(bot, message):
         return
     if message.author.id == bot.user.id:
         return
-    if message.type.name != 'default':
+    if message.is_system():
         return
     ctx = await bot.get_context(message)
     if not permissions.can_send(ctx):

@@ -137,14 +137,40 @@ class GuildOnly(commands.Cog):
                     if isinstance(getattr(all_perms, atributo), bool):
                         if getattr(all_perms, atributo):
                             perms.append(atributo)
-                translator = Translator()
+                perms_traduzidas = {
+                    'add_reactions': 'adicionar reações',
+                    'administrator': 'administrador',
+                    'attach_files': 'anexar arquivos',
+                    'ban_members': 'banir membros',
+                    'change_nickname': 'mudar apelido',
+                    'create_instant_invite': 'criar convite',
+                    'embed_links': 'enviar links',
+                    'kick_members': 'expulsar membros',
+                    'manage_channels': 'gerenciar canais',
+                    'manage_emojis': 'gerenciar emojis',
+                    'manage_guild': 'gerenciar servidor',
+                    'manage_messages': 'gerenciar mensagens',
+                    'manage_nicknames': 'gerenciar apelidos',
+                    'manage_permissions': 'gerenciar permissões',
+                    'manage_roles': 'gerenciar cargos',
+                    'manage_webhooks': 'gerenciar webhooks',
+                    'mention_everyone': 'mencionar everyone',
+                    'read_message_history': 'ler histórico de mensagens',
+                    'read_messages': 'ver mensagens',
+                    'send_messages': 'enviar mensagens',
+                    'send_tts_messages': 'enviar mensagem com tts',
+                    'view_audit_log': 'ver registro de auditoria',
+                    'view_channel': 'ver canal',
+                    'view_guild_insights': 'ver desempenho do servidor',
+                    'use_external_emojis': 'usar emojis externos'
+                }
                 for c in range(0, len(perms)):
-                    # além de substituir os "_" por espaços, vai traduzir a permissão
-                    perm_filtrada = perms[c].replace('_', ' ')
-                    perm_filtrada = perm_filtrada.replace('ban members', 'banir membros')
-                    perm_filtrada = perm_filtrada.replace('kick members', 'expulsar membros')
-                    perm_filtrada = perm_filtrada.replace('embed links', 'enviar links')
-                    perms[c] = f"``{translator.translate(perm_filtrada, dest='pt').text}``"
+                    # vai substituir os "_" por espaços e tirar o external_emojis
+                    for perm_traducao in perms_traduzidas.items():
+                        if perm_traducao[0] == perms[c]:
+                            perms[c] = f"``{perm_traducao[-1]}``"
+                            break
+                perms.pop(perms.index('external_emojis'))
                 info2.add_field(name=f'Permissões({len(perms)}):', value=capitalize(', '.join(perms)), inline=False)
 
         async def menus_user_info(ctx, msg):

@@ -10,3 +10,4 @@ python-dateutil
 py_expression_eval
 googletrans
 Pillow
+currency-exchange

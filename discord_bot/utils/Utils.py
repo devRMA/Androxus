@@ -4,8 +4,10 @@
 
 __author__ = 'Rafael'
 
+import datetime
 
-def pegar_o_prefixo(bot, message):
+
+def pegar_o_prefixo(bot, message) -> str:
     """
     :param bot: Pode passar None, esse parâmetro não é usado
     :param message: A mensagem que quer saber o prefixo do bot
@@ -38,7 +40,7 @@ def pegar_o_prefixo(bot, message):
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
 
 
-def random_color():
+def random_color() -> hex:
     """
     :return: uma cor "aleatoria" em hexadecimal
     :rtype: hex
@@ -49,7 +51,7 @@ def random_color():
     return int(f'0x{r():02x}{r():02x}{r():02x}', 16)
 
 
-def get_emoji_dance():
+def get_emoji_dance() -> str:
     """
     :return: um emoji de dança aleatório
     :rtype: str
@@ -77,7 +79,7 @@ def get_emoji_dance():
     return choice(emojis)  # retorna o emoji escolhido da lista
 
 
-def get_last_update():
+def get_last_update() -> datetime.datetime:
     """
     :return: vai retornar o datetime do último commit que teve no github
     :rtype: datetime.datetime
@@ -97,7 +99,7 @@ def get_last_update():
     return data_do_update  # retorna o objeto datetime
 
 
-def get_last_commit():
+def get_last_commit() -> str:
     """
     :return: vai retornar a mensagem do último commit que teve no github do bot
     :rtype: str
@@ -111,7 +113,7 @@ def get_last_commit():
     return json[0]['commit']['message']  # vai pegar o último commit que teve, e retornar a mensagem
 
 
-def get_configs():
+def get_configs() -> dict:
     """
     :return: vai retornar um dicionário com as configurações do arquivo configs.json
     :rtype: dict
@@ -141,7 +143,7 @@ def get_configs():
         exit('Não achei o arquivo de configurações!\nBaixe o arquivo configs.json!\nhttps://github.com/devRMA/Androxus')
 
 
-def capitalize(string):
+def capitalize(string) -> str:
     """
     :param string: string que vai ser formatada
     :type string: str
@@ -159,7 +161,7 @@ def capitalize(string):
     return new_string
 
 
-def datetime_format(date1, date2=None):
+def datetime_format(date1, date2=None) -> str:
     """
     :param date1: objeto datetime que vai ser subtraido pelo date2
     :param date2: Parâmetro opcional, se não for passado nada, vai pegar o datetime utc atual
@@ -293,7 +295,7 @@ def datetime_format(date1, date2=None):
     return dt_str
 
 
-def inverter_string(string):
+def inverter_string(string) -> str:
     """
     :param string: a string que vai ser virada de cabeça para baixo
     :type string: str
@@ -358,3 +360,31 @@ def inverter_string(string):
             string_invertida += c
             encontrou = True
     return string_invertida[::-1]
+
+
+def isnumber(string) -> bool:
+    """
+    :param string: A string que vai ser verificada
+    :type string: str
+    :return: Vai retornar se a string pode ser convertida para float ou int
+    :rtype: bool
+    """
+    from string import ascii_lowercase
+    try:
+        if string.find(',') != -1:
+            # se a string vier assim: 2,2
+            # vai converter para: 2.2
+            string = string.replace(',', '.')
+        # remove espaços
+        string = string.replace(' ', '')
+        # a função isalpha verifica se a string é inteiramente de leras
+        if string.isalpha():
+            return False
+        # aqui vai verificar se tem alguma letra no meio dos números
+        for char in ascii_lowercase:
+            if char in string.lower():
+                return False
+        float(string)
+        return True
+    except ValueError:
+        return False

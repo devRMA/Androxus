@@ -79,7 +79,7 @@ class Help(commands.Cog):
                                                        inline=True)
                 if servidor:  # adiciona os comandos personalizados na lista
                     comandos_personalizados = ComandoPersonalizadoRepository().get_commands(conexao, servidor)
-                    if len(comandos_personalizados) != 0:
+                    if len(comandos_personalizados) >= 1:
                         lista_de_comando.add_field(name='**Comandos personalizados:**',
                                                    value='Estes sãos os comandos personalizados deste servidor.' +
                                                          ' **Não precisam do prefixo**',
@@ -103,26 +103,24 @@ class Help(commands.Cog):
             await ctx.send(embed=lista_de_comando)
             conexao.fechar()
         else:
-            async with ctx.channel.typing():  # vai aparecer "bot está digitando"
-                comando = ' '.join(comando)
-                for cog in self.bot.cogs:  # Abre todos os cogs que o bot têm
-                    for command in self.bot.get_cog(cog).get_commands():  # pega todos os comandos do cog
-                        if (str(command) == f'help_{comando.lower()}') or (
-                                f'help_{comando.lower()}' in command.aliases):  # se o comando for help_comando
-                            await command(ctx)  # chama ele xD
-                            return
-                cor = random_color()
-                embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>',
-                                      colour=discord.Colour(cor),
-                                      description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
-                                      timestamp=datetime.utcnow())
-                embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
-                embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-                embed.add_field(name='**Possiveis soluções:**',
-                                value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para' +
-                                      ' comandos padrões, ou seja, comandos personalizados não têm ajuda.```',
-                                inline=False)
-            await ctx.send(embed=embed)
+            comando = ' '.join(comando)
+            for cog in self.bot.cogs:  # Abre todos os cogs que o bot têm
+                for command in self.bot.get_cog(cog).get_commands():  # pega todos os comandos do cog
+                    if (str(command) == f'help_{comando.lower()}') or (
+                            f'help_{comando.lower()}' in command.aliases):  # se o comando for help_comando
+                        return await command(ctx)  # chama ele xD
+            cor = random_color()
+            embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>',
+                                  colour=discord.Colour(cor),
+                                  description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
+                                  timestamp=datetime.utcnow())
+            embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            embed.add_field(name='**Possiveis soluções:**',
+                            value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para' +
+                                  ' comandos padrões, ou seja, comandos personalizados não têm ajuda.```',
+                            inline=False)
+            return await ctx.send(embed=embed)
 
 
 def setup(bot):
