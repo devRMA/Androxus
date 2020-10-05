@@ -174,7 +174,9 @@ class Converter(commands.Cog):
                         # se a pessoa passou mais de 3 parâmetros:
                         return await self.help_money(ctx)
             result, _ = currency_exchange.exchange(m_from, m_to, m_qtd, False)[0].split(' ')
+            um_valor, _ = currency_exchange.exchange(m_from, m_to, 1, False)[0].split(' ')
             result = float(f'{float(result):.2f}')
+            um_valor = float(f'{float(um_valor):.2f}')
             embed = discord.Embed(title=f'{m_qtd:.2f} {m_from.lower()} = {result:.2f} {m_to.lower()}',
                                   colour=discord.Colour(random_color()),
                                   description='** **',
@@ -187,15 +189,15 @@ class Converter(commands.Cog):
             # se ainda não tiver essa conversão no banco:
             if info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}') is None:
                 # vai criar
-                info.create(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{result:.2f}')
-                ultimo_valor = result
+                info.create(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
+                ultimo_valor = um_valor
             else:
                 ultimo_valor = float(info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}'))
-                info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{result:.2f}')
+                info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
             msg = ''
-            if ultimo_valor > result:
+            if ultimo_valor > um_valor:
                 msg = f'O valor diminuiu {(ultimo_valor - result):.2f}! <:diminuiu:730088971077681162>'
-            elif ultimo_valor < result:
+            elif ultimo_valor < um_valor:
                 msg = f'O valor aumentou {(result - ultimo_valor):.2f}! <:aumentou:730088970779623524>'
             else:
                 msg = 'Não teve alteração no valor.'
