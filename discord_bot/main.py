@@ -12,6 +12,7 @@ from sys import version  # função para pegar a versão do python
 
 import discord  # import da API do discord
 from discord.ext import commands, tasks  # outros imports do discord
+from requests import get
 
 # evento que vai ser chamado, toda vez que enviarem uma mensagem
 from discord_bot.events.OnMessageEvent import on_message_event
@@ -21,8 +22,8 @@ from discord_bot.utils.Utils import pegar_o_prefixo  # função que vai ser usad
 configs = get_configs()
 
 intents = discord.Intents.default()
-intents.members = True 
-intents.presences = True 
+intents.members = True
+intents.presences = True
 
 # criação do bot em si, passando a função "pegar_o_prefixo" no prefixo
 if len(configs['owners']) > 1:
@@ -58,6 +59,7 @@ async def on_ready():
         bot.dm_channel_log = bot.get_channel(configs['dm_channel'])
     try:
         change_status.start()  # inicia o loop para mudar o status
+        request_no_site.start()  # inicia o loop que vai fazer os requests no site
     except RuntimeError:
         pass
 
@@ -94,6 +96,19 @@ async def change_status():  # loop que vai ficar alterando o status do bot
         status_escolhido = choice(status)  # escolhe um status "aleatório"
         status_escolhido = status_escolhido.format(servers=len(bot.guilds), pessoas=len(bot.users))
         await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
+
+
+@tasks.loop(minutes=3)
+async def request_no_site():
+    # um request no site, para que ele não fique off
+    # como o projeto está no heroku, e é um plano free
+    # se o site ficar 5 minutos sem ter um acesso, o heroku
+    # desliga a aplicação, então a cada 3 minutos o bot vai fazer
+    # um request, para que ele não caia
+    url = 'https://androxus.herokuapp.com/'
+    html = get(url).text
+    del (url)
+    del (html)
 
 
 if __name__ == '__main__':
