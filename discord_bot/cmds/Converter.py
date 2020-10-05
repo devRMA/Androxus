@@ -12,6 +12,8 @@ import discord
 from discord.ext import commands
 from googletrans import Translator
 
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.InformacoesRepository import InformacoesRepository
 from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.utils.Utils import isnumber, random_color
 
@@ -172,14 +174,35 @@ class Converter(commands.Cog):
                         # se a pessoa passou mais de 3 parâmetros:
                         return await self.help_money(ctx)
             result, _ = currency_exchange.exchange(m_from, m_to, m_qtd, False)[0].split(' ')
-            result = float(result)
+            result = float(f'{float(result):.2f}')
             embed = discord.Embed(title=f'{m_qtd:.2f} {m_from.lower()} = {result:.2f} {m_to.lower()}',
                                   colour=discord.Colour(random_color()),
-                                  description='[fonte](https://www.x-rates.com/calculator/?f' +
-                                              f'rom={m_from}&to={m_to}&amount={m_qtd})',
+                                  description='** **',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}',
                              icon_url=ctx.author.avatar_url)
+            conexao = Conexao()
+            info = InformacoesRepository()
+            ultimo_valor = 0.00
+            # se ainda não tiver essa conversão no banco:
+            if info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}') is None:
+                # vai criar
+                info.create(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{result:.2f}')
+                ultimo_valor = result
+            else:
+                ultimo_valor = float(info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}'))
+                info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{result:.2f}')
+            msg = ''
+            if ultimo_valor > result:
+                msg = f'O valor diminuiu {(ultimo_valor - result):.2f}! <:diminuiu:730088971077681162>'
+            elif ultimo_valor < result:
+                msg = f'O valor aumentou {(result - ultimo_valor):.2f}! <:aumentou:730088970779623524>'
+            else:
+                msg = 'Não teve alteração no valor.'
+            embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',
+                            value=f'Fonte: [x-rates](https://www.x-rates.com/calculator/?from={m_from}&to='
+                                  f'{m_to}&amount={m_qtd})',
+                            inline=True)
         await ctx.send(embed=embed)
 
 
