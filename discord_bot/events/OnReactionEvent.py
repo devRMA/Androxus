@@ -4,6 +4,7 @@
 
 __author__ = 'Rafael'
 
+import googletrans
 from discord.ext import commands
 
 from discord_bot.database.Conexao import Conexao
@@ -200,9 +201,18 @@ class OnReactionEvent(commands.Cog):
                 if str(reaction) == flag_lang[0]:
                     # evita que a pessoa fique usando o comando na mesma mensagem
                     self.bot.msg_traduzidas.append(id_msg)
-                    await self.bot.get_cog('Translator').traduzir(await self.bot.get_context(reaction.message),
-                                                                  flag_lang[-1],
-                                                                  reaction.message.content)
+                    frase = reaction.message.content
+                    # anti mention:
+                    if reaction.message.mentions:  # se tiver alguma menção na mensagem
+                        for mention in reaction.message.mentions:
+                            frase = frase.replace(f'<@{mention.id}>', '')
+                            frase = frase.replace(f'<@!{mention.id}>', '')
+                            frase = frase.replace(f'<@&{mention.id}>', '')
+                    frase = frase.replace(f'@', '@\uFEFF')  # quebra o @everyone e o @here
+                    # se após a remoção das menções, não sobrar nada, para a execução
+                    if len(frase.replace(' ', '')) == 0: return
+                    msg = googletrans.Translator().translate(frase, dest=flag_lang[-1]).text.capitalize()
+                    await reaction.message.channel.send(content=f'{user.mention} {msg}')
                     return
 
 

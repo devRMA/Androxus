@@ -99,7 +99,7 @@ async def on_message_event(bot, message):
                     if comando_personalizado.comando.lower() in message.content.lower():
                         enviar_mensagem = True
                         # se não for para ignorar a posição, vai ver se a mensagem inicia com o comando
-                        if not comando_personalizado.inText:
+                        if not comando_personalizado.in_text:
                             if not message.content.lower().startswith(comando_personalizado.comando.lower()):
                                 # se for obrigatorio que a mensagem comesse com o comando, e ela não estiver começando
                                 enviar_mensagem = False  # não vai responder
