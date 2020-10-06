@@ -11,7 +11,7 @@ import discord
 from discord.ext import commands
 
 from discord_bot.database.Conexao import Conexao
-from discord_bot.utils import permissions
+from discord_bot.database.Repositories.BlacklistRepository import BlacklistRepository
 from discord_bot.utils.Utils import get_emoji_dance, random_color
 
 
@@ -153,6 +153,32 @@ class OwnerOnly(commands.Cog):
             return await ctx.send(
                 f'Ocorreu o erro ```{e}``` na hora de executar o comando ```py\nasync def {fn_name}():\n{cmd}```')
         await ctx.send(f'Resultado:```{result}```')
+
+    @commands.command(aliases=['blacklisted', 'banido'], hidden=True)
+    @commands.is_owner()
+    async def blacklist(self, ctx, *, pessoaId: int):
+        conexao = Conexao()
+        if not BlacklistRepository().get_pessoa(conexao, pessoaId):
+            await ctx.send(f'A pessoa pode usar meus comandos! {get_emoji_dance()}')
+        else:
+            await ctx.send(f'<a:no_no:755774680325029889> Essa pessoa não usar meus comandos!')
+        conexao.fechar()
+
+    @commands.command(aliases=['ab'], hidden=True)
+    @commands.is_owner()
+    async def add_blacklist(self, ctx, *, pessoaId: int):
+        conexao = Conexao()
+        BlacklistRepository().create(conexao, pessoaId)
+        await ctx.send('Este usuário não vai poder usar meus comandos! <a:banned:756138595882107002>}')
+        conexao.fechar()
+
+    @commands.command(aliases=['rb', 'whitelist'], hidden=True)
+    @commands.is_owner()
+    async def remove_blacklist(self, ctx, *, pessoaId: int):
+        conexao = Conexao()
+        BlacklistRepository().delete(conexao, pessoaId)
+        await ctx.send(f'Usuário perdoado! {get_emoji_dance()}')
+        conexao.fechar()
 
 
 def setup(bot):
