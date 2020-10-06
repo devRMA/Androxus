@@ -43,7 +43,7 @@ class GuildOnly(commands.Cog):
                             id_de_quem_ver_o_avatar)  # se chegou aqui, vai tentar pegar o usuário com esse id
                         if user is not None:  # se achou uma pessoa
                             # vai mandar o avatar desta pessoa
-                            embed = discord.Embed(title=f'Avatar do(a) {str(ctx.author)}!',
+                            embed = discord.Embed(title=f'Avatar do(a) {str(user)}!',
                                                   colour=discord.Colour(random_color()),
                                                   description='** **',
                                                   timestamp=datetime.utcnow())
