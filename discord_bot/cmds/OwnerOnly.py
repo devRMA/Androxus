@@ -152,7 +152,8 @@ class OwnerOnly(commands.Cog):
         except Exception as e:
             return await ctx.send(
                 f'Ocorreu o erro ```{e}``` na hora de executar o comando ```py\nasync def {fn_name}():\n{cmd}```')
-        await ctx.send(f'Resultado:```{result}```')
+        if result != 'nada':
+            await ctx.send(f'Resultado:```{result}```')
 
     @commands.command(aliases=['blacklisted', 'banido'], hidden=True)
     @commands.is_owner()

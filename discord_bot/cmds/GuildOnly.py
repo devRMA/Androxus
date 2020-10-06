@@ -42,18 +42,32 @@ class GuildOnly(commands.Cog):
                         user = self.bot.get_user(
                             id_de_quem_ver_o_avatar)  # se chegou aqui, vai tentar pegar o usuário com esse id
                         if user is not None:  # se achou uma pessoa
-                            await ctx.send(f'{user.avatar_url}')  # vai mandar o avatar desta pessoa
+                            # vai mandar o avatar desta pessoa
+                            embed = discord.Embed(title=f'Avatar do(a) {str(ctx.author)}!',
+                                                  colour=discord.Colour(random_color()),
+                                                  description='** **',
+                                                  timestamp=datetime.utcnow())
+                            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                            embed.set_image(url=user.avatar_url)
+                            return await ctx.send(embed=embed)
                         else:  # se o user for None, é porque o bot não achou esse usuário
-                            await ctx.send('<a:sad:755774681008832623> Não consegui encontrar o usuário' +
-                                           f' <@{id_de_quem_ver_o_avatar}>\nEu preciso ter pelo menos 1' +
-                                           ' servidor em comum com a pessoa, para conseguir encontrar ela.')
+                            return await ctx.send('<a:sad:755774681008832623> Não consegui encontrar o usuário' +
+                                                  f' <@{id_de_quem_ver_o_avatar}>\nEu preciso ter pelo menos 1' +
+                                                  ' servidor em comum com a pessoa, para conseguir encontrar ela.')
                     except ValueError:  # se der erro, é porque a pessoa não passou apenas números
-                        await ctx.send(f'<a:atencao:755844029333110815> O valor ``{args[0]}`` não é um id valido!')
+                        return await ctx.send(
+                            f'<a:atencao:755844029333110815> O valor ``{args[0]}`` não é um id valido!')
                 else:  # se a pessoa passou mais de 1 argumento
-                    await ctx.send('<a:atencao:755844029333110815> Você me disse muitas coisas,' +
-                                   ' eu só preciso, ou do id da pessoa, ou que você mencione ela.')
+                    return await ctx.send('<a:atencao:755844029333110815> Você me disse muitas coisas,' +
+                                          ' eu só preciso, ou do id da pessoa, ou que você mencione ela.')
             else:  # se a pessoa não passou nenhum argumento:
-                await ctx.send(f'{ctx.author.avatar_url}')
+                embed = discord.Embed(title=f'Seu avatar!',
+                                      colour=discord.Colour(random_color()),
+                                      description='** **',
+                                      timestamp=datetime.utcnow())
+                embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                embed.set_image(url=ctx.author.avatar_url)
+                return await ctx.send(embed=embed)
 
     @commands.command(hidden=True)
     async def help_userinfo(self, ctx):
@@ -217,6 +231,32 @@ class GuildOnly(commands.Cog):
             except asyncio.TimeoutError:  # se acabar o tempo
                 pass
 
+    @commands.command(hidden=True, aliases=["help_fundo_convite"])
+    async def help_splash(self, ctx):
+        embed = embedHelp(self.bot,
+                          ctx,
+                          comando=self.splash.name,
+                          descricao=self.splash.description,
+                          exemplos=['``{pref}splash``'],
+                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
+                          aliases=self.splash.aliases.copy())
+        await ctx.send(embed=embed)
+
+    @commands.command(description='Eu vou enviar a imagem de fundo do convite deste servidor (se tiver).',
+                      aliases=["fundo_convite"])
+    @commands.guild_only()
+    async def splash(self, ctx):
+        if ctx.guild.splash_url:
+            embed = discord.Embed(title=f'Splash deste servidor!',
+                                  colour=discord.Colour(random_color()),
+                                  description='** **',
+                                  timestamp=datetime.utcnow())
+            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            embed.set_image(url=ctx.guild.splash_url)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(f'{ctx.author.mention} este servidor não tem uma foto de fundo no convite! ;-;')
+
     @commands.command(hidden=True)
     async def help_serverinfo(self, ctx):
         embed = embedHelp(self.bot,
@@ -244,7 +284,10 @@ class GuildOnly(commands.Cog):
             if ctx.guild.icon:
                 embed.set_thumbnail(url=ctx.guild.icon_url)
             if ctx.guild.banner:
-                embed.set_image(url=ctx.guild.banner_url_as(format="png"))
+                embed.set_image(url=ctx.guild.banner_url)
+            else:
+                if ctx.guild.splash_url:
+                    embed.set_image(url=ctx.guild.splash_url)
 
             embed.add_field(name='Nome do servidor', value=f'{ctx.guild.name}', inline=True)
             if ctx.guild.description:
@@ -278,9 +321,14 @@ class GuildOnly(commands.Cog):
     @commands.guild_only()
     async def server_avatar(self, ctx):
         if not ctx.guild.icon:
-            await ctx.send("Este servidor não tem avatar.")
-            return
-        await ctx.send(f"{ctx.guild.icon_url_as(size=1024)}")
+            return await ctx.send("Este servidor não tem avatar.")
+        embed = discord.Embed(title=f'Avatar deste servidor!',
+                              colour=discord.Colour(random_color()),
+                              description='** **',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        embed.set_image(url=ctx.guild.icon_url_as(size=1024))
+        await ctx.send(embed=embed)
 
     @commands.command(hidden=True, aliases=["help_banner"])
     async def help_server_banner(self, ctx):
@@ -297,9 +345,14 @@ class GuildOnly(commands.Cog):
     @commands.guild_only()
     async def server_banner(self, ctx):
         if not ctx.guild.banner:
-            await ctx.send("Este servidor não tem banner.")
-            return
-        await ctx.send(f"{ctx.guild.banner_url_as(format='png')}")
+            return await ctx.send("Este servidor não tem banner.")
+        embed = discord.Embed(title=f'banner deste servidor!',
+                              colour=discord.Colour(random_color()),
+                              description='** **',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        embed.set_image(url=ctx.guild.banner_url)
+        await ctx.send(embed=embed)
 
 
 def setup(bot):
