@@ -89,7 +89,7 @@ class Help(commands.Cog):
                             for comando_desativado in comandos_desativados:
                                 if comando_personalizado.comando.lower() in comando_desativado.comando.lower():
                                     emoji_personalizado = '<a:desativado:755774682397147226>'
-                            if comando_personalizado.inText:  # se o inText estiver on:
+                            if comando_personalizado.in_text:  # se o in_text estiver on:
                                 lista_de_comando.add_field(
                                     name=f'{emoji_personalizado}``{comando_personalizado.comando}``',
                                     value=f'Eu irei responder **independente da posição do comando na mensagem**.',
