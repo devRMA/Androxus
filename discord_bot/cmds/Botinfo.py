@@ -153,13 +153,17 @@ class Botinfo(commands.Cog):
     @commands.command(aliases=['latency', 'latência'], description='Mostra a minha latência atual.')
     async def ping(self, ctx):
         from stopwatch import Stopwatch
-        mensagem_do_bot = await ctx.send(f'Minha latência atual é de {int(self.bot.latency * 1000)}ms !')
         stopwatch_banco = Stopwatch()
         conexao = Conexao()
         stopwatch_banco.stop()
         conexao.fechar()
-        await mensagem_do_bot.edit(content=f'Latência da API do discord: {int(self.bot.latency * 1000)}ms!\n' +
-                                           f'Latência com o banco de dados: {str(stopwatch_banco)}!\n<a:hello:755774680949850173>')
+        stopwatch_message = Stopwatch()
+        mensagem_do_bot = await ctx.send(f'Calculando ping...')
+        stopwatch_message.stop()
+        await mensagem_do_bot.edit(content=f'Latência da API do discord: {(self.bot.latency * 1000):.2f}ms!\n'
+                                           f'Tempo para se conectar ao banco de dados: {str(stopwatch_banco)}!\n'
+                                           f'Tempo para enviar uma mensagem: {str(stopwatch_message)}!\n'
+                                           '<a:hello:755774680949850173>')
 
     @commands.command(hidden=True, aliases=['help_convidar', 'help_convite'])
     async def help_invite(self, ctx):
