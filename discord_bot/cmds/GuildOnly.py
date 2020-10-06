@@ -10,7 +10,6 @@ from datetime import datetime
 
 import discord
 from discord.ext import commands
-from googletrans import Translator
 
 from discord_bot.modelos.EmbedHelp import embedHelp
 from discord_bot.utils.Utils import random_color, capitalize, datetime_format

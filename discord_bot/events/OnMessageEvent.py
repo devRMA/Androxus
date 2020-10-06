@@ -32,14 +32,14 @@ async def on_message_event(bot, message):
     stopwatch = Stopwatch()
     # se a pessoa não usar um comando do bot, vai chegar None como prefixo
     conexao = Conexao()
+    servidor = None
     if message.guild:
-        prefixo = ServidorRepository().get_prefix(conexao, message.guild.id)
+        servidor = ServidorRepository().get_servidor(conexao, message.guild.id)
+    if servidor:
+        prefixo = servidor.prefixo
     else:
         prefixo = ''
     banido = BlacklistRepository().get_pessoa(conexao, message.author.id)
-    servidor = None
-    if message.guild:
-        servidor = Servidor(message.guild.id, prefixo)
     if banido or message.author.bot:
         stopwatch.stop()
         return conexao.fechar()

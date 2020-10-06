@@ -11,7 +11,7 @@ from discord.ext import commands
 
 from discord_bot.database.Conexao import Conexao
 from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
-from discord_bot.database.Servidor import Servidor
+from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
 from discord_bot.utils.Utils import random_color, get_emoji_dance
 
 
@@ -31,7 +31,7 @@ def embedHelp(bot: commands.Bot = None,
     comando_esta_desativado = False
     if ctx.guild is not None:  # se a mensagem foi enviar de um server
         conexao = Conexao()
-        servidor = Servidor(ctx.guild.id, prefixo)
+        servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
         cmds_desativados = ComandoDesativadoRepository().get_commands(conexao, servidor)
         conexao.fechar()
         # for em todos os comandos desativados

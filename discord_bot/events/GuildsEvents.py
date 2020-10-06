@@ -35,14 +35,17 @@ class GuildsEvents(commands.Cog):
         except IndexError:
             pass
         else:
-            adm = ''
-            if ctx.me.guild_permissions.view_audit_log:
-                async for entry in ctx.audit_logs(limit=2):
-                    if str(entry.action).startswith('AuditLogAction.bot_add') and (
-                            str(entry.target) == str(self.bot.user)):
-                        adm = f' {entry.user.mention}'
-            await to_send.send(f'{get_emoji_dance()}\nOlá{adm}! Obrigado por me adicionar em seu servidor!\n' +
-                               'Para saber meus comandos, digite ``--help``!')
+            try:
+                adm = ''
+                if ctx.me.guild_permissions.view_audit_log:
+                    async for entry in ctx.audit_logs(limit=2):
+                        if str(entry.action).startswith('AuditLogAction.bot_add') and (
+                                str(entry.target) == str(self.bot.user)):
+                            adm = f' {entry.user.mention}'
+                await to_send.send(f'{get_emoji_dance()}\nOlá{adm}! Obrigado por me adicionar em seu servidor!\n' +
+                                   'Para saber meus comandos, digite ``--help``!')
+            except:
+                pass
 
     @commands.Cog.listener()
     async def on_guild_remove(self, ctx):

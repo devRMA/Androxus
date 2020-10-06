@@ -15,6 +15,7 @@ from discord_bot.utils.Utils import get_configs, get_emoji_dance
 from discord_bot.utils.Utils import random_color
 
 
+# font: https://github.com/Rapptz/RoboDanny
 class BannedMember(commands.Converter):
     async def convert(self, ctx, argument):
         if argument:

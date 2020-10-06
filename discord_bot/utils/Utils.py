@@ -27,11 +27,13 @@ def pegar_o_prefixo(bot, message) -> str:
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
         conexao = Conexao()
         # vai no banco de dados, e faz um select para ver qual o prefixo
-        prefixo = ServidorRepository().get_prefix(conexao, message.guild.id)
+        servidor = ServidorRepository().get_servidor(conexao, message.guild.id)
+        if servidor:
+            prefixo = servidor.prefixo
         if prefixo is not None:  # se achou um prefixo, retorna o que achou
             conexao.fechar()
             return prefixo
-        else:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
+        if servidor is None:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
             servidor = Servidor(message.guild.id)  # vai criar um objeto Servidor
             ServidorRepository().create(conexao, servidor)  # e vai mandar ele para o banco
             conexao.fechar()

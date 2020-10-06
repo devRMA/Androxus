@@ -16,7 +16,7 @@ class IServidorRepository(metaclass=ABCMeta):
         """ Insert into da table servidor """
 
     @abstractmethod
-    def get_prefix(self, conn: Conexao, serverId: int):
+    def get_servidor(self, conn: Conexao, serverId: int):
         """ Select que vai pegar o prefixo """
 
     @abstractmethod
