@@ -11,29 +11,30 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.Classes import Androxus
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
 from discord_bot.utils.Utils import random_color, capitalize, datetime_format
 
 
-class GuildOnly(commands.Cog):
+class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
-    async def help_avatar(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.avatar.name,
-                          descricao=self.avatar.description,
-                          parametros=['<"Mencionar uma pessoa ou um id">'],
-                          exemplos=['``{pref}avatar``' + f' {ctx.author.mention}'])
-        await ctx.send(embed=embed)
-
-    @commands.command(description='Eu vou mandar a foto de perfil da pessoa que você marcar.')
-    async def avatar(self, ctx, *args):
+    @commands.command(name='avatar',
+                      description='Eu vou mandar a foto de perfil da pessoa que você marcar.',
+                      parameters=['[usuário (padrão: quem usou o comando)]'],
+                      examples=['``{prefix}avatar`` {author_mention}'],
+                      cls=Androxus.Command)
+    async def _avatar(self, ctx, *args):
         if ctx.message.mentions:  # se tiver alguma menção na mensagem
-            await ctx.send(
-                f'{ctx.message.mentions[0].avatar_url}')  # vai pegar a primeira menção, e pega o avatar da pessoa
+            embed = discord.Embed(title=f'Avatar do(a) {str(ctx.message.mentions[0])}!',
+                                  colour=discord.Colour(random_color()),
+                                  description='** **',
+                                  timestamp=datetime.utcnow())
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
+            embed.set_image(url=ctx.message.mentions[0].avatar_url)
+            return await ctx.send(embed=embed)
         else:  # se a pessoa não mencionou ninguém, entra aqui
             if args:  # se a pessoa passou pelo menos alguma coisa
                 if len(args) == 1:  # se a pessoa passou mais de um item
@@ -48,7 +49,7 @@ class GuildOnly(commands.Cog):
                                                   description='** **',
                                                   timestamp=datetime.utcnow())
                             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-                            embed.set_image(url=user.avatar_url)
+                            embed.set_image(url=user.avatar)
                             return await ctx.send(embed=embed)
                         else:  # se o user for None, é porque o bot não achou esse usuário
                             return await ctx.send('<a:sad:755774681008832623> Não consegui encontrar o usuário' +
@@ -65,21 +66,16 @@ class GuildOnly(commands.Cog):
                                       colour=discord.Colour(random_color()),
                                       description='** **',
                                       timestamp=datetime.utcnow())
-                embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-                embed.set_image(url=ctx.author.avatar_url)
+                embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
+                embed.set_image(url=ctx.author.avatar)
                 return await ctx.send(embed=embed)
 
-    @commands.command(hidden=True)
-    async def help_userinfo(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.userinfo.name,
-                          descricao=self.userinfo.description,
-                          exemplos=['``{pref}userinfo``'])
-        await ctx.send(embed=embed)
-
-    @commands.command(description='Eu vou mandar o máximo de informações sobre um usuário.')
-    async def userinfo(self, ctx, *args):
+    @commands.command(name='userinfo',
+                      description='Eu vou mandar o máximo de informações sobre um usuário.',
+                      parameters=['[usuário (padrão: quem usou o comando)]'],
+                      examples=['``{prefix}userinfo`` {author_mention}'],
+                      cls=Androxus.Command)
+    async def _userinfo(self, ctx, *args):
         async with ctx.channel.typing():  # vai aparecer "bot está digitando"
             user = None
             if ctx.message.mentions:  # se tiver alguma menção na mensagem
@@ -121,8 +117,8 @@ class GuildOnly(commands.Cog):
                                   colour=cor,
                                   description='O máximo de informação que eu consegui encontrar.',
                                   timestamp=datetime.utcnow())
-            info1.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            info1.set_thumbnail(url=user.avatar_url)
+            info1.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
+            info1.set_thumbnail(url=user.avatar)
             info1.add_field(name="Nome e tag:", value=f'``{user}``', inline=True)
             info1.add_field(name="Id: ", value=f'``{user.id}``', inline=True)
             if hasattr(user, 'nick'):
@@ -140,7 +136,7 @@ class GuildOnly(commands.Cog):
                                       colour=cor,
                                       description='** **',
                                       timestamp=datetime.utcnow())
-                info2.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                info2.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
                 info2.set_thumbnail(url=user.avatar_url)
                 if roles is not None:
                     info2.add_field(name=f'Cargos({len(roles.split(", "))}):', value=roles, inline=False)
@@ -231,44 +227,47 @@ class GuildOnly(commands.Cog):
             except asyncio.TimeoutError:  # se acabar o tempo
                 pass
 
-    @commands.command(hidden=True, aliases=["help_fundo_convite"])
-    async def help_splash(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.splash.name,
-                          descricao=self.splash.description,
-                          exemplos=['``{pref}splash``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.splash.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(description='Eu vou enviar a imagem de fundo do convite deste servidor (se tiver).',
-                      aliases=["fundo_convite"])
+    @commands.command(name='splash',
+                      aliases=['fundo_convite'],
+                      description='Eu vou enviar a imagem de fundo do convite deste servidor (se tiver).',
+                      examples=['``{prefix}splash``'],
+                      cls=Androxus.Command)
     @commands.guild_only()
-    async def splash(self, ctx):
+    async def _splash(self, ctx):
         if ctx.guild.splash_url:
             embed = discord.Embed(title=f'Splash deste servidor!',
                                   colour=discord.Colour(random_color()),
                                   description='** **',
                                   timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
             embed.set_image(url=ctx.guild.splash_url)
             await ctx.send(embed=embed)
         else:
             await ctx.send(f'{ctx.author.mention} este servidor não tem uma foto de fundo no convite! ;-;')
 
-    @commands.command(hidden=True)
-    async def help_serverinfo(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.serverinfo.name,
-                          descricao=self.serverinfo.description,
-                          exemplos=['``{pref}serverinfo``'])
-        await ctx.send(embed=embed)
-
-    @commands.command(description='Eu vou mandar o máximo de informações sobre um servidor.')
+    @commands.command(name='discovery_splash',
+                      description='Eu vou enviar discovery splash deste servidor (se tiver).',
+                      examples=['``{prefix}discovery_splash``'],
+                      cls=Androxus.Command)
     @commands.guild_only()
-    async def serverinfo(self, ctx):
+    async def _discovery_splash(self, ctx):
+        if ctx.guild.discovery_splash_url:
+            embed = discord.Embed(title=f'discovery splash deste servidor!',
+                                  colour=discord.Colour(random_color()),
+                                  description='** **',
+                                  timestamp=datetime.utcnow())
+            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            embed.set_image(url=ctx.guild.discovery_splash_url(format='gif', static_format='png'))
+            return await ctx.send(embed=embed)
+        else:
+            return await ctx.send(f'{ctx.author.mention} este servidor não tem discovery splash ;-;')
+
+    @commands.command(name='serverinfo',
+                      description='Eu vou mandar o máximo de informações sobre um servidor.',
+                      examples=['``{prefix}serverinfo``'],
+                      cls=Androxus.Command)
+    @commands.guild_only()
+    async def _serverinfo(self, ctx):
         async with ctx.channel.typing():  # vai aparecer "bot está digitando"
             bots = 0
             for member in ctx.guild.members:
@@ -285,9 +284,10 @@ class GuildOnly(commands.Cog):
                 embed.set_thumbnail(url=ctx.guild.icon_url)
             if ctx.guild.banner:
                 embed.set_image(url=ctx.guild.banner_url)
-            else:
-                if ctx.guild.splash_url:
-                    embed.set_image(url=ctx.guild.splash_url)
+            elif ctx.guild.splash_url:
+                embed.set_image(url=ctx.guild.splash_url)
+            elif ctx.guild.discovery_splash_url:
+                embed.set_image(url=ctx.guild.discovery_splash_url(format='gif', static_format='png'))
 
             embed.add_field(name='Nome do servidor', value=f'{ctx.guild.name}', inline=True)
             if ctx.guild.description:
@@ -306,20 +306,13 @@ class GuildOnly(commands.Cog):
                                                      f'({datetime_format(ctx.guild.created_at)})', inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True, aliases=["help_icone"])
-    async def help_server_avatar(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.server_avatar.name,
-                          descricao=self.server_avatar.description,
-                          exemplos=['``{pref}server_avatar``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.server_avatar.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=["icone"], description='Eu vou enviar o icone do servidor (se tiver).')
+    @commands.command(name='server_avatar',
+                      aliases=['icone', 'icon'],
+                      description='Eu vou enviar o icone do servidor (se tiver).',
+                      examples=['``{prefix}server_avatar``'],
+                      cls=Androxus.Command)
     @commands.guild_only()
-    async def server_avatar(self, ctx):
+    async def _server_avatar(self, ctx):
         if not ctx.guild.icon:
             return await ctx.send("Este servidor não tem avatar.")
         embed = discord.Embed(title=f'Avatar deste servidor!',
@@ -330,20 +323,13 @@ class GuildOnly(commands.Cog):
         embed.set_image(url=ctx.guild.icon_url_as(size=1024))
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True, aliases=["help_banner"])
-    async def help_server_banner(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.server_banner.name,
-                          descricao=self.server_banner.description,
-                          exemplos=['``{pref}server_banner``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.server_banner.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=["banner"], description='Eu vou enviar o banner do servidor (se tiver).')
+    @commands.command(name='server_banner',
+                      aliases=["banner"],
+                      description='Eu vou enviar o banner do servidor (se tiver).',
+                      examples=['``{prefix}server_banner``'],
+                      cls=Androxus.Command)
     @commands.guild_only()
-    async def server_banner(self, ctx):
+    async def _server_banner(self, ctx):
         if not ctx.guild.banner:
             return await ctx.send("Este servidor não tem banner.")
         embed = discord.Embed(title=f'banner deste servidor!',
@@ -353,6 +339,68 @@ class GuildOnly(commands.Cog):
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         embed.set_image(url=ctx.guild.banner_url)
         await ctx.send(embed=embed)
+
+    @commands.command(name='configs',
+                      aliases=['configurações', 'configuraçoes', 'settings'],
+                      description='Eu vou mostrar todos as configurações deste servidor.',
+                      examples=['``{prefix}configs``'],
+                      cls=Androxus.Command)
+    @commands.guild_only()
+    async def _configs(self, ctx):
+        conexao = Conexao()
+        servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
+        conexao.fechar()
+        e = discord.Embed(title=f'Todas as configurações deste servidor!',
+                          colour=discord.Colour(random_color()),
+                          description='** **',
+                          timestamp=datetime.utcnow())
+        e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        if ctx.guild.icon:
+            e.set_thumbnail(url=ctx.guild.icon_url)
+        if ctx.guild.banner:
+            e.set_image(url=ctx.guild.banner_url)
+        elif ctx.guild.splash_url:
+            e.set_image(url=ctx.guild.splash_url)
+        elif ctx.guild.discovery_splash_url:
+            e.set_image(url=ctx.guild.discovery_splash_url(format='gif', static_format='png'))
+        e.add_field(name=f'Prefixo',
+                    value=f'{servidor.prefixo}',
+                    inline=True)
+        if servidor.sugestao_de_comando:
+            sugestao_cmd = '<a:ativado:755774682334101615>'
+        else:
+            sugestao_cmd = '<a:desativado:755774682397147226>'
+        e.add_field(name=f'Sugestao de comando',
+                    value=sugestao_cmd,
+                    inline=True)
+        if servidor.channel_id_log is not None:
+            e.add_field(name=f'Log',
+                        value=f'<a:ativado:755774682334101615>\n<#{servidor.channel_id_log}>',
+                        inline=True)
+            logs = []
+            if servidor.mensagem_deletada:
+                logs.append('``mensagem deletada``')
+            if servidor.mensagem_editada:
+                logs.append('``mensagem editada``')
+            if servidor.avatar_alterado:
+                logs.append('``avatar alterado``')
+            if servidor.nome_alterado:
+                logs.append('``nome alterado``')
+            if servidor.tag_alterado:
+                logs.append('``tag alterada``')
+            if servidor.nick_alterado:
+                logs.append('``nick alterado``')
+            if servidor.role_alterado:
+                logs.append('``cargo adicionado/removido``')
+            if len(logs) != 0:
+                e.add_field(name=f'Logs ativos',
+                            value=capitalize(', '.join(logs)),
+                            inline=True)
+        else:
+            e.add_field(name=f'Log',
+                        value=f'<a:desativado:755774682397147226>',
+                        inline=True)
+        await ctx.send(embed=e)
 
 
 def setup(bot):

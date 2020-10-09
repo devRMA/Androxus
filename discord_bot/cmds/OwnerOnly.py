@@ -9,32 +9,59 @@ from datetime import datetime
 
 import discord
 from discord.ext import commands
+from stopwatch import Stopwatch
 
+from discord_bot.Classes import Androxus
+from discord_bot.database.ComandoDesativado import ComandoDesativado
+from discord_bot.database.ComandoPersonalizado import ComandoPersonalizado
 from discord_bot.database.Conexao import Conexao
 from discord_bot.database.Repositories.BlacklistRepository import BlacklistRepository
-from discord_bot.utils.Utils import get_emoji_dance, random_color
+from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
+from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
+from discord_bot.database.Repositories.InformacoesRepository import InformacoesRepository
+from discord_bot.database.Servidor import Servidor
+from discord_bot.utils import permissions
+from discord_bot.utils.Utils import pegar_o_prefixo, random_color, get_emoji_dance, get_last_update, get_last_commit, \
+    get_configs, capitalize, datetime_format, inverter_string, is_number, convert_to_bool, convert_to_string, \
+    string_similarity, get_most_similar_item, get_most_similar_items
 
 
-class OwnerOnly(commands.Cog):
+class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
     # algumas outras funções que só o dono do bot pode usar
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['desativar_tratamento_de_erro', 'erros_off'], hidden=True)
-    @commands.is_owner()
-    async def desativar_erros(self, ctx):
+    @commands.command(name='desativar_erros',
+                      aliases=['desativar_tratamento_de_erro', 'erros_off'],
+                      description='Vou desativar o tratamento de erros.',
+                      examples=['``{prefix}erros_off``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _desativar_erros(self, ctx):
         self.bot.unload_extension('events.ErrorCommands')
         await ctx.send('Tratamento de erro desativado!')
 
-    @commands.command(aliases=['ativar_tratamento_de_erro', 'erros_on'], hidden=True)
-    @commands.is_owner()
-    async def ativar_erros(self, ctx):
+    @commands.command(name='ativar_erros',
+                      aliases=['ativar_tratamento_de_erro', 'erros_on'],
+                      description='Vou reativar o tratamento de erros.',
+                      examples=['``{prefix}erros_on``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _ativar_erros(self, ctx):
         self.bot.load_extension('events.ErrorCommands')
         await ctx.send('Tratamento de erro ativado!')
 
-    @commands.command(aliases=['jogar', 'status'], hidden=True)
-    @commands.is_owner()
-    async def game(self, ctx, *args):
+    @commands.command(name='game',
+                      aliases=['jogar', 'status'],
+                      description='Muda o meu status.',
+                      parameters=['<frase>'],
+                      examples=['``{prefix}game`` ``olá mundo!``', '``{prefix}game`` ``-1``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _game(self, ctx, *args):
         if (len(args) == 1) and (args[0] == '-1'):  # se só tiver um item, e for -1
             self.bot.mudar_status = True
             embed = discord.Embed(title=f'Agora meus status vão ficar alterado!',
@@ -54,9 +81,12 @@ class OwnerOnly(commands.Cog):
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['pv'], hidden=True)
-    @commands.is_owner()
-    async def dm(self, ctx, id: int, *args):
+    @commands.command(name='dm',
+                      aliases=['pv'],
+                      hidden=True,
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _dm(self, ctx, id: int, *args):
         user = self.bot.get_user(id)
         if user is not None:
             if ctx.guild.id != 405826835793051649:
@@ -84,17 +114,28 @@ class OwnerOnly(commands.Cog):
             if ctx.guild.id == 405826835793051649:
                 await ctx.send('Não achei o usuário')
 
-    @commands.command(aliases=['reboot', 'reiniciar'], hidden=True)
-    @commands.is_owner()
-    async def kill(self, ctx):
+    @commands.command(name='kill',
+                      aliases=['reboot', 'reiniciar'],
+                      description='Reinicia o bot.',
+                      examples=['``{prefix}reboot``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _kill(self, ctx):
         await ctx.send('Reiniciando <a:loading:756715436149702806>')
+        await self.bot.logout()
         raise SystemExit('Rebooting...')
 
-    @commands.command(aliases=['query', 'query_sql'], hidden=True)
-    @commands.is_owner()
-    async def sql(self, ctx, *args):
-        if args:
-            query = ' '.join(args)
+    @commands.command(name='sql',
+                      aliases=['query', 'query_sql'],
+                      description='Executa uma query sql no banco de dados.',
+                      parameters=['<query sql>'],
+                      examples=['``{prefix}sql`` ``select version();``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _sql(self, ctx, *, query=''):
+        if query:
             if query[-1] != ';':
                 query += ';'
             conexao = Conexao()
@@ -113,6 +154,8 @@ class OwnerOnly(commands.Cog):
             if modo == 's':
                 await ctx.send(f'Query:```sql\n{query}```Resultado:```python\n{cursor.fetchall()}```')
             conexao.fechar()
+        else:
+            return await self.bot.send_help(ctx)
 
     # font: https://gist.github.com/nitros12/2c3c265813121492655bc95aa54da6b9
     def __insert_returns(self, body):
@@ -125,9 +168,16 @@ class OwnerOnly(commands.Cog):
         if isinstance(body[-1], ast.With):
             self.__insert_returns(body[-1].body)
 
-    @commands.command(aliases=['ev'], hidden=True)
-    @commands.is_owner()
-    async def eval(self, ctx, *, cmd):
+    @commands.command(name='eval',
+                      aliases=['ev'],
+                      description='Executa um script em python (com retorno).',
+                      parameters=['<script>'],
+                      examples=['``{prefix}eval`` ``return \'opa\'``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _eval(self, ctx, *, cmd):
+        execution_time = Stopwatch()
         fn_name = '_eval_expr'
         cmd = cmd.strip('` ')
         # add a layer of indentation
@@ -143,6 +193,32 @@ class OwnerOnly(commands.Cog):
             'self': self,
             'discord': discord,
             'commands': commands,
+            'datetime': datetime,
+            'Androxus': Androxus,
+            'BlacklistRepository': BlacklistRepository,
+            'ComandoDesativadoRepository': ComandoDesativadoRepository,
+            'ComandoPersonalizadoRepository': ComandoPersonalizadoRepository,
+            'InformacoesRepository': InformacoesRepository,
+            'ComandoDesativado': ComandoDesativado,
+            'ComandoPersonalizado': ComandoPersonalizado,
+            'Conexao': Conexao,
+            'Servidor': Servidor,
+            'pegar_o_prefixo': pegar_o_prefixo,
+            'random_color': random_color,
+            'get_emoji_dance': get_emoji_dance,
+            'get_last_update': get_last_update,
+            'get_last_commit': get_last_commit,
+            'get_configs': get_configs,
+            'capitalize': capitalize,
+            'datetime_format': datetime_format,
+            'inverter_string': inverter_string,
+            'is_number': is_number,
+            'convert_to_bool': convert_to_bool,
+            'convert_to_string': convert_to_string,
+            'string_similarity': string_similarity,
+            'get_most_similar_item': get_most_similar_item,
+            'get_most_similar_items': get_most_similar_items,
+            'Stopwatch': Stopwatch,
             'ctx': ctx,
             '__import__': __import__
         }
@@ -150,36 +226,82 @@ class OwnerOnly(commands.Cog):
             exec(compile(parsed, filename='<ast>', mode='exec'), env)
             result = (await eval(f'{fn_name}()', env))
         except Exception as e:
+            execution_time.stop()
             return await ctx.send(
                 f'Ocorreu o erro ```{e}``` na hora de executar o comando ```py\nasync def {fn_name}():\n{cmd}```')
         if result != 'nada':
-            await ctx.send(f'Resultado:```{result}```')
+            execution_time.stop()
+            return await ctx.send(f'Resultado:```{result}```Tipo do return:```{type(result)}```Tempo de execução: '
+                                  f'``{str(execution_time)}``')
 
-    @commands.command(aliases=['blacklisted', 'banido'], hidden=True)
-    @commands.is_owner()
-    async def blacklist(self, ctx, *, pessoaId: int):
-        conexao = Conexao()
-        if not BlacklistRepository().get_pessoa(conexao, pessoaId):
-            await ctx.send(f'A pessoa pode usar meus comandos! {get_emoji_dance()}')
+    @commands.command(name='exec',
+                      aliases=['execute'],
+                      description='Executa um script em python (sem retorno).',
+                      parameters=['<script>'],
+                      examples=['``{prefix}exec`` ``def opa():\\n\\tprint(\'opa\')``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _exec(self, ctx, *, cmd):
+        env = {
+            'discord': discord,
+            'commands': commands,
+            'permissions': permissions,
+            'Androxus': Androxus
+        }
+        try:
+            exec(cmd, env)
+        except Exception as e:
+            return await ctx.send(f'Ocorreu um erro na execução do comando```py\n{cmd}```Erro:```{e}```.')
         else:
-            await ctx.send(f'<a:no_no:755774680325029889> Essa pessoa não usar meus comandos!')
-        conexao.fechar()
+            return await ctx.send(f'Comando```py\n{cmd}```executado com sucesso!')
 
-    @commands.command(aliases=['ab'], hidden=True)
-    @commands.is_owner()
-    async def add_blacklist(self, ctx, *, pessoaId: int):
+    @commands.command(name='blacklist',
+                      aliases=['blacklisted', 'banido'],
+                      hidden=True,
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _blacklist(self, ctx, *, pessoaId: int):
         conexao = Conexao()
-        BlacklistRepository().create(conexao, pessoaId)
-        await ctx.send('Este usuário não vai poder usar meus comandos! <a:banned:756138595882107002>}')
+        msg = ''
+        if not BlacklistRepository().get_pessoa(conexao, pessoaId):
+            msg = f'A pessoa pode usar meus comandos! {get_emoji_dance()}'
+        else:
+            msg = f'<a:no_no:755774680325029889> Essa pessoa não usar meus comandos!'
         conexao.fechar()
+        return await ctx.send(msg)
 
-    @commands.command(aliases=['rb', 'whitelist'], hidden=True)
-    @commands.is_owner()
-    async def remove_blacklist(self, ctx, *, pessoaId: int):
+    @commands.command(name='add_blacklist',
+                      aliases=['ab'],
+                      hidden=True,
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _add_blacklist(self, ctx, *args):
         conexao = Conexao()
-        BlacklistRepository().delete(conexao, pessoaId)
-        await ctx.send(f'Usuário perdoado! {get_emoji_dance()}')
+        user_id = None
+        if ctx.message.mentions:
+            user_id = ctx.message.mentions[0].id
+        else:
+            user_id = int(args[0])
+        BlacklistRepository().create(conexao, user_id)
         conexao.fechar()
+        return await ctx.send('Este usuário não vai poder usar meus comandos! <a:banned:756138595882107002>')
+
+    @commands.command(name='remove_blacklist',
+                      aliases=['rb', 'whitelist'],
+                      hidden=True,
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _remove_blacklist(self, ctx, *args):
+        conexao = Conexao()
+        user_id = None
+        if ctx.message.mentions:
+            user_id = ctx.message.mentions[0].id
+        else:
+            user_id = int(args[0])
+        BlacklistRepository().delete(conexao, user_id)
+        conexao.fechar()
+        return await ctx.send(f'Usuário perdoado! {get_emoji_dance()}')
 
 
 def setup(bot):

@@ -4,8 +4,10 @@
 
 __author__ = 'Rafael'
 
-from psycopg2 import connect
 from os import environ
+
+from psycopg2 import connect
+
 from discord_bot.utils.Utils import get_configs
 
 

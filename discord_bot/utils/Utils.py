@@ -6,13 +6,19 @@ __author__ = 'Rafael'
 
 import datetime
 
+from typing import List
 
-def pegar_o_prefixo(bot, message) -> str:
+
+def pegar_o_prefixo(bot, message, open_con=True, conn=None) -> str:
     """
     :param bot: Pode passar None, esse parâmetro não é usado
     :param message: A mensagem que quer saber o prefixo do bot
+    :param open_con: Parâmetro que servir como flag, para saber se é ou não para abrir uma conexão nova
+    :param conn: Conexão com o banco, caso o "open_con" esteja como False
     :type bot: discord.ext.commands.Bot
     :type message: discord.Message
+    :type open_con: bool
+    :type conn: Conexao
     :return: o prefixo do bot, para está mensagem
     :rtype: str
     """
@@ -25,18 +31,24 @@ def pegar_o_prefixo(bot, message) -> str:
     # função que vai ler as informações do json
     from discord_bot.utils.Utils import get_configs
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
-        conexao = Conexao()
+        if open_con:  # se for para abrir a conexão:
+            conexao = Conexao()
+        else:  # se não for, vai pegar a conexão que for passada
+            conexao = conn
         # vai no banco de dados, e faz um select para ver qual o prefixo
         servidor = ServidorRepository().get_servidor(conexao, message.guild.id)
+        prefixo = None
         if servidor:
             prefixo = servidor.prefixo
         if prefixo is not None:  # se achou um prefixo, retorna o que achou
-            conexao.fechar()
+            if open_con:  # se a conexão foi aberta aqui, vai ser fechada
+                conexao.fechar()
             return prefixo
         if servidor is None:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
             servidor = Servidor(message.guild.id)  # vai criar um objeto Servidor
             ServidorRepository().create(conexao, servidor)  # e vai mandar ele para o banco
-            conexao.fechar()
+            if open_con:  # se a conexão foi aberta aqui, vai ser fechada
+                conexao.fechar()
             # se acabou de criar o registro, o prefixo vai ser o padrão
             return get_configs()['default_prefix']
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
@@ -364,7 +376,7 @@ def inverter_string(string) -> str:
     return string_invertida[::-1]
 
 
-def isnumber(string) -> bool:
+def is_number(string) -> bool:
     """
     :param string: A string que vai ser verificada
     :type string: str
@@ -390,3 +402,114 @@ def isnumber(string) -> bool:
         return True
     except ValueError:
         return False
+
+
+def convert_to_bool(argument: str) -> bool or None:
+    """
+    :param argument: A string que vai ser convertida para bool
+    :type argument: str
+    :return: Vai retornar o boolean correspondente a string passada
+    :rtype: bool or None
+    """
+    lowered = argument.lower()
+    strings_true = ('sim', 'yes', 'true', '1', 'ativo', 'on')
+    strings_false = ('não', 'nao', 'no', 'false', '0', 'desativo', 'off')
+    for string in strings_true:
+        if string.startswith(lowered):
+            return True
+    for string in strings_false:
+        if string.startswith(lowered):
+            return False
+    return None
+
+
+def convert_to_string(argument: bool or None) -> str:
+    """
+    :param argument: O bool que vai ser convertido para string
+    :type argument: bool or None
+    :return: Vai retornar "sim" ou "não" ou "nulo" de acordo com o parâmetro
+    :rtype: bool
+    """
+    if argument is None:
+        return 'nulo'
+    elif argument:
+        return 'sim'
+    else:
+        return 'não'
+
+
+def string_similarity(string1, string2) -> float:
+    """
+    :param string1: Primeira string que vai ser comparada
+    :param string2: Segunda string que vai ser comparada
+    :type string1: str
+    :type string2: str
+    :return: Vai retornar o quão similar, são as strings, podendo ir de 0.0 a 1.0
+    :rtype: float
+    """
+    import jellyfish
+    difference = jellyfish.levenshtein_distance(string1, string2)
+    if difference == 0:
+        return 1.0
+    max_value = max([len(string1), len(string2)])
+    result = 100 - ((100 * difference) / max_value)
+    return result / 100
+
+
+def get_most_similar_item(string: str, list_items: List[str]) -> str or None:
+    """
+    :param string: String que vai ser comparada com a lista
+    :param list_items: Uma lista de strings que vão ser comparadas com a primeira string
+    :type string: str
+    :type list_items: List[str]
+    :return: Vai retornar o item da lista mais parecido com a string do parâmetro
+    :rtype: str or None
+    """
+    # lista que vai guardar o item e o score mais alto que teve
+    highest_score = [0.0, '']
+    for item in list_items:
+        # vai pegar o quão similar a string é do item
+        similatity = string_similarity(string, item)
+        # se a similaridade for maior do que a registrada
+        # vai atualizar
+        if similatity > highest_score[0]:
+            highest_score[0] = similatity
+            highest_score[-1] = item
+    # se algum item ser pelo menos 30% parecido com a string, vai retornar ele
+    if highest_score[0] >= 0.3:
+        return highest_score[-1]
+    # caso contrario, não retorna nada
+    return None
+
+
+def get_most_similar_items(string: str, list_items: List[str]) -> list:
+    """
+    :param string: String que vai ser comparada com a lista
+    :param list_items: Uma lista de strings que vão ser comparadas com a primeira string
+    :type string: str
+    :type list_items: List[str]
+    :return: Vai retornar uma lista com os itens mais parecidos com a string base
+    :rtype: list
+    """
+    list_items_cp = list_items.copy()
+    ms = []
+    for _ in list_items:
+        most_similar = get_most_similar_item(string, list_items_cp)
+        if most_similar is not None:
+            list_items_cp.remove(most_similar)
+            ms.append(most_similar)
+        else:
+            break
+    return ms[:5]
+
+
+def difference_between_lists(list1: list, list2: list) -> list:
+    """
+    :param list1: Primeira lista
+    :param list2: Segunda lista
+    :type list1: list
+    :type list2: list
+    :return: Vai retornar uma lista, com os itens que não se repetiram nas listas
+    :rtype: list
+    """
+    return list(list(set(list1) - set(list2)) + list(set(list2) - set(list1)))

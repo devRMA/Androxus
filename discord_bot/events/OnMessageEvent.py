@@ -14,7 +14,6 @@ from discord_bot.database.Repositories.BlacklistRepository import BlacklistRepos
 from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
-from discord_bot.database.Servidor import Servidor
 from discord_bot.utils import permissions
 
 
@@ -108,9 +107,12 @@ async def on_message_event(bot, message):
                             await channel.send(comando_personalizado.resposta.format(tempo=str(stopwatch)))
                             return
     if (f'<@{str(bot.user.id)}>' == message.content) or (f'<@!{str(bot.user.id)}>' == message.content):
-        await channel.send(f'Use o comando ``{prefixo}help`` para obter ajuda!')
+        await channel.send(f'Use o comando ``{prefixo}cmds`` para obter todos os meus comandos!')
         if permissions.can_use_external_emojis(ctx):
             await channel.send('<a:hello:755774680949850173>')
+        conexao.fechar()
+        stopwatch.stop()
+        return
     conexao.fechar()
     stopwatch.stop()
     await bot.process_commands(message)

@@ -7,6 +7,7 @@ __author__ = 'Rafael'
 import asyncio
 from datetime import datetime
 from os.path import exists
+from os import remove
 
 import discord
 from PIL import Image
@@ -15,28 +16,20 @@ from PIL import ImageFont
 from discord.ext import commands
 from py_expression_eval import Parser
 
-from discord_bot.modelos.EmbedHelp import embedHelp
+from discord_bot.Classes import Androxus
 from discord_bot.utils.Utils import random_color
 
 
-class Math(commands.Cog):
+class Math(commands.Cog, command_attrs=dict(category='matemática')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True, aliases=['help_operações', 'help_operacoes', 'help_ops'])
-    async def help_operators(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.operators.name,
-                          descricao=self.operators.description,
-                          exemplos=['``{pref}operações``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.operators.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(name='operações', aliases=['operators', 'operacoes', 'ops'],
-                      description='Todas as operações que eu suporto no comando ``calc``!')
-    async def operators(self, ctx):
+    @commands.command(name='operações',
+                      aliases=['operators', 'operacoes', 'ops'],
+                      description='Todas as operações que eu suporto no comando ``calc``!',
+                      examples=['``{prefix}operações``', '{prefix}ops'],
+                      cls=Androxus.Command)
+    async def _operators(self, ctx):
         operators = {
             'Operador: ``+``': 'Adição\nEx: ``2 + 2``\nVou responder: ``4``',
             'Operador: ``-``': 'Subtração\nEx: ``3 - 1``\nVou responder: ``2``',
@@ -74,24 +67,17 @@ class Math(commands.Cog):
                             inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True, aliases=['help_calcular'])
-    async def help_calc(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.calc.name,
-                          descricao='Eu vou virar uma calculadora! (Caso você queira saber quais operações eu aceito' +
-                                    ', use o comando ``operações``)',
-                          parametros=['<Operação(ões)>'],
-                          exemplos=['``{pref}calc`` ``2 + 5 * 2``',
-                                    '``{pref}calcular`` ``(2 + 5) * 2``',
-                                    '``{pref}calc`` ``5 ^ 5``',
-                                    '``{pref}calc`` ``2.5 * 4``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.calc.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['calcular'], description='Vou virar uma calculadora xD')
-    async def calc(self, ctx, *args):
+    @commands.command(name='calc',
+                      aliases=['calcular'],
+                      descricao='Eu vou virar uma calculadora! (Caso você queira saber quais operações eu aceito'
+                                ', use o comando ``operações``)',
+                      parameters=['<operação(ões)>'],
+                      examples=['``{prefix}calc`` ``2 + 5 * 2``',
+                                '``{prefix}calcular`` ``(2 + 5) * 2``',
+                                '``{prefix}calc`` ``5 ^ 5``',
+                                '``{prefix}calc`` ``2.5 * 4``'],
+                      cls=Androxus.Command)
+    async def _calc(self, ctx, *args):
         if len(args) == 0:
             await self.help_calc(ctx)
             return
@@ -149,20 +135,14 @@ class Math(commands.Cog):
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True, aliases=['help_regra_de_3', 'help_r3'])
-    async def help_regra_de_tres(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.regra_de_tres.name,
-                          descricao='Eu vou virar realizar uma regra de 3 simples para você!',
-                          exemplos=['``{pref}regra_de_tres``',
-                                    '``{pref}r3``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.regra_de_tres.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['regra_de_3', 'r3'], description='Eu vou fazer uma regra de três simples!')
-    async def regra_de_tres(self, ctx):
+    @commands.command(name='regra_de_tres',
+                      aliases=['regra_de_3', 'r3'],
+                      description='Eu vou fazer uma regra de três simples!',
+                      parameters=['<operação(ões)>'],
+                      examples=['``{prefix}regra_de_tres``',
+                                '``{prefix}r3``'],
+                      cls=Androxus.Command)
+    async def _regra_de_tres(self, ctx):
         # TODO
         await ctx.send(
             f'Olá {ctx.author.mention}!\nPrimeiro, qual regra de três você quer que eu faça? ' +
@@ -266,6 +246,7 @@ class Math(commands.Cog):
                 img.close()
                 await ctx.send(embed=embed,
                                file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
+                remove(f'{path}images/regra_de_tres_direta-edited.png')
             else:
                 await ctx.send('Modo selecionado: ``inversamente proporcional``!')
                 valores = [
@@ -345,6 +326,7 @@ class Math(commands.Cog):
                 img.close()
                 await ctx.send(embed=embed,
                                file=discord.File(f'{path}images/regra_de_tres_inversa-edited.png'))
+                remove(f'{path}images/regra_de_tres_inversa-edited.png')
         else:
             await ctx.send(f'{ctx.author.mention} eu não sei o que é ' +
                            f'``{msg.content}``! Eu aceito apenas ``inversamente`` ou ``diretamente``')

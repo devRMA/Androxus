@@ -13,31 +13,26 @@ import psutil
 from discord.ext import commands
 from stopwatch import Stopwatch
 
+from discord_bot.Classes import Androxus
 from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from discord_bot.database.Repositories.InformacoesRepository import InformacoesRepository
-from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import get_last_commit
+from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
+from discord_bot.utils.Utils import get_last_commit, capitalize
 from discord_bot.utils.Utils import get_last_update, datetime_format
 from discord_bot.utils.Utils import random_color
 
 
-class Botinfo(commands.Cog):
+class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True, aliases=['help_info', 'help_detalhes'])
-    async def help_botinfo(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.botinfo.name,
-                          descricao=self.botinfo.description,
-                          exemplos=['``{pref}botinfo``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.botinfo.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['info', 'detalhes'], description='Mostra algumas informações sobre mim!')
-    async def botinfo(self, ctx):
+    @commands.command(name='botinfo',
+                      aliases=['info', 'detalhes'],
+                      description='Mostra algumas informações sobre mim!',
+                      examples=['``{prefix}botinfo``'],
+                      cls=Androxus.Command)
+    async def _botinfo(self, ctx):
         async with ctx.typing():  # vai aparecer "bot está digitando"
             stopwatch_banco = Stopwatch()
             conexao = Conexao()
@@ -113,19 +108,12 @@ class Botinfo(commands.Cog):
         await ctx.send(embed=embed)
         conexao.fechar()
 
-    @commands.command(hidden=True, aliases=['help_github', 'help_programação'])
-    async def help_source(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.source.name,
-                          descricao=self.source.description,
-                          exemplos=['``{pref}source``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.source.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['github', 'programação'], description='Mostra o meu código fonte!')
-    async def source(self, ctx):
+    @commands.command(name='source',
+                      aliases=['github', 'programação'],
+                      description='Mostra o meu código fonte!',
+                      examples=['``{prefix}source``'],
+                      cls=Androxus.Command)
+    async def _source(self, ctx):
         embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot feito em python, com ' +
                                     'a API do discord e um banco de dados!',
                               colour=discord.Colour(random_color()),
@@ -139,19 +127,12 @@ class Botinfo(commands.Cog):
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True, aliases=['help_latency', 'help_latência'])
-    async def help_ping(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.ping.name,
-                          descricao=self.ping.description,
-                          exemplos=['``{pref}ping``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.ping.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['latency', 'latência'], description='Mostra a minha latência atual.')
-    async def ping(self, ctx):
+    @commands.command(name='ping',
+                      aliases=['latency', 'latência'],
+                      description='Mostra a minha latência atual.',
+                      examples=['``{prefix}ping``'],
+                      cls=Androxus.Command)
+    async def _ping(self, ctx):
         from stopwatch import Stopwatch
         stopwatch_banco = Stopwatch()
         conexao = Conexao()
@@ -165,37 +146,26 @@ class Botinfo(commands.Cog):
                                            f'Tempo para enviar uma mensagem: {str(stopwatch_message)}!\n'
                                            '<a:hello:755774680949850173>')
 
-    @commands.command(hidden=True, aliases=['help_convidar', 'help_convite'])
-    async def help_invite(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.invite.name,
-                          descricao=self.invite.description,
-                          exemplos=['``{pref}invite``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.invite.aliases.copy())
-        await ctx.send(embed=embed)
+    @commands.command(name='invite',
+                      aliases=['convidar', 'convite'],
+                      description='Mostra o link que você usa para me adicionar em seu servidor',
+                      examples=['``{prefix}invite``'],
+                      cls=Androxus.Command)
+    async def _invite(self, ctx):
+        e = discord.Embed(title=f'Invite',
+                          colour=discord.Colour(random_color()),
+                          description=f'Clique [aqui](https://discord.com/oauth2/authorize?client_id={self.bot.user.id}'
+                                      '&scope=bot&permissions=604892375) para me adicionar em outro servidor! <a:love:7'
+                                      '63523322675068958>',
+                          timestamp=datetime.utcnow())
+        await ctx.send(embed=e)
 
-    @commands.command(aliases=['convidar', 'convite'],
-                      description='Mostra o link que você usa para me adicionar em seu servidor')
-    async def invite(self, ctx):
-        await ctx.send(
-            f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=604892375')
-
-    @commands.command(hidden=True, aliases=['help_ultima_att', 'help_última_att', 'help_att_log'])
-    async def help_changelog(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.changelog.name,
-                          descricao='Mostra quando foi a minha última atualização e ainda mostra o que foi alterado.',
-                          exemplos=['``{pref}changelog``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.changelog.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['ultima_att', 'última_att', 'att_log'],
-                      description='Mostra qual foi a última atualização que eu tive!')
-    async def changelog(self, ctx):
+    @commands.command(name='changelog',
+                      aliases=['ultima_att', 'última_att', 'att_log'],
+                      description='Mostra quando foi a minha última atualização e ainda mostra o que foi alterado.',
+                      examples=['``{prefix}changelog``'],
+                      cls=Androxus.Command)
+    async def _changelog(self, ctx):
         async with ctx.channel.typing():  # vai aparecer "bot está digitando"
             embed = discord.Embed(title=f'Ultima atualização que eu tive:',
                                   colour=discord.Colour(random_color()),
@@ -208,19 +178,12 @@ class Botinfo(commands.Cog):
                             inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command(hidden=True, aliases=['help_tempo_on'])
-    async def help_uptime(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.uptime.name,
-                          descricao=self.uptime.description,
-                          exemplos=['``{pref}uptime``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.uptime.aliases.copy())
-        await ctx.send(embed=embed)
-
-    @commands.command(aliases=['tempo_on'], description='Mostra a quanto tempo eu estou online!')
-    async def uptime(self, ctx):
+    @commands.command(name='uptime',
+                      aliases=['tempo_on'],
+                      description='Mostra a quanto tempo eu estou online!',
+                      examples=['``{prefix}uptime``'],
+                      cls=Androxus.Command)
+    async def _uptime(self, ctx):
         embed = discord.Embed(title=f':timer: Quando eu liguei:',
                               description=f'``{datetime_format(self.bot.uptime)}``',
                               colour=discord.Colour(random_color()),
@@ -228,6 +191,46 @@ class Botinfo(commands.Cog):
         embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
+
+    @commands.command(name='cmds',
+                      aliases=['comandos', 'listar_comandos', 'list_cmds'],
+                      description='A lista com todos os comandos que eu tenho!',
+                      examples=['``{prefix}cmds``', '``{prefix}comandos``'],
+                      cls=Androxus.Command)
+    async def _cmds(self, ctx):
+        e = discord.Embed(title='Todos os meus comandos',
+                          colour=discord.Colour(random_color()),
+                          description=f'Caso você queira saber mais informações sobre um comando, '
+                                      'digite \'help comando\'',
+                          timestamp=datetime.utcnow())
+        e.set_author(name='Androxus', icon_url=self.bot.user.avatar_url)
+        e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+        categories = self.bot.get_all_categories()
+        for category in categories:
+            commands = self.bot.get_commands_from_category(category)
+            if len(commands) != 0:
+                for i in range(len(commands)):
+                    commands[i] = f'``{commands[i]}``'
+                e.add_field(
+                    name=f'{self.bot.get_emoji_from_category(category)} {capitalize(category)} ({len(commands)})',
+                    value=f'{", ".join(commands)}.',
+                    inline=False)
+        if ctx.guild:
+            conexao = Conexao()
+            servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
+            cmds_personalizados = ComandoPersonalizadoRepository().get_commands(conexao, servidor)
+            conexao.fechar()
+            commands = []
+            if len(cmds_personalizados) >= 1:
+                for comando_personalizado in cmds_personalizados:
+                    commands.append(f'``{comando_personalizado.comando}``')
+                commands.sort()
+                e.add_field(name=f'{self.bot.get_emoji_from_category("personalizado")} Comandos personalizados (são '
+                                 'comandos exclusivos deste servidor, e não precisam do prefixo)'
+                                 f'({len(commands)})',
+                            value=f'{", ".join(commands)}.',
+                            inline=False)
+        await ctx.send(embed=e)
 
 
 def setup(bot):

@@ -14,3 +14,8 @@ class ComandoDesativado:
     def __init__(self, servidor, comando):
         self.servidor = servidor
         self.comando = comando
+
+    def __eq__(self, other):
+        if other.__class__ == self.__class__:
+            return (other.servidor.id == self.servidor.id) and (other.comando == self.comando)
+        return False

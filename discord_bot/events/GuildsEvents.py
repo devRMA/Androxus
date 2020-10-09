@@ -43,7 +43,7 @@ class GuildsEvents(commands.Cog):
                                 str(entry.target) == str(self.bot.user)):
                             adm = f' {entry.user.mention}'
                 await to_send.send(f'{get_emoji_dance()}\nOlá{adm}! Obrigado por me adicionar em seu servidor!\n' +
-                                   'Para saber meus comandos, digite ``--help``!')
+                                   'Para saber todos os meus comandos, digite ``--cmds``!')
             except:
                 pass
 

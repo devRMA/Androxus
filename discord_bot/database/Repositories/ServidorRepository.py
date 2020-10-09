@@ -65,7 +65,7 @@ class ServidorRepository(IServidorRepository):
             if resposta:  # se vier alguma coisa:
                 # apenas encurtando a variavel, para que a linha do return não ficasse muito grande
                 r = resposta
-                return Servidor(serverId, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10])
+                return Servidor(serverId, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9])
             return None  # se não veio nada, retorna Nulo
         except Exception as e:
             raise e  # se acontecer algum erro...
@@ -85,7 +85,7 @@ class ServidorRepository(IServidorRepository):
             self.create(conn, servidor)
             return True  # vai retornar True, pra dizer que não houve nenhum erro
         try:  # se ele já existe, vai atualizar
-            query = 'CALL server_update(%s, %s);'
+            query = 'CALL server_update(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);'
             # vai substituir os %s pelos valores do servidor passado, respectivamente
             cursor.execute(query, (servidor.prefixo,
                                    servidor.channel_id_log,
@@ -96,8 +96,7 @@ class ServidorRepository(IServidorRepository):
                                    servidor.tag_alterado,
                                    servidor.nick_alterado,
                                    servidor.role_alterado,
-                                   servidor.status_alterado,
-                                   servidor.activity_alterado,
+                                   servidor.sugestao_de_comando,
                                    servidor.id,))
             conn.salvar()
             return True

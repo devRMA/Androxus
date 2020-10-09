@@ -1,6 +1,7 @@
 async-timeout
 asyncio
 discord.py
+discord
 pandas
 psycopg2
 stopwatch.py
@@ -11,3 +12,4 @@ py_expression_eval
 googletrans
 Pillow
 currency-exchange
+jellyfish

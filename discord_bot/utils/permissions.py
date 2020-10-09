@@ -11,7 +11,9 @@ from discord_bot.utils.Utils import get_configs
 
 
 def is_owner(ctx):
-    return ctx.author.id in get_configs()['owners']
+    if ctx.author.id in get_configs()['owners']:
+        return True
+    raise commands.errors.NotOwner('You do not own this bot.')
 
 
 async def check_permissions(ctx, perms, *, check=all):
@@ -43,6 +45,7 @@ def can_upload(ctx):
 
 def can_react(ctx):
     return isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).add_reactions
+
 
 def can_use_external_emojis(ctx):
     return isinstance(ctx.channel, discord.DMChannel) or ctx.channel.permissions_for(ctx.guild.me).external_emojis

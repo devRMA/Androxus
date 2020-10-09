@@ -18,3 +18,8 @@ class ComandoPersonalizado:
         self.comando = comando
         self.resposta = resposta
         self.in_text = inText
+
+    def __eq__(self, other):
+        if other.__class__ == self.__class__:
+            return (other.servidor.id == self.servidor.id) and (other.comando == self.comando)
+        return False

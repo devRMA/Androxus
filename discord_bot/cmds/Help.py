@@ -4,123 +4,149 @@
 
 __author__ = 'Rafael'
 
+import asyncio
 from datetime import datetime
 
+import currency_exchange
 import discord
 from discord.ext import commands
-from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
-from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
-from discord_bot.database.Conexao import Conexao
-from discord_bot.database.Servidor import Servidor
+from googletrans import Translator
 
-from discord_bot.modelos.EmbedHelp import embedHelp
-from discord_bot.utils.Utils import random_color
+from discord_bot.Classes import Androxus
+from discord_bot.modelos.embedHelpCategory import embedHelpCategory
+from discord_bot.modelos.embedHelpCommand import embedHelpCommand
+from discord_bot.utils.Utils import random_color, get_most_similar_item, string_similarity
 
 
-class Help(commands.Cog):
-    # TODO
+class Help(commands.Cog, command_attrs=dict(category='bot_info')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True, aliases=['help_ajuda'])
-    async def help_help(self, ctx):
-        embed = embedHelp(self.bot,
-                          ctx,
-                          comando=self.help.name,
-                          descricao=self.help.description,
-                          parametros=['[comando]'],
-                          exemplos=['``{pref}help``', '``{pref}ajuda`` ``adicionar_comando``'],
-                          # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                          aliases=self.help.aliases.copy())
-        await ctx.send(embed=embed)
+    @commands.command(name='help',
+                      aliases=['ajuda'],
+                      description='Mostra mais detalhes sobre um comando.\n**Para obter os meus comandos, '
+                                  'digite "cmds"**!',
+                      parameters=['[comando/categoria]'],
+                      examples=['``{prefix}help``',
+                                '``{prefix}ajuda`` ``adicionar_comando``'],
+                      cls=Androxus.Command)
+    async def _help(self, ctx, *, comando=None):
+        e = None
+        # se o comando foi chamado pela pessoa assim: "help ..." e se a pessoa passou alguma coisa
+        # se o comando for None, vai mostrar a ajuda do comando "help" ou qualquer outro que vier no ctx
+        if (ctx.command.name == 'help') and (comando is not None):
+            # vai verificar se o que a pessoa passou não foi uma categoria
+            command = None
+            if not self.bot.is_category(comando):
+                command = self.bot.get_command(comando)
+                # se o comando estiver "escondido"
+                if (command is not None) and command.hidden:
+                    command = None
+                # se o bot não achar o comando com esse nome
+                if command is None:
+                    embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>',
+                                          colour=discord.Colour(random_color()),
+                                          description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
+                                          timestamp=datetime.utcnow())
+                    embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+                    embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                    msg = '```ini\n[•] Veja se você não digitou algo errado'
+                    all_commands = []
+                    for command in self.bot.get_all_commands():
+                        all_commands.append(command.name)
+                        all_commands.append(command.category)
+                        for alias in command.aliases:
+                            all_commands.append(alias)
+                    comando = str(ctx.message.content.lower()).replace(ctx.prefix, '').split(' ')[0]
+                    sugestao = get_most_similar_item(comando, all_commands)
+                    # se a sugestão for pelo menos 50% semelhante ao comando
+                    if (sugestao is not None) and (string_similarity(comando, sugestao) >= 0.5):
+                        msg += f'\n[•] Você quis dizer {sugestao}?'
+                    embed.add_field(name='**Possiveis soluções:**',
+                                    value=f'{msg}```',
+                                    inline=False)
+                    return await ctx.send(embed=embed)
+            else:
+                # se a pessoa usou o comando "help diversão" vai mostrar todos os comandos
+                # que estão nessa categoria
+                e = embedHelpCategory(self.bot, ctx, comando)
+            # se não passou pelo return , vai atribuir o comando ao ctx.command
+            ctx.command = command
+            # o help do comando money é diferente, por isso esta condição
+            if (ctx.command is not None) and (ctx.command.name == 'money'):
+                embed1 = embedHelpCommand(self.bot, ctx)
+                embed1.add_field(name=f'Para saber todas as abreviações das moedas que eu aceito, clique em ➕',
+                                 value=f'** **',
+                                 inline=True)
+                embed2 = discord.Embed(title=f'Todas as moedas que eu aceito no comando "money"',
+                                       colour=discord.Colour(random_color()),
+                                       description='** **',
+                                       timestamp=datetime.utcnow())
+                translator = Translator()
+                moedas = ''
+                for c in currency_exchange.currencies():
+                    moedas += f'{c}\n'
+                moedas = translator.translate(moedas, dest='pt').text
+                for c in moedas.splitlines():
+                    abreviacao, moeda = c.split(' - ')
+                    embed2.add_field(name=f'**{abreviacao}**',
+                                     value=f'{moeda}',
+                                     inline=True)
 
-    @commands.command(aliases=['ajuda'], description='Mostra a mensagem de ajuda de um comando.')
-    async def help(self, ctx, *comando):
-        if len(comando) == 0:
-            conexao = Conexao()
-            async with ctx.channel.typing():  # vai aparecer "bot está digitando"
-                servidor = None
-                if ctx.guild:
-                    servidor = Servidor(ctx.guild.id, ctx.prefix)
-                cor = random_color()
-                embed = embedHelp(self.bot,
-                                  ctx,
-                                  comando=self.help.name,
-                                  descricao=self.help.description,
-                                  parametros=['[comando]'],
-                                  exemplos=['``{pref}help``', '``{pref}ajuda`` ``adicionar_comando``'],
-                                  # precisa fazer uma copia da lista, senão, as alterações vão refletir aqui tbm
-                                  aliases=self.help.aliases.copy(),
-                                  cor=cor)
-                lista_de_comando = discord.Embed(title=f'Lista de comandos:',
-                                                 colour=discord.Colour(cor),
-                                                 description='Estes são os comandos que eu tenho (todos abaixo ' +
-                                                             f'precisam do prefixo ``{ctx.prefix}``)',
-                                                 timestamp=datetime.utcnow())
-                lista_de_comando.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
-                lista_de_comando.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-                if servidor:
-                    comandos_desativados = ComandoDesativadoRepository().get_commands(conexao, servidor)
-                else:
-                    comandos_desativados = []
-                for cog in self.bot.cogs:  # adiciona os comandos padrões no embed
-                    for command in self.bot.get_cog(cog).get_commands():
-                        if not command.hidden:  # se o comando não estiver privado
-                            emoji = '<a:ativado:755774682334101615>'
-                            if comandos_desativados:
-                                for comando_desativado in comandos_desativados:
-                                    if command.name.lower() in comando_desativado.comando.lower():
-                                        emoji = '<a:desativado:755774682397147226>'
-                                for aliases in command.aliases:  # também verifica os "sinônimos"
-                                    if aliases.lower() in comando_desativado.comando.lower():
-                                        emoji = '<a:desativado:755774682397147226>'
-                            lista_de_comando.add_field(name=f'{emoji}``{command.name}``',
-                                                       value=str(command.description),
-                                                       inline=True)
-                if servidor:  # adiciona os comandos personalizados na lista
-                    comandos_personalizados = ComandoPersonalizadoRepository().get_commands(conexao, servidor)
-                    if len(comandos_personalizados) >= 1:
-                        lista_de_comando.add_field(name='**Comandos personalizados:**',
-                                                   value='Estes sãos os comandos personalizados deste servidor.' +
-                                                         ' **Não precisam do prefixo**',
-                                                   inline=False)
-                        for comando_personalizado in comandos_personalizados:
-                            emoji_personalizado = '<a:check:755775267275931799>'
-                            for comando_desativado in comandos_desativados:
-                                if comando_personalizado.comando.lower() in comando_desativado.comando.lower():
-                                    emoji_personalizado = '<a:desativado:755774682397147226>'
-                            if comando_personalizado.in_text:  # se o in_text estiver on:
-                                lista_de_comando.add_field(
-                                    name=f'{emoji_personalizado}``{comando_personalizado.comando}``',
-                                    value=f'Eu irei responder **independente da posição do comando na mensagem**.',
-                                    inline=True)
-                            else:
-                                lista_de_comando.add_field(
-                                    name=f'{emoji_personalizado}``{comando_personalizado.comando}``',
-                                    value=f'Eu irei responder **apenas se a mensagem iniciar com o comando**',
-                                    inline=True)
-            await ctx.send(embed=embed)
-            await ctx.send(embed=lista_de_comando)
-            conexao.fechar()
-        else:
-            comando = ' '.join(comando)
-            for cog in self.bot.cogs:  # Abre todos os cogs que o bot têm
-                for command in self.bot.get_cog(cog).get_commands():  # pega todos os comandos do cog
-                    if (str(command) == f'help_{comando.lower()}') or (
-                            f'help_{comando.lower()}' in command.aliases):  # se o comando for help_comando
-                        return await command(ctx)  # chama ele xD
-            cor = random_color()
-            embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>',
-                                  colour=discord.Colour(cor),
-                                  description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
-                                  timestamp=datetime.utcnow())
-            embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
-            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            embed.add_field(name='**Possiveis soluções:**',
-                            value='```ini\n[•] Veja se você não digitou algo errado\n[•] A ajuda só funciona para' +
-                                  ' comandos padrões, ou seja, comandos personalizados não têm ajuda.```',
-                            inline=False)
-            return await ctx.send(embed=embed)
+                async def menu_help(ctx, msg):
+                    # fica verificando a pagina 1, para ver se é para ir para a pagina 2
+                    def check_page1(reaction, user):
+                        return (user.id == ctx.author.id) and (str(reaction.emoji) == '➡')
+
+                    # fica verificando a pagina 2, para ver se é para ir para a pagina 1
+                    def check_page2(reaction, user):
+                        return (user.id == ctx.author.id) and (str(reaction.emoji) == '⬅')
+
+                    async def check_reactions_without_perm(ctx, msg, bot):
+                        # mudas as páginas, se o bot não tiver perm pra apagar reações
+                        while True:
+                            await bot.wait_for('reaction_add', timeout=900.0, check=check_page1)
+                            await msg.delete()
+                            msg = await ctx.send(embed=embed2)
+                            await msg.add_reaction('⬅')
+                            await bot.wait_for('reaction_add', timeout=900.0, check=check_page2)
+                            await msg.delete()
+                            msg = await ctx.send(embed=embed1)
+                            await msg.add_reaction('➡')
+
+                    async def check_reactions_with_perm(msg, bot):
+                        # mudas as páginas, se o bot tiver perm pra apagar reações
+                        while True:
+                            await bot.wait_for('reaction_add', timeout=900.0, check=check_page1)
+                            await msg.clear_reactions()
+                            await msg.add_reaction('⬅')
+                            await msg.edit(embed=embed2)
+                            await bot.wait_for('reaction_add', timeout=900.0, check=check_page2)
+                            await msg.clear_reactions()
+                            await msg.add_reaction('➡')
+                            await msg.edit(embed=embed1)
+
+                    # se foi usado num servidor:
+                    if ctx.guild:
+                        # se o bot tiver perm pra usar o "clear_reactions"
+                        if ctx.guild.me.guild_permissions.manage_messages:
+                            await check_reactions_with_perm(msg, self.bot)
+                        else:  # se o bot não tiver permissão:
+                            await check_reactions_without_perm(ctx, msg, self.bot)
+                    else:  # se não for usado no servidor:
+                        await check_reactions_without_perm(ctx, msg, self.bot)
+
+                msg_bot = await ctx.send(embed=embed1)
+                await msg_bot.add_reaction('➡')
+                try:
+                    # vai fica 1 minuto e meio esperando o usuário apertas nas reações
+                    await asyncio.wait_for(menu_help(ctx, msg_bot), timeout=90.0)
+                except asyncio.TimeoutError:  # se acabar o tempo
+                    pass
+                return
+        if e is None:
+            e = embedHelpCommand(self.bot, ctx)
+        return await ctx.send(embed=e)
 
 
 def setup(bot):

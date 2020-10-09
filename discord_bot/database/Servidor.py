@@ -10,7 +10,7 @@ from discord_bot.utils.Utils import get_configs
 class Servidor:
     id: int
     prefixo: str
-    channel_id_log: bool
+    channel_id_log: int
     mensagem_deletada: bool
     mensagem_editada: bool
     avatar_alterado: bool
@@ -18,8 +18,7 @@ class Servidor:
     tag_alterado: bool
     nick_alterado: bool
     role_alterado: bool
-    status_alterado: bool
-    activity_alterado: bool
+    sugestao_de_comando: bool
 
     def __init__(self,
                  id,
@@ -32,8 +31,7 @@ class Servidor:
                  tagAlterado=False,
                  nickAlterado=False,
                  roleAlterado=False,
-                 statusAlterado=False,
-                 activityAlterado=False):
+                 sugestaoDeComando=True):
         self.id = id
         self.prefixo = prefix or get_configs()['default_prefix']
         self.channel_id_log = channelIdLog
@@ -44,5 +42,4 @@ class Servidor:
         self.tag_alterado = tagAlterado
         self.nick_alterado = nickAlterado
         self.role_alterado = roleAlterado
-        self.status_alterado = statusAlterado
-        self.activity_alterado = activityAlterado
+        self.sugestao_de_comando = sugestaoDeComando

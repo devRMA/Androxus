@@ -5,6 +5,7 @@
 __author__ = 'Rafael'
 
 from abc import ABCMeta, abstractmethod
+
 from discord_bot.database.Conexao import Conexao
 
 

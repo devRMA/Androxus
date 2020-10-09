@@ -38,7 +38,7 @@ class ComandoPersonalizadoRepository(IComandoPersonalizadoRepository):
             cursor.execute(query, (comandoPersonalizado.servidor.id,
                                    comandoPersonalizado.comando,
                                    comandoPersonalizado.resposta,
-                                   comandoPersonalizado.inText,))
+                                   comandoPersonalizado.in_text,))
             conn.salvar()
             return True  # vai retornar True se tudo ocorrer bem
         except psycopg2.IntegrityError as e:
@@ -87,7 +87,7 @@ class ComandoPersonalizadoRepository(IComandoPersonalizadoRepository):
         try:
             query = 'CALL cmd_personalizado_update(%s, %s, %s, %s);'
             cursor.execute(query, (comandoPersonalizado.resposta,
-                                   comandoPersonalizado.inText,
+                                   comandoPersonalizado.in_text,
                                    comandoPersonalizado.servidor.id,
                                    comandoPersonalizado.comando))
             conn.salvar()
