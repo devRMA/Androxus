@@ -17,8 +17,11 @@ def is_owner(ctx):
 
 
 async def check_permissions(ctx, perms, *, check=all):
-    if is_owner(ctx):
-        return True
+    try:
+        if is_owner(ctx):
+            return True
+    except commands.errors.NotOwner:
+        pass
 
     resolved = ctx.channel.permissions_for(ctx.author)
     return check(getattr(resolved, name, None) == value for name, value in perms.items())
