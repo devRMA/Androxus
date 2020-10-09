@@ -32,7 +32,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                   colour=discord.Colour(random_color()),
                                   description='** **',
                                   timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             embed.set_image(url=ctx.message.mentions[0].avatar_url)
             return await ctx.send(embed=embed)
         else:  # se a pessoa não mencionou ninguém, entra aqui
@@ -49,7 +49,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                                   description='** **',
                                                   timestamp=datetime.utcnow())
                             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-                            embed.set_image(url=user.avatar)
+                            embed.set_image(url=user.avatar_url)
                             return await ctx.send(embed=embed)
                         else:  # se o user for None, é porque o bot não achou esse usuário
                             return await ctx.send('<a:sad:755774681008832623> Não consegui encontrar o usuário' +
@@ -66,8 +66,8 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                       colour=discord.Colour(random_color()),
                                       description='** **',
                                       timestamp=datetime.utcnow())
-                embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
-                embed.set_image(url=ctx.author.avatar)
+                embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+                embed.set_image(url=ctx.author.avatar_url)
                 return await ctx.send(embed=embed)
 
     @commands.command(name='userinfo',
@@ -117,8 +117,8 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                   colour=cor,
                                   description='O máximo de informação que eu consegui encontrar.',
                                   timestamp=datetime.utcnow())
-            info1.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
-            info1.set_thumbnail(url=user.avatar)
+            info1.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+            info1.set_thumbnail(url=user.avatar_url)
             info1.add_field(name="Nome e tag:", value=f'``{user}``', inline=True)
             info1.add_field(name="Id: ", value=f'``{user.id}``', inline=True)
             if hasattr(user, 'nick'):
@@ -136,7 +136,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                       colour=cor,
                                       description='** **',
                                       timestamp=datetime.utcnow())
-                info2.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
+                info2.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
                 info2.set_thumbnail(url=user.avatar_url)
                 if roles is not None:
                     info2.add_field(name=f'Cargos({len(roles.split(", "))}):', value=roles, inline=False)
@@ -239,7 +239,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                   colour=discord.Colour(random_color()),
                                   description='** **',
                                   timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar)
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             embed.set_image(url=ctx.guild.splash_url)
             await ctx.send(embed=embed)
         else:

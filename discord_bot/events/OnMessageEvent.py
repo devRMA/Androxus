@@ -18,6 +18,12 @@ from discord_bot.utils import permissions
 
 
 async def on_message_event(bot, message):
+    try:
+        permissions.is_owner(message)
+    except discord.ext.commands.errors.NotOwner:
+        # se a pessoa não for dona do bot, e ele estiver em manutenção, simplesmente ignora a mensagem
+        if bot.maintenance_mode:
+            return
     if not bot.is_ready():
         return
     if message.author.id == bot.user.id:

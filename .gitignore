@@ -3,3 +3,6 @@
 vendor/
 .env
 __pycache__/
+site/
+composer.lock
+composer.json

@@ -24,6 +24,7 @@ class Androxus(commands.Bot):
     # que o bot vai usar quando mandarem mensagem no privado dele
     dm_channel_log: discord.TextChannel = None
     configurado: bool = False
+    maintenance_mode: bool
     emoji_category: dict = {}
 
     def __init__(self, *args, **kwargs):
@@ -36,6 +37,7 @@ class Androxus(commands.Bot):
         self.msg_traduzidas = []
         self.dm_channel_log = self.get_channel(get_configs()['dm_channel'])
         self.configurado = True
+        self.maintenance_mode = False
         self.emoji_category = {
             'administração': '<:staffs:763807585174290452>',
             'bot_info': '<:bot:763808270426177538>',

@@ -261,10 +261,15 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
-    async def _blacklist(self, ctx, *, pessoaId: int):
+    async def _blacklist(self, ctx, *args):
         conexao = Conexao()
+        user_id = None
+        if ctx.message.mentions:
+            user_id = ctx.message.mentions[0].id
+        else:
+            user_id = int(args[0])
         msg = ''
-        if not BlacklistRepository().get_pessoa(conexao, pessoaId):
+        if not BlacklistRepository().get_pessoa(conexao, user_id):
             msg = f'A pessoa pode usar meus comandos! {get_emoji_dance()}'
         else:
             msg = f'<a:no_no:755774680325029889> Essa pessoa não usar meus comandos!'
@@ -302,6 +307,33 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         BlacklistRepository().delete(conexao, user_id)
         conexao.fechar()
         return await ctx.send(f'Usuário perdoado! {get_emoji_dance()}')
+
+    @commands.command(name='manutenção_on',
+                      aliases=['ativar_manutenção'],
+                      description='Ativa o modo "em manutenção" do bot.',
+                      examples=['``{prefix}manutenção_on``',
+                                '``{prefix}ativar_manutenção``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _manutencao_on(self, ctx):
+        self.bot.maintenance_mode = True
+        self.bot.mudar_status = False
+        await self.bot.change_presence(activity=discord.Game(name='Em manutenção!'))
+        await ctx.send('Modo manutenção:\n<a:on:755774680580882562>')
+
+    @commands.command(name='manutenção_off',
+                      aliases=['desativar_manutenção'],
+                      description='Desativa o modo "em manutenção" do bot.',
+                      examples=['``{prefix}manutenção_off``',
+                                '``{prefix}desativar_manutenção``'],
+                      perm_user='administrar a conta do bot',
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _manutencao_off(self, ctx):
+        self.bot.maintenance_mode = False
+        self.bot.mudar_status = True
+        await ctx.send('Modo manutenção:\n<a:off:755774680660574268>')
 
 
 def setup(bot):
