@@ -15,6 +15,7 @@ from stopwatch import Stopwatch
 
 from discord_bot.Classes import Androxus
 from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from discord_bot.database.Repositories.InformacoesRepository import InformacoesRepository
 from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
@@ -198,6 +199,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       examples=['``{prefix}cmds``', '``{prefix}comandos``'],
                       cls=Androxus.Command)
     async def _cmds(self, ctx):
+        conexao = Conexao()
         e = discord.Embed(title='Todos os meus comandos',
                           colour=discord.Colour(random_color()),
                           description=f'Caso você queira saber mais informações sobre um comando, '
@@ -206,20 +208,29 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
         e.set_author(name='Androxus', icon_url=self.bot.user.avatar_url)
         e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         categories = self.bot.get_all_categories()
+        servidor = None
+        if ctx.guild:
+            servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
+            comandos_desativados = [c.comando for c in ComandoDesativadoRepository().get_commands(conexao, servidor)]
         for category in categories:
             commands = self.bot.get_commands_from_category(category)
             if len(commands) != 0:
                 for i in range(len(commands)):
                     commands[i] = f'``{commands[i]}``'
+                if servidor:
+                    # vai remover todos os comandos desativados, da lista que vai aparecer na mensagem
+                    for cmds_off in comandos_desativados:
+                        if cmds_off in commands:
+                            try:
+                                commands = commands.remove(cmds_off)
+                            except:
+                                pass
                 e.add_field(
                     name=f'{self.bot.get_emoji_from_category(category)} {capitalize(category)} ({len(commands)})',
                     value=f'{", ".join(commands)}.',
                     inline=False)
-        if ctx.guild:
-            conexao = Conexao()
-            servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
+        if servidor:
             cmds_personalizados = ComandoPersonalizadoRepository().get_commands(conexao, servidor)
-            conexao.fechar()
             commands = []
             if len(cmds_personalizados) >= 1:
                 for comando_personalizado in cmds_personalizados:
@@ -230,6 +241,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                                  f'({len(commands)})',
                             value=f'{", ".join(commands)}.',
                             inline=False)
+        conexao.fechar()
         await ctx.send(embed=e)
 
 

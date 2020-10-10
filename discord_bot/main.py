@@ -106,9 +106,9 @@ async def request_no_site():
     # desliga a aplicação, então a cada 3 minutos o bot vai fazer
     # um request, para que ele não caia
     url = 'https://androxus.herokuapp.com/'
-    html = get(url).text
-    del (url)
-    del (html)
+    html = get(url)
+    del(url)
+    del(html)
 
 
 if __name__ == '__main__':

@@ -25,6 +25,7 @@ class OnUpdateEvent(commands.Cog):
     async def on_member_update(self, before, after):
         if after.bot: return
         if not self.bot.is_ready(): return
+        if self.bot.maintenance_mode: return
         conexao = Conexao()
         server = ServidorRepository().get_servidor(conexao, after.guild.id)
         conexao.fechar()
@@ -33,9 +34,12 @@ class OnUpdateEvent(commands.Cog):
             if channel is not None:
                 if before.nick != after.nick:
                     if server.nick_alterado:
-                        embed = discord.Embed(title=f'O(A) {after} mudou de nick!\n(id: {after.id})',
+                        embed = discord.Embed(title='Nick alterado',
                                               colour=discord.Colour(random_color()),
-                                              description=f'Nick antigo: {before.nick}\n'
+                                              description=f'O(A) {after.name} mudou de nick!\n'
+                                                          f'User: {after.mention}\n'
+                                                          f'Id: {after.id}\n'
+                                                          f'Nick antigo: {before.nick}\n'
                                                           f'Nick novo: {after.nick}',
                                               timestamp=datetime.utcnow())
                         embed.set_thumbnail(url=str(after.avatar_url))
@@ -56,9 +60,12 @@ class OnUpdateEvent(commands.Cog):
                                 desc = f'Cargo removido: <@&{cargos[0]}>'
                             elif len(cargos) > 1:
                                 desc = 'Cargo removido: ' + ', '.join(cargos)
-                        embed = discord.Embed(title=f'O(A) {after} sofreu alteração nos cargos!\n(id: {after.id})',
+                        embed = discord.Embed(title='Cargos alterados',
                                               colour=discord.Colour(random_color()),
-                                              description=desc,
+                                              description=f'O(A) {after.name} sofreu alteração nos cargos!\n'
+                                                          f'User: {after.mention}\n'
+                                                          f'Id: {after.id}\n'
+                                                          f'{desc}',
                                               timestamp=datetime.utcnow())
                         embed.set_thumbnail(url=str(after.avatar_url))
                         await channel.send(embed=embed)
@@ -67,6 +74,9 @@ class OnUpdateEvent(commands.Cog):
     async def on_user_update(self, before, after):
         if after.bot: return
         if not self.bot.is_ready(): return
+        if self.bot.maintenance_mode: return
+        url_antigo = str(before.avatar_url)
+        url_novo = str(after.avatar_url)
         conexao = Conexao()
         servers_with_user = []
         for guild in self.bot.guilds:
@@ -74,9 +84,12 @@ class OnUpdateEvent(commands.Cog):
                 servers_with_user.append(ServidorRepository().get_servidor(conexao, guild.id))
         conexao.fechar()
         if before.name != after.name:
-            embed = discord.Embed(title=f'O(A) {after} mudou de nome!\n(id: {after.id})',
+            embed = discord.Embed(title='Nome alterado',
                                   colour=discord.Colour(random_color()),
-                                  description=f'Nome antigo: {before.name}\n'
+                                  description=f'O(A) {after.name} mudou de nome!\n'
+                                              f'User: {after.mention}\n'
+                                              f'Id: {after.id}\n'
+                                              f'Nome antigo: {before.name}\n'
                                               f'Nome novo: {after.name}',
                                   timestamp=datetime.utcnow())
             embed.set_thumbnail(url=after.avatar_url)
@@ -86,10 +99,13 @@ class OnUpdateEvent(commands.Cog):
                     if (channel is not None) and server.nome_alterado:
                         await channel.send(embed=embed)
         if before.discriminator != after.discriminator:
-            embed = discord.Embed(title=f'O(A) {after} mudou a tag!\n(id: {after.id})',
+            embed = discord.Embed(title='Tag alterada',
                                   colour=discord.Colour(random_color()),
-                                  description=f'Username antigo: {before}\n'
-                                              f'Username novo: {after}',
+                                  description=f'O(A) {after.name} mudou a tag!\n'
+                                              f'User: {after.mention}\n'
+                                              f'Id: {after.id}\n'
+                                              f'Tag antiga: {before.discriminator}\n'
+                                              f'Tag nova: {after.discriminator}',
                                   timestamp=datetime.utcnow())
             embed.set_thumbnail(url=after.avatar_url)
             for server in servers_with_user:
@@ -97,13 +113,16 @@ class OnUpdateEvent(commands.Cog):
                     channel = self.bot.get_channel(server.channel_id_log)
                     if (channel is not None) and server.tag_alterado:
                         await channel.send(embed=embed)
-        if before.avatar != after.avatar:
+        if before.avatar_url != after.avatar_url:
             try:
-                url_antigo = before.avatar_url
-                url_novo = after.avatar_url
 
-                response_antigo = requests.get(url_antigo)
-                response_novo = requests.get(url_novo)
+                # response_antigo = requests.get(url_antigo)
+                # response_novo = requests.get(url_novo)
+                response_antigo = requests.get(url_antigo, stream=True)
+                response_novo = requests.get(url_novo, stream=True)
+
+                # avatar_antigo = Image.open(BytesIO(response_antigo.content)).resize((512, 512), Image.ANTIALIAS)
+                # avatar_novo = Image.open(BytesIO(response_novo.content)).resize((512, 512), Image.ANTIALIAS)
 
                 avatar_antigo = Image.open(BytesIO(response_antigo.content)).resize((512, 512), Image.ANTIALIAS)
                 avatar_novo = Image.open(BytesIO(response_novo.content)).resize((512, 512), Image.ANTIALIAS)
@@ -115,9 +134,12 @@ class OnUpdateEvent(commands.Cog):
                 base.save(arr, format='PNG')
                 arr.seek(0)
                 file = discord.File(arr, filename='avatar.png')
-                embed = discord.Embed(title=f'O(A) {after} mudou o avatar!\n(id: {after.id})',
+                embed = discord.Embed(title='Avatar alterado',
                                       colour=discord.Colour(random_color()),
-                                      description='Avatar antigo → avatar novo',
+                                      description=f'O(A) {after.name} mudou o avatar!\n'
+                                                  f'User: {after.mention}\n'
+                                                  f'Id: {after.id}\n'
+                                                  'Avatar antigo → avatar novo',
                                       timestamp=datetime.utcnow())
                 embed.set_image(url='attachment://avatar.png')
                 for server in servers_with_user:
@@ -127,8 +149,60 @@ class OnUpdateEvent(commands.Cog):
                             await channel.send(file=file, embed=embed)
             except UnidentifiedImageError:
                 pass
-            except Exception as e:
-                raise e
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, before, after):
+        if after.author.bot: return
+        if not self.bot.is_ready(): return
+        if self.bot.maintenance_mode: return
+        if before.content == after.content: return
+        if after.is_system(): return
+        conexao = Conexao()
+        server = ServidorRepository().get_servidor(conexao, after.guild.id)
+        conexao.fechar()
+        if server.channel_id_log is not None:
+            channel = self.bot.get_channel(server.channel_id_log)
+            if channel is not None:
+                if server.mensagem_editada:
+                    msg_antiga = discord.utils.escape_markdown(before.content)
+                    msg_nova = discord.utils.escape_markdown(after.content)
+                    embed = discord.Embed(title='Mensagem editada',
+                                          colour=discord.Colour(random_color()),
+                                          description=f'Autor: {after.author.name}\n'
+                                                      f'Menção: {after.mention}\n'
+                                                      f'Id: {after.author.id}\n'
+                                                      f'Chat: <#{after.channel.id}>\n'
+                                                      f'Mensagem antiga:```{msg_antiga}```'
+                                                      f'Mensagem nova: ```{msg_nova}```',
+                                          timestamp=datetime.utcnow())
+                    embed.set_thumbnail(url=after.author.avatar_url)
+                    await channel.send(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_message_delete(self, message):
+        if message.author.bot: return
+        if not self.bot.is_ready(): return
+        if self.bot.maintenance_mode: return
+        if message.is_system(): return
+        conexao = Conexao()
+        server = ServidorRepository().get_servidor(conexao, message.guild.id)
+        conexao.fechar()
+        if server.channel_id_log is not None:
+            channel = self.bot.get_channel(server.channel_id_log)
+            if channel is not None:
+                if server.mensagem_deletada:
+                    msg_escaped = discord.utils.escape_markdown(message.content)
+                    embed = discord.Embed(
+                        title=f'Mensagem deletada',
+                        colour=discord.Colour(random_color()),
+                        description=f'Autor: {message.author.name}\n'
+                                    f'Menção: {message.mention}\n'
+                                    f'Id: {message.author.id}\n'
+                                    f'Chat: <#{message.channel.id}>\n'
+                                    f'Mensagem deletada:```{msg_escaped}```',
+                        timestamp=datetime.utcnow())
+                    embed.set_thumbnail(url=message.author.avatar_url)
+                    await channel.send(embed=embed)
 
 
 def setup(bot):

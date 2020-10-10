@@ -19,11 +19,11 @@ from discord_bot.database.Repositories.BlacklistRepository import BlacklistRepos
 from discord_bot.database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from discord_bot.database.Repositories.InformacoesRepository import InformacoesRepository
+from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
 from discord_bot.database.Servidor import Servidor
+from discord_bot.utils import Utils as u
 from discord_bot.utils import permissions
-from discord_bot.utils.Utils import pegar_o_prefixo, random_color, get_emoji_dance, get_last_update, get_last_commit, \
-    get_configs, capitalize, datetime_format, inverter_string, is_number, convert_to_bool, convert_to_string, \
-    string_similarity, get_most_similar_item, get_most_similar_items
+from discord_bot.utils.Utils import get_emoji_dance, random_color
 
 
 class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
@@ -86,9 +86,10 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
-    async def _dm(self, ctx, id: int, *args):
-        user = self.bot.get_user(id)
+    async def _dm(self, ctx, user_id: int, *args):
+        user = self.bot.get_user(user_id)
         if user is not None:
+            foi = False
             if ctx.guild.id != 405826835793051649:
                 try:
                     await ctx.message.delete()
@@ -98,7 +99,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 await user.send(' '.join(args))
                 foi = True
             except discord.errors.Forbidden:
-                foi = False
+                pass
             try:
                 if foi and (ctx.guild.id == 405826835793051649):
                     embed = discord.Embed(title=f'Mensagem enviada no privado do(a) {str(user)}!',
@@ -199,25 +200,27 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             'ComandoDesativadoRepository': ComandoDesativadoRepository,
             'ComandoPersonalizadoRepository': ComandoPersonalizadoRepository,
             'InformacoesRepository': InformacoesRepository,
+            'ServidorRepository': ServidorRepository,
             'ComandoDesativado': ComandoDesativado,
             'ComandoPersonalizado': ComandoPersonalizado,
             'Conexao': Conexao,
             'Servidor': Servidor,
-            'pegar_o_prefixo': pegar_o_prefixo,
-            'random_color': random_color,
-            'get_emoji_dance': get_emoji_dance,
-            'get_last_update': get_last_update,
-            'get_last_commit': get_last_commit,
-            'get_configs': get_configs,
-            'capitalize': capitalize,
-            'datetime_format': datetime_format,
-            'inverter_string': inverter_string,
-            'is_number': is_number,
-            'convert_to_bool': convert_to_bool,
-            'convert_to_string': convert_to_string,
-            'string_similarity': string_similarity,
-            'get_most_similar_item': get_most_similar_item,
-            'get_most_similar_items': get_most_similar_items,
+            'pegar_o_prefixo': u.pegar_o_prefixo,
+            'random_color': u.random_color,
+            'get_emoji_dance': u.get_emoji_dance,
+            'get_last_update': u.get_last_update,
+            'get_last_commit': u.get_last_commit,
+            'get_configs': u.get_configs,
+            'capitalize': u.capitalize,
+            'datetime_format': u.datetime_format,
+            'inverter_string': u.inverter_string,
+            'is_number': u.is_number,
+            'convert_to_bool': u.convert_to_bool,
+            'convert_to_string': u.convert_to_string,
+            'string_similarity': u.string_similarity,
+            'get_most_similar_item': u.get_most_similar_item,
+            'get_most_similar_items': u.get_most_similar_items,
+            'difference_between_lists': u.difference_between_lists,
             'Stopwatch': Stopwatch,
             'ctx': ctx,
             '__import__': __import__
@@ -263,12 +266,10 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
     @commands.check(permissions.is_owner)
     async def _blacklist(self, ctx, *args):
         conexao = Conexao()
-        user_id = None
         if ctx.message.mentions:
             user_id = ctx.message.mentions[0].id
         else:
             user_id = int(args[0])
-        msg = ''
         if not BlacklistRepository().get_pessoa(conexao, user_id):
             msg = f'A pessoa pode usar meus comandos! {get_emoji_dance()}'
         else:
@@ -283,7 +284,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
     @commands.check(permissions.is_owner)
     async def _add_blacklist(self, ctx, *args):
         conexao = Conexao()
-        user_id = None
         if ctx.message.mentions:
             user_id = ctx.message.mentions[0].id
         else:
@@ -299,7 +299,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
     @commands.check(permissions.is_owner)
     async def _remove_blacklist(self, ctx, *args):
         conexao = Conexao()
-        user_id = None
         if ctx.message.mentions:
             user_id = ctx.message.mentions[0].id
         else:

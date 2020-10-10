@@ -375,7 +375,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                     inline=True)
         if servidor.channel_id_log is not None:
             e.add_field(name=f'Log',
-                        value=f'<a:ativado:755774682334101615>\n<#{servidor.channel_id_log}>',
+                        value=f'<a:ativado:755774682334101615>\nEm: <#{servidor.channel_id_log}>',
                         inline=True)
             logs = []
             if servidor.mensagem_deletada:

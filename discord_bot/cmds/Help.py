@@ -13,9 +13,12 @@ from discord.ext import commands
 from googletrans import Translator
 
 from discord_bot.Classes import Androxus
+from discord_bot.database.Conexao import Conexao
+from discord_bot.database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
+from discord_bot.database.Repositories.ServidorRepository import ServidorRepository
 from discord_bot.modelos.embedHelpCategory import embedHelpCategory
 from discord_bot.modelos.embedHelpCommand import embedHelpCommand
-from discord_bot.utils.Utils import random_color, get_most_similar_item, string_similarity
+from discord_bot.utils.Utils import random_color, get_most_similar_item, string_similarity, convert_to_string
 
 
 class Help(commands.Cog, command_attrs=dict(category='bot_info')):
@@ -39,7 +42,28 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
             command = None
             if not self.bot.is_category(comando):
                 command = self.bot.get_command(comando)
-                # se o comando estiver "escondido"
+                comandos_personalizados = []
+                # se não achar um comando, vai procurar nos comandos personalizados
+                if (command is None) and (ctx.guild is not None):
+                    conexao = Conexao()
+                    servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
+                    comandos_personalizados = ComandoPersonalizadoRepository().get_commands(conexao, servidor)
+                    conexao.fechar()
+                    for cmd_pers in comandos_personalizados:
+                        if cmd_pers.comando == comando:
+                            e = discord.Embed(title='<a:loop_fun:763809373046702110> Comando personalizado',
+                                              colour=discord.Colour(random_color()),
+                                              description=f'**Este comando só existe neste servidor!**',
+                                              timestamp=datetime.utcnow())
+                            e.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+                            e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+                            e.add_field(name=f'Comando: ```{cmd_pers.comando}```\n'
+                                             f'Resposta: ```{cmd_pers.resposta}```\n'
+                                             f'Ignorar posição: ```{convert_to_string(cmd_pers.in_text)}```',
+                                        value='** **',
+                                        inline=False)
+                            return await ctx.send(embed=e)
+                # se achou um comando "escondido"
                 if (command is not None) and command.hidden:
                     command = None
                 # se o bot não achar o comando com esse nome
@@ -57,11 +81,16 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                         all_commands.append(command.category)
                         for alias in command.aliases:
                             all_commands.append(alias)
-                    comando = str(ctx.message.content.lower()).replace(ctx.prefix, '').split(' ')[0]
+                    comando = ctx.message.content.lower()[len(ctx.prefix):].split(' ')
+                    if comando[0] == 'help':
+                        comando.pop(0)
+                    comando = comando[0]
+                    if ctx.guild:
+                        all_commands = all_commands + [c.comando for c in comandos_personalizados]
                     sugestao = get_most_similar_item(comando, all_commands)
                     # se a sugestão for pelo menos 50% semelhante ao comando
                     if (sugestao is not None) and (string_similarity(comando, sugestao) >= 0.5):
-                        msg += f'\n[•] Você quis dizer {sugestao}?'
+                        msg += f'\n[•] Você quis dizer "{sugestao}"?'
                     embed.add_field(name='**Possiveis soluções:**',
                                     value=f'{msg}```',
                                     inline=False)

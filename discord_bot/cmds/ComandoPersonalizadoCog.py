@@ -38,7 +38,7 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         if in_text is None:
             return await ctx.send(
                 f'Valor ``{in_text}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
-        if ctx.message.content.count('"') != 4:
+        if ctx.message.content.count('"') < 4:
             return await ctx.send('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n' +
                                   f'{ctx.prefix}adicionar_comando **"**comando**"** **"**resposta**"**')
         if (comando.replace(' ', '') == '') or (resposta.replace(' ', '') == ''):
