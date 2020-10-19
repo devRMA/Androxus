@@ -68,62 +68,61 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
     async def _ban(self, ctx, member: discord.Member = None, *args):
-        async with ctx.typing():  # vai aparecer "bot está digitando"
-            if isinstance(args, tuple):
-                # se chegar como tupla, vai transformar em lista
-                args = list(args)
-            # se a pessoa passou pelo menos o membro, ou algum argumento
-            if args or member:
-                if not member:  # se o membro não foi marcado
-                    # vai ver se a pessoa passou um id
-                    try:
-                        # vai tentar converter para int, o primeiro valor que a pessoa passou
-                        id = int(args[0])
-                    except ValueError:
-                        # se não conseguir:
-                        return await self.bot.send_help(ctx)
-                    else:
-                        # se não entrou no except
-                        args.pop(0)
-                    # vai tentar achar o membro com esse id
-                    try:
-                        member = await ctx.guild.fetch_member(id)
-                    except:
-                        member = None
-                    if member is None:  # se não achou o membro:
-                        return await ctx.send(f'Não consegui encontrar o membro com id `{id}`!')
-                # vai verificar se a pessoa pode usar o comando
-                if ctx.guild.owner == member:
-                    return await ctx.send(f'{ctx.author.mention} você não pode banir o dono do servidor! ' +
-                                          '<:ah_nao:758003636822474887>')
-                elif member == ctx.author:
-                    return await ctx.send(f'{ctx.author.mention} você não pode se banir! ' +
-                                          '<:ah_nao:758003636822474887>')
-                elif member == self.bot.user:
-                    return await ctx.send(f'{ctx.author.mention} eu não posso me banir! ' +
-                                          '<:ah_nao:758003636822474887>')
-                elif ctx.author.id in get_configs()['owners'] or ctx.author == ctx.guild.owner:
-                    pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
-                elif ctx.author.top_role <= member.top_role:
-                    return await ctx.send(f'{ctx.author.mention} você só pode banir pessoas que tenham cargo mais ' +
-                                          'baixo que o seu!')
-                # se sobrou algum argumento, é porque a pessoa passou um motivo
-                reason = None
-                if args:
-                    reason = ' '.join(args)
-            else:
-                # se a pessoa não passou nada:
-                return await self.bot.send_help(ctx)
-            embed = discord.Embed(title=f'<a:banned:756138595882107002> Usuário banido!',
-                                  colour=discord.Colour(random_color()),
-                                  description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
-                                              f'{str(reason).replace("None", "nulo")}',
-                                  timestamp=datetime.utcnow())
-            embed.set_footer(text=str(ctx.author),
-                             icon_url=ctx.author.avatar_url)
-            msg_ban = f'{member.mention} Você foi banido do servidor {ctx.guild}!'
-            if reason:
-                msg_ban += f'\nPelo motivo: {reason}'
+        if isinstance(args, tuple):
+            # se chegar como tupla, vai transformar em lista
+            args = list(args)
+        # se a pessoa passou pelo menos o membro, ou algum argumento
+        if args or member:
+            if not member:  # se o membro não foi marcado
+                # vai ver se a pessoa passou um id
+                try:
+                    # vai tentar converter para int, o primeiro valor que a pessoa passou
+                    id = int(args[0])
+                except ValueError:
+                    # se não conseguir:
+                    return await self.bot.send_help(ctx)
+                else:
+                    # se não entrou no except
+                    args.pop(0)
+                # vai tentar achar o membro com esse id
+                try:
+                    member = await ctx.guild.fetch_member(id)
+                except:
+                    member = None
+                if member is None:  # se não achou o membro:
+                    return await ctx.send(f'Não consegui encontrar o membro com id `{id}`!')
+            # vai verificar se a pessoa pode usar o comando
+            if ctx.guild.owner == member:
+                return await ctx.send(f'{ctx.author.mention} você não pode banir o dono do servidor! ' +
+                                      '<:ah_nao:758003636822474887>')
+            elif member == ctx.author:
+                return await ctx.send(f'{ctx.author.mention} você não pode se banir! ' +
+                                      '<:ah_nao:758003636822474887>')
+            elif member == self.bot.user:
+                return await ctx.send(f'{ctx.author.mention} eu não posso me banir! ' +
+                                      '<:ah_nao:758003636822474887>')
+            elif ctx.author.id in get_configs()['owners'] or ctx.author == ctx.guild.owner:
+                pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
+            elif ctx.author.top_role <= member.top_role:
+                return await ctx.send(f'{ctx.author.mention} você só pode banir pessoas que tenham cargo mais ' +
+                                      'baixo que o seu!')
+            # se sobrou algum argumento, é porque a pessoa passou um motivo
+            reason = None
+            if args:
+                reason = ' '.join(args)
+        else:
+            # se a pessoa não passou nada:
+            return await self.bot.send_help(ctx)
+        embed = discord.Embed(title=f'<a:banned:756138595882107002> Usuário banido!',
+                              colour=discord.Colour(random_color()),
+                              description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
+                                          f'{str(reason).replace("None", "nulo")}',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=str(ctx.author),
+                         icon_url=ctx.author.avatar_url)
+        msg_ban = f'{member.mention} Você foi banido do servidor {ctx.guild}!'
+        if reason:
+            msg_ban += f'\nPelo motivo: {reason}'
         try:
             if not member.bot:
                 msg = await member.send(msg_ban)
@@ -154,59 +153,58 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.bot_has_permissions(kick_members=True)
     @commands.guild_only()
     async def _kick(self, ctx, member: discord.Member = None, *args):
-        async with ctx.typing():  # vai aparecer "bot está digitando"
-            if isinstance(args, tuple):
-                # se chegar como tupla, vai transformar em lista
-                args = list(args)
-            # se a pessoa passou pelo menos o membro, ou algum argumento
-            if args or member:
-                if not member:  # se o membro não foi marcado
-                    # vai ver se a pessoa passou um id
-                    try:
-                        # vai tentar converter para int, o primeiro valor que a pessoa passou
-                        id = int(args[0])
-                    except ValueError:
-                        # se não conseguir:
-                        return await self.bot.send_help(ctx)
-                    else:
-                        # se não entrou no except
-                        args.pop(0)
-                    # vai tentar achar o membro com esse id
-                    member = ctx.guild.get_member(id)
-                    if not member:  # se não achou o membro:
-                        return await ctx.send(f'Não consegui encontrar o membro com id `{id}`!')
-                # vai verificar se a pessoa pode usar o comando
-                if ctx.guild.owner == member:
-                    return await ctx.send(f'{ctx.author.mention} você não pode expulsar o dono do servidor! ' +
-                                          '<:ah_nao:758003636822474887>')
-                elif member == ctx.author:
-                    return await ctx.send(f'{ctx.author.mention} você não pode se expulsar! ' +
-                                          '<:ah_nao:758003636822474887>')
-                elif member == self.bot.user:
-                    return await ctx.send(f'{ctx.author.mention} eu não posso me expulsar! ' +
-                                          '<:ah_nao:758003636822474887>')
-                elif ctx.author.id in get_configs()['owners'] or ctx.author == ctx.guild.owner:
-                    pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
-                elif ctx.author.top_role <= member.top_role:
-                    return await ctx.send(f'{ctx.author.mention} você só pode expulsar pessoas que tenham cargo mais ' +
-                                          'baixo que o seu!')
-                # se sobrou algum argumento, é porque a pessoa passou um motivo
-                reason = None
-                if args:
-                    reason = ' '.join(args)
-            else:
-                # se a pessoa não passou nada:
-                return await self.bot.send_help(ctx)
-            embed = discord.Embed(title=f'Usuário expulso!',
-                                  colour=discord.Colour(random_color()),
-                                  description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
-                                              f'{str(reason).replace("None", "nulo")}',
-                                  timestamp=datetime.utcnow())
-            embed.set_footer(text=str(ctx.author),
-                             icon_url=ctx.author.avatar_url)
-            msg_kick = f'{member.mention} Você foi expulso do servidor {ctx.guild}!'
-            if reason:
-                msg_kick += f'\nPelo motivo: {reason}'
+        if isinstance(args, tuple):
+            # se chegar como tupla, vai transformar em lista
+            args = list(args)
+        # se a pessoa passou pelo menos o membro, ou algum argumento
+        if args or member:
+            if not member:  # se o membro não foi marcado
+                # vai ver se a pessoa passou um id
+                try:
+                    # vai tentar converter para int, o primeiro valor que a pessoa passou
+                    id = int(args[0])
+                except ValueError:
+                    # se não conseguir:
+                    return await self.bot.send_help(ctx)
+                else:
+                    # se não entrou no except
+                    args.pop(0)
+                # vai tentar achar o membro com esse id
+                member = ctx.guild.get_member(id)
+                if not member:  # se não achou o membro:
+                    return await ctx.send(f'Não consegui encontrar o membro com id `{id}`!')
+            # vai verificar se a pessoa pode usar o comando
+            if ctx.guild.owner == member:
+                return await ctx.send(f'{ctx.author.mention} você não pode expulsar o dono do servidor! ' +
+                                      '<:ah_nao:758003636822474887>')
+            elif member == ctx.author:
+                return await ctx.send(f'{ctx.author.mention} você não pode se expulsar! ' +
+                                      '<:ah_nao:758003636822474887>')
+            elif member == self.bot.user:
+                return await ctx.send(f'{ctx.author.mention} eu não posso me expulsar! ' +
+                                      '<:ah_nao:758003636822474887>')
+            elif ctx.author.id in get_configs()['owners'] or ctx.author == ctx.guild.owner:
+                pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
+            elif ctx.author.top_role <= member.top_role:
+                return await ctx.send(f'{ctx.author.mention} você só pode expulsar pessoas que tenham cargo mais ' +
+                                      'baixo que o seu!')
+            # se sobrou algum argumento, é porque a pessoa passou um motivo
+            reason = None
+            if args:
+                reason = ' '.join(args)
+        else:
+            # se a pessoa não passou nada:
+            return await self.bot.send_help(ctx)
+        embed = discord.Embed(title=f'Usuário expulso!',
+                              colour=discord.Colour(random_color()),
+                              description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
+                                          f'{str(reason).replace("None", "nulo")}',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=str(ctx.author),
+                         icon_url=ctx.author.avatar_url)
+        msg_kick = f'{member.mention} Você foi expulso do servidor {ctx.guild}!'
+        if reason:
+            msg_kick += f'\nPelo motivo: {reason}'
         try:
             if not member.bot:
                 msg = await member.send(msg_kick)
@@ -235,24 +233,23 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
     async def _unban(self, ctx, member: BannedMember = None, *args):
-        async with ctx.typing():  # vai aparecer "bot está digitando"
-            if member is None:
-                return await self.bot.send_help(ctx)
-            reason = None
-            if args:
-                reason = ' '.join(args)
-            embed = discord.Embed(title=f'Ban revogado!',
-                                  colour=discord.Colour(random_color()),
-                                  description=f'Usuário: {member.user}\nId: {member.user.id}\nMotivo: ' +
-                                              f'{str(reason).replace("None", "nulo")}',
-                                  timestamp=datetime.utcnow())
-            if member.reason:
-                embed.add_field(name='Antigo ban:',
-                                value=f'{member.reason}',
-                                inline=False)
-            embed.set_footer(text=str(ctx.author),
-                             icon_url=ctx.author.avatar_url)
-            reason = f'Ban revogado por: {ctx.author} —— Motivo: {str(reason).replace("None", "nulo")}'
+        if member is None:
+            return await self.bot.send_help(ctx)
+        reason = None
+        if args:
+            reason = ' '.join(args)
+        embed = discord.Embed(title=f'Ban revogado!',
+                              colour=discord.Colour(random_color()),
+                              description=f'Usuário: {member.user}\nId: {member.user.id}\nMotivo: ' +
+                                          f'{str(reason).replace("None", "nulo")}',
+                              timestamp=datetime.utcnow())
+        if member.reason:
+            embed.add_field(name='Antigo ban:',
+                            value=f'{member.reason}',
+                            inline=False)
+        embed.set_footer(text=str(ctx.author),
+                         icon_url=ctx.author.avatar_url)
+        reason = f'Ban revogado por: {ctx.author} —— Motivo: {str(reason).replace("None", "nulo")}'
         try:
             await ctx.guild.unban(member.user, reason=reason)
         except discord.Forbidden:
