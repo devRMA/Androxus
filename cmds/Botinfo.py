@@ -175,16 +175,15 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       cls=Androxus.Command)
     @commands.max_concurrency(1, commands.BucketType.user)
     async def _changelog(self, ctx):
-        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
-            embed = discord.Embed(title=f'Ultima atualização que eu tive:',
-                                  colour=discord.Colour(random_color()),
-                                  description=f'```{get_last_commit()}```',
-                                  timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}',
-                             icon_url=ctx.author.avatar_url)
-            embed.add_field(name='Atualização feita em:',
-                            value=f'{datetime_format(get_last_update())}',
-                            inline=True)
+        embed = discord.Embed(title=f'Ultima atualização que eu tive:',
+                                colour=discord.Colour(random_color()),
+                                description=f'```{get_last_commit()}```',
+                                timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}',
+                            icon_url=ctx.author.avatar_url)
+        embed.add_field(name='Atualização feita em:',
+                        value=f'{datetime_format(get_last_update())}',
+                        inline=True)
         await ctx.send(embed=embed)
 
     @commands.command(name='uptime',

@@ -82,58 +82,57 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
         if len(args) == 0:
             await self.help_calc(ctx)
             return
-        async with ctx.channel.typing():  # vai aparecer "bot está digitando"
-            args = ' '.join(args)
-            resultado = 0
-            try:
-                parser = Parser()
-                resultado = parser.parse(args).evaluate({})
-                if isinstance(resultado, bool):  # se o resultado veio como True ou False
-                    resultado = convert_to_string(resultado)
-            except OverflowError:
-                resultado = '∞'
-            except ZeroDivisionError:
-                resultado = '∞'
-            except Exception as exception:
-                if 'unexpected' in exception.args[0]:
-                    await ctx.send(
-                        f'Parece que há um erro de digitação!\n```{args}```<:ah_nao:758003636822474887>')
-                    return
-                elif 'undefined variable' in exception.args[0]:
-                    variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
-                    await ctx.send(
-                        f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` <a:sad:755774681008832623>')
-                    return
-                elif 'unknown character' in exception.args[0]:
-                    await ctx.send(
-                        f'Desculpe, mas você digitou algum caracter que eu não conheço. <a:sad:755774681008832623>')
-                    return
-                elif 'unmatched "()"' in exception.args[0]:
-                    await ctx.send(
-                        f'Pare que você esqueceu de abrir ou fechar algum parêntese! <:ah_nao:758003636822474887>')
-                    return
-                elif 'parity' in exception.args[0]:
-                    await ctx.send('Não consigo resolver está equação, verifique se você digitou tudo certo!')
-                    return
-                else:
-                    await ctx.send('<a:sad:755774681008832623> Ocorreu um erro na hora de executar este comando,' +
-                                   f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
-                    return
-            if len(str(resultado)) >= 200:
-                await ctx.send('O resultado desta equação é tão grande que não consigo enviar a resposta!' +
-                               '\n<a:sad:755774681008832623>')
+        args = ' '.join(args)
+        resultado = 0
+        try:
+            parser = Parser()
+            resultado = parser.parse(args).evaluate({})
+            if isinstance(resultado, bool):  # se o resultado veio como True ou False
+                resultado = convert_to_string(resultado)
+        except OverflowError:
+            resultado = '∞'
+        except ZeroDivisionError:
+            resultado = '∞'
+        except Exception as exception:
+            if 'unexpected' in exception.args[0]:
+                await ctx.send(
+                    f'Parece que há um erro de digitação!\n```{args}```<:ah_nao:758003636822474887>')
                 return
-            embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
-                                  colour=discord.Colour(random_color()),
-                                  description='\uFEFF',
-                                  timestamp=datetime.utcnow())
-            embed.add_field(name=f'Calculo:',
-                            value=f'```{args}```',
-                            inline=False)
-            embed.add_field(name=f'Resposta:',
-                            value=f'```{resultado}```',
-                            inline=False)
-            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            elif 'undefined variable' in exception.args[0]:
+                variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
+                await ctx.send(
+                    f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` <a:sad:755774681008832623>')
+                return
+            elif 'unknown character' in exception.args[0]:
+                await ctx.send(
+                    f'Desculpe, mas você digitou algum caracter que eu não conheço. <a:sad:755774681008832623>')
+                return
+            elif 'unmatched "()"' in exception.args[0]:
+                await ctx.send(
+                    f'Pare que você esqueceu de abrir ou fechar algum parêntese! <:ah_nao:758003636822474887>')
+                return
+            elif 'parity' in exception.args[0]:
+                await ctx.send('Não consigo resolver está equação, verifique se você digitou tudo certo!')
+                return
+            else:
+                await ctx.send('<a:sad:755774681008832623> Ocorreu um erro na hora de executar este comando,' +
+                                f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
+                return
+        if len(str(resultado)) >= 200:
+            await ctx.send('O resultado desta equação é tão grande que não consigo enviar a resposta!' +
+                            '\n<a:sad:755774681008832623>')
+            return
+        embed = discord.Embed(title=f'<:calculator:757079712077053982> Resultado:',
+                                colour=discord.Colour(random_color()),
+                                description='\uFEFF',
+                                timestamp=datetime.utcnow())
+        embed.add_field(name=f'Calculo:',
+                        value=f'```{args}```',
+                        inline=False)
+        embed.add_field(name=f'Resposta:',
+                        value=f'```{resultado}```',
+                        inline=False)
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
 
     @commands.command(name='regra_de_tres',
