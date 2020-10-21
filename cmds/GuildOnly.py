@@ -257,7 +257,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             if hasattr(user, 'roles'):
                 roles = ', '.join(
                     [f"<@&{x.id}>" for x in sorted(user.roles, key=lambda x: x.position, reverse=True) if
-                        x.id != ctx.guild.default_role.id]
+                     x.id != ctx.guild.default_role.id]
                 ) if len(user.roles) > 1 else None
             if hasattr(user, 'top_role'):
                 cor = user.top_role.colour.value
@@ -285,25 +285,86 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 badges += '<:hypesquad_balance:767511585080999966>'
             if pf.early_supporter:
                 badges += '<:early_supporter:767511883368366100>'
-            if pf.verified_bot:
-                badges += '<:bot_verified:767514924468404225>'
-            elif user.bot:
+            if user.bot:
                 badges += '<:bot:763808270426177538>'
             if pf.verified_bot_developer or pf.early_verified_bot_developer:
                 badges += '<:dev_tag:763812174514487346>'
             # como o discord não deixar bots verem o profile do user
             # e no profile que diz se a pessoa tem nitro, vamos ver se 
             # ela tem um gif no avatar, se tiver, ela tem nitro
+            # ou vamos ver se ela está dando boost no servidor
             if user.is_avatar_animated():
                 badges += '<a:nitro:767516060785311744>'
-            info1 = discord.Embed(title=f'{badges} {user.display_name}',
-                                    colour=cor,
-                                    description='** **',
-                                    timestamp=datetime.utcnow())
+            elif hasattr(user, 'premium_since'):
+                if user.premium_since is not None:
+                    badges += '<a:nitro:767516060785311744>'
+            if hasattr(user, 'premium_since'):
+                if user.premium_since is not None:
+                    badges += '<a:boost:767518522619985930>'
+            status = ''
+            if hasattr(user, 'raw_status'):
+                if user.raw_status == 'online':
+                    status = '<:online:768461948743843861>'
+                elif user.raw_status == 'dnd':
+                    status = '<:dnd:768461948928655381>'
+                elif user.raw_status == 'idle':
+                    status = '<:idle:768461949041246229>'
+                elif (user.raw_status == 'offline') or (user.raw_status == 'invisible'):
+                    status = '<:offline:768461948790243349>'
+            info1 = discord.Embed(title=f'{badges} {user.display_name} {status}',
+                                  colour=cor,
+                                  description='** **',
+                                  timestamp=datetime.utcnow())
             info1.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             info1.set_thumbnail(url=user.avatar_url)
             info1.add_field(name="📑 Nome e tag:", value=f'`{user}`', inline=True)
             info1.add_field(name="🆔 Id: ", value=f'``{user.id}``', inline=True)
+            if hasattr(user, 'raw_status'):
+                # se a pessoa não estiver offline ou invisivel
+                if (user.raw_status != 'offline') and (user.raw_status != 'invisible'):
+                    if user.is_on_mobile():
+                        plataforma = '📱 Celular'
+                    else:
+                        plataforma = '💻 Pc'
+                    info1.add_field(name="🗯 Está no:", value=f'``{plataforma}``', inline=True)
+            if hasattr(user, 'activities'):
+                activities = user.activities
+                streaming = False
+                custom = False
+                playing = False
+                if len(activities) != 0:
+                    for activity in activities:
+                        if (activity.type.name == 'streaming') and (not streaming):
+                            info1.add_field(name='<:stream:768461948538454017> Fazendo live',
+                                            value=f'**🎙 Plataforma**: `{activity.platform}`\n'
+                                                  f'**🏷 Nome da live**: `{activity.name}`\n'
+                                                  f'**🕛 Começou**: `{datetime_format(activity.created_at)}`',
+                                            inline=True)
+                            streaming = True
+                        elif (activity.type.name == 'custom') and (not custom):
+                            if (activity.emoji is not None) or (activity.name is not None):
+                                if activity.emoji is not None:
+                                    if activity.emoji.id in [c.id for c in self.bot.emojis]:
+                                        emoji = f'{activity.emoji}'
+                                    else:
+                                        emoji = f'❓'
+                                else:
+                                    emoji = '`🚫 Nulo`'
+                                if activity.name is not None:
+                                    texto = f'`{activity.name}`'
+                                else:
+                                    texto = '`🚫 Nulo`'
+                                info1.add_field(name='<a:disco:763811701589803098> Status personalizado',
+                                                value=f'🔰 Emoji: {emoji}\n'
+                                                      f'🖋 Frase: {texto}',
+                                                inline=True)
+                                custom = True
+                        elif (activity.type.name == 'playing') and (not playing):
+                            info1.add_field(name='🕹 Jogando',
+                                            value=f'`{activity.name}`\n**🕛 Começou a jogar:**\n'
+                                                  f'`{datetime_format(activity.start)}`',
+                                            inline=True)
+                            playing = True
             if hasattr(user, 'nick'):
                 if user.nick is not None:
                     info1.add_field(name="🔄 Nickname", value=f'``{user.nick}``', inline=True)
@@ -314,19 +375,19 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 rank_members = [str(c) for c in sorted(user.guild.members, key=lambda x: x.joined_at)]
                 info1.add_field(name="📥 Entrou no servidor em:",
                                 value=f'`{user.joined_at.strftime("%d/%m/%Y")}`({datetime_format(user.joined_at)})'
-                                        f'\nEle está na `{rank_members.index(str(user)) + 1}°` posição, '
-                                        'no rank dos membros mais antigos!',
+                                      f'\n🏆 Está na `{rank_members.index(str(user)) + 1}°` posição, '
+                                      'no rank dos membros mais antigos!',
                                 inline=True)
                 if user.premium_since is not None:
                     info1.add_field(name="<a:boost:767518522619985930> Começou a dar boost neste servidor em:",
                                     value=f'`{user.premium_since.strftime("%d/%m/%Y")}`('
-                                            f'{datetime_format(user.premium_since)})',
+                                          f'{datetime_format(user.premium_since)})',
                                     inline=True)
                 # só vai mostrar as permissões da pessoa, se ela estiver no server
                 info2 = discord.Embed(title=f'{badges} {user.display_name}',
-                                        colour=cor,
-                                        description='** **',
-                                        timestamp=datetime.utcnow())
+                                      colour=cor,
+                                      description='** **',
+                                      timestamp=datetime.utcnow())
                 info2.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
                 info2.set_thumbnail(url=user.avatar_url)
                 if roles is not None:
@@ -492,9 +553,9 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             if member.bot:
                 bots += 1
         embed = discord.Embed(title=f'Informações sobre este servidor!',
-                                colour=discord.Colour(random_color()),
-                                description='O máximo de informação que eu consegui encontrar sobre este servidor.',
-                                timestamp=datetime.utcnow())
+                              colour=discord.Colour(random_color()),
+                              description='O máximo de informação que eu consegui encontrar sobre este servidor.',
+                              timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
 
         if ctx.guild.icon:
@@ -520,13 +581,13 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         embed.add_field(name='🗺 Região', value=f'{str(ctx.guild.region).capitalize()}', inline=True)
         embed.add_field(name='📅 Criado em:',
                         value=f'{ctx.guild.created_at.strftime("%d/%m/%Y")}\n'
-                                f'({datetime_format(ctx.guild.created_at)})', inline=True)
+                              f'({datetime_format(ctx.guild.created_at)})', inline=True)
         rank_members = [str(c) for c in sorted(ctx.guild.members, key=lambda x: x.joined_at)]
         embed.add_field(name='📥 Entrei aqui em:',
                         value=f'`{ctx.guild.me.joined_at.strftime("%d/%m/%Y")}`\n'
-                                f'({datetime_format(ctx.guild.me.joined_at)})\n'
-                                f'Estou na posição `{rank_members.index(str(ctx.guild.me)) + 1}°` no rank dos '
-                                'membros mais antigos.',
+                              f'({datetime_format(ctx.guild.me.joined_at)})\n'
+                              f'Estou na posição `{rank_members.index(str(ctx.guild.me)) + 1}°` no rank dos '
+                              'membros mais antigos.',
                         inline=True)
         await ctx.send(embed=embed)
 

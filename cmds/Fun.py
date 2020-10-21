@@ -71,6 +71,7 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
     @commands.command(name='girar',
                       aliases=['side-down', 'inverter'],
                       description='Eu vou deixar a frase cabeça pra baixo.',
+                      parameters=['<frase>'],
                       examples=['``{prefix}girar`` ``muito show kkk``'],
                       cls=Androxus.Command)
     async def _girar(self, ctx, *, args):

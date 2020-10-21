@@ -164,10 +164,15 @@ def capitalize(string) -> str:
     :return: vai deixar apenas a primeira letra em maiúscula da string
     :rtype: str
     """
+    from string import ascii_lowercase
+    # aqui, vamos pegar o alfabeto em minusculo e adicionar alguma letras com acentuação, que têm maiusculo
+    ascii_lowercase += 'éŕýúíóṕḉĺḱj́ǵśáźçǘńḿẁỳùìòàǜǹm̀ẽỹũĩõãṽñŵêŷûîôâŝĝĥĵẑĉ'
+    if string == '':
+        return ''
     new_string = ''
     foi = False
     for char in string:
-        if (char.upper() != char) and (not foi):
+        if (char.lower() in ascii_lowercase) and (not foi):
             new_string += char.upper()
             foi = True
         else:

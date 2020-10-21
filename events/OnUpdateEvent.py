@@ -71,6 +71,17 @@ class OnUpdateEvent(commands.Cog):
                                               timestamp=datetime.utcnow())
                         embed.set_thumbnail(url=str(after.avatar_url))
                         await channel.send(embed=embed)
+                if (before.premium_since is None) and (after.premium_since is not None):
+                    if server.role_alterado:
+                        # pessoa começou a dar boost
+                        embed = discord.Embed(title='Novo booster',
+                                              colour=discord.Colour(0xffdcf4),
+                                              description=f'O(A) {after.name} começou a dar boost!\n'
+                                                          f'User: {after.mention}\n'
+                                                          f'Id: {after.id}\n',
+                                              timestamp=datetime.utcnow())
+                        embed.set_thumbnail(url=str(after.avatar_url))
+                        await channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_user_update(self, before, after):

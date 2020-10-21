@@ -70,7 +70,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                 # se o bot não achar o comando com esse nome
                 if command is None:
                     embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>',
-                                          colour=discord.Colour(random_color()),
+                                          colour=discord.Colour(0xFF0000),
                                           description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
                                           timestamp=datetime.utcnow())
                     embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')

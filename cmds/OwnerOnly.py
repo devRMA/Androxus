@@ -37,6 +37,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       description='Vou desativar o tratamento de erros.',
                       examples=['``{prefix}erros_off``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _desativar_erros(self, ctx):
@@ -48,6 +49,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       description='Vou reativar o tratamento de erros.',
                       examples=['``{prefix}erros_on``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _ativar_erros(self, ctx):
@@ -60,6 +62,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       parameters=['<frase>'],
                       examples=['``{prefix}game`` ``olá mundo!``', '``{prefix}game`` ``-1``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _game(self, ctx, *args):
@@ -121,6 +124,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       description='Reinicia o bot.',
                       examples=['``{prefix}reboot``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _kill(self, ctx):
@@ -134,6 +138,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       parameters=['<query sql>'],
                       examples=['``{prefix}sql`` ``select version();``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _sql(self, ctx, *, query=''):
@@ -154,7 +159,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 conexao.salvar()
                 await ctx.send(f'Query:```sql\n{query}```Executado com sucesso!')
             if modo == 's':
-                await ctx.send(f'Query:```sql\n{query}```Resultado:```python\n{cursor.fetchall()}```')
+                await ctx.send(f'Query:```sql\n{query}```Resultado:```py\n{cursor.fetchall()}```')
             conexao.fechar()
         else:
             return await self.bot.send_help(ctx)
@@ -176,6 +181,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       parameters=['<script>'],
                       examples=['``{prefix}eval`` ``return \'opa\'``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _eval(self, ctx, *, cmd):
@@ -252,6 +258,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 'get_most_similar_item': u.get_most_similar_item,
                 'get_most_similar_items': u.get_most_similar_items,
                 'difference_between_lists': u.difference_between_lists,
+                'get_most_similar_items_with_similarity': u.get_most_similar_items_with_similarity,
                 'permissions': permissions,
                 'Stopwatch': Stopwatch,
                 'ctx': ctx,
@@ -397,13 +404,15 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       examples=['``{prefix}manutenção_on``',
                                 '``{prefix}ativar_manutenção``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _manutencao_on(self, ctx):
-        self.bot.maintenance_mode = True
-        self.bot.mudar_status = False
-        await self.bot.change_presence(activity=discord.Game(name='Em manutenção!'))
-        self.bot.unload_extension('events.ErrorCommands')
+        if not self.bot.maintenance_mode:
+            self.bot.maintenance_mode = True
+            self.bot.mudar_status = False
+            await self.bot.change_presence(activity=discord.Game(name='Em manutenção!'))
+            self.bot.unload_extension('events.ErrorCommands')
         await ctx.send('Modo manutenção:\n<a:on:755774680580882562>')
 
     @commands.command(name='manutenção_off',
@@ -412,13 +421,330 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       examples=['``{prefix}manutenção_off``',
                                 '``{prefix}desativar_manutenção``'],
                       perm_user='administrar a conta do bot',
+                      hidden=True,
                       cls=Androxus.Command)
     @commands.check(permissions.is_owner)
     async def _manutencao_off(self, ctx):
-        self.bot.maintenance_mode = False
-        self.bot.mudar_status = True
-        self.bot.load_extension('events.ErrorCommands')
+        if self.bot.maintenance_mode:
+            self.bot.maintenance_mode = False
+            self.bot.mudar_status = True
+            self.bot.load_extension('events.ErrorCommands')
         await ctx.send('Modo manutenção:\n<a:off:755774680660574268>')
+
+    @commands.command(name='testes',
+                      aliases=['rodar_testes', 'testar'],
+                      description='Vai verificar se tudo está ok (banco de dados e funções do utils).',
+                      examples=['``{prefix}testes``'],
+                      perm_user='administrar a conta do bot',
+                      hidden=True,
+                      cls=Androxus.Command)
+    @commands.check(permissions.is_owner)
+    async def _testes(self, ctx):
+        tempo_msg = Stopwatch()
+        msg = await ctx.send('Realizando os testes <a:loading:756715436149702806>')
+        tempo_msg.stop()
+        conexao_check = False
+        banco_check = False
+        testes_check = True
+        testes_falhos = []
+        try:
+            tempo_conexao = Stopwatch()
+            conexao = Conexao()
+            cursor = conexao.cursor()
+            tempo_conexao.stop()
+            conexao_check = True
+        except:
+            tempo_conexao = None
+            conexao = None
+            cursor = None
+        try:
+            if conexao is not None:
+                query = 'select serverId from servidor;'
+                tempo_query = Stopwatch()
+                cursor.execute(query)
+                tempo_query.stop()
+                result = [c[0] for c in cursor.fetchall()]
+                conexao.fechar()
+            else:
+                raise Exception
+        except:
+            tempo_query = None
+            result = None
+        if result is not None:
+            servers = [c.id for c in self.bot.guilds]
+            if len(u.difference_between_lists(result, servers)) == 0:
+                banco_check = True
+        # testes das funções uteis
+        # [(operação, resultado esperado)]
+        testes = [
+            (
+                "u.capitalize(';;ABC')",
+                ';;Abc'
+            ),
+            (
+                "u.capitalize('´ABC')",
+                '´Abc'
+            ),
+            (
+                "u.capitalize('12345AB  __+=12llaksamC')",
+                '12345Ab  __+=12llaksamc'
+            ),
+            (
+                "u.capitalize('9Ç12Opa')",
+                '9Ç12opa'
+            ),
+            (
+                "u.capitalize('12É987G654U012A!')",
+                '12É987g654u012a!'
+            ),
+            (
+                "u.datetime_format(datetime(2020, 10, 21, 16, 43, 48), datetime(2020, 10, 21, 14, 42, 47))",
+                'Hoje há 2 horas, 1 minuto e 1 segundo.'
+            ),
+            (
+                "u.datetime_format(datetime(2020, 10, 21, 16, 43, 48), datetime(2020, 10, 20, 16, 23, 18))",
+                'Ontem há 20 minutos e 30 segundos.'
+            ),
+            (
+                "u.datetime_format(datetime(2020, 10, 21, 16, 43, 48), datetime(2020, 9, 10, 10, 59, 59))",
+                '1 mês, 11 dias e 5 horas.'
+            ),
+            (
+                "u.inverter_string('opa')",
+                'ɐdo'
+            ),
+            (
+                "u.inverter_string('teste1234abc')",
+                'ɔqɐ4321ǝʇsǝʇ'
+            ),
+            (
+                "u.inverter_string('áããçãóṕteste')",
+                'ǝʇsǝʇṕóãçããá'
+            ),
+            (
+                "u.is_number('123')",
+                True
+            ),
+            (
+                "u.is_number('99999a')",
+                False
+            ),
+            (
+                "u.is_number('3.1415')",
+                True
+            ),
+            (
+                "u.is_number('3.1415a')",
+                False
+            ),
+            (
+                "u.is_number('teste')",
+                False
+            ),
+            (
+                "u.convert_to_bool('SIm')",
+                True
+            ),
+            (
+                "u.convert_to_bool('sim')",
+                True
+            ),
+            (
+                "u.convert_to_bool('1')",
+                True
+            ),
+            (
+                "u.convert_to_bool('ye')",
+                True
+            ),
+            (
+                "u.convert_to_bool('aTIvo')",
+                True
+            ),
+            (
+                "u.convert_to_bool('on')",
+                True
+            ),
+            (
+                "u.convert_to_bool('yep')",
+                None
+            ),
+            (
+                "u.convert_to_bool('ava')",
+                None
+            ),
+            (
+                "u.convert_to_bool('teste')",
+                None
+            ),
+            (
+                "u.convert_to_bool('2')",
+                None
+            ),
+            (
+                "u.convert_to_bool('+-=')",
+                None
+            ),
+            (
+                "u.convert_to_bool('çç')",
+                None
+            ),
+            (
+                "u.convert_to_bool('abc')",
+                None
+            ),
+            (
+                "u.convert_to_bool('não')",
+                False
+            ),
+            (
+                "u.convert_to_bool('nao')",
+                False
+            ),
+            (
+                "u.convert_to_bool('No')",
+                False
+            ),
+            (
+                "u.convert_to_bool('0')",
+                False
+            ),
+            (
+                "u.convert_to_bool('faLse')",
+                False
+            ),
+            (
+                "u.convert_to_bool('FALSE')",
+                False
+            ),
+            (
+                "u.convert_to_bool('desaTIvo')",
+                False
+            ),
+            (
+                "u.convert_to_bool('off')",
+                False
+            ),
+            (
+                "u.convert_to_string(True)",
+                'sim'
+            ),
+            (
+                "u.convert_to_string(None)",
+                'nulo'
+            ),
+            (
+                "u.convert_to_string(False)",
+                'não'
+            ),
+            (
+                "u.string_similarity('a', 'a')",
+                1.0
+            ),
+            (
+                "u.string_similarity('a', 'ab')",
+                0.5
+            ),
+            (
+                "u.string_similarity('falei', 'falar')",
+                0.6
+            ),
+            (
+                "u.string_similarity('123', '456')",
+                0.0
+            ),
+            (
+                "u.get_most_similar_item('123', ['123', '234', '321', '679'])",
+                '123'
+            ),
+            (
+                "u.get_most_similar_item('234', ['123', '234', '321', '679'])",
+                '234'
+            ),
+            (
+                "u.get_most_similar_item('5679', ['1234', '2345', '3210', '5679'])",
+                '5679'
+            ),
+            (
+                "u.get_most_similar_item('9234', ['1234', '2345', '3210', '5679'])",
+                '1234'
+            ),
+            (
+                "u.get_most_similar_items('9234', ['1234', '2345', '3210', '5679'])",
+                ['1234', '2345']
+            ),
+            (
+                "u.get_most_similar_items('5678', ['1234', '2345', '3210', '5679'])",
+                ['5679']
+            ),
+            (
+                "u.get_most_similar_items_with_similarity('5678', ['1234', '2345', '3210', '5679'])",
+                [['5679', 0.75]]
+            ),
+            (
+                "u.get_most_similar_items_with_similarity('1243', ['1234', '2345', '3210', '5679'])",
+                [['1234', 0.5]]
+            ),
+            (
+                "u.get_most_similar_items_with_similarity('9234', ['1234', '2345', '3210', '5679'])",
+                [['1234', 0.75], ['2345', 0.5]]
+            ),
+            (
+                "u.difference_between_lists(list(range(0, 20)), list(range(0, 21)))",
+                [20]
+            ),
+            (
+                "u.difference_between_lists(['a', 'b'], ['b', 'c'])",
+                ['a', 'c']
+            ),
+        ]
+
+        for teste, resultado in testes:
+            if eval(teste) != resultado:
+                testes_check = False
+                testes_falhos.append(f'Teste com erro: ```py\n{teste}```'
+                                     f'Resultado esperado: `{resultado}`\n'
+                                     f'Resultado obtido: `{eval(teste)}`')
+        e = discord.Embed(title=f'Resultado dos testes!',
+                          colour=discord.Colour(0xF5F5F5),
+                          description='** **',
+                          timestamp=datetime.utcnow())
+        e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+        if conexao_check:
+            con_emoji = '<a:ativado:755774682334101615>'
+            desc_con = f'Tempo para abrir conexão: `{str(tempo_conexao)}`'
+        else:
+            con_emoji = '<a:desativado:755774682397147226>'
+            desc_con = '** **'
+        if banco_check:
+            banco_emoji = '<a:ativado:755774682334101615>'
+            desc_banco = f'Tempo para executar a query: `{str(tempo_query)}`'
+        else:
+            banco_emoji = '<a:desativado:755774682397147226>'
+            desc_banco = '** **'
+        if testes_check:
+            testes_emoji = '<a:ativado:755774682334101615>'
+            desc_testes = 'Todas as funções estão retornando aquilo que deveriam estar retornando!'
+        else:
+            testes_emoji = '<a:desativado:755774682397147226>'
+            testes_falhos = '\n'.join(testes_falhos)
+            desc_testes = f'{testes_falhos}'
+        e.add_field(name=f'Conexão com o banco: {con_emoji}',
+                    value=desc_con,
+                    inline=False)
+        e.add_field(name=f'Executar uma query no banco: {banco_emoji}',
+                    value=desc_banco,
+                    inline=False)
+        e.add_field(name=f'Funções funcionando: {testes_emoji}',
+                    value=desc_testes,
+                    inline=False)
+        e.add_field(name=f'Latências',
+                    value=f'Tempo para enviar mensagem:\n'
+                          f'`{str(tempo_msg)}`\n'
+                          f'Ping do discord.py:\n'
+                          f'`{int(self.bot.latency * 1000)}ms`',
+                    inline=False)
+        await msg.edit(content='', embed=e)
 
 
 def setup(bot):
