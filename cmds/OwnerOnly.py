@@ -190,7 +190,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
 
         def check(reaction, user):
             author = user.id == ctx.author.id
-            reactions = (str(reaction.emoji) == '<a:desativado:755774682397147226>') or (
+            reactions = (str(reaction.emoji) == '<:trancar:768871933202268212>') or (
                     str(reaction.emoji) == '<a:ativado:755774682334101615>')
             message_check = reaction.message == msg_bot
             return author and reactions and message_check
@@ -321,18 +321,18 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                     inline=False)
         msg_bot = await ctx.send(embed=e)
         await msg_bot.add_reaction(self.bot.get_emoji(755774682397147226))
-        await msg_bot.add_reaction(self.bot.get_emoji(755774682334101615))
+        await msg_bot.add_reaction(self.bot.get_emoji(768871933202268212))
         try:
             reaction, _ = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
             if str(reaction.emoji) == '<a:desativado:755774682397147226>':
                 await msg_bot.edit(embed=closed)
-            elif str(reaction.emoji) == '<a:ativado:755774682334101615>':
+            elif str(reaction.emoji) == '<:trancar:768871933202268212>':
                 e.remove_field(-1)
                 await msg_bot.edit(embed=e)
         except asyncio.TimeoutError:
             await msg_bot.edit(embed=closed)
         await msg_bot.remove_reaction(self.bot.get_emoji(755774682397147226), ctx.me)
-        await msg_bot.remove_reaction(self.bot.get_emoji(755774682334101615), ctx.me)
+        await msg_bot.remove_reaction(self.bot.get_emoji(768871933202268212), ctx.me)
 
     @commands.command(name='blacklist',
                       aliases=['blacklisted', 'banido'],

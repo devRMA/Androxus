@@ -360,9 +360,13 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                                 inline=True)
                                 custom = True
                         elif (activity.type.name == 'playing') and (not playing):
+                            if activity.start is not None:
+                                value = f'`{activity.name}`\n**🕛 Começou a jogar:**\n' + \
+                                        f'`{datetime_format(activity.start)}`'
+                            else:
+                                value = f'`{activity.name}`'
                             info1.add_field(name='🕹 Jogando',
-                                            value=f'`{activity.name}`\n**🕛 Começou a jogar:**\n'
-                                                  f'`{datetime_format(activity.start)}`',
+                                            value=value,
                                             inline=True)
                             playing = True
             if hasattr(user, 'nick'):
@@ -375,8 +379,8 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 rank_members = [str(c) for c in sorted(user.guild.members, key=lambda x: x.joined_at)]
                 info1.add_field(name="📥 Entrou no servidor em:",
                                 value=f'`{user.joined_at.strftime("%d/%m/%Y")}`({datetime_format(user.joined_at)})'
-                                      f'\n🏆 Está na `{rank_members.index(str(user)) + 1}°` posição, '
-                                      'no rank dos membros mais antigos!',
+                                      f'\n**🏆 Está na `{rank_members.index(str(user)) + 1}°` posição, '
+                                      'no rank dos membros mais antigos!**',
                                 inline=True)
                 if user.premium_since is not None:
                     info1.add_field(name="<a:boost:767518522619985930> Começou a dar boost neste servidor em:",

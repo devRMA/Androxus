@@ -89,7 +89,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                         inline=True)
         embed.add_field(name=':frog: Memória RAM:',
                         value=f'``{(this_process.memory_info().rss / (1e+6)):.2f}Mb' +
-                              '/512Mb``',
+                              '/100Mb``',
                         inline=True)
         embed.add_field(name='<:WumpusPizza:756712226710356122> Versão do discord.py:',
                         value=f'``{discord.__version__}``',
