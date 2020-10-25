@@ -22,15 +22,14 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='adicionar_comando',
+    @Androxus.comando(name='adicionar_comando',
                       aliases=['add_command', 'ac'],
                       description='Adiciona um comando personalizado!',
                       parameters=['"<comando>"', '"<resposta>"',
                                   '[ignorar a posição do comando (sim/nao) (padrão: sim)]'],
                       examples=['``{prefix}adicionar_comando`` ``"bom dia"`` ``"bom dia!"``',
                                 '``{prefix}ac`` ``"hello world!"`` ``"olá mundo!"`` ``não``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -67,14 +66,13 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         finally:
             conexao.fechar()
 
-    @commands.command(name='remover_comando',
+    @Androxus.comando(name='remover_comando',
                       aliases=['remove_command', 'rc'],
                       description='Remove um comando personalizado!',
                       parameters=['"<comando>"'],
                       examples=['``{prefix}remover_comando`` ``"bom dia"``',
                                 '``{prefix}rc`` ``"hello world!"``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -89,7 +87,7 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         if comando_personalizado not in [cmd for cmd in
                                          ComandoPersonalizadoRepository().get_commands(conexao, servidor)]:
             conexao.fechar()
-            return await ctx.send('<a:atencao:755844029333110815> Este comando não existe!')
+            return await ctx.send(f'{self.bot.configs["emojis"]["atencao"]} Este comando não existe!')
         try:
             ComandoPersonalizadoRepository().delete(conexao, comando_personalizado)
             embed = discord.Embed(title=f'Comando removido com sucesso!',
@@ -103,15 +101,14 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         finally:
             conexao.fechar()
 
-    @commands.command(name='modificar_comando',
+    @Androxus.comando(name='modificar_comando',
                       aliases=['update_command', 'mc'],
                       description='Modifica um comando personalizado',
                       parameters=['<"comando">', '<"resposta">',
                                   '[ignorar a posição do comando (sim/nao)(padrão: sim)]'],
                       examples=['``{prefix}modificar_comando`` ``"bom dia"`` ``"boa noite!"``',
                                 '``{prefix}mc`` ``"olá mundo!"`` ``"hello world!"`` ``não``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -136,7 +133,7 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         if comando_personalizado not in [cmd for cmd in
                                          ComandoPersonalizadoRepository().get_commands(conexao, servidor)]:
             conexao.fechar()
-            return await ctx.send('<a:atencao:755844029333110815> Este comando não existe!')
+            return await ctx.send(f'{self.bot.configs["emojis"]["atencao"]} Este comando não existe!')
         try:
             ComandoPersonalizadoRepository().update(conexao, comando_personalizado)
             in_text_str = capitalize(convert_to_string(in_text))

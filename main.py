@@ -11,7 +11,6 @@ from sys import version  # função para pegar a versão do python
 
 import discord  # import da API do discord
 from discord.ext import commands, tasks  # outros imports do discord
-from requests import get  # função que vai fazer os requests no site
 
 from Classes.Androxus import Androxus  # classe que herda o commands.Bot
 # evento que vai ser chamado, toda vez que enviarem uma mensagem
@@ -48,16 +47,19 @@ else:  # se só tiver 1:
 @bot.event
 async def on_ready():
     # esse evento vai ser chamado quando o bot iniciar
-    print('Bot online!')
+    print(('-='*10) + 'Androxus Online!' + ('-='*10))
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
+    print(f'{len(bot.get_all_commands())} comandos!')
+    print(f'{len(set(bot.get_all_members()))} usuários!')
+    print(f'{len(bot.guilds)} servidores!')
     print(f'Versão do discord.py: {discord.__version__}')
     print(f'Versão do python: {version[0:5]}')
+    print(f'Versão do bot: {bot.__version__}')
     if not bot.configurado:
         bot.configurar()
     try:
         change_status.start()  # inicia o loop para mudar o status
-        request_no_site.start()  # inicia o loop que vai fazer os requests no site
     except RuntimeError:
         pass
 
@@ -99,19 +101,6 @@ async def change_status():  # loop que vai ficar alterando o status do bot
         await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
 
 
-@tasks.loop(minutes=3)
-async def request_no_site():
-    # um request no site, para que ele não fique off
-    # como o projeto está no heroku, e é um plano free
-    # se o site ficar 5 minutos sem ter um acesso, o heroku
-    # desliga a aplicação, então a cada 3 minutos o bot vai fazer
-    # um request, para que ele não caia
-    url = 'https://androxus.herokuapp.com/'
-    html = get(url)
-    del (url)
-    del (html)
-
-
 if __name__ == '__main__':
     try:
         listdir('discord_bot/')  # vai tentar achar a pasta "discord/cmd"
@@ -134,8 +123,8 @@ if __name__ == '__main__':
                 pass  # se não achar o def setup
             except:
                 print(f'⚠ - Módulo {filename[:-3]} não foi carregado!')
-    if configs['token'] == 'token_bot':
+    if bot.configs['token'] == 'token_bot':
         token = environ.get('TOKEN')
     else:
-        token = configs['token']
+        token = bot.configs['token']
     bot.run(token)  # inicia o bot

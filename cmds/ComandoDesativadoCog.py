@@ -22,13 +22,12 @@ class ComandoDesativadoCog(commands.Cog, command_attrs=dict(category='administra
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='desativar_comando',
+    @Androxus.comando(name='desativar_comando',
                       aliases=['disable_command', 'dc'],
                       description='Desativa algum comando que eu tenho!',
                       parameters=['<comando>'],
                       examples=['``{prefix}desativar_comando`` ``say``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -47,7 +46,7 @@ class ComandoDesativadoCog(commands.Cog, command_attrs=dict(category='administra
                                                   'help',
                                                   'ajuda']
         if comando.lower() in comandos_que_nao_podem_ser_desativados:
-            return await ctx.send('Você não pode desativar este comando! <a:no_no:755774680325029889>')
+            return await ctx.send(f'Você não pode desativar este comando! {self.bot.configs["emojis"]["no_no"]}')
         conexao = Conexao()
         servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
         comando_desativado = ComandoDesativado(servidor, comando)
@@ -57,19 +56,18 @@ class ComandoDesativadoCog(commands.Cog, command_attrs=dict(category='administra
                                   description=f'Comando desativado: {comando}',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            return await ctx.send(content='<a:off:755774680660574268>', embed=embed)
+            return await ctx.send(content=f'{self.bot.configs["emojis"]["off"]}', embed=embed)
         except Exception as e:
             raise e
         finally:
             conexao.fechar()
 
-    @commands.command(name='reativar_comando',
+    @Androxus.comando(name='reativar_comando',
                       aliases=['reactivate_command'],
                       description='Reativa algum comando que eu tenho!',
                       parameters=['<comando>'],
                       examples=['``{prefix}reativar_comando`` ``say``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -85,14 +83,14 @@ class ComandoDesativadoCog(commands.Cog, command_attrs=dict(category='administra
         # se não tiver o comando no banco:
         if not comando_desativado in [cmd for cmd in comandos_desativados]:
             conexao.fechar()
-            return await ctx.send('<a:atencao:755844029333110815> Este comando já está ativo!')
+            return await ctx.send(f'{self.bot.configs["emojis"]["atencao"]} Este comando já está ativo!')
         try:
             ComandoDesativadoRepository().delete(conexao, comando_desativado)
             embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Comando reativado: {comando}',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            return await ctx.send(content='<a:on:755774680580882562>', embed=embed)
+            return await ctx.send(content=self.bot.configs['emojis']['on'], embed=embed)
         except Exception as e:
             raise e
         finally:

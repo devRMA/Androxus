@@ -16,12 +16,11 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='eightball',
+    @Androxus.comando(name='eightball',
                       aliases=['8ball'],
                       description='8ball tem a resposta para tudo!',
                       parameters=['<pergunta>'],
-                      examples=['``{prefix}eightball`` ``Existe alguém mais lindo do que eu?``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}eightball`` ``Existe alguém mais lindo do que eu?``'])
     async def _eightball(self, ctx, *args):
         if len(args) == 0:
             return await self.bot.send_help(ctx)
@@ -59,21 +58,19 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
         seed(asci_value)
         await ctx.send(f'{choice(respostas)}')
 
-    @commands.command(name='cara_coroa',
+    @Androxus.comando(name='cara_coroa',
                       aliases=['cc', 'coinflip'],
                       description='Cara ou coroa?',
-                      examples=['``{prefix}cara_coroa``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}cara_coroa``'])
     async def _cara_coroa(self, ctx):
         respostas = ['🙂 Cara.', '👑 Coroa.']
         await ctx.send(f'{choice(respostas)}')
 
-    @commands.command(name='girar',
+    @Androxus.comando(name='girar',
                       aliases=['side-down', 'inverter'],
                       description='Eu vou deixar a frase cabeça pra baixo.',
                       parameters=['<frase>'],
-                      examples=['``{prefix}girar`` ``muito show kkk``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}girar`` ``muito show kkk``'])
     async def _girar(self, ctx, *, args):
         if args:
             # anti mention

@@ -32,38 +32,35 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='desativar_erros',
+    @Androxus.comando(name='desativar_erros',
                       aliases=['desativar_tratamento_de_erro', 'erros_off'],
                       description='Vou desativar o tratamento de erros.',
                       examples=['``{prefix}erros_off``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _desativar_erros(self, ctx):
         self.bot.unload_extension('events.ErrorCommands')
         await ctx.send('Tratamento de erro desativado!')
 
-    @commands.command(name='ativar_erros',
+    @Androxus.comando(name='ativar_erros',
                       aliases=['ativar_tratamento_de_erro', 'erros_on'],
                       description='Vou reativar o tratamento de erros.',
                       examples=['``{prefix}erros_on``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _ativar_erros(self, ctx):
         self.bot.load_extension('events.ErrorCommands')
         await ctx.send('Tratamento de erro ativado!')
 
-    @commands.command(name='game',
+    @Androxus.comando(name='game',
                       aliases=['jogar', 'status'],
                       description='Muda o meu status.',
                       parameters=['<frase>'],
                       examples=['``{prefix}game`` ``olá mundo!``', '``{prefix}game`` ``-1``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _game(self, ctx, *args):
         if (len(args) == 1) and (args[0] == '-1'):  # se só tiver um item, e for -1
@@ -85,10 +82,9 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
-    @commands.command(name='dm',
+    @Androxus.comando(name='dm',
                       aliases=['pv'],
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _dm(self, ctx, user_id: int, *, args):
         user = self.bot.get_user(user_id)
@@ -119,48 +115,106 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             if ctx.guild.id == 405826835793051649:
                 await ctx.send('Não achei o usuário')
 
-    @commands.command(name='kill',
+    @Androxus.comando(name='kill',
                       aliases=['reboot', 'reiniciar'],
                       description='Reinicia o bot.',
                       examples=['``{prefix}reboot``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _kill(self, ctx):
-        await ctx.send('Reiniciando <a:loading:756715436149702806>')
+        await ctx.send(f'Reiniciando {self.bot.configs["emojis"]["loading"]}')
         await self.bot.logout()
         raise SystemExit('Rebooting...')
 
-    @commands.command(name='sql',
+    @Androxus.comando(name='sql',
                       aliases=['query', 'query_sql'],
                       description='Executa uma query sql no banco de dados.',
                       parameters=['<query sql>'],
                       examples=['``{prefix}sql`` ``select version();``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _sql(self, ctx, *, query=''):
+        msg_bot = None
+
+        def check(reaction, user):
+            author = user.id == ctx.author.id
+            reactions = (str(reaction.emoji) == self.bot.configs['emoji']['cadeado']) or (
+                    str(reaction.emoji) == self.bot.configs['emoji']['desativado'])
+            message_check = reaction.message == msg_bot
+            return author and reactions and message_check
+
         if query:
             if query[-1] != ';':
                 query += ';'
             conexao = Conexao()
             cursor = conexao.cursor()
             modo = 'i'
+            closed = discord.Embed(title=f'Query fechada {self.bot.configs["emojis"]["check_verde"]}',
+                                   colour=discord.Colour(0xff6961),
+                                   description='** **',
+                                   timestamp=datetime.utcnow())
+            closed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             try:
                 cursor.execute(query)
             except Exception as e:
                 conexao.fechar()
-                return await ctx.send(f'Erro ```{str(e)}``` ao executar a query!')
+                erro = discord.Embed(title=f'{self.bot.configs["emojis"]["atencao"]} Erro ao executar query',
+                                     colour=discord.Colour(0xff6961),
+                                     description='** **',
+                                     timestamp=datetime.utcnow())
+                erro.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                erro.add_field(name='📥 Input',
+                               value=f'```sql\n{query}```',
+                               inline=False)
+                e = [f'- {c}' for c in str(e).splitlines()]
+                e = '\n'.join(e)
+                erro.add_field(name=f'{self.bot.configs["emojis"]["warning_flag"]} Erro',
+                               value=f'```diff\n{e}```',
+                               inline=False)
+                msg_bot = await ctx.send(embed=erro)
+                await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]))
+                try:
+                    await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
+                except asyncio.TimeoutError:
+                    pass
+                await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]), ctx.me)
+                return await msg_bot.edit(embed=closed)
+            e = discord.Embed(title=f'Query executada com sucesso!',
+                              colour=discord.Colour(0xbdecb6),
+                              description='** **',
+                              timestamp=datetime.utcnow())
+            e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            e.add_field(name='📥 Input',
+                        value=f'```sql\n{query}```',
+                        inline=False)
             if 'select' in query.lower():
                 modo = 's'
             if modo == 'i':
                 conexao.salvar()
-                await ctx.send(f'Query:```sql\n{query}```Executado com sucesso!')
             if modo == 's':
-                await ctx.send(f'Query:```sql\n{query}```Resultado:```py\n{cursor.fetchall()}```')
+                e.add_field(name='📤 Output',
+                            value=f'```py\n{cursor.fetchall()}```',
+                            inline=False)
             conexao.fechar()
+            e.add_field(name='** **',
+                        value=f'Essa mensagem será fechada em 2 minutos 🙂',
+                        inline=False)
+            msg_bot = await ctx.send(embed=e)
+            await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]))
+            await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]))
+            try:
+                reaction, _ = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
+                if str(reaction.emoji) == self.bot.configs["emojis"]["desativado"]:
+                    await msg_bot.edit(embed=closed)
+                elif str(reaction.emoji) == self.bot.configs["emojis"]["cadeado"]:
+                    e.remove_field(-1)
+                    await msg_bot.edit(embed=e)
+            except asyncio.TimeoutError:
+                await msg_bot.edit(embed=closed)
+            await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]), ctx.me)
+            await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]), ctx.me)
         else:
             return await self.bot.send_help(ctx)
 
@@ -175,14 +229,13 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         if isinstance(body[-1], ast.With):
             self.__insert_returns(body[-1].body)
 
-    @commands.command(name='eval',
+    @Androxus.comando(name='eval',
                       aliases=['ev'],
                       description='Executa um script em python.',
                       parameters=['<script>'],
                       examples=['``{prefix}eval`` ``return \'opa\'``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _eval(self, ctx, *, cmd):
         execution_time = Stopwatch()
@@ -190,12 +243,13 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
 
         def check(reaction, user):
             author = user.id == ctx.author.id
-            reactions = (str(reaction.emoji) == '<:trancar:768871933202268212>') or (
-                    str(reaction.emoji) == '<a:ativado:755774682334101615>')
+            reactions = (str(reaction.emoji) == self.bot.configs["emojis"]["cadeado"]) or (
+                    str(reaction.emoji) == self.bot.configs["emojis"]["desativado"]) or (
+                    str(reaction.emoji) == self.bot.configs["emojis"]["ativado"])
             message_check = reaction.message == msg_bot
             return author and reactions and message_check
 
-        closed = discord.Embed(title=f'Eval fechada <a:check:755775267275931799>',
+        closed = discord.Embed(title=f'Eval fechada {self.bot.configs["emojis"]["check_verde"]}',
                                colour=discord.Colour(0xff6961),
                                description='** **',
                                timestamp=datetime.utcnow())
@@ -271,7 +325,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                     retornar_algo = False
         except Exception as e:
             execution_time.stop()
-            erro = discord.Embed(title=f'<a:atencao:755844029333110815> Erro no comando eval',
+            erro = discord.Embed(title=f'{self.bot.configs["emojis"]["atencao"]} Erro no comando eval',
                                  colour=discord.Colour(0xff6961),
                                  description='** **',
                                  timestamp=datetime.utcnow())
@@ -281,17 +335,16 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                            inline=False)
             e = [f'- {c}' for c in str(e).splitlines()]
             e = '\n'.join(e)
-            erro.add_field(name='<:warning:765612208629219358> Erro',
+            erro.add_field(name=f'{self.bot.configs["emojis"]["warning_flag"]} Erro',
                            value=f'```diff\n{e}```',
                            inline=False)
             msg_bot = await ctx.send(embed=erro)
-            await msg_bot.add_reaction(self.bot.get_emoji(755774682334101615))
+            await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]))
             try:
                 await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
-                pass
             except asyncio.TimeoutError:
                 pass
-            await msg_bot.remove_reaction(self.bot.get_emoji(755774682334101615), ctx.me)
+            await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]), ctx.me)
             return await msg_bot.edit(embed=closed)
         execution_time.stop()
         e = discord.Embed(title=f'Comando eval executado com sucesso!',
@@ -320,29 +373,33 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                     value=f'Essa mensagem será fechada em 2 minutos 🙂',
                     inline=False)
         msg_bot = await ctx.send(embed=e)
-        await msg_bot.add_reaction(self.bot.get_emoji(755774682397147226))
-        await msg_bot.add_reaction(self.bot.get_emoji(768871933202268212))
+        await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]))
+        await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]))
         try:
             reaction, _ = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
-            if str(reaction.emoji) == '<a:desativado:755774682397147226>':
+            if str(reaction.emoji) == self.bot.configs["emojis"]["desativado"]:
                 await msg_bot.edit(embed=closed)
-            elif str(reaction.emoji) == '<:trancar:768871933202268212>':
+            elif str(reaction.emoji) == self.bot.configs["emojis"]["cadeado"]:
                 e.remove_field(-1)
                 await msg_bot.edit(embed=e)
         except asyncio.TimeoutError:
             await msg_bot.edit(embed=closed)
-        await msg_bot.remove_reaction(self.bot.get_emoji(755774682397147226), ctx.me)
-        await msg_bot.remove_reaction(self.bot.get_emoji(768871933202268212), ctx.me)
+        await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]), ctx.me)
+        await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]), ctx.me)
 
-    @commands.command(name='blacklist',
+    @Androxus.comando(name='blacklist',
                       aliases=['blacklisted', 'banido'],
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _blacklist(self, ctx, *args):
         conexao = Conexao()
+        if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
+            # se a pessoa marcou o bot apenas 1 vez
+            if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
+                # vai tirar a menção da mensagem
+                ctx.message.mentions.pop(0)
         if ctx.message.mentions:
-            user_id = ctx.message.mentions[0].id
+            user_id = ctx.message.mentions[-1].id
         else:
             user_id = int(args[0])
         blacklisted = BlacklistRepository().get_pessoa(conexao, user_id)
@@ -350,19 +407,23 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         if not blacklisted[0]:
             msg = f'A pessoa pode usar meus comandos! {get_emoji_dance()}'
         else:
-            msg = f'<a:no_no:755774680325029889> Esse usuário foi banido de me usar!' + \
+            msg = f'{self.bot.configs["emojis"]["no_no"]} Esse usuário foi banido de me usar!' + \
                   f'\nMotivo: `{blacklisted[1]}`\nQuando: {datetime_format(blacklisted[-1])}'
         return await ctx.send(msg)
 
-    @commands.command(name='add_blacklist',
+    @Androxus.comando(name='add_blacklist',
                       aliases=['ab'],
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _add_blacklist(self, ctx, *args):
         conexao = Conexao()
+        if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
+            # se a pessoa marcou o bot apenas 1 vez
+            if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
+                # vai tirar a menção da mensagem
+                ctx.message.mentions.pop(0)
         if ctx.message.mentions:
-            user_id = ctx.message.mentions[0].id
+            user_id = ctx.message.mentions[-1].id
             args = ctx.message.content.split(' ')
             args.pop(0)
         else:
@@ -380,32 +441,35 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         except Exception as e:
             if str(e) == 'blacklisted':
                 return await ctx.send('Essa pessoa já está na blacklist!')
-        return await ctx.send('Este usuário não vai poder usar meus comandos! <a:banned:756138595882107002>'
+        return await ctx.send(f'Este usuário não vai poder usar meus comandos! {self.bot.configs["emojis"]["banido"]}'
                               f'\nCom o motivo: {motivo}')
 
-    @commands.command(name='remove_blacklist',
+    @Androxus.comando(name='remove_blacklist',
                       aliases=['rb', 'whitelist'],
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _remove_blacklist(self, ctx, *args):
         conexao = Conexao()
+        if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
+            # se a pessoa marcou o bot apenas 1 vez
+            if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
+                # vai tirar a menção da mensagem
+                ctx.message.mentions.pop(0)
         if ctx.message.mentions:
-            user_id = ctx.message.mentions[0].id
+            user_id = ctx.message.mentions[-1].id
         else:
             user_id = int(args[0])
         BlacklistRepository().delete(conexao, user_id)
         conexao.fechar()
         return await ctx.send(f'Usuário perdoado! {get_emoji_dance()}')
 
-    @commands.command(name='manutenção_on',
+    @Androxus.comando(name='manutenção_on',
                       aliases=['ativar_manutenção'],
                       description='Ativa o modo "em manutenção" do bot.',
                       examples=['``{prefix}manutenção_on``',
                                 '``{prefix}ativar_manutenção``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _manutencao_on(self, ctx):
         if not self.bot.maintenance_mode:
@@ -413,35 +477,33 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             self.bot.mudar_status = False
             await self.bot.change_presence(activity=discord.Game(name='Em manutenção!'))
             self.bot.unload_extension('events.ErrorCommands')
-        await ctx.send('Modo manutenção:\n<a:on:755774680580882562>')
+        await ctx.send(f'Modo manutenção:\n{self.bot.configs["emojis"]["on"]}')
 
-    @commands.command(name='manutenção_off',
+    @Androxus.comando(name='manutenção_off',
                       aliases=['desativar_manutenção'],
                       description='Desativa o modo "em manutenção" do bot.',
                       examples=['``{prefix}manutenção_off``',
                                 '``{prefix}desativar_manutenção``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _manutencao_off(self, ctx):
         if self.bot.maintenance_mode:
             self.bot.maintenance_mode = False
             self.bot.mudar_status = True
             self.bot.load_extension('events.ErrorCommands')
-        await ctx.send('Modo manutenção:\n<a:off:755774680660574268>')
+        await ctx.send(f'Modo manutenção:\n{self.bot.configs["emojis"]["off"]}')
 
-    @commands.command(name='testes',
+    @Androxus.comando(name='testes',
                       aliases=['rodar_testes', 'testar'],
                       description='Vai verificar se tudo está ok (banco de dados e funções do utils).',
                       examples=['``{prefix}testes``'],
                       perm_user='administrar a conta do bot',
-                      hidden=True,
-                      cls=Androxus.Command)
+                      hidden=True)
     @commands.check(permissions.is_owner)
     async def _testes(self, ctx):
         tempo_msg = Stopwatch()
-        msg = await ctx.send('Realizando os testes <a:loading:756715436149702806>')
+        msg = await ctx.send(f'Realizando os testes {self.bot.configs["emojis"]["loading"]}')
         tempo_msg.stop()
         conexao_check = False
         banco_check = False
@@ -711,22 +773,22 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                           timestamp=datetime.utcnow())
         e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         if conexao_check:
-            con_emoji = '<a:ativado:755774682334101615>'
+            con_emoji = self.bot.configs["emojis"]["ativado"]
             desc_con = f'Tempo para abrir conexão: `{str(tempo_conexao)}`'
         else:
-            con_emoji = '<a:desativado:755774682397147226>'
+            con_emoji = self.bot.configs["emojis"]["desativado"]
             desc_con = '** **'
         if banco_check:
-            banco_emoji = '<a:ativado:755774682334101615>'
+            banco_emoji = self.bot.configs["emojis"]["ativado"]
             desc_banco = f'Tempo para executar a query: `{str(tempo_query)}`'
         else:
-            banco_emoji = '<a:desativado:755774682397147226>'
+            banco_emoji = self.bot.configs["emojis"]["desativado"]
             desc_banco = '** **'
         if testes_check:
-            testes_emoji = '<a:ativado:755774682334101615>'
+            testes_emoji = self.bot.configs["emojis"]["ativado"]
             desc_testes = 'Todas as funções estão retornando aquilo que deveriam estar retornando!'
         else:
-            testes_emoji = '<a:desativado:755774682397147226>'
+            testes_emoji = self.bot.configs["emojis"]["desativado"]
             testes_falhos = '\n'.join(testes_falhos)
             desc_testes = f'{testes_falhos}'
         e.add_field(name=f'Conexão com o banco: {con_emoji}',

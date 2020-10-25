@@ -22,7 +22,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='money',
+    @Androxus.comando(name='money',
                       aliases=['money_converter', 'currency_exchange', 'ce', 'mon'],
                       description='Eu vou converter moedas, com a cotação atual e ainda dizer se a moeda valorizou ou '
                                   'desvalorizou!',
@@ -35,8 +35,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                                 '``{prefix}ce`` ``eur``\n(Vou mostrar quanto vale 1 euro em reais)',
                                 '``{prefix}mo`` ``eur`` ``20``\n(Vou mostrar quanto vale 20 euros em reais)',
                                 '``{prefix}money`` ``usd`` ``eur`` ``50``\n(Vou mostrar quanto vale 50 dólares em '
-                                'euros)'],
-                      cls=Androxus.Command)
+                                'euros)'])
     @commands.max_concurrency(1, commands.BucketType.user)
     async def _money(self, ctx, *args):
         """
@@ -119,9 +118,9 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             ultimo_valor = float(info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}'))
             info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
         if ultimo_valor > um_valor:
-            msg = f'O valor diminuiu {(ultimo_valor - result):.2f}! <:diminuiu:730088971077681162>'
+            msg = f'O valor diminuiu {(ultimo_valor - um_valor):.2f}! {self.bot.configs["emojis"]["diminuiu"]}'
         elif ultimo_valor < um_valor:
-            msg = f'O valor aumentou {(result - ultimo_valor):.2f}! <:aumentou:730088970779623524>'
+            msg = f'O valor aumentou {(um_valor - ultimo_valor):.2f}! {self.bot.configs["emojis"]["aumentou"]}'
         else:
             msg = 'Não teve alteração no valor.'
         embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',
@@ -130,14 +129,13 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                         inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command(name='say',
+    @Androxus.comando(name='say',
                       aliases=['fale', 'falar'],
                       description='Eu vou repetir o que você falar!',
                       parameters=['[channel (padrão: o chat atual)]', '<frase>'],
                       examples=['``{prefix}say`` ``Hello World!!``',
                                 '``{prefix}fale`` ``Olá Mundo!``'],
-                      perm_user='gerenciar mensagens',
-                      cls=Androxus.Command)
+                      perm_user='gerenciar mensagens')
     async def _say(self, ctx, *, frase=''):
         if len(frase) == 0:
             await self.bot.send_help(ctx)
@@ -156,7 +154,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                     channel = ctx
                 if channel is None:
                     return await ctx.send(f'{ctx.author.mention} Não consegui achar o chat que você me informou.'
-                                          ' <a:sad:755774681008832623>')
+                                          f' {self.bot.configs["emojis"]["sad"]}')
             else:
                 channel = ctx
             if channel != ctx:
@@ -177,7 +175,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         except discord.Forbidden:
             return await ctx.send(
                 f'{ctx.author.mention} eu não tenho permissão para enviar mensagem no chat {channel.mention}.'
-                ' <a:sad:755774681008832623>')
+                f' {self.bot.configs["emojis"]["sad"]}')
         if channel != ctx:
             await ctx.send(f'{ctx.author.mention} Mensagem enviada no chat {channel.mention} com sucesso!')
         else:  # se o channel for igual ao ctx
@@ -185,14 +183,13 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             if await bot_check_permissions(ctx, manage_messages=True):
                 await ctx.message.delete()
 
-    @commands.command(name='traduzir',
+    @Androxus.comando(name='traduzir',
                       aliases=['tradutor', 'traduza', 'translate', 'translator'],
                       description='Eu vou traduzir alguma frase!',
                       parameters=['<língua final>', '<frase>'],
                       examples=['``{prefix}traduzir`` ``pt`` ``Hello world!``',
                                 '``{prefix}translate`` ``en`` ``Olá Mundo!``',
-                                '``{prefix}traduza`` ``pt`` ``Здравствуйте!``'],
-                      cls=Androxus.Command)
+                                '``{prefix}traduza`` ``pt`` ``Здравствуйте!``'])
     @commands.max_concurrency(1, commands.BucketType.user)
     async def _traduzir(self, ctx, dest=None, *, frase=''):
         if dest and frase:
@@ -205,7 +202,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             if not dest in dests:  # se o "dest" que a pessoa passou não for válido:
                 return await ctx.send(f'Não encontrei nenhuma lingua chamada ``{dest}``!\n' +
                                       'Por favor, verifique se você digitou a abreviação certa!\n' +
-                                      '<a:sad:755774681008832623>')
+                                      f'{self.bot.configs["emojis"]["sad"]}')
             # anti mention:
             if ctx.message.mentions:  # se tiver alguma menção na mensagem
                 for mention in ctx.message.mentions:

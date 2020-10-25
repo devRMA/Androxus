@@ -22,20 +22,25 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='avatar',
+    @Androxus.comando(name='avatar',
                       description='Eu vou mandar a foto de perfil da pessoa que você marcar.',
                       parameters=['[usuário (padrão: quem usou o comando)]'],
-                      examples=['``{prefix}avatar`` {author_mention}'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}avatar`` {author_mention}'])
     @commands.max_concurrency(1, commands.BucketType.user)
     async def _avatar(self, ctx, *args):
+        # se a pessoa usou o comando mencionando o bot
+        if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
+            # se a pessoa marcou o bot apenas 1 vez
+            if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
+                # vai tirar a menção da mensagem
+                ctx.message.mentions.pop(0)
         if ctx.message.mentions:  # se tiver alguma menção na mensagem
             embed = discord.Embed(title=f'Avatar do(a) {str(ctx.message.mentions[0])}!',
                                   colour=discord.Colour(random_color()),
                                   description='** **',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-            embed.set_image(url=ctx.message.mentions[0].avatar_url)
+            embed.set_image(url=ctx.message.mentions[-1].avatar_url)
             return await ctx.send(embed=embed)
         else:  # se a pessoa não mencionou ninguém, entra aqui
             if args:  # se a pessoa passou pelo menos alguma coisa
@@ -147,17 +152,22 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 embed.set_image(url=ctx.author.avatar_url)
                 return await ctx.send(embed=embed)
 
-    @commands.command(name='userinfo',
+    @Androxus.comando(name='userinfo',
                       description='Eu vou mandar o máximo de informações sobre um usuário.',
                       parameters=['[usuário (padrão: quem usou o comando)]'],
-                      examples=['``{prefix}userinfo`` {author_mention}'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}userinfo`` {author_mention}'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _userinfo(self, ctx, *args):
         try:
             user = None
+            # se a pessoa usou o comando mencionando o bot
+            if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
+                # se a pessoa marcou o bot apenas 1 vez
+                if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
+                    # vai tirar a menção da mensagem
+                    ctx.message.mentions.pop(0)
             if ctx.message.mentions:  # se tiver alguma menção na mensagem
-                user = ctx.message.mentions[0]  # vai pegar a primeira menção
+                user = ctx.message.mentions[-1]  # vai pegar a primeira menção
             else:  # se a pessoa não mencionou ninguém, entra aqui
                 if args:  # se a pessoa passou pelo menos alguma coisa
                     try:  # vai tentar converter o primeiro argumento para int
@@ -270,47 +280,47 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 if ctx.guild.owner_id == user.id:
                     badges += '👑'
             if pf.staff:
-                badges += '<:staff:767508404687863844>'
+                badges += self.bot.configs['emojis']['staff_badge']
             if pf.partner:
-                badges += '<:parceiro:767508978162073670>'
+                badges += self.bot.configs['emojis']['parceiro_badge']
             if pf.hypesquad:
-                badges += '<:hypesquad:767509441926004746>'
+                badges += self.bot.configs['emojis']['hs_badge']
             if pf.bug_hunter or pf.bug_hunter_level_2:
-                badges += '<:bug_hunter:767510394021216277>'
+                badges += self.bot.configs['emojis']['bug_hunter_badge']
             if pf.hypesquad_bravery:
-                badges += '<:hypesquad_bravery:767510882238333009>'
+                badges += self.bot.configs['emojis']['hs_bravery_badge']
             if pf.hypesquad_brilliance:
-                badges += '<:hypesquad_brilliance:767511165173235763>'
+                badges += self.bot.configs['emojis']['hs_brilliance_badge']
             if pf.hypesquad_balance:
-                badges += '<:hypesquad_balance:767511585080999966>'
+                badges += self.bot.configs['emojis']['hs_balance_badge']
             if pf.early_supporter:
-                badges += '<:early_supporter:767511883368366100>'
+                badges += self.bot.configs['emojis']['early_supporter_badge']
             if user.bot:
-                badges += '<:bot:763808270426177538>'
+                badges += self.bot.configs['emojis']['bot_badge']
             if pf.verified_bot_developer or pf.early_verified_bot_developer:
-                badges += '<:dev_tag:763812174514487346>'
+                badges += self.bot.configs['emojis']['dev_badge']
             # como o discord não deixar bots verem o profile do user
             # e no profile que diz se a pessoa tem nitro, vamos ver se 
             # ela tem um gif no avatar, se tiver, ela tem nitro
             # ou vamos ver se ela está dando boost no servidor
             if user.is_avatar_animated():
-                badges += '<a:nitro:767516060785311744>'
+                badges += self.bot.configs['emojis']['nitro']
             elif hasattr(user, 'premium_since'):
                 if user.premium_since is not None:
-                    badges += '<a:nitro:767516060785311744>'
+                    badges += self.bot.configs['emojis']['nitro']
             if hasattr(user, 'premium_since'):
                 if user.premium_since is not None:
-                    badges += '<a:boost:767518522619985930>'
+                    badges += self.bot.configs['emojis']['boost']
             status = ''
             if hasattr(user, 'raw_status'):
                 if user.raw_status == 'online':
-                    status = '<:online:768461948743843861>'
+                    status = self.bot.configs['emojis']['online']
                 elif user.raw_status == 'dnd':
-                    status = '<:dnd:768461948928655381>'
+                    status = self.bot.configs['emojis']['dnd']
                 elif user.raw_status == 'idle':
-                    status = '<:idle:768461949041246229>'
+                    status = self.bot.configs['emojis']['idle']
                 elif (user.raw_status == 'offline') or (user.raw_status == 'invisible'):
-                    status = '<:offline:768461948790243349>'
+                    status = self.bot.configs['emojis']['offline']
             info1 = discord.Embed(title=f'{badges} {user.display_name} {status}',
                                   colour=cor,
                                   description='** **',
@@ -335,7 +345,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 if len(activities) != 0:
                     for activity in activities:
                         if (activity.type.name == 'streaming') and (not streaming):
-                            info1.add_field(name='<:stream:768461948538454017> Fazendo live',
+                            info1.add_field(name=f'{self.bot.configs["emojis"]["streaming"]} Fazendo live',
                                             value=f'**🎙 Plataforma**: `{activity.platform}`\n'
                                                   f'**🏷 Nome da live**: `{activity.name}`\n'
                                                   f'**🕛 Começou**: `{datetime_format(activity.created_at)}`',
@@ -354,7 +364,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                     texto = f'`{activity.name}`'
                                 else:
                                     texto = '`🚫 Nulo`'
-                                info1.add_field(name='<a:disco:763811701589803098> Status personalizado',
+                                info1.add_field(name=f'{self.bot.configs["emojis"]["disco"]} Status personalizado',
                                                 value=f'🔰 Emoji: {emoji}\n'
                                                       f'🖋 Frase: {texto}',
                                                 inline=True)
@@ -383,7 +393,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                       'no rank dos membros mais antigos!**',
                                 inline=True)
                 if user.premium_since is not None:
-                    info1.add_field(name="<a:boost:767518522619985930> Começou a dar boost neste servidor em:",
+                    info1.add_field(name=f'{self.bot.configs["emojis"]["boost"]} Começou a dar boost neste servidor em:',
                                     value=f'`{user.premium_since.strftime("%d/%m/%Y")}`('
                                           f'{datetime_format(user.premium_since)})',
                                     inline=True)
@@ -510,11 +520,10 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             except asyncio.TimeoutError:  # se acabar o tempo
                 pass
 
-    @commands.command(name='splash',
+    @Androxus.comando(name='splash',
                       aliases=['fundo_convite'],
                       description='Eu vou enviar a imagem de fundo do convite deste servidor (se tiver).',
-                      examples=['``{prefix}splash``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}splash``'])
     @commands.guild_only()
     async def _splash(self, ctx):
         if ctx.guild.splash_url:
@@ -528,10 +537,9 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         else:
             await ctx.send(f'{ctx.author.mention} este servidor não tem uma foto de fundo no convite! ;-;')
 
-    @commands.command(name='discovery_splash',
+    @Androxus.comando(name='discovery_splash',
                       description='Eu vou enviar discovery splash deste servidor (se tiver).',
-                      examples=['``{prefix}discovery_splash``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}discovery_splash``'])
     @commands.guild_only()
     async def _discovery_splash(self, ctx):
         if ctx.guild.discovery_splash_url:
@@ -545,10 +553,9 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         else:
             return await ctx.send(f'{ctx.author.mention} este servidor não tem discovery splash ;-;')
 
-    @commands.command(name='serverinfo',
+    @Androxus.comando(name='serverinfo',
                       description='Eu vou mandar o máximo de informações sobre um servidor.',
-                      examples=['``{prefix}serverinfo``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}serverinfo``'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     async def _serverinfo(self, ctx):
@@ -595,11 +602,10 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                         inline=True)
         await ctx.send(embed=embed)
 
-    @commands.command(name='server_avatar',
+    @Androxus.comando(name='server_avatar',
                       aliases=['icone', 'icon'],
                       description='Eu vou enviar o icone do servidor (se tiver).',
-                      examples=['``{prefix}server_avatar``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}server_avatar``'])
     @commands.guild_only()
     async def _server_avatar(self, ctx):
         if not ctx.guild.icon:
@@ -612,11 +618,10 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         embed.set_image(url=ctx.guild.icon_url_as(size=1024))
         await ctx.send(embed=embed)
 
-    @commands.command(name='server_banner',
+    @Androxus.comando(name='server_banner',
                       aliases=["banner"],
                       description='Eu vou enviar o banner do servidor (se tiver).',
-                      examples=['``{prefix}server_banner``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}server_banner``'])
     @commands.guild_only()
     async def _server_banner(self, ctx):
         if not ctx.guild.banner:
@@ -629,11 +634,10 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         embed.set_image(url=ctx.guild.banner_url)
         await ctx.send(embed=embed)
 
-    @commands.command(name='configs',
+    @Androxus.comando(name='configs',
                       aliases=['configurações', 'configuraçoes', 'settings'],
                       description='Eu vou mostrar todos as configurações deste servidor.',
-                      examples=['``{prefix}configs``'],
-                      cls=Androxus.Command)
+                      examples=['``{prefix}configs``'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     async def _configs(self, ctx):
@@ -657,15 +661,15 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                     value=f'{servidor.prefixo}',
                     inline=True)
         if servidor.sugestao_de_comando:
-            sugestao_cmd = '<a:ativado:755774682334101615>'
+            sugestao_cmd = self.bot.configs['emojis']['ativado']
         else:
-            sugestao_cmd = '<a:desativado:755774682397147226>'
+            sugestao_cmd = self.bot.configs['emojis']['desativado']
         e.add_field(name=f'Sugestao de comando',
                     value=sugestao_cmd,
                     inline=True)
         if servidor.channel_id_log is not None:
             e.add_field(name=f'Log',
-                        value=f'<a:ativado:755774682334101615>\nEm: <#{servidor.channel_id_log}>',
+                        value=f'{self.bot.configs["emojis"]["ativado"]}\nEm: <#{servidor.channel_id_log}>',
                         inline=True)
             logs = []
             if servidor.mensagem_deletada:
@@ -688,7 +692,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                             inline=True)
         else:
             e.add_field(name=f'Log',
-                        value=f'<a:desativado:755774682397147226>',
+                        value=f'{self.bot.configs["emojis"]["desativado"]}',
                         inline=True)
         await ctx.send(embed=e)
 

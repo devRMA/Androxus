@@ -74,7 +74,7 @@ async def on_message_event(bot, message):
             if (palavras_formatadas[0] != '') and (
                     comando_desativado.comando.lower() in palavras_formatadas[0].lower()):
                 # se ela corresponder, a um comando que está desativado:
-                await message.channel.send('<a:no_no:755774680325029889> Este comando ' +
+                await message.channel.send(f'{bot.configs["emojis"]["no_no"]} Este comando ' +
                                            'foi desativado por um administrador do servidor!')
                 stopwatch.stop()
                 return conexao.fechar()
@@ -115,7 +115,7 @@ async def on_message_event(bot, message):
     if (f'<@{str(bot.user.id)}>' == message.content) or (f'<@!{str(bot.user.id)}>' == message.content):
         await channel.send(f'Use o comando ``{prefixo}cmds`` para obter todos os meus comandos!')
         if permissions.can_use_external_emojis(ctx):
-            await channel.send('<a:hello:755774680949850173>')
+            await channel.send(bot.configs["emojis"]["hello"])
         conexao.fechar()
         stopwatch.stop()
         return

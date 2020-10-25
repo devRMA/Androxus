@@ -25,14 +25,13 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='help',
+    @Androxus.comando(name='help',
                       aliases=['ajuda'],
                       description='Mostra mais detalhes sobre um comando.\n**Para obter os meus comandos, '
                                   'digite "cmds"**!',
                       parameters=['[comando/categoria]'],
                       examples=['``{prefix}help``',
-                                '``{prefix}ajuda`` ``adicionar_comando``'],
-                      cls=Androxus.Command)
+                                '``{prefix}ajuda`` ``adicionar_comando``'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _help(self, ctx, *, comando=None):
         e = None
@@ -52,7 +51,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                     conexao.fechar()
                     for cmd_pers in comandos_personalizados:
                         if cmd_pers.comando == comando:
-                            e = discord.Embed(title='<a:loop_fun:763809373046702110> Comando personalizado',
+                            e = discord.Embed(title=f'{self.bot.configs["emojis"]["loop_fun"]} Comando personalizado',
                                               colour=discord.Colour(random_color()),
                                               description=f'**Este comando só existe neste servidor!**',
                                               timestamp=datetime.utcnow())
@@ -69,7 +68,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                     command = None
                 # se o bot não achar o comando com esse nome
                 if command is None:
-                    embed = discord.Embed(title='Comando não encontrado <a:sad:755774681008832623>',
+                    embed = discord.Embed(title=f'Comando não encontrado {self.bot.configs["emojis"]["sad"]}',
                                           colour=discord.Colour(0xFF0000),
                                           description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
                                           timestamp=datetime.utcnow())

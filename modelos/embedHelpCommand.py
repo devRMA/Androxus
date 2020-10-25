@@ -97,7 +97,7 @@ def embedHelpCommand(bot: Androxus = None,
                     inline=False)
     if parametros:  # novamente, só vai entrar, se tiver pelo menos 1 item nos parâmetros
         embed.add_field(
-            name='<a:atencao:755844029333110815> Tudo que estiver entre **<>** é obrigatório, e tudo que estiver '
+            name=f'{bot.configs["emojis"]["atencao"]} Tudo que estiver entre **<>** é obrigatório, e tudo que estiver '
                  'entre **[]** é opcional.',
             value='** **', inline=False)
     embed.add_field(name='📖 Exemplo',
@@ -119,7 +119,7 @@ def embedHelpCommand(bot: Androxus = None,
                         inline=False)
     if comando_esta_desativado:  # se o comando estiver desativado
         embed.add_field(
-            name="<a:atencao:755844029333110815> **O comando foi desativado por algum administrador do server!**",
+            name=f"{bot.configs['emojis']['atencao']} **O comando foi desativado por algum administrador do server!**",
             value="**Se você usar este comando, eu não irei responder!**",
             inline=False)
     conexao.fechar()

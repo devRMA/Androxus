@@ -70,7 +70,7 @@ class ErrorCommands(commands.Cog):
                 for alias in command.aliases:
                     commands.append(alias)
             if mostrar_erro:
-                msg = f'{ctx.author.mention} <:sad:763839041095204895> eu não achei consegui ' \
+                msg = f'{ctx.author.mention} {self.bot.configs["emojis"]["sad"]} eu não achei consegui ' \
                       f'achar o comando "{comando}".'
                 sugestao = get_most_similar_item(comando, commands)
                 if sugestao:
@@ -80,14 +80,14 @@ class ErrorCommands(commands.Cog):
                 msg += f'\nPara desativar esta mensagem, use o comando ``desativar_sugestão``'
                 return await ctx.send(msg, delete_after=10)
         elif isinstance(error, errors.NotOwner):
-            return await ctx.send(f'{ctx.author.mention} você não é meu criador <a:no_no:755774680325029889>')
+            return await ctx.send(f'{ctx.author.mention} você não é meu criador {self.bot.configs["emojis"]["no_no"]}')
         elif isinstance(error, errors.MissingRequiredArgument):
             return await self.bot.send_help(ctx)
         elif isinstance(error, errors.MaxConcurrencyReached):
             return await ctx.send(f'Calma lá {ctx.author.mention}! Você só pode usar 1 comando por vez!')
         elif isinstance(error, errors.NoPrivateMessage):
             return await ctx.send(
-                f'{ctx.author.mention} Este comando só pode ser usado num servidor! <a:atencao:755844029333110815>')
+                f'{ctx.author.mention} Este comando só pode ser usado num servidor! {self.bot.configs["emojis"]["atencao"]}')
         elif isinstance(error, errors.MissingPermissions):
             if len(error.missing_perms) == 1:
                 permissoes = error.missing_perms[0]
@@ -102,7 +102,7 @@ class ErrorCommands(commands.Cog):
                 permissoes = ', '.join(error.missing_perms)
             return await ctx.send(
                 f'{ctx.author.mention} Eu não posso executar este comando, pois não tenho permissão de ' +
-                f'``{permissoes}`` neste servidor! <a:sad:755774681008832623>')
+                f'``{permissoes}`` neste servidor! {self.bot.configs["emojis"]["sad"]}')
         elif isinstance(error, errors.CheckFailure):
             return await ctx.send(f'{ctx.author.mention} você não tem permissão para usar este comando!\nDigite ' +
                                   f'`{ctx.prefix}help {ctx.command}` para ver quais permissões você precisa ter!')
@@ -150,21 +150,21 @@ class ErrorCommands(commands.Cog):
                 pass
             elif str(error).startswith('duplicate comando desativado'):
                 return await ctx.send(
-                    f'<a:atencao:755844029333110815> {ctx.author.mention} Esse comando já está desativado!')
+                    f'{self.bot.configs["emojis"]["atencao"]} {ctx.author.mention} Esse comando já está desativado!')
             elif str(error).startswith('Este comando já está ativo!'):
                 return await ctx.send(
-                    f'<a:atencao:755844029333110815> {ctx.author.mention} Esse comando já está ativado!')
+                    f'{self.bot.configs["emojis"]["atencao"]} {ctx.author.mention} Esse comando já está ativado!')
             elif str(error).startswith('blacklisted'):
                 return await ctx.send(
-                    f'<a:atencao:755844029333110815> {ctx.author.mention} Essa pessoa já está na blacklist!')
+                    f'{self.bot.configs["emojis"]["atencao"]} {ctx.author.mention} Essa pessoa já está na blacklist!')
             elif str(error).startswith('comando personalizado duplicado'):
                 return await ctx.send(
-                    f'<a:atencao:755844029333110815> {ctx.author.mention} Esse comando já está cadastrado!')
+                    f'{self.bot.configs["emojis"]["atencao"]} {ctx.author.mention} Esse comando já está cadastrado!')
             else:
                 try:
                     return await ctx.send(
-                        f'Ocorreu o erro:```py\n{error}```Na execução do comando ```{ctx.message.content}```<a:sad'
-                        ':755774681008832623>')
+                        f'Ocorreu o erro:```py\n{error}```Na execução do comando ```{ctx.message.content}```'
+                        f'{self.bot.configs["emojis"]["sad"]}')
                 except:
                     print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
 

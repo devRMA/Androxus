@@ -1,6 +1,6 @@
 # coding=utf-8
 # Androxus bot
-# eHelpCategory.py
+# embedHelpCategory.py
 
 __author__ = 'Rafael'
 

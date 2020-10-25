@@ -55,15 +55,14 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name='ban',
+    @Androxus.comando(name='ban',
                       aliases=['banir'],
                       description='Vou banir algum membro.',
                       parameters=['<membro do servidor>', '[motivo (padrão: Nulo)]'],
                       examples=['``{prefix}ban`` ``@membro#1234`` ``ofendeu membro``',
                                 '``{prefix}banir`` {author_mention}'],
                       perm_user='banir membros',
-                      perm_bot='banir membros',
-                      cls=Androxus.Command)
+                      perm_bot='banir membros')
     @permissions.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
@@ -94,14 +93,14 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
                 return await ctx.send(f'{ctx.author.mention} você não pode banir o dono do servidor! ' +
-                                      '<:ah_nao:758003636822474887>')
+                                      f'{self.bot.configs["emojis"]["ah_nao"]}')
             elif member == ctx.author:
                 return await ctx.send(f'{ctx.author.mention} você não pode se banir! ' +
-                                      '<:ah_nao:758003636822474887>')
+                                      f'{self.bot.configs["emojis"]["ah_nao"]}')
             elif member == self.bot.user:
                 return await ctx.send(f'{ctx.author.mention} eu não posso me banir! ' +
-                                      '<:ah_nao:758003636822474887>')
-            elif ctx.author.id in get_configs()['owners'] or ctx.author == ctx.guild.owner:
+                                      f'{self.bot.configs["emojis"]["ah_nao"]}')
+            elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
                 return await ctx.send(f'{ctx.author.mention} você só pode banir pessoas que tenham cargo mais ' +
@@ -113,7 +112,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             # se a pessoa não passou nada:
             return await self.bot.send_help(ctx)
-        embed = discord.Embed(title=f'<a:banned:756138595882107002> Usuário banido!',
+        embed = discord.Embed(title=f'{self.bot.configs["emojis"]["banned"]} Usuário banido!',
                               colour=discord.Colour(random_color()),
                               description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
                                           f'{str(reason).replace("None", "nulo")}',
@@ -136,19 +135,18 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 await msg.delete()
             except:
                 pass
-            await ctx.send('Eu não tenho permissão para banir este usuário. <a:sad:755774681008832623>')
+            await ctx.send(f'Eu não tenho permissão para banir este usuário. {self.bot.configs["emojis"]["sad"]}')
         else:
             await ctx.send(embed=embed)
 
-    @commands.command(name='kick',
+    @Androxus.comando(name='kick',
                       aliases=['expulsar'],
                       description='Vou expulsar algum membro.',
                       parameters=['<membro do servidor>', '[motivo (padrão: Nulo)]'],
                       examples=['``{prefix}kick`` ``@membro#1234`` ``não quero você aqui!``',
                                 '``{prefix}expulsar`` {author_mention}'],
                       perm_user='expulsar membros',
-                      perm_bot='expulsar membros',
-                      cls=Androxus.Command)
+                      perm_bot='expulsar membros')
     @permissions.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
     @commands.guild_only()
@@ -176,14 +174,14 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
                 return await ctx.send(f'{ctx.author.mention} você não pode expulsar o dono do servidor! ' +
-                                      '<:ah_nao:758003636822474887>')
+                                      f'{self.bot.configs["emojis"]["ah_nao"]}')
             elif member == ctx.author:
                 return await ctx.send(f'{ctx.author.mention} você não pode se expulsar! ' +
-                                      '<:ah_nao:758003636822474887>')
+                                      f'{self.bot.configs["emojis"]["ah_nao"]}')
             elif member == self.bot.user:
                 return await ctx.send(f'{ctx.author.mention} eu não posso me expulsar! ' +
-                                      '<:ah_nao:758003636822474887>')
-            elif ctx.author.id in get_configs()['owners'] or ctx.author == ctx.guild.owner:
+                                      f'{self.bot.configs["emojis"]["ah_nao"]}')
+            elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
                 return await ctx.send(f'{ctx.author.mention} você só pode expulsar pessoas que tenham cargo mais ' +
@@ -215,11 +213,11 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             await ctx.guild.kick(member, reason=reason)
         except discord.errors.Forbidden:
             await msg.delete()
-            await ctx.send('Eu não tenho permissão para expulsar esse usuário. <a:sad:755774681008832623>')
+            await ctx.send(f'Eu não tenho permissão para expulsar esse usuário. {self.bot.configs["emojis"]["sad"]}')
         else:
             await ctx.send(content=get_emoji_dance(), embed=embed)
 
-    @commands.command(name='unban',
+    @Androxus.comando(name='unban',
                       aliases=['desbanir', 'revogar_ban'],
                       description='Revoga o banimento de algum membro!',
                       parameters=['<membro>', '[motivo (padrão: Nulo)]'],
@@ -227,8 +225,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                                 'o comando unban, passando o nome e a tag da pessoa, é necessário usar "")**',
                                 '``{prefix}revogar_ban`` ``123456789``'],
                       perm_user='banir membros',
-                      perm_bot='banir membros',
-                      cls=Androxus.Command)
+                      perm_bot='banir membros')
     @permissions.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
@@ -259,14 +256,13 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             await ctx.send(content=get_emoji_dance(), embed=embed)
 
-    @commands.command(name='change_prefix',
+    @Androxus.comando(name='change_prefix',
                       aliases=['prefixo', 'prefix'],
                       description='Comando que é usado para mudar o meu prefixo',
                       parameters=['``[prefixo (padrão: "--")]``'],
                       examples=['``{prefix}change_prefix`` ``!!``',
                                 '``{prefix}prefixo``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -280,7 +276,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             prefixo_antigo = ctx.prefix
         servidor = Servidor(ctx.guild.id, prefixo_novo)
         ServidorRepository().update(conexao, servidor)
-        if prefixo_novo != get_configs()['default_prefix']:
+        if prefixo_novo != self.bot.configs['default_prefix']:
             embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour(random_color()),
                                   description=f'Prefixo antigo: {prefixo_antigo}\n' +
                                               f'Prefixo novo: {prefixo_novo}',
@@ -295,14 +291,13 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             await ctx.send(f'Agora estou com o prefixo padrão! {get_emoji_dance()}')
         conexao.fechar()
 
-    @commands.command(name='desativar_sugestão',
+    @Androxus.comando(name='desativar_sugestão',
                       aliases=['ds', 'desativar_sugestao'],
                       description='Comando que é usado para desativar as sugestões, quando a pessoa usar meu prefixo, '
                                   'com um comando que não existe',
                       examples=['``{prefix}desativar_sugestão``',
                                 '``{prefix}ds``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -318,14 +313,13 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             conexao.fechar()
             return await ctx.send('As sugestões já estavam desativadas!')
 
-    @commands.command(name='reativar_sugestão',
+    @Androxus.comando(name='reativar_sugestão',
                       aliases=['rs', 'reativar_sugestao'],
                       description='Comando que é usado para reativar as sugestões, quando a pessoa usar meu prefixo, '
                                   'com um comando que não existe',
                       examples=['``{prefix}reativar_sugestão``',
                                 '``{prefix}rs``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -341,15 +335,14 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             conexao.fechar()
             return await ctx.send('As sugestões já estavam ativadas!')
 
-    @commands.command(name='channel_log',
+    @Androxus.comando(name='channel_log',
                       aliases=['chat_log', 'cl'],
                       description='Comando que é usado para configurar onde que o bot vai mandar os logs. Se não for'
                                   ' passado nada, vai desativar os logs.',
                       parameters=['[channel (padrão: nulo)]'],
                       examples=['``{prefix}chat_log`` {this_channel}',
                                 '``{prefix}cl``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -387,13 +380,12 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             raise error
 
-    @commands.command(name='setup_logs',
+    @Androxus.comando(name='setup_logs',
                       aliases=['logs', 'sl'],
                       description='Comando que é usado para configurar os logs.',
                       examples=['``{prefix}setup_logs``',
                                 '``{prefix}sl``'],
-                      perm_user='administrador',
-                      cls=Androxus.Command)
+                      perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
