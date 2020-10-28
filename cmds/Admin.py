@@ -66,6 +66,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @permissions.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _ban(self, ctx, member: discord.Member = None, *args):
         if isinstance(args, tuple):
             # se chegar como tupla, vai transformar em lista
@@ -150,6 +151,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @permissions.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
     @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _kick(self, ctx, member: discord.Member = None, *args):
         if isinstance(args, tuple):
             # se chegar como tupla, vai transformar em lista
@@ -229,6 +231,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @permissions.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _unban(self, ctx, member: BannedMember = None, *args):
         if member is None:
             return await self.bot.send_help(ctx)

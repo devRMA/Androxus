@@ -14,7 +14,8 @@ from discord.ext import commands
 from Classes import Androxus
 from database.Conexao import Conexao
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity
+from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity, \
+    prettify_number
 from utils.erros import InvalidArgument
 
 
@@ -27,6 +28,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       parameters=['[usuário (padrão: quem usou o comando)]'],
                       examples=['``{prefix}avatar`` {author_mention}'])
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _avatar(self, ctx, *args):
         # se a pessoa usou o comando mencionando o bot
         if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
@@ -153,6 +155,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 return await ctx.send(embed=embed)
 
     @Androxus.comando(name='userinfo',
+                      aliases=['profile', 'memberinfo'],
                       description='Eu vou mandar o máximo de informações sobre um usuário.',
                       parameters=['[usuário (padrão: quem usou o comando)]'],
                       examples=['``{prefix}userinfo`` {author_mention}'])
@@ -389,14 +392,15 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 rank_members = [str(c) for c in sorted(user.guild.members, key=lambda x: x.joined_at)]
                 info1.add_field(name="📥 Entrou no servidor em:",
                                 value=f'`{user.joined_at.strftime("%d/%m/%Y")}`({datetime_format(user.joined_at)})'
-                                      f'\n**🏆 Está na `{rank_members.index(str(user)) + 1}°` posição, '
+                                      f'\n**🏆 Está na `{prettify_number(rank_members.index(str(user)) + 1)}°` posição, '
                                       'no rank dos membros mais antigos!**',
                                 inline=True)
                 if user.premium_since is not None:
-                    info1.add_field(name=f'{self.bot.configs["emojis"]["boost"]} Começou a dar boost neste servidor em:',
-                                    value=f'`{user.premium_since.strftime("%d/%m/%Y")}`('
-                                          f'{datetime_format(user.premium_since)})',
-                                    inline=True)
+                    info1.add_field(
+                        name=f'{self.bot.configs["emojis"]["boost"]} Começou a dar boost neste servidor em:',
+                        value=f'`{user.premium_since.strftime("%d/%m/%Y")}`('
+                              f'{datetime_format(user.premium_since)})',
+                        inline=True)
                 # só vai mostrar as permissões da pessoa, se ela estiver no server
                 info2 = discord.Embed(title=f'{badges} {user.display_name}',
                                       colour=cor,
@@ -525,6 +529,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       description='Eu vou enviar a imagem de fundo do convite deste servidor (se tiver).',
                       examples=['``{prefix}splash``'])
     @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _splash(self, ctx):
         if ctx.guild.splash_url:
             embed = discord.Embed(title=f'Splash deste servidor!',
@@ -541,6 +546,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       description='Eu vou enviar discovery splash deste servidor (se tiver).',
                       examples=['``{prefix}discovery_splash``'])
     @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _discovery_splash(self, ctx):
         if ctx.guild.discovery_splash_url:
             embed = discord.Embed(title=f'discovery splash deste servidor!',
@@ -558,6 +564,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       examples=['``{prefix}serverinfo``'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _serverinfo(self, ctx):
         bots = 0
         for member in ctx.guild.members:
@@ -582,13 +589,16 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if ctx.guild.description:
             embed.add_field(name='📕 Descrição do servidor', value=f'{ctx.guild.description}', inline=True)
         embed.add_field(name='👑 Dono', value=f'`{ctx.guild.owner}` ({ctx.guild.owner_id})', inline=True)
-        embed.add_field(name=f'👥 Membros ({ctx.guild.member_count})',
-                        value=f'🧍 Pessoas: {ctx.guild.member_count - bots}\n🤖 Bots: {bots}', inline=True)
-        embed.add_field(name='🙂 Emojis', value=f'{len(ctx.guild.emojis)}', inline=True)
-        embed.add_field(name=f'💬 Canais ({len(ctx.guild.text_channels) + len(ctx.guild.voice_channels)})',
-                        value=f'📖 Chat: {len(ctx.guild.text_channels)}\n🗣 Voz: {len(ctx.guild.voice_channels)}',
-                        inline=True)
-        embed.add_field(name='🏅 Cargos', value=f'{len(ctx.guild.roles)}', inline=True)
+        embed.add_field(name=f'👥 Membros ({prettify_number(ctx.guild.member_count)})',
+                        value=f'🧍 Pessoas: {prettify_number(ctx.guild.member_count - bots)}\n'
+                              f'🤖 Bots: {prettify_number(bots)}', inline=True)
+        embed.add_field(name='🙂 Emojis', value=f'{prettify_number(len(ctx.guild.emojis))}', inline=True)
+        embed.add_field(
+            name=f'💬 Canais ({prettify_number(len(ctx.guild.text_channels)) + len(ctx.guild.voice_channels)})',
+            value=f'📖 Chat: {prettify_number(len(ctx.guild.text_channels))}\n'
+                  f'🗣 Voz: {prettify_number(len(ctx.guild.voice_channels))}',
+            inline=True)
+        embed.add_field(name='🏅 Cargos', value=f'{prettify_number(len(ctx.guild.roles))}', inline=True)
         embed.add_field(name='🗺 Região', value=f'{str(ctx.guild.region).capitalize()}', inline=True)
         embed.add_field(name='📅 Criado em:',
                         value=f'{ctx.guild.created_at.strftime("%d/%m/%Y")}\n'
@@ -597,8 +607,8 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         embed.add_field(name='📥 Entrei aqui em:',
                         value=f'`{ctx.guild.me.joined_at.strftime("%d/%m/%Y")}`\n'
                               f'({datetime_format(ctx.guild.me.joined_at)})\n'
-                              f'Estou na posição `{rank_members.index(str(ctx.guild.me)) + 1}°` no rank dos '
-                              'membros mais antigos.',
+                              f'Estou na posição `{prettify_number(rank_members.index(str(ctx.guild.me)) + 1)}°` no '
+                              'rank dos membros mais antigos.',
                         inline=True)
         await ctx.send(embed=embed)
 
@@ -607,6 +617,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       description='Eu vou enviar o icone do servidor (se tiver).',
                       examples=['``{prefix}server_avatar``'])
     @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _server_avatar(self, ctx):
         if not ctx.guild.icon:
             return await ctx.send("Este servidor não tem icone.")
@@ -623,6 +634,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       description='Eu vou enviar o banner do servidor (se tiver).',
                       examples=['``{prefix}server_banner``'])
     @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _server_banner(self, ctx):
         if not ctx.guild.banner:
             return await ctx.send("Este servidor não tem banner.")
@@ -640,6 +652,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       examples=['``{prefix}configs``'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _configs(self, ctx):
         conexao = Conexao()
         servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)

@@ -28,7 +28,7 @@ def _warn(frase: str) -> None:
 
 class Androxus(commands.Bot):
     # versão do bot
-    __version__ = '2.1.3'
+    __version__ = '2.1.3.1'
     # dicionário com todas as configurações do arquivo configs.json
     configs = get_configs()
     # atributo que vai guardar quando o bot iniciou

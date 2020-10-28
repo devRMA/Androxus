@@ -5,7 +5,7 @@
 __author__ = 'Rafael'
 
 import datetime
-
+from re import sub
 from typing import List
 
 
@@ -522,3 +522,42 @@ def difference_between_lists(list1: list, list2: list) -> list:
     :rtype: list
     """
     return list(set(list1) - set(list2)) + list(set(list2) - set(list1))
+
+
+def prettify_number(number: not (not float and not int and not str), br: bool = True, truncate: bool = False) -> str:
+    """
+    :param truncate: Parâmetro que vai definir se é ou não para cortar as casas decimais
+    :param number: O valor que vai ser deixado "bonito"
+    :param br: Flag que vai ativar ou não o padrão br: "100.000,00". Se tiver desativado, vai sair assim "100,000.00"
+    :return: A string com o número formatado
+    :type number: float or int or str
+    :type br: bool
+    :type truncate: bool
+    :rtype: str
+    """
+    # se a pessoa não passou um número
+    if not is_number(str(number)):
+        return number  # simplesmente não faz nada
+    # se for para cortar as casas decimais:
+    if truncate:
+        number = sub(r'^(\d+\.\d{,2})\d*$', r'\1', str(number))
+    # vai dividir a string onde tiver um ponto
+    number = str(number).split('.')
+    # se a lista tiver mais de 1 item, vai jogar o último item para a variável, se não tiver, fica com ''
+    decimal = number[-1] if len(number) > 1 else ''
+    # se o decimal for apenas zeros, vai cortar ele
+    decimal = decimal if decimal.strip('0') else ''
+    # e a variável 'number' vai ficar apenas com o primeiro item
+    number = number[0]
+    # o separador, se o parâmetro 'br' for True, vai ser '.' se ele estiver off, vai ser ','
+    separator = '.' if br else ','
+    # por padrão, o separador das casas decimais vai ser ''
+    decimal_separator = ''
+    # se veio algum decimal
+    if decimal != '':
+        # vai colocar ',' caso o 'br' esteja on, e '.' quando ele estiver off
+        decimal_separator = ',' if br else '.'
+    # depois, vai formatar os números
+    number = f'{int(number):_}'.replace('_', separator)
+    # depois, é só retornar a string com o número, o separador de casa decimal, e as casas decimais
+    return f'{number}{decimal_separator}{decimal}'

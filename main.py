@@ -4,9 +4,9 @@
 
 __author__ = 'Rafael'
 
+from itertools import cycle  # vai criar um ciclo com os status
 from os import environ  # função responsável por pegas o token do bot
 from os import listdir  # função responsável por pegar todos os cogs
-from random import choice  # função que vai ser usada para escolher "aleatoriamente" qual status do bot
 from sys import version  # função para pegar a versão do python
 
 import discord  # import da API do discord
@@ -15,7 +15,7 @@ from discord.ext import commands, tasks  # outros imports do discord
 from Classes.Androxus import Androxus  # classe que herda o commands.Bot
 # evento que vai ser chamado, toda vez que enviarem uma mensagem
 from events.OnMessageEvent import on_message_event
-from utils.Utils import get_configs  # função que pega as configurações do json
+from utils.Utils import get_configs, prettify_number  # função que pega as configurações do json
 from utils.Utils import pegar_o_prefixo  # função que vai ser usada toda vez que enviarem uma mensagem
 
 
@@ -47,7 +47,7 @@ else:  # se só tiver 1:
 @bot.event
 async def on_ready():
     # esse evento vai ser chamado quando o bot iniciar
-    print(('-='*10) + 'Androxus Online!' + ('-='*10))
+    print(('-=' * 10) + 'Androxus Online!' + ('-=' * 10))
     print(f'Logado em {bot.user}')
     print(f'ID: {bot.user.id}')
     print(f'{len(bot.get_all_commands())} comandos!')
@@ -73,31 +73,26 @@ async def on_message(message):
         pass
 
 
-@bot.event
-async def on_message_edit(before, after):
-    # caso a pessoa tinha digitado um comando errado, e depois editado para um comando valido, vai ser verificado também
-    try:
-        if before.content != after.content:
-            await on_message_event(bot, after)
-    except discord.errors.NotFound:
-        pass
-
-
 @tasks.loop(seconds=10)
 async def change_status():  # loop que vai ficar alterando o status do bot
     if bot.mudar_status:
         # lista com os status
-        status = ['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
-                  'Eu estou divertindo {servers} servidores!',
-                  'Estou divertindo {pessoas} pessoas',
-                  'Caso você precise de ajuda, basta me mencionar!',
-                  '🤔 como que eu estou "jogando" se eu sou um bot?',
-                  'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
-                  'Caso você queira ver meu código fonte, use o comando "source"!',
-                  'Para saber todos os meus comandos, digite "cmds"!',
-                  'Para obter mais informações sobre um comando, use o comando "help comando"!']
-        status_escolhido = choice(status)  # escolhe um status "aleatório"
-        status_escolhido = status_escolhido.format(servers=len(bot.guilds), pessoas=len(bot.users))
+        status = cycle(['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
+                        'Eu estou divertindo {servers} servidores!',
+                        'Estou divertindo {pessoas} pessoas',
+                        'Estou ouvindo {channels} chats!',
+                        'Caso você precise de ajuda, basta me mencionar!',
+                        '🤔 como que eu estou "jogando" se eu sou um bot?',
+                        'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
+                        'Caso você queira ver meu código fonte, use o comando "source"!',
+                        'Para saber todos os meus comandos, digite "cmds"!',
+                        'Para obter mais informações sobre um comando, use o comando "help comando"!'
+                        ])
+        status_escolhido = next(status)  # escolhe o próximo status
+        status_escolhido = status_escolhido.format(servers=prettify_number(len(bot.guilds)),
+                                                   pessoas=prettify_number(len(bot.users)),
+                                                   channels=prettify_number(len(set(bot.get_all_channels())))
+                                                   )
         await bot.change_presence(activity=discord.Game(name=status_escolhido))  # muda o status do bot
 
 

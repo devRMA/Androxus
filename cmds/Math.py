@@ -17,7 +17,7 @@ from discord.ext import commands
 from py_expression_eval import Parser
 
 from Classes import Androxus
-from utils.Utils import random_color, convert_to_string
+from utils.Utils import random_color, convert_to_string, prettify_number
 
 
 class Math(commands.Cog, command_attrs=dict(category='matemática')):
@@ -28,6 +28,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                       aliases=['operators', 'operacoes', 'ops'],
                       description='Todas as operações que eu suporto no comando ``calc``!',
                       examples=['``{prefix}operações``', '{prefix}ops'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _operators(self, ctx):
         operators = {
             'Operador: ``+``': 'Adição\nEx: ``2 + 2``\nVou responder: ``4``',
@@ -78,7 +79,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _calc(self, ctx, *args):
         if len(args) == 0:
-            await self.help_calc(ctx)
+            await self.bot.send_help(ctx)
             return
         args = ' '.join(args)
         resultado = 0
@@ -110,15 +111,18 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                     f'Pare que você esqueceu de abrir ou fechar algum parêntese! {self.bot.configs["emojis"]["ah_nao"]}')
                 return
             elif 'parity' in exception.args[0]:
-                await ctx.send('Não consigo resolver está equação, verifique se você digitou tudo certo!')
+                await ctx.send('Não consigo resolver está operação, verifique se você digitou tudo certo!')
+                return
+            elif 'math domain error' in exception.args[0]:
+                await ctx.send('')
                 return
             else:
                 await ctx.send(
                     f'{self.bot.configs["emojis"]["sad"]} Ocorreu um erro na hora de executar este comando,' +
                     f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
                 return
-        if len(str(resultado)) >= 200:
-            await ctx.send('O resultado desta equação é tão grande que não consigo enviar a resposta!' +
+        if len(str(resultado)) >= 400:
+            await ctx.send('O resultado desta operação é tão grande que não consigo enviar a resposta!' +
                            f'\n{self.bot.configs["emojis"]["sad"]}')
             return
         embed = discord.Embed(title=f'{self.bot.configs["emojis"]["calculator"]} Resultado:',
@@ -129,7 +133,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                         value=f'```{args}```',
                         inline=False)
         embed.add_field(name=f'Resposta:',
-                        value=f'```{resultado}```',
+                        value=f'```{prettify_number(resultado)}```',
                         inline=False)
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await ctx.send(embed=embed)
@@ -141,6 +145,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                       examples=['``{prefix}regra_de_tres``',
                                 '``{prefix}r3``'])
     @discord.ext.commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _regra_de_tres(self, ctx):
         # TODO
         await ctx.send(
@@ -218,7 +223,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                                   f'**{valores_user[0]}x = {valores_user[-1]}×{valores_user[1]}**\n' +
                                                   f'**{valores_user[0]}x = {mult}**\n' +
                                                   f'**x = {mult}/{valores_user[0]}**\n' +
-                                                  f'**x = {resp:.2f}**',
+                                                  f'**x = {prettify_number(resp)}**',
                                       timestamp=datetime.utcnow())
                 embed.set_author(name='Androxus',
                                  icon_url=self.bot.user.avatar_url)
@@ -298,7 +303,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                                   f'**{valores_user[-1]}x = {valores_user[0]}×{valores_user[1]}**\n' +
                                                   f'**{valores_user[-1]}x = {mult}**\n' +
                                                   f'**x = {mult}/{valores_user[-1]}**\n' +
-                                                  f'**x = {resp:.2f}**',
+                                                  f'**x = {prettify_number(resp)}**',
                                       timestamp=datetime.utcnow())
                 embed.set_author(name='Androxus',
                                  icon_url=self.bot.user.avatar_url)

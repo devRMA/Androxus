@@ -14,7 +14,7 @@ from discord.ext import commands
 from Classes import Androxus
 from database.Conexao import Conexao
 from database.Repositories.InformacoesRepository import InformacoesRepository
-from utils.Utils import is_number, random_color
+from utils.Utils import is_number, random_color, prettify_number
 from utils.permissions import check_permissions, bot_check_permissions
 
 
@@ -37,6 +37,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                                 '``{prefix}money`` ``usd`` ``eur`` ``50``\n(Vou mostrar quanto vale 50 dólares em '
                                 'euros)'])
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _money(self, ctx, *args):
         """
         possibilidades de uso do comando:
@@ -101,7 +102,8 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         um_valor, _ = currency_exchange.exchange(m_from, m_to, 1, False)[0].split(' ')
         result = float(f'{float(result.replace(",", "")):.2f}')
         um_valor = float(f'{float(um_valor):.2f}')
-        embed = discord.Embed(title=f'🪙 {m_qtd:.2f} {m_from.lower()} = {result:.2f} {m_to.lower()}',
+        embed = discord.Embed(title=f'🪙 {prettify_number(m_qtd)} {m_from.lower()} = {prettify_number(result)}'
+                                    f' {m_to.lower()}',
                               colour=discord.Colour(random_color()),
                               description='** **',
                               timestamp=datetime.utcnow())
@@ -118,9 +120,9 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             ultimo_valor = float(info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}'))
             info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
         if ultimo_valor > um_valor:
-            msg = f'O valor diminuiu {(ultimo_valor - um_valor):.2f}! {self.bot.configs["emojis"]["diminuiu"]}'
+            msg = f'O valor diminuiu {prettify_number((ultimo_valor - um_valor), truncate=True)}! {self.bot.configs["emojis"]["diminuiu"]}'
         elif ultimo_valor < um_valor:
-            msg = f'O valor aumentou {(um_valor - ultimo_valor):.2f}! {self.bot.configs["emojis"]["aumentou"]}'
+            msg = f'O valor aumentou {prettify_number((um_valor - ultimo_valor), truncate=True)}! {self.bot.configs["emojis"]["aumentou"]}'
         else:
             msg = 'Não teve alteração no valor.'
         embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',
@@ -136,6 +138,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                       examples=['``{prefix}say`` ``Hello World!!``',
                                 '``{prefix}fale`` ``Olá Mundo!``'],
                       perm_user='gerenciar mensagens')
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _say(self, ctx, *, frase=''):
         if len(frase) == 0:
             await self.bot.send_help(ctx)
@@ -191,6 +194,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                                 '``{prefix}translate`` ``en`` ``Olá Mundo!``',
                                 '``{prefix}traduza`` ``pt`` ``Здравствуйте!``'])
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _traduzir(self, ctx, dest=None, *, frase=''):
         if dest and frase:
             from googletrans.constants import LANGUAGES

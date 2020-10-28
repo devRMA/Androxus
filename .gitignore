@@ -2,3 +2,5 @@
 *.pyc
 .env
 __pycache__/
+Procfile
+runtime.txt

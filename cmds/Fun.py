@@ -21,6 +21,7 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
                       description='8ball tem a resposta para tudo!',
                       parameters=['<pergunta>'],
                       examples=['``{prefix}eightball`` ``Existe alguém mais lindo do que eu?``'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _eightball(self, ctx, *args):
         if len(args) == 0:
             return await self.bot.send_help(ctx)
@@ -62,6 +63,7 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
                       aliases=['cc', 'coinflip'],
                       description='Cara ou coroa?',
                       examples=['``{prefix}cara_coroa``'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _cara_coroa(self, ctx):
         respostas = ['🙂 Cara.', '👑 Coroa.']
         await ctx.send(f'{choice(respostas)}')
@@ -71,6 +73,7 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
                       description='Eu vou deixar a frase cabeça pra baixo.',
                       parameters=['<frase>'],
                       examples=['``{prefix}girar`` ``muito show kkk``'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _girar(self, ctx, *, args):
         if args:
             # anti mention

@@ -19,7 +19,7 @@ from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoR
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.InformacoesRepository import InformacoesRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import get_last_commit, capitalize, pegar_o_prefixo
+from utils.Utils import get_last_commit, capitalize, pegar_o_prefixo, prettify_number
 from utils.Utils import get_last_update, datetime_format
 from utils.Utils import random_color
 
@@ -33,6 +33,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       description='Mostra algumas informações sobre mim!',
                       examples=['``{prefix}botinfo``'])
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _botinfo(self, ctx):
         stopwatch_banco = Stopwatch()
         conexao = Conexao()
@@ -68,16 +69,16 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                         value=f'``{self.bot.get_user(self.bot.owner_id)}``',
                         inline=True)
         embed.add_field(name=f'{self.bot.configs["emojis"]["dances"]["pato"]} Quantos servidores estão me usando:',
-                        value=f'``{len(self.bot.guilds)}``',
+                        value=f'``{prettify_number(len(self.bot.guilds))}``',
                         inline=True)
         embed.add_field(name=f'{self.bot.configs["emojis"]["dances"]["parrot"]} Quantas pessoas têm acesso a mim:',
                         # observer, que aqui, estamos pegando a lista de membros e jogando para um set
                         # pois, o "set" não permite que haja itens duplicados, ou seja, fazendo desta forma
                         # cada item vai ser único
-                        value=f'``{len(set(self.bot.get_all_members()))}``',
+                        value=f'``{prettify_number(len(set(self.bot.get_all_members())))}``',
                         inline=True)
         embed.add_field(name=':ping_pong: Latência da API:',
-                        value=f'``{int(self.bot.latency * 1000)}ms``',
+                        value=f'``{prettify_number(int(self.bot.latency * 1000))}ms``',
                         inline=True)
         embed.add_field(name=f'{self.bot.configs["emojis"]["database"]} Tempo para se conectar ao banco:',
                         value=f'``{stopwatch_banco}``',
@@ -88,7 +89,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                         inline=True)
         embed.add_field(name=':frog: Memória RAM:',
                         value=f'``{(this_process.memory_info().rss / (1e+6)):.2f}Mb' +
-                              '/100Mb``',
+                              '/512Mb``',
                         inline=True)
         embed.add_field(name=f'{self.bot.configs["emojis"]["pizza"]} Versão do discord.py:',
                         value=f'``{discord.__version__}``',
@@ -100,7 +101,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                         value=f'``{InformacoesRepository().get_sql_version(conexao)[:15]}``',
                         inline=True)
         embed.add_field(name=':desktop: Quantos comandos eu tenho:',
-                        value=f'``{len(self.bot.get_all_commands())}``')
+                        value=f'``{prettify_number(len(self.bot.get_all_commands()))}``')
         embed.add_field(name=':stopwatch: Quando eu liguei:',
                         value=f'``{datetime_format(self.bot.uptime)}``',
                         inline=True)
@@ -114,6 +115,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       aliases=['github', 'programação'],
                       description='Mostra o meu código fonte!',
                       examples=['``{prefix}source``'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _source(self, ctx):
         embed = discord.Embed(title=f'Olá {ctx.author.name}, eu sou um bot feito em python, com ' +
                                     'a API do discord e um banco de dados!',
@@ -132,6 +134,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       aliases=['latency', 'latência'],
                       description='Mostra a minha latência atual.',
                       examples=['``{prefix}ping``'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _ping(self, ctx):
         from stopwatch import Stopwatch
         stopwatch_banco = Stopwatch()
@@ -141,15 +144,17 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
         stopwatch_message = Stopwatch()
         mensagem_do_bot = await ctx.send(f'Calculando ping...')
         stopwatch_message.stop()
-        await mensagem_do_bot.edit(content=f'Latência da API do discord: {(self.bot.latency * 1000):.2f}ms!\n'
-                                           f'Tempo para se conectar ao banco de dados: {str(stopwatch_banco)}!\n'
-                                           f'Tempo para enviar uma mensagem: {str(stopwatch_message)}!\n'
-                                           f'{self.bot.configs["emojis"]["hello"]}')
+        await mensagem_do_bot.edit(
+            content=f'Latência da API do discord: {prettify_number(int(self.bot.latency * 1000))}ms!\n'
+                    f'Tempo para se conectar ao banco de dados: {str(stopwatch_banco)}!\n'
+                    f'Tempo para enviar uma mensagem: {str(stopwatch_message)}!\n'
+                    f'{self.bot.configs["emojis"]["hello"]}')
 
     @Androxus.comando(name='invite',
                       aliases=['convidar', 'convite'],
                       description='Mostra o link que você usa para me adicionar em seu servidor',
                       examples=['``{prefix}invite``'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _invite(self, ctx):
         e = discord.Embed(title=f'Invite',
                           colour=discord.Colour(random_color()),
@@ -164,13 +169,14 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       description='Mostra quando foi a minha última atualização e ainda mostra o que foi alterado.',
                       examples=['``{prefix}changelog``'])
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _changelog(self, ctx):
         embed = discord.Embed(title=f'Ultima atualização que eu tive:',
-                                colour=discord.Colour(random_color()),
-                                description=f'```{get_last_commit()}```',
-                                timestamp=datetime.utcnow())
+                              colour=discord.Colour(random_color()),
+                              description=f'```{get_last_commit()}```',
+                              timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}',
-                            icon_url=ctx.author.avatar_url)
+                         icon_url=ctx.author.avatar_url)
         embed.add_field(name='Atualização feita em:',
                         value=f'{datetime_format(get_last_update())}',
                         inline=True)
@@ -180,6 +186,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       aliases=['tempo_on'],
                       description='Mostra a quanto tempo eu estou online!',
                       examples=['``{prefix}uptime``'])
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _uptime(self, ctx):
         embed = discord.Embed(title=f':timer: Quando eu liguei:',
                               description=f'``{datetime_format(self.bot.uptime)}``',
@@ -194,6 +201,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       description='A lista com todos os comandos que eu tenho!',
                       examples=['``{prefix}cmds``', '``{prefix}comandos``'])
     @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
     async def _cmds(self, ctx):
         conexao = Conexao()
         e = discord.Embed(title='Todos os meus comandos',

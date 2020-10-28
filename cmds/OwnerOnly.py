@@ -140,8 +140,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
 
         def check(reaction, user):
             author = user.id == ctx.author.id
-            reactions = (str(reaction.emoji) == self.bot.configs['emoji']['cadeado']) or (
-                    str(reaction.emoji) == self.bot.configs['emoji']['desativado'])
+            reactions = (str(reaction.emoji) == self.bot.configs['emojis']['cadeado']) or (
+                    str(reaction.emoji) == self.bot.configs['emojis']['desativado'])
             message_check = reaction.message == msg_bot
             return author and reactions and message_check
 
@@ -245,7 +245,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             author = user.id == ctx.author.id
             reactions = (str(reaction.emoji) == self.bot.configs["emojis"]["cadeado"]) or (
                     str(reaction.emoji) == self.bot.configs["emojis"]["desativado"]) or (
-                    str(reaction.emoji) == self.bot.configs["emojis"]["ativado"])
+                                str(reaction.emoji) == self.bot.configs["emojis"]["ativado"])
             message_check = reaction.message == msg_bot
             return author and reactions and message_check
 
@@ -313,6 +313,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 'get_most_similar_items': u.get_most_similar_items,
                 'difference_between_lists': u.difference_between_lists,
                 'get_most_similar_items_with_similarity': u.get_most_similar_items_with_similarity,
+                'prettify_number': u.prettify_number,
                 'permissions': permissions,
                 'Stopwatch': Stopwatch,
                 'ctx': ctx,
@@ -358,6 +359,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         if retornar_algo:
             result_type = type(result)
             result_str = str(result)
+            if u.is_number(result_str):
+                result_str = u.prettify_number(result_str)
             if len(result_str) > 1000:
                 result_str = f'{result_str[:1000]}\n...'
             e.add_field(name='📤 Output',
@@ -758,6 +761,38 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             (
                 "u.difference_between_lists(['a', 'b'], ['b', 'c'])",
                 ['a', 'c']
+            ),
+            (
+                "u.prettify_number(123)",
+                '123'
+            ),
+            (
+                "u.prettify_number(1234)",
+                '1.234'
+            ),
+            (
+                "u.prettify_number(123456)",
+                '123.456'
+            ),
+            (
+                "u.prettify_number(123456, br=False)",
+                '123,456'
+            ),
+            (
+                "u.prettify_number(123456.999, truncate=False)",
+                '123.456,999'
+            ),
+            (
+                "u.prettify_number(123456.999, truncate=True)",
+                '123.456,99'
+            ),
+            (
+                "u.prettify_number(123456.000000000001, truncate=True)",
+                '123.456'
+            ),
+            (
+                "u.prettify_number(123456.01, truncate=True)",
+                '123.456,01'
             ),
         ]
 
