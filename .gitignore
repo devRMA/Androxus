@@ -4,3 +4,4 @@
 __pycache__/
 Procfile
 runtime.txt
+database/Factories/certificate/certificado.pem

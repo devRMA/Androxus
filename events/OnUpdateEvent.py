@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # OnUpdateEvent.py
 
@@ -12,9 +12,8 @@ import discord
 from PIL import Image
 from discord.ext import commands
 
-from database.Conexao import Conexao
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import random_color, difference_between_lists
+from utils.Utils import random_color, difference_between_lists, get_path_from_file
 
 
 class OnUpdateEvent(commands.Cog):
@@ -23,12 +22,10 @@ class OnUpdateEvent(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
-        if after.bot: return
-        if not self.bot.is_ready(): return
-        if self.bot.maintenance_mode: return
-        conexao = Conexao()
-        server = ServidorRepository().get_servidor(conexao, after.guild.id)
-        conexao.fechar()
+        if after.bot or self.bot.maintenance_mode \
+                or (not self.bot.started) or (self.bot.db_connection is None):
+            return
+        server = await ServidorRepository().get_servidor(self.bot.db_connection, after.guild.id)
         if server is None:
             return
         if server.channel_id_log is not None:
@@ -85,15 +82,13 @@ class OnUpdateEvent(commands.Cog):
 
     @commands.Cog.listener()
     async def on_user_update(self, before, after):
-        if after.bot: return
-        if not self.bot.is_ready(): return
-        if self.bot.maintenance_mode: return
-        conexao = Conexao()
+        if after.bot or self.bot.maintenance_mode \
+                or (not self.bot.started) or (self.bot.db_connection is None):
+            return
         servers_with_user = []
         for guild in self.bot.guilds:
             if guild.get_member(after.id) is not None:
-                servers_with_user.append(ServidorRepository().get_servidor(conexao, guild.id))
-        conexao.fechar()
+                servers_with_user.append(await ServidorRepository().get_servidor(self.bot.db_connection, guild.id))
         if len(servers_with_user) == 0:
             return
         if before.name != after.name:
@@ -131,26 +126,23 @@ class OnUpdateEvent(commands.Cog):
             if url_antigo.find('?size=') != -1:
                 url_antigo = url_antigo[:url_antigo.rfind('?size=')]
             url_novo = str(after.avatar_url_as(format='webp'))
+            path_401_image = get_path_from_file('401.png', 'images/')
             async with aiohttp.ClientSession() as session:
                 async with session.get(url_antigo) as resp:
                     if resp.status == 200:
                         response_antigo = BytesIO(await resp.read())
                     else:
-                        return
+                        response_antigo = path_401_image
                 async with session.get(url_novo) as resp:
                     if resp.status == 200:
                         response_novo = BytesIO(await resp.read())
                     else:
-                        return
+                        response_novo = path_401_image
                 avatar_antigo = Image.open(response_antigo).resize((512, 512), Image.ANTIALIAS)
                 avatar_novo = Image.open(response_novo).resize((512, 512), Image.ANTIALIAS)
                 base = Image.new('RGBA', (1024, 512), (0, 0, 0, 0))
                 base.paste(avatar_antigo, (0, 0))
                 base.paste(avatar_novo, (512, 0))
-                arr = BytesIO()
-                base.save(arr, format='PNG')
-                arr.seek(0)
-                file = discord.File(arr, filename='avatar.png')
                 embed = discord.Embed(title='Avatar alterado',
                                       colour=discord.Colour(random_color()),
                                       description=f'O(A) {after.name} mudou o avatar!\n'
@@ -164,65 +156,82 @@ class OnUpdateEvent(commands.Cog):
                     if server.channel_id_log is not None:
                         channel = self.bot.get_channel(server.channel_id_log)
                         if (channel is not None) and server.avatar_alterado:
+                            arr = BytesIO()
+                            base.save(arr, format='PNG')
+                            arr.seek(0)
+                            file = discord.File(arr, filename='avatar.png')
                             await channel.send(file=file, embed=embed)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        if after.author.bot: return
-        if not self.bot.is_ready(): return
-        if self.bot.maintenance_mode: return
-        if before.content == after.content: return
-        if after.is_system(): return
-        if (after.guild is None) or (before.guild is None): return
-        conexao = Conexao()
-        server = ServidorRepository().get_servidor(conexao, after.guild.id)
-        conexao.fechar()
+        if after.author.bot or after.is_system() or self.bot.maintenance_mode \
+                or ((after.guild is None) or (before.guild is None)) \
+                or (not self.bot.started) or (before.content == after.content) \
+                or (self.bot.db_connection is None):
+            return
+        server = await ServidorRepository().get_servidor(self.bot.db_connection, after.guild.id)
         if server.channel_id_log is not None:
             channel = self.bot.get_channel(server.channel_id_log)
             if channel is not None:
                 if server.mensagem_editada:
-                    msg_antiga = discord.utils.escape_markdown(before.content)
-                    msg_nova = discord.utils.escape_markdown(after.content)
+                    if len(before.content) >= 800:
+                        before.content = f'{before.content[:800]}...'
+                    if before.content.count('`') >= 3:
+                        msg_antiga = f'\n{before.content}\n'
+                    else:
+                        msg_antiga = f'```{before.content}```'
+                    if len(after.content) >= 800:
+                        after.content = f'{after.content[:800]}...'
+                    if after.content.count('`') >= 3:
+                        msg_nova = f'\n{after.content}\n'
+                    else:
+                        msg_nova = f'```{after.content}```'
                     embed = discord.Embed(title='Mensagem editada',
                                           colour=discord.Colour(random_color()),
                                           description=f'Autor: {after.author.name}\n'
                                                       f'Menção: {after.author.mention}\n'
                                                       f'Id: {after.author.id}\n'
-                                                      f'Chat: <#{after.channel.id}>\n'
-                                                      f'Mensagem antiga:```{msg_antiga}```'
+                                                      f'Chat: {after.channel.mention}\n'
+                                                      f'Mensagem antiga:{msg_antiga}'
                                                       f'[Mensagem nova]({after.jump_url}):'
-                                                      f'```{msg_nova}```',
+                                                      f'{msg_nova}',
                                           timestamp=datetime.utcnow())
                     embed.set_thumbnail(url=after.author.avatar_url)
                     await channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        if message.author.bot: return
-        if not self.bot.is_ready(): return
-        if self.bot.maintenance_mode: return
-        if message.is_system(): return
-        if message.guild is None: return
-        conexao = Conexao()
-        server = ServidorRepository().get_servidor(conexao, message.guild.id)
-        conexao.fechar()
+        if message.author.bot or message.is_system() or self.bot.maintenance_mode \
+                or (message.guild is None) or (not self.bot.started) or (len(message.content) == 0) \
+                or (self.bot.db_connection is None):
+            return
+        server = await ServidorRepository().get_servidor(self.bot.db_connection, message.guild.id)
         if server.channel_id_log is not None:
             channel = self.bot.get_channel(server.channel_id_log)
             if channel is not None:
                 if server.mensagem_deletada:
-                    msg_escaped = discord.utils.escape_markdown(message.content)
+                    if message.content.count('`') >= 3:
+                        msg_escaped = f'\n{message.content}\n'
+                    else:
+                        msg_escaped = f'```{message.content}```'
                     embed = discord.Embed(
                         title=f'Mensagem deletada',
                         colour=discord.Colour(random_color()),
                         description=f'Autor: {message.author.name}\n'
                                     f'Menção: {message.author.mention}\n'
                                     f'Id: {message.author.id}\n'
-                                    f'Chat: <#{message.channel.id}>\n'
-                                    f'Mensagem deletada:```{msg_escaped}```',
+                                    f'Chat: {message.channel.mention}\n'
+                                    f'Mensagem deletada:{msg_escaped}',
                         timestamp=datetime.utcnow())
                     embed.set_thumbnail(url=message.author.avatar_url)
                     await channel.send(embed=embed)
 
 
 def setup(bot):
+    """
+
+    Args:
+        bot (Classes.Androxus.Androxus): Instância do bot
+
+    """
     bot.add_cog(OnUpdateEvent(bot))

@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # IInformacoesRepository.py
 
@@ -6,23 +6,23 @@ __author__ = 'Rafael'
 
 from abc import ABCMeta, abstractmethod
 
-from database.Conexao import Conexao
+import asyncpg
 
 
 class IInformacoesRepository(metaclass=ABCMeta):
 
     @abstractmethod
-    def create(self, conn: Conexao, informacao: str, dado: str):
+    def create(self, conn: asyncpg.pool.Pool, informacao: str, dado: str) -> bool:
         """ Insert into da table informacoes """
 
     @abstractmethod
-    def get_dado(self, conn: Conexao, informacao: str):
+    def get_dado(self, conn: asyncpg.pool.Pool, informacao: str) -> str:
         """ Select que vai trazer o dado daquela informação """
 
     @abstractmethod
-    def update(self, conn: Conexao, informacao: str, dado: str):
+    def update(self, conn: asyncpg.pool.Pool, informacao: str, dado: str) -> bool:
         """ Update da table comando informacoes """
 
     @abstractmethod
-    def delete(self, conn: Conexao, informacao: str):
+    def delete(self, conn: asyncpg.pool.Pool, informacao: str) -> bool:
         """ Delete da table informacoes """

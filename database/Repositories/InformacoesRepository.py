@@ -1,107 +1,96 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # InformacoesRepository.py
 
 __author__ = 'Rafael'
 
-from database.Conexao import Conexao
 from database.Repositories.Interfaces.IInformacoesRepository import IInformacoesRepository
 
 
 class InformacoesRepository(IInformacoesRepository):
 
-    def create(self, conn: Conexao, informacao: str, dado: str):
+    async def create(self, pool, informacao, dado):
         """
-        :param conn: Conexão com o banco de dados
-        :param informacao: Informação que vai ser salva no banco
-        :param dado: O dado referente a informação
-        :type conn: Conexao
-        :type informacao: str
-        :type dado: dado
-        :return: Se conseguir adicionar o comando ao banco, vai retornar True
-        :rtype: bool
-        """
-        cursor = conn.cursor()
-        try:
-            query = 'CALL info_add(%s, %s);'  # query
-            cursor.execute(query, (informacao, dado,))
-            conn.salvar()
-            return True  # vai retornar True se tudo ocorrer bem
-        except:
-            return False
 
-    def get_dado(self, conn: Conexao, informacao: str):
+        Args:
+            pool (asyncpg.pool.Pool): Conexão com o banco de dados
+            informacao (str): Informação que vai ser salva no banco
+            dado (str): O dado referente a informação
+
+        Returns:
+            bool: Se conseguir adicionar o comando ao banco, vai retornar True
+
         """
-        :param conn: Conexão com o banco de dados
-        :param informacao: Informação que vai querer pegar o dado
-        :type conn: Conexao
-        :type informacao: str
-        :return: Vai retornar o dado referente a informação passada
-        :rtype: str
+        async with pool.acquire() as conn:
+            query = 'CALL info_add($1, $2);'  # query
+            try:
+                await conn.execute(query, informacao, dado)
+                return True  # vai retornar True se tudo ocorrer bem
+            except:
+                return False
+
+    async def get_dado(self, pool, informacao):
         """
-        cursor = conn.cursor()
-        try:
-            query = 'SELECT * FROM info_get(%s);'
-            cursor.execute(query, (informacao,))
-            resposta = cursor.fetchone()
+
+        Args:
+            pool (asyncpg.pool.Pool): Conexão com o banco de dados
+            informacao (str): Informação que vai querer pegar o dado
+
+        Returns:
+            str: Vai retornar o dado referente a informação passada
+
+        """
+        async with pool.acquire() as conn:
+            query = 'SELECT * FROM info_get($1);'
+            resposta = tuple(tuple(record) for record in await conn.fetch(query, informacao))
             if resposta:
-                return resposta[0]
-            return resposta
-        except Exception as e:
-            return f'error: {str(e)}'
+                return resposta[0][0]
+            return None
 
-    def update(self, conn: Conexao, informacao: str, dado: str):
+    async def update(self, pool, informacao, dado):
         """
-        :param conn: Conexão com o banco de dados
-        :param informacao: Informação que vai ser atualizada
-        :param dado: O dado que também vai ser atualizado
-        :type conn: Conexao
-        :type informacao: str
-        :type dado: dado
-        :return: Se conseguir atualizar, vai retornar True
-        :rtype: bool
+
+        Args:
+            pool (asyncpg.pool.Pool): Conexão com o banco de dados
+            informacao (str): Informação que vai ser atualizada
+            dado (str): O dado que também vai ser atualizado
+
+        Returns:
+            bool: Se conseguir atualizar, vai retornar True
+
         """
-        cursor = conn.cursor()
-        try:
-            query = 'CALL info_update(%s, %s);'
-            cursor.execute(query, (dado, informacao,))
-            conn.salvar()
+        async with pool.acquire() as conn:
+            query = 'CALL info_update($1, $2);'
+            await conn.execute(query, dado, informacao)
             return True
-        except Exception as e:
-            raise Exception(str(e))
-        return False
 
-    def delete(self, conn: Conexao, informacao: str):
+    async def delete(self, pool, informacao):
         """
-        :param conn: Conexão com o banco de dados
-        :param informacao: Informação que vai ser deletada
-        :type conn: Conexao
-        :type informacao: str
-        :return: None
-        :rtype: None
+
+        Args:
+            pool (asyncpg.pool.Pool): Conexão com o banco de dados
+            informacao (str): Informação que vai ser deletada
+
+        Returns:
+            bool: Se conseguiu deletar a informação, retorna True
+
         """
-        cursor = conn.cursor()
-        try:
-            query = 'CALL info_remove(%s);'
-            cursor.execute(query, (informacao,))
-            conn.salvar()
+        async with pool.acquire() as conn:
+            query = 'CALL info_remove($1);'
+            await conn.execute(query, informacao)
             return True
-        except Exception as e:
-            raise Exception(str(e))
-        return False
 
-    def get_sql_version(self, conn: Conexao):
+    async def get_sql_version(self, pool):
         """
-        :param conn: Conexão com o banco de dados
-        :type conn: Conexao
-        :return: Vai retornar a versão do banco de dados
-        :rtype: str
+
+        Args:
+            pool (asyncpg.pool.Pool): Conexão com o banco de dados
+
+        Returns:
+            str: Vai retornar a versão do banco de dados
+
         """
-        cursor = conn.cursor()
-        try:
-            query = 'SELECT version()'
-            cursor.execute(query)
-            resposta = cursor.fetchone()
+        async with pool.acquire() as conn:
+            query = 'SELECT version();'
+            resposta = tuple((await conn.fetch(query))[0])
             return resposta[0]
-        except Exception as e:
-            return f'error: {str(e)}'

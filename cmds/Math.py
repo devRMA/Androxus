@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # Math.py
 
@@ -22,6 +22,12 @@ from utils.Utils import random_color, convert_to_string, prettify_number
 
 class Math(commands.Cog, command_attrs=dict(category='matemática')):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.Androxus.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @Androxus.comando(name='operações',
@@ -57,7 +63,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                               colour=discord.Colour(random_color()),
                               description='Todas as operações que eu suporto no comando ``calc``!',
                               timestamp=datetime.utcnow())
-        embed.set_author(name='Androxus',
+        embed.set_author(name=self.bot.user.name,
                          icon_url=self.bot.user.avatar_url)
         embed.set_footer(text=f'{ctx.author}',
                          icon_url=ctx.author.avatar_url)
@@ -95,37 +101,37 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
         except Exception as exception:
             if 'unexpected' in exception.args[0]:
                 await ctx.send(
-                    f'Parece que há um erro de digitação!\n```{args}```{self.bot.configs["emojis"]["ah_nao"]}')
+                    f'Parece que há um erro de digitação!\n```{args}```{self.bot.emoji("ah_nao")}')
                 return
             elif 'undefined variable' in exception.args[0]:
                 variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
                 await ctx.send(
-                    f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` {self.bot.configs["emojis"]["sad"]}')
+                    f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` {self.bot.emoji("sad")}')
                 return
             elif 'unknown character' in exception.args[0]:
                 await ctx.send(
-                    f'Desculpe, mas você digitou algum caracter que eu não conheço. {self.bot.configs["emojis"]["sad"]}')
+                    f'Desculpe, mas você digitou algum caracter que eu não conheço. {self.bot.emoji("sad")}')
                 return
             elif 'unmatched "()"' in exception.args[0]:
                 await ctx.send(
-                    f'Pare que você esqueceu de abrir ou fechar algum parêntese! {self.bot.configs["emojis"]["ah_nao"]}')
+                    f'Pare que você esqueceu de abrir ou fechar algum parêntese! {self.bot.emoji("ah_nao")}')
                 return
             elif 'parity' in exception.args[0]:
                 await ctx.send('Não consigo resolver está operação, verifique se você digitou tudo certo!')
                 return
-            elif 'math domain error' in exception.args[0]:
-                await ctx.send('')
+            elif ('IndexError' in str(exception.__class__)) or ('math domain error' in exception.args[0]):
+                await ctx.send(f'Estamos em {datetime.now().year}, mas ainda não sou capaz de resolver isso.')
                 return
             else:
                 await ctx.send(
-                    f'{self.bot.configs["emojis"]["sad"]} Ocorreu um erro na hora de executar este comando,' +
+                    f'{self.bot.emoji("sad")} Ocorreu um erro na hora de executar este comando,' +
                     f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
                 return
         if len(str(resultado)) >= 400:
             await ctx.send('O resultado desta operação é tão grande que não consigo enviar a resposta!' +
-                           f'\n{self.bot.configs["emojis"]["sad"]}')
+                           f'\n{self.bot.emoji("sad")}')
             return
-        embed = discord.Embed(title=f'{self.bot.configs["emojis"]["calculator"]} Resultado:',
+        embed = discord.Embed(title=f'{self.bot.emoji("calculator")} Resultado:',
                               colour=discord.Colour(random_color()),
                               description='** **',
                               timestamp=datetime.utcnow())
@@ -202,15 +208,20 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                    file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
                     try:
                         value = await self.bot.wait_for('message', check=check, timeout=30)
+                        if not value.content.isdigit():
+                            return await ctx.send(f'O valor ``{value.content}`` não é um número válido!')
                         try:
                             value = int(value.content)
                         except ValueError:
                             try:
                                 value = float(value.content.replace(',', '.'))
                             except ValueError:
-                                return await ctx.send(f'O valor ``{value.content}`` não é um número!')
+                                return await ctx.send(f'O valor ``{value.content}`` não é um número válido!')
                     except asyncio.TimeoutError:
                         return await ctx.send('Tempo esgotado!')
+                    if value >= 5000:
+                        return await ctx.send(
+                            f'{ctx.author.mention} você não acha que ``{value}`` não é muito grande não?!')
                     for c in range(0, len(pos_text_list)):
                         if pos_text_list[c][-1] == valor[-1]:
                             pos_text_list[c][-1] = f'{value}'
@@ -225,7 +236,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                                   f'**x = {mult}/{valores_user[0]}**\n' +
                                                   f'**x = {prettify_number(resp)}**',
                                       timestamp=datetime.utcnow())
-                embed.set_author(name='Androxus',
+                embed.set_author(name=self.bot.user.name,
                                  icon_url=self.bot.user.avatar_url)
                 embed.set_footer(text=f'{ctx.author}',
                                  icon_url=ctx.author.avatar_url)
@@ -282,15 +293,20 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                    file=discord.File(f'{path}images/regra_de_tres_inversa-edited.png'))
                     try:
                         value = await self.bot.wait_for('message', check=check, timeout=30)
+                        if not value.content.isdigit():
+                            return await ctx.send(f'O valor ``{value.content}`` não é um número válido!')
                         try:
                             value = int(value.content)
                         except ValueError:
                             try:
                                 value = float(value.content.replace(',', '.'))
                             except ValueError:
-                                return await ctx.send(f'O valor ``{value.content}`` não é um número!')
+                                return await ctx.send(f'O valor ``{value.content}`` não é um número válido!')
                     except asyncio.TimeoutError:
                         return await ctx.send('Tempo esgotado!')
+                    if value >= 5000:
+                        return await ctx.send(
+                            f'{ctx.author.mention} você não acha que ``{value}`` não é muito grande não?!')
                     for c in range(0, len(pos_text_list)):
                         if pos_text_list[c][-1] == valor[-1]:
                             pos_text_list[c][-1] = f'{value}'
@@ -305,7 +321,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                                   f'**x = {mult}/{valores_user[-1]}**\n' +
                                                   f'**x = {prettify_number(resp)}**',
                                       timestamp=datetime.utcnow())
-                embed.set_author(name='Androxus',
+                embed.set_author(name=self.bot.user.name,
                                  icon_url=self.bot.user.avatar_url)
                 embed.set_footer(text=f'{ctx.author}',
                                  icon_url=ctx.author.avatar_url)

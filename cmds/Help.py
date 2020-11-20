@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # Help.py
 
@@ -13,20 +13,25 @@ from discord.ext import commands
 from googletrans import Translator
 
 from Classes import Androxus
-from database.Conexao import Conexao
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from modelos.embedHelpCategory import embedHelpCategory
-from modelos.embedHelpCommand import embedHelpCommand
+from modelos.embedHelpCategory import embed_help_category
+from modelos.embedHelpCommand import embed_help_command
 from utils.Utils import random_color, get_most_similar_item, string_similarity, convert_to_string
 
 
 class Help(commands.Cog, command_attrs=dict(category='bot_info')):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.Androxus.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @Androxus.comando(name='help',
-                      aliases=['ajuda'],
+                      aliases=['ajuda', 'h'],
                       description='Mostra mais detalhes sobre um comando.\n**Para obter os meus comandos, '
                                   'digite "cmds"**!',
                       parameters=['[comando/categoria]'],
@@ -45,17 +50,16 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                 comandos_personalizados = []
                 # se não achar um comando, vai procurar nos comandos personalizados
                 if (command is None) and (ctx.guild is not None):
-                    conexao = Conexao()
-                    servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
-                    comandos_personalizados = ComandoPersonalizadoRepository().get_commands(conexao, servidor)
-                    conexao.fechar()
+                    servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+                    comandos_personalizados = await ComandoPersonalizadoRepository().get_commands(
+                        self.bot.db_connection, servidor)
                     for cmd_pers in comandos_personalizados:
                         if cmd_pers.comando == comando:
-                            e = discord.Embed(title=f'{self.bot.configs["emojis"]["loop_fun"]} Comando personalizado',
+                            e = discord.Embed(title=f'{self.bot.emoji("loop_fun")} Comando personalizado',
                                               colour=discord.Colour(random_color()),
                                               description=f'**Este comando só existe neste servidor!**',
                                               timestamp=datetime.utcnow())
-                            e.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+                            e.set_author(name=self.bot.user.name, icon_url=f'{self.bot.user.avatar_url}')
                             e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
                             e.add_field(name=f'Comando: ```{cmd_pers.comando}```\n'
                                              f'Resposta: ```{cmd_pers.resposta}```\n'
@@ -68,11 +72,11 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                     command = None
                 # se o bot não achar o comando com esse nome
                 if command is None:
-                    embed = discord.Embed(title=f'Comando não encontrado {self.bot.configs["emojis"]["sad"]}',
+                    embed = discord.Embed(title=f'Comando não encontrado {self.bot.emoji("sad")}',
                                           colour=discord.Colour(0xFF0000),
                                           description=f'Desculpe, mas não achei a ajuda para o comando ``{comando}``',
                                           timestamp=datetime.utcnow())
-                    embed.set_author(name='Androxus', icon_url=f'{self.bot.user.avatar_url}')
+                    embed.set_author(name=self.bot.user.name, icon_url=f'{self.bot.user.avatar_url}')
                     embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
                     msg = '```ini\n[•] Veja se você não digitou algo errado'
                     all_commands = []
@@ -98,12 +102,12 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
             else:
                 # se a pessoa usou o comando "help diversão" vai mostrar todos os comandos
                 # que estão nessa categoria
-                e = embedHelpCategory(self.bot, ctx, comando)
+                e = await embed_help_category(self.bot, ctx, comando)
             # se não passou pelo return , vai atribuir o comando ao ctx.command
             ctx.command = command
             # o help do comando money é diferente, por isso esta condição
             if (ctx.command is not None) and (ctx.command.name == 'money'):
-                embed1 = embedHelpCommand(self.bot, ctx)
+                embed1 = await embed_help_command(self.bot, ctx)
                 embed1.add_field(name=f'Para saber todas as abreviações das moedas que eu aceito, clique em ➡',
                                  value=f'** **',
                                  inline=True)
@@ -186,7 +190,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                     pass
                 return
         if e is None:
-            e = embedHelpCommand(self.bot, ctx)
+            e = await embed_help_command(self.bot, ctx)
         return await ctx.send(embed=e)
 
 

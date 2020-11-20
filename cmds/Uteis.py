@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # Uteis.py
 
@@ -12,7 +12,6 @@ import googletrans
 from discord.ext import commands
 
 from Classes import Androxus
-from database.Conexao import Conexao
 from database.Repositories.InformacoesRepository import InformacoesRepository
 from utils.Utils import is_number, random_color, prettify_number
 from utils.permissions import check_permissions, bot_check_permissions
@@ -20,6 +19,12 @@ from utils.permissions import check_permissions, bot_check_permissions
 
 class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.Androxus.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @Androxus.comando(name='money',
@@ -109,20 +114,19 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}',
                          icon_url=ctx.author.avatar_url)
-        conexao = Conexao()
         info = InformacoesRepository()
         # se ainda não tiver essa conversão no banco:
-        if info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}') is None:
+        if await info.get_dado(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}') is None:
             # vai criar
-            info.create(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
+            await info.create(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
             ultimo_valor = um_valor
         else:
-            ultimo_valor = float(info.get_dado(conexao, f'{m_from.upper()} to {m_to.upper()}'))
-            info.update(conexao, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
+            ultimo_valor = float(await info.get_dado(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}'))
+            await info.update(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
         if ultimo_valor > um_valor:
-            msg = f'O valor diminuiu {prettify_number((ultimo_valor - um_valor), truncate=True)}! {self.bot.configs["emojis"]["diminuiu"]}'
+            msg = f'O valor diminuiu {prettify_number((ultimo_valor - um_valor), truncate=True)}! {self.bot.emoji("diminuiu")}'
         elif ultimo_valor < um_valor:
-            msg = f'O valor aumentou {prettify_number((um_valor - ultimo_valor), truncate=True)}! {self.bot.configs["emojis"]["aumentou"]}'
+            msg = f'O valor aumentou {prettify_number((um_valor - ultimo_valor), truncate=True)}! {self.bot.emoji("aumentou")}'
         else:
             msg = 'Não teve alteração no valor.'
         embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',
@@ -157,7 +161,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                     channel = ctx
                 if channel is None:
                     return await ctx.send(f'{ctx.author.mention} Não consegui achar o chat que você me informou.'
-                                          f' {self.bot.configs["emojis"]["sad"]}')
+                                          f' {self.bot.emoji("sad")}')
             else:
                 channel = ctx
             if channel != ctx:
@@ -178,7 +182,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         except discord.Forbidden:
             return await ctx.send(
                 f'{ctx.author.mention} eu não tenho permissão para enviar mensagem no chat {channel.mention}.'
-                f' {self.bot.configs["emojis"]["sad"]}')
+                f' {self.bot.emoji("sad")}')
         if channel != ctx:
             await ctx.send(f'{ctx.author.mention} Mensagem enviada no chat {channel.mention} com sucesso!')
         else:  # se o channel for igual ao ctx
@@ -206,7 +210,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             if not dest in dests:  # se o "dest" que a pessoa passou não for válido:
                 return await ctx.send(f'Não encontrei nenhuma lingua chamada ``{dest}``!\n' +
                                       'Por favor, verifique se você digitou a abreviação certa!\n' +
-                                      f'{self.bot.configs["emojis"]["sad"]}')
+                                      f'{self.bot.emoji("sad")}')
             # anti mention:
             if ctx.message.mentions:  # se tiver alguma menção na mensagem
                 for mention in ctx.message.mentions:

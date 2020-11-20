@@ -1,10 +1,13 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # Servidor.py
 
 __author__ = 'Rafael'
 
-from utils.Utils import get_configs
+try:
+    from utils.Utils import get_configs
+except ImportError:
+    pass
 
 
 class Servidor:
@@ -33,7 +36,7 @@ class Servidor:
                  roleAlterado=False,
                  sugestaoDeComando=True):
         self.id = id
-        self.prefixo = prefix or get_configs()['default_prefix']
+        self.prefixo = prefix
         self.channel_id_log = channelIdLog
         self.mensagem_deletada = mensagemDeletada
         self.mensagem_editada = mensagemEditada

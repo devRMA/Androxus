@@ -1,19 +1,23 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
-# ComandoDesativado.py
+# ComandoPersonalizado.py
 
 __author__ = 'Rafael'
 
-from database.Servidor import Servidor
+from database.Models.Servidor import Servidor
 
 
-class ComandoDesativado:
+class ComandoPersonalizado:
     servidor: Servidor
     comando: str
+    resposta: str
+    in_text: bool
 
-    def __init__(self, servidor, comando):
+    def __init__(self, servidor, comando, resposta, inText):
         self.servidor = servidor
         self.comando = comando
+        self.resposta = resposta
+        self.in_text = inText
 
     def __eq__(self, other):
         if other.__class__ == self.__class__:

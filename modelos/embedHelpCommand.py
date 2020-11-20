@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # embedHelpCommand.py
 
@@ -7,30 +7,35 @@ __author__ = 'Rafael'
 from datetime import datetime
 
 import discord
-from discord.ext import commands
 
-from Classes.Androxus import Androxus
-from database.Conexao import Conexao
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import random_color, pegar_o_prefixo
 
 
-def embedHelpCommand(bot: Androxus = None,
-                     ctx: commands.Context = None,
-                     comando: str = None,
-                     descricao: str = None,
-                     parametros: list = [],
-                     exemplos: list = [],
-                     aliases: list = [],
-                     perm_pessoa: str = None,
-                     perm_bot: str = None,
-                     cor: int = None):
-    conexao = Conexao()
+async def embed_help_command(bot, ctx, comando=None, descricao=None, parametros=None, exemplos=None,
+                             aliases=None, perm_pessoa=None, perm_bot=None, cor=None):
+    """
+
+    Args:
+        bot (Classes.Androxus.Androxus): A instância do bot
+        ctx (discord.ext.commands.context.Context): O contexto que vai ser usado para pegar o prefixo e o comando
+        comando (str): O comando que vai ser criado o embed (Default value = ctx.command.name)
+        descricao (str): A descrição do comando (Default value = ctx.command.description)
+        parametros (list): Lista de parâmetros do comando (Default value = ctx.command.parameters)
+        exemplos (list): Lista com exemplos de uso do comando (Default value = ctx.command.examples)
+        aliases (list): Lista de "sinônimos" do comando (Default value = ctx.command.aliases)
+        perm_pessoa (str): Permissão que o usuário precisa ter para usar o comando (Default value = ctx.command.perm_user)
+        perm_bot (str): Permissão que o bot precisa ter executar o comando (Default value = ctx.command.perm_bot)
+        cor (hex): Cor que vai ser usada no embed (Default value = random)
+
+    Returns:
+
+    """
     # se a pessoa usou o comando, mencionando o bot:
     if ctx.prefix.replace("!", "").replace(" ", "") == bot.user.mention:
         # vai pegar o prefixo que está no banco
-        prefixo = pegar_o_prefixo(bot, ctx, False, conexao)
+        prefixo = await pegar_o_prefixo(bot, ctx)
     else:
         # se a pessoa não marcou o bot:
         prefixo = ctx.prefix
@@ -43,24 +48,25 @@ def embedHelpCommand(bot: Androxus = None,
     # precisa fazer uma copia da lista, senão
     # as alterações feitas aqui
     # vão refletir no comando fora da função
-    if len(parametros) == 0:
+    if parametros is None:
         parametros = ctx.command.parameters.copy()
-    if len(exemplos) == 0:
+    if exemplos is None:
         exemplos = ctx.command.examples.copy()
-    if len(aliases) == 0:
+    if aliases is None:
         aliases = ctx.command.aliases.copy()
     if perm_pessoa is None:
         perm_pessoa = ctx.command.perm_user
     if perm_bot is None:
         perm_bot = ctx.command.perm_bot
-    exemplo = '\n'.join(exemplos).format(prefix=ctx.prefix,
-                                         author_mention=ctx.author.mention,
-                                         this_channel=f'<#{ctx.channel.id}>')
+    exemplo = '\n'.join(exemplos)
+    exemplo = exemplo.replace('{prefix}', ctx.prefix)
+    exemplo = exemplo.replace('{author_mention}', ctx.author.mention)
+    exemplo = exemplo.replace('{this_channel}', ctx.channel.mention)
     como_usar = f'``{prefixo}{comando}`` '
     comando_esta_desativado = False
     if ctx.guild is not None:  # se a mensagem foi enviar de um server
-        servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
-        cmds_desativados = ComandoDesativadoRepository().get_commands(conexao, servidor)
+        servidor = await ServidorRepository().get_servidor(bot.db_connection, ctx.guild.id)
+        cmds_desativados = await ComandoDesativadoRepository().get_commands(bot.db_connection, servidor)
         # for em todos os comandos desativados
         try:
             for comando_desativado in cmds_desativados:
@@ -84,20 +90,20 @@ def embedHelpCommand(bot: Androxus = None,
             alias = aliases[0]
         else:
             alias = ', '.join(aliases)
-    embed = discord.Embed(title=f'``{prefixo}{comando}``',
+    embed = discord.Embed(title=f'🔑 Detalhes sobre o comando ``{prefixo}{comando}``',
                           colour=discord.Colour(cor_a_usar),
                           description=descricao,
                           timestamp=datetime.utcnow())
-    embed.set_author(name='Androxus',
+    embed.set_author(name=bot.user.name,
                      icon_url=bot.user.avatar_url)
     embed.set_footer(text=f'{ctx.author}',
                      icon_url=ctx.author.avatar_url)
-    embed.add_field(name='**Como usar?**',
+    embed.add_field(name='🤔 **Como usar?**',
                     value=como_usar,
                     inline=False)
     if parametros:  # novamente, só vai entrar, se tiver pelo menos 1 item nos parâmetros
         embed.add_field(
-            name=f'{bot.configs["emojis"]["atencao"]} Tudo que estiver entre **<>** é obrigatório, e tudo que estiver '
+            name=f'{bot.emoji("atencao")} Tudo que estiver entre **<>** é obrigatório, e tudo que estiver '
                  'entre **[]** é opcional.',
             value='** **', inline=False)
     embed.add_field(name='📖 Exemplo',
@@ -119,8 +125,7 @@ def embedHelpCommand(bot: Androxus = None,
                         inline=False)
     if comando_esta_desativado:  # se o comando estiver desativado
         embed.add_field(
-            name=f"{bot.configs['emojis']['atencao']} **O comando foi desativado por algum administrador do server!**",
+            name=f"{bot.emoji('atencao')} **O comando foi desativado por algum administrador do server!**",
             value="**Se você usar este comando, eu não irei responder!**",
             inline=False)
-    conexao.fechar()
     return embed

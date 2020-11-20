@@ -1,30 +1,32 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # IComandoPersonalizadoRepository.py
 
 __author__ = 'Rafael'
 
 from abc import ABCMeta, abstractmethod
+from typing import List
 
-from database.ComandoPersonalizado import ComandoPersonalizado
-from database.Conexao import Conexao
-from database.Servidor import Servidor
+import asyncpg
+
+from database.Models.ComandoPersonalizado import ComandoPersonalizado
+from database.Models.Servidor import Servidor
 
 
 class IComandoPersonalizadoRepository(metaclass=ABCMeta):
 
     @abstractmethod
-    def create(self, conn: Conexao, comandoPersonalizado: ComandoPersonalizado):
+    def create(self, conn: asyncpg.pool.Pool, comandoPersonalizado: ComandoPersonalizado) -> bool:
         """ Insert into da table comando personalizado """
 
     @abstractmethod
-    def get_commands(self, conn: Conexao, servidor: Servidor):
+    def get_commands(self, conn: asyncpg.pool.Pool, servidor: Servidor) -> List[ComandoPersonalizado]:
         """ Select que vai trazer todos os comandos personalizados do servidor """
 
     @abstractmethod
-    def update(self, conn: Conexao, comandoPersonalizado: ComandoPersonalizado):
+    def update(self, conn: asyncpg.pool.Pool, comandoPersonalizado: ComandoPersonalizado) -> bool:
         """ Update da table comando personalizado """
 
     @abstractmethod
-    def delete(self, conn: Conexao, comandoPersonalizado: ComandoPersonalizado):
+    def delete(self, conn: asyncpg.pool.Pool, comandoPersonalizado: ComandoPersonalizado) -> bool:
         """ Delete da table comando personalizado """

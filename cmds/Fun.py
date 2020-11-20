@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # Fun.py
 
@@ -14,6 +14,12 @@ from utils.Utils import inverter_string
 
 class Fun(commands.Cog, command_attrs=dict(category='diversão')):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.Androxus.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @Androxus.comando(name='eightball',
@@ -46,7 +52,7 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
                      'Eu tenho cara de google?']
         # vai transformar a pergunta em asci, e usar este número como seed para pegar a resposta
         # e a base, vai ser o id da pessoa
-        asci_value = ctx.author.id
+        asci_value = ctx.author.id + ctx.channel.id
         for c in args:
             try:
                 # aqui, vamos fazer uma divisão, com o valor de cada caracter, pois assim

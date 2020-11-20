@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # GuildOnly.py
 # source: https://github.com/AlexFlipnote/discord_bot.py/blob/master/cogs/discord.py
@@ -12,18 +12,24 @@ import discord
 from discord.ext import commands
 
 from Classes import Androxus
-from database.Conexao import Conexao
+from Classes.erros import InvalidArgument
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity, \
     prettify_number
-from utils.erros import InvalidArgument
 
 
 class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.Androxus.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @Androxus.comando(name='avatar',
+                      aliases=['av'],
                       description='Eu vou mandar a foto de perfil da pessoa que você marcar.',
                       parameters=['[usuário (padrão: quem usou o comando)]'],
                       examples=['``{prefix}avatar`` {author_mention}'])
@@ -155,7 +161,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 return await ctx.send(embed=embed)
 
     @Androxus.comando(name='userinfo',
-                      aliases=['profile', 'memberinfo'],
+                      aliases=['profile', 'memberinfo', 'ui'],
                       description='Eu vou mandar o máximo de informações sobre um usuário.',
                       parameters=['[usuário (padrão: quem usou o comando)]'],
                       examples=['``{prefix}userinfo`` {author_mention}'])
@@ -268,10 +274,19 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                     user = ctx.author
             roles = None
             if hasattr(user, 'roles'):
-                roles = ', '.join(
-                    [f"<@&{x.id}>" for x in sorted(user.roles, key=lambda x: x.position, reverse=True) if
-                     x.id != ctx.guild.default_role.id]
-                ) if len(user.roles) > 1 else None
+                roles = None
+                if len(user.roles) > 1:
+                    roles = []
+                    for role in sorted(user.roles, key=lambda r: r.position, reverse=True):
+                        if role.id != ctx.guild.default_role.id:
+                            roles.append(role)
+                roles_mention = ', '.join([f'<@&{c}>' for c in map(lambda x: x.id, roles)])
+                roles_name = None
+                if len(roles_mention) > 1000:
+                    roles_name = ', '.join([f'`{c}`' for c in map(lambda x: x.name, roles)])
+                if roles_name is not None and len(roles_name) > 1000:
+                    roles_name = f'{roles_name[:1000]}...'
+                roles = roles_mention if roles_name is None else roles_name
             if hasattr(user, 'top_role'):
                 cor = user.top_role.colour.value
             else:
@@ -283,47 +298,47 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 if ctx.guild.owner_id == user.id:
                     badges += '👑'
             if pf.staff:
-                badges += self.bot.configs['emojis']['staff_badge']
+                badges += self.bot.emoji('staff_badge')
             if pf.partner:
-                badges += self.bot.configs['emojis']['parceiro_badge']
+                badges += self.bot.emoji('parceiro_badge')
             if pf.hypesquad:
-                badges += self.bot.configs['emojis']['hs_badge']
+                badges += self.bot.emoji('hs_badge')
             if pf.bug_hunter or pf.bug_hunter_level_2:
-                badges += self.bot.configs['emojis']['bug_hunter_badge']
+                badges += self.bot.emoji('bug_hunter_badge')
             if pf.hypesquad_bravery:
-                badges += self.bot.configs['emojis']['hs_bravery_badge']
+                badges += self.bot.emoji('hs_bravery_badge')
             if pf.hypesquad_brilliance:
-                badges += self.bot.configs['emojis']['hs_brilliance_badge']
+                badges += self.bot.emoji('hs_brilliance_badge')
             if pf.hypesquad_balance:
-                badges += self.bot.configs['emojis']['hs_balance_badge']
+                badges += self.bot.emoji('hs_balance_badge')
             if pf.early_supporter:
-                badges += self.bot.configs['emojis']['early_supporter_badge']
+                badges += self.bot.emoji('early_supporter_badge')
             if user.bot:
-                badges += self.bot.configs['emojis']['bot_badge']
+                badges += self.bot.emoji('bot_badge')
             if pf.verified_bot_developer or pf.early_verified_bot_developer:
-                badges += self.bot.configs['emojis']['dev_badge']
+                badges += self.bot.emoji('dev_badge')
             # como o discord não deixar bots verem o profile do user
             # e no profile que diz se a pessoa tem nitro, vamos ver se 
             # ela tem um gif no avatar, se tiver, ela tem nitro
             # ou vamos ver se ela está dando boost no servidor
             if user.is_avatar_animated():
-                badges += self.bot.configs['emojis']['nitro']
+                badges += self.bot.emoji('nitro')
             elif hasattr(user, 'premium_since'):
                 if user.premium_since is not None:
-                    badges += self.bot.configs['emojis']['nitro']
+                    badges += self.bot.emoji('nitro')
             if hasattr(user, 'premium_since'):
                 if user.premium_since is not None:
-                    badges += self.bot.configs['emojis']['boost']
+                    badges += self.bot.emoji('boost')
             status = ''
             if hasattr(user, 'raw_status'):
                 if user.raw_status == 'online':
-                    status = self.bot.configs['emojis']['online']
+                    status = self.bot.emoji('online')
                 elif user.raw_status == 'dnd':
-                    status = self.bot.configs['emojis']['dnd']
+                    status = self.bot.emoji('dnd')
                 elif user.raw_status == 'idle':
-                    status = self.bot.configs['emojis']['idle']
+                    status = self.bot.emoji('idle')
                 elif (user.raw_status == 'offline') or (user.raw_status == 'invisible'):
-                    status = self.bot.configs['emojis']['offline']
+                    status = self.bot.emoji('offline')
             info1 = discord.Embed(title=f'{badges} {user.display_name} {status}',
                                   colour=cor,
                                   description='** **',
@@ -332,14 +347,17 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             info1.set_thumbnail(url=user.avatar_url)
             info1.add_field(name="📑 Nome e tag:", value=f'`{user}`', inline=True)
             info1.add_field(name="🆔 Id: ", value=f'``{user.id}``', inline=True)
-            if hasattr(user, 'raw_status'):
+            if hasattr(user, 'raw_status') and (not user.bot):
                 # se a pessoa não estiver offline ou invisivel
-                if (user.raw_status != 'offline') and (user.raw_status != 'invisible'):
+                if (user.raw_status != 'offline') and (user.raw_status != 'invisible') and (not user.bot):
                     if user.is_on_mobile():
                         plataforma = '📱 Celular'
                     else:
-                        plataforma = '💻 Pc'
-                    info1.add_field(name="🗯 Está no:", value=f'``{plataforma}``', inline=True)
+                        if user.web_status.value != 'offline':
+                            plataforma = '💻 Pc ─ usando o site 🌐'
+                        else:
+                            plataforma = '💻 Pc ─ usando o discord desktop 🖥'
+                    info1.add_field(name="🕵️ Está acessando o discord pelo:", value=f'``{plataforma}``', inline=True)
             if hasattr(user, 'activities'):
                 activities = user.activities
                 streaming = False
@@ -348,7 +366,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 if len(activities) != 0:
                     for activity in activities:
                         if (activity.type.name == 'streaming') and (not streaming):
-                            info1.add_field(name=f'{self.bot.configs["emojis"]["streaming"]} Fazendo live',
+                            info1.add_field(name=f'{self.bot.emoji("streaming")} Fazendo live',
                                             value=f'**🎙 Plataforma**: `{activity.platform}`\n'
                                                   f'**🏷 Nome da live**: `{activity.name}`\n'
                                                   f'**🕛 Começou**: `{datetime_format(activity.created_at)}`',
@@ -367,7 +385,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                     texto = f'`{activity.name}`'
                                 else:
                                     texto = '`🚫 Nulo`'
-                                info1.add_field(name=f'{self.bot.configs["emojis"]["disco"]} Status personalizado',
+                                info1.add_field(name=f'{self.bot.emoji("disco")} Status personalizado',
                                                 value=f'🔰 Emoji: {emoji}\n'
                                                       f'🖋 Frase: {texto}',
                                                 inline=True)
@@ -397,7 +415,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                 inline=True)
                 if user.premium_since is not None:
                     info1.add_field(
-                        name=f'{self.bot.configs["emojis"]["boost"]} Começou a dar boost neste servidor em:',
+                        name=f'{self.bot.emoji("boost")} Começou a dar boost neste servidor em:',
                         value=f'`{user.premium_since.strftime("%d/%m/%Y")}`('
                               f'{datetime_format(user.premium_since)})',
                         inline=True)
@@ -560,6 +578,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             return await ctx.send(f'{ctx.author.mention} este servidor não tem discovery splash ;-;')
 
     @Androxus.comando(name='serverinfo',
+                      aliases=['guildinfo', 'si'],
                       description='Eu vou mandar o máximo de informações sobre um servidor.',
                       examples=['``{prefix}serverinfo``'])
     @commands.guild_only()
@@ -593,11 +612,11 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                         value=f'🧍 Pessoas: {prettify_number(ctx.guild.member_count - bots)}\n'
                               f'🤖 Bots: {prettify_number(bots)}', inline=True)
         embed.add_field(name='🙂 Emojis', value=f'{prettify_number(len(ctx.guild.emojis))}', inline=True)
-        embed.add_field(
-            name=f'💬 Canais ({prettify_number(len(ctx.guild.text_channels)) + len(ctx.guild.voice_channels)})',
-            value=f'📖 Chat: {prettify_number(len(ctx.guild.text_channels))}\n'
-                  f'🗣 Voz: {prettify_number(len(ctx.guild.voice_channels))}',
-            inline=True)
+        embed.add_field(name=f'💬 Canais ('
+                             f'{prettify_number(len(ctx.guild.text_channels) + len(ctx.guild.voice_channels))})',
+                        value=f'📖 Chat: {prettify_number(len(ctx.guild.text_channels))}\n'
+                              f'🗣 Voz: {prettify_number(len(ctx.guild.voice_channels))}',
+                        inline=True)
         embed.add_field(name='🏅 Cargos', value=f'{prettify_number(len(ctx.guild.roles))}', inline=True)
         embed.add_field(name='🗺 Região', value=f'{str(ctx.guild.region).capitalize()}', inline=True)
         embed.add_field(name='📅 Criado em:',
@@ -613,7 +632,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         await ctx.send(embed=embed)
 
     @Androxus.comando(name='server_avatar',
-                      aliases=['icone', 'icon'],
+                      aliases=['icone', 'icon', 'sa'],
                       description='Eu vou enviar o icone do servidor (se tiver).',
                       examples=['``{prefix}server_avatar``'])
     @commands.guild_only()
@@ -630,7 +649,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         await ctx.send(embed=embed)
 
     @Androxus.comando(name='server_banner',
-                      aliases=["banner"],
+                      aliases=["banner", 'sb'],
                       description='Eu vou enviar o banner do servidor (se tiver).',
                       examples=['``{prefix}server_banner``'])
     @commands.guild_only()
@@ -654,9 +673,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _configs(self, ctx):
-        conexao = Conexao()
-        servidor = ServidorRepository().get_servidor(conexao, ctx.guild.id)
-        conexao.fechar()
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
         e = discord.Embed(title=f'Todas as configurações deste servidor!',
                           colour=discord.Colour(random_color()),
                           description='** **',
@@ -674,15 +691,15 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                     value=f'{servidor.prefixo}',
                     inline=True)
         if servidor.sugestao_de_comando:
-            sugestao_cmd = self.bot.configs['emojis']['ativado']
+            sugestao_cmd = self.bot.emoji('ativado')
         else:
-            sugestao_cmd = self.bot.configs['emojis']['desativado']
+            sugestao_cmd = self.bot.emoji('desativado')
         e.add_field(name=f'Sugestao de comando',
                     value=sugestao_cmd,
                     inline=True)
         if servidor.channel_id_log is not None:
             e.add_field(name=f'Log',
-                        value=f'{self.bot.configs["emojis"]["ativado"]}\nEm: <#{servidor.channel_id_log}>',
+                        value=f'{self.bot.emoji("ativado")}\nEm: <#{servidor.channel_id_log}>',
                         inline=True)
             logs = []
             if servidor.mensagem_deletada:
@@ -705,7 +722,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                             inline=True)
         else:
             e.add_field(name=f'Log',
-                        value=f'{self.bot.configs["emojis"]["desativado"]}',
+                        value=f'{self.bot.emoji("desativado")}',
                         inline=True)
         await ctx.send(embed=e)
 

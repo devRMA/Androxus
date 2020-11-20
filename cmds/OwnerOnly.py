@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # OwnerOnly.py
 
@@ -7,21 +7,22 @@ __author__ = 'Rafael'
 import ast
 import asyncio
 from datetime import datetime
+from traceback import format_exc
 
+import asyncpg
 import discord
 from discord.ext import commands
 from stopwatch import Stopwatch
 
 from Classes import Androxus
-from database.ComandoDesativado import ComandoDesativado
-from database.ComandoPersonalizado import ComandoPersonalizado
-from database.Conexao import Conexao
+from database.Models.ComandoDesativado import ComandoDesativado
+from database.Models.ComandoPersonalizado import ComandoPersonalizado
+from database.Models.Servidor import Servidor
 from database.Repositories.BlacklistRepository import BlacklistRepository
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.InformacoesRepository import InformacoesRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from database.Servidor import Servidor
 from utils import Utils as u
 from utils import permissions
 from utils.Utils import get_emoji_dance, random_color, datetime_format
@@ -30,6 +31,12 @@ from utils.Utils import get_emoji_dance, random_color, datetime_format
 class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
     # algumas outras funções que só o dono do bot pode usar
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.Androxus.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @Androxus.comando(name='desativar_erros',
@@ -69,7 +76,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                   colour=discord.Colour(random_color()),
                                   description=get_emoji_dance(),
                                   timestamp=datetime.utcnow())
-            embed.set_author(name='Androxus', icon_url=self.bot.user.avatar_url)
+            embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         else:
             self.bot.mudar_status = False
@@ -78,7 +85,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                   colour=discord.Colour(random_color()),
                                   description=f'Agora eu estou jogando ``{" ".join(args)}``',
                                   timestamp=datetime.utcnow())
-            embed.set_author(name='Androxus', icon_url=self.bot.user.avatar_url)
+            embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 
@@ -106,7 +113,15 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                           colour=discord.Colour(random_color()),
                                           description=f'{args}\nId da mensagem: ``{msg.id}``',
                                           timestamp=datetime.utcnow())
-                    embed.set_author(name='Androxus', icon_url=self.bot.user.avatar_url)
+                    embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+                    embed.set_thumbnail(url=user.avatar_url)
+                    await ctx.send(embed=embed)
+                elif not foi and (ctx.guild.id == 405826835793051649):
+                    embed = discord.Embed(title=f'O(A) {str(user)} está com o dm privado!',
+                                          colour=discord.Colour(random_color()),
+                                          description='** **',
+                                          timestamp=datetime.utcnow())
+                    embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
                     embed.set_thumbnail(url=user.avatar_url)
                     await ctx.send(embed=embed)
             except:
@@ -123,7 +138,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True)
     @commands.check(permissions.is_owner)
     async def _kill(self, ctx):
-        await ctx.send(f'Reiniciando {self.bot.configs["emojis"]["loading"]}')
+        await ctx.send(f'Reiniciando {self.bot.emoji("loading")}')
         await self.bot.logout()
         raise SystemExit('Rebooting...')
 
@@ -140,27 +155,25 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
 
         def check(reaction, user):
             author = user.id == ctx.author.id
-            reactions = (str(reaction.emoji) == self.bot.configs['emojis']['cadeado']) or (
-                    str(reaction.emoji) == self.bot.configs['emojis']['desativado'])
+            reactions = (str(reaction.emoji) == self.bot.emoji('cadeado')) or (
+                    str(reaction.emoji) == self.bot.emoji('desativado'))
             message_check = reaction.message == msg_bot
             return author and reactions and message_check
 
-        if query:
-            if query[-1] != ';':
+        if query != '':
+            if not query.endswith(';'):
                 query += ';'
-            conexao = Conexao()
-            cursor = conexao.cursor()
             modo = 'i'
-            closed = discord.Embed(title=f'Query fechada {self.bot.configs["emojis"]["check_verde"]}',
+            closed = discord.Embed(title=f'Query fechada {self.bot.emoji("check_verde")}',
                                    colour=discord.Colour(0xff6961),
                                    description='** **',
                                    timestamp=datetime.utcnow())
             closed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             try:
-                cursor.execute(query)
-            except Exception as e:
-                conexao.fechar()
-                erro = discord.Embed(title=f'{self.bot.configs["emojis"]["atencao"]} Erro ao executar query',
+                async with self.bot.db_connection.acquire() as conn:
+                    conn.execute(query)
+            except:
+                erro = discord.Embed(title=f'{self.bot.emoji("atencao")} Erro ao executar query',
                                      colour=discord.Colour(0xff6961),
                                      description='** **',
                                      timestamp=datetime.utcnow())
@@ -168,9 +181,9 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 erro.add_field(name='📥 Input',
                                value=f'```sql\n{query}```',
                                inline=False)
-                e = [f'- {c}' for c in str(e).splitlines()]
+                e = [f'- {c}' for c in format_exc().splitlines()]
                 e = '\n'.join(e)
-                erro.add_field(name=f'{self.bot.configs["emojis"]["warning_flag"]} Erro',
+                erro.add_field(name=f'{self.bot.emoji("warning_flag")} Erro',
                                value=f'```diff\n{e}```',
                                inline=False)
                 msg_bot = await ctx.send(embed=erro)
@@ -191,13 +204,12 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                         inline=False)
             if 'select' in query.lower():
                 modo = 's'
-            if modo == 'i':
-                conexao.salvar()
             if modo == 's':
-                e.add_field(name='📤 Output',
-                            value=f'```py\n{cursor.fetchall()}```',
-                            inline=False)
-            conexao.fechar()
+                async with self.bot.db_connection.acquire() as conn:
+                    e.add_field(name='📤 Output',
+                                value=f'```py\n'
+                                      f'{tuple(tuple(record) for record in await conn.fetch(query))}```',
+                                inline=False)
             e.add_field(name='** **',
                         value=f'Essa mensagem será fechada em 2 minutos 🙂',
                         inline=False)
@@ -206,9 +218,9 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]))
             try:
                 reaction, _ = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
-                if str(reaction.emoji) == self.bot.configs["emojis"]["desativado"]:
+                if str(reaction.emoji) == self.bot.emoji("desativado"):
                     await msg_bot.edit(embed=closed)
-                elif str(reaction.emoji) == self.bot.configs["emojis"]["cadeado"]:
+                elif str(reaction.emoji) == self.bot.emoji("cadeado"):
                     e.remove_field(-1)
                     await msg_bot.edit(embed=e)
             except asyncio.TimeoutError:
@@ -230,7 +242,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             self.__insert_returns(body[-1].body)
 
     @Androxus.comando(name='eval',
-                      aliases=['ev'],
+                      aliases=['ev', 'e'],
                       description='Executa um script em python.',
                       parameters=['<script>'],
                       examples=['``{prefix}eval`` ``return \'opa\'``'],
@@ -238,24 +250,25 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True)
     @commands.check(permissions.is_owner)
     async def _eval(self, ctx, *, cmd):
-        execution_time = Stopwatch()
         msg_bot = None
+        result_hastebin = None
+        erro_hastebin = None
 
         def check(reaction, user):
             author = user.id == ctx.author.id
-            reactions = (str(reaction.emoji) == self.bot.configs["emojis"]["cadeado"]) or (
-                    str(reaction.emoji) == self.bot.configs["emojis"]["desativado"]) or (
-                                str(reaction.emoji) == self.bot.configs["emojis"]["ativado"])
+            reactions = (str(reaction.emoji) == self.bot.emoji("cadeado")) or (
+                    str(reaction.emoji) == self.bot.emoji("desativado")) or (
+                                str(reaction.emoji) == self.bot.emoji("ativado"))
             message_check = reaction.message == msg_bot
             return author and reactions and message_check
 
-        closed = discord.Embed(title=f'Eval fechada {self.bot.configs["emojis"]["check_verde"]}',
+        closed = discord.Embed(title=f'Eval fechada {self.bot.emoji("check_verde")}',
                                colour=discord.Colour(0xff6961),
                                description='** **',
                                timestamp=datetime.utcnow())
         closed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         try:
-            fn_name = '__eval_function'
+            fn_name = '_eval_function'
             if cmd.startswith('```py'):
                 cmd = cmd[5:]
             elif cmd.startswith('```'):
@@ -284,9 +297,10 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             env = {
                 'self': self,
                 'discord': discord,
+                'asyncpg': asyncpg,
+                'asyncio': asyncio,
                 'commands': commands,
                 'datetime': datetime,
-                'Androxus': Androxus,
                 'BlacklistRepository': BlacklistRepository,
                 'ComandoDesativadoRepository': ComandoDesativadoRepository,
                 'ComandoPersonalizadoRepository': ComandoPersonalizadoRepository,
@@ -294,7 +308,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 'ServidorRepository': ServidorRepository,
                 'ComandoDesativado': ComandoDesativado,
                 'ComandoPersonalizado': ComandoPersonalizado,
-                'Conexao': Conexao,
                 'Servidor': Servidor,
                 'pegar_o_prefixo': u.pegar_o_prefixo,
                 'random_color': u.random_color,
@@ -314,6 +327,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 'difference_between_lists': u.difference_between_lists,
                 'get_most_similar_items_with_similarity': u.get_most_similar_items_with_similarity,
                 'prettify_number': u.prettify_number,
+                'get_path_from_file': u.get_path_from_file,
+                'hastebin_post': u.hastebin_post,
                 'permissions': permissions,
                 'Stopwatch': Stopwatch,
                 'ctx': ctx,
@@ -321,12 +336,13 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             }
             exec(compile(parsed, filename='<ast>', mode='exec'), env)
             if retornar_algo:
-                result = (await eval(f'{fn_name}()', env))
+                execution_time = Stopwatch()
+                result = await eval(f'{fn_name}()', env)
+                execution_time.stop()
                 if result in ['nada', 'nda', 'null']:
                     retornar_algo = False
-        except Exception as e:
-            execution_time.stop()
-            erro = discord.Embed(title=f'{self.bot.configs["emojis"]["atencao"]} Erro no comando eval',
+        except:
+            erro = discord.Embed(title=f'{self.bot.emoji("atencao")} Erro no comando eval',
                                  colour=discord.Colour(0xff6961),
                                  description='** **',
                                  timestamp=datetime.utcnow())
@@ -334,11 +350,19 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             erro.add_field(name='📥 Input',
                            value=f'```py\n{execute_cmd}```',
                            inline=False)
-            e = [f'- {c}' for c in str(e).splitlines()]
+            e = [f'- {c}' for c in format_exc().splitlines()]
             e = '\n'.join(e)
-            erro.add_field(name=f'{self.bot.configs["emojis"]["warning_flag"]} Erro',
+            if len(e) >= 500:
+                e = f'{e[:500]}\n...'
+                erro_hastebin = await u.hastebin_post(format_exc())
+            erro.add_field(name=f'{self.bot.emoji("warning_flag")} Erro',
                            value=f'```diff\n{e}```',
                            inline=False)
+            if erro_hastebin is not None:
+                erro.add_field(name='** **',
+                               value=f'😅 infelizmente o erro foi muito grande, clique [aqui]({erro_hastebin})'
+                                     ' para ver o erro completo.',
+                               inline=False)
             msg_bot = await ctx.send(embed=erro)
             await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]))
             try:
@@ -347,7 +371,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 pass
             await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]), ctx.me)
             return await msg_bot.edit(embed=closed)
-        execution_time.stop()
         e = discord.Embed(title=f'Comando eval executado com sucesso!',
                           colour=discord.Colour(0xbdecb6),
                           description='** **',
@@ -362,10 +385,16 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             if u.is_number(result_str):
                 result_str = u.prettify_number(result_str)
             if len(result_str) > 1000:
+                result_hastebin = await u.hastebin_post(result)
                 result_str = f'{result_str[:1000]}\n...'
             e.add_field(name='📤 Output',
                         value=f'```py\n{result_str}```',
                         inline=False)
+            if result_hastebin is not None:
+                e.add_field(name='** **',
+                            value=f'😅 infelizmente o resultado ficou muito grande, clique [aqui]({result_hastebin})'
+                                  ' para ver o resultado completo.',
+                            inline=False)
             e.add_field(name='🤔 Tipo do return',
                         value=f'```py\n{result_type}```',
                         inline=False)
@@ -380,9 +409,9 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]))
         try:
             reaction, _ = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
-            if str(reaction.emoji) == self.bot.configs["emojis"]["desativado"]:
+            if str(reaction.emoji) == self.bot.emoji("desativado"):
                 await msg_bot.edit(embed=closed)
-            elif str(reaction.emoji) == self.bot.configs["emojis"]["cadeado"]:
+            elif str(reaction.emoji) == self.bot.emoji("cadeado"):
                 e.remove_field(-1)
                 await msg_bot.edit(embed=e)
         except asyncio.TimeoutError:
@@ -395,7 +424,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True)
     @commands.check(permissions.is_owner)
     async def _blacklist(self, ctx, *args):
-        conexao = Conexao()
         if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
             # se a pessoa marcou o bot apenas 1 vez
             if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
@@ -405,13 +433,12 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             user_id = ctx.message.mentions[-1].id
         else:
             user_id = int(args[0])
-        blacklisted = BlacklistRepository().get_pessoa(conexao, user_id)
-        conexao.fechar()
+        blacklisted = await BlacklistRepository().get_pessoa(self.bot.db_connection, user_id)
         if not blacklisted[0]:
-            msg = f'A pessoa pode usar meus comandos! {get_emoji_dance()}'
+            msg = f'O usuário <@!{user_id}> pode usar meus comandos! {get_emoji_dance()}'
         else:
-            msg = f'{self.bot.configs["emojis"]["no_no"]} Esse usuário foi banido de me usar!' + \
-                  f'\nMotivo: `{blacklisted[1]}`\nQuando: {datetime_format(blacklisted[-1])}'
+            msg = f'{self.bot.emoji("no_no")} O usuário <@!{user_id}> foi banido de me usar!' + \
+                  f'\nMotivo: `{blacklisted[1]}`\nQuando: `{datetime_format(blacklisted[-1])}`'
         return await ctx.send(msg)
 
     @Androxus.comando(name='add_blacklist',
@@ -419,7 +446,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True)
     @commands.check(permissions.is_owner)
     async def _add_blacklist(self, ctx, *args):
-        conexao = Conexao()
         if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
             # se a pessoa marcou o bot apenas 1 vez
             if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
@@ -438,13 +464,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             motivo = ' '.join(arg)
         else:
             motivo = 'nulo'
-        try:
-            BlacklistRepository().create(conexao, user_id, motivo)
-            conexao.fechar()
-        except Exception as e:
-            if str(e) == 'blacklisted':
-                return await ctx.send('Essa pessoa já está na blacklist!')
-        return await ctx.send(f'Este usuário não vai poder usar meus comandos! {self.bot.configs["emojis"]["banido"]}'
+        await BlacklistRepository().create(self.bot.db_connection, user_id, motivo)
+        return await ctx.send(f'O usuário <@!{user_id}> não vai poder usar meus comandos! {self.bot.emoji("banido")}'
                               f'\nCom o motivo: {motivo}')
 
     @Androxus.comando(name='remove_blacklist',
@@ -452,7 +473,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True)
     @commands.check(permissions.is_owner)
     async def _remove_blacklist(self, ctx, *args):
-        conexao = Conexao()
         if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
             # se a pessoa marcou o bot apenas 1 vez
             if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
@@ -462,12 +482,11 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             user_id = ctx.message.mentions[-1].id
         else:
             user_id = int(args[0])
-        BlacklistRepository().delete(conexao, user_id)
-        conexao.fechar()
-        return await ctx.send(f'Usuário perdoado! {get_emoji_dance()}')
+        await BlacklistRepository().delete(self.bot.db_connection, user_id)
+        return await ctx.send(f'Usuário <@!{user_id}> perdoado! {get_emoji_dance()}')
 
     @Androxus.comando(name='manutenção_on',
-                      aliases=['ativar_manutenção'],
+                      aliases=['ativar_manutenção', 'man_on'],
                       description='Ativa o modo "em manutenção" do bot.',
                       examples=['``{prefix}manutenção_on``',
                                 '``{prefix}ativar_manutenção``'],
@@ -480,10 +499,10 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             self.bot.mudar_status = False
             await self.bot.change_presence(activity=discord.Game(name='Em manutenção!'))
             self.bot.unload_extension('events.ErrorCommands')
-        await ctx.send(f'Modo manutenção:\n{self.bot.configs["emojis"]["on"]}')
+        await ctx.send(f'Modo manutenção:\n{self.bot.emoji("on")}')
 
     @Androxus.comando(name='manutenção_off',
-                      aliases=['desativar_manutenção'],
+                      aliases=['desativar_manutenção', 'man_off'],
                       description='Desativa o modo "em manutenção" do bot.',
                       examples=['``{prefix}manutenção_off``',
                                 '``{prefix}desativar_manutenção``'],
@@ -495,353 +514,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             self.bot.maintenance_mode = False
             self.bot.mudar_status = True
             self.bot.load_extension('events.ErrorCommands')
-        await ctx.send(f'Modo manutenção:\n{self.bot.configs["emojis"]["off"]}')
-
-    @Androxus.comando(name='testes',
-                      aliases=['rodar_testes', 'testar'],
-                      description='Vai verificar se tudo está ok (banco de dados e funções do utils).',
-                      examples=['``{prefix}testes``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
-    @commands.check(permissions.is_owner)
-    async def _testes(self, ctx):
-        tempo_msg = Stopwatch()
-        msg = await ctx.send(f'Realizando os testes {self.bot.configs["emojis"]["loading"]}')
-        tempo_msg.stop()
-        conexao_check = False
-        banco_check = False
-        testes_check = True
-        testes_falhos = []
-        try:
-            tempo_conexao = Stopwatch()
-            conexao = Conexao()
-            cursor = conexao.cursor()
-            tempo_conexao.stop()
-            conexao_check = True
-        except:
-            tempo_conexao = None
-            conexao = None
-            cursor = None
-        try:
-            if conexao is not None:
-                query = 'select serverId from servidor;'
-                tempo_query = Stopwatch()
-                cursor.execute(query)
-                tempo_query.stop()
-                result = [c[0] for c in cursor.fetchall()]
-                conexao.fechar()
-            else:
-                raise Exception
-        except:
-            tempo_query = None
-            result = None
-        if result is not None:
-            servers = [c.id for c in self.bot.guilds]
-            if len(u.difference_between_lists(result, servers)) == 0:
-                banco_check = True
-        # testes das funções uteis
-        # [(operação, resultado esperado)]
-        testes = [
-            (
-                "u.capitalize(';;ABC')",
-                ';;Abc'
-            ),
-            (
-                "u.capitalize('´ABC')",
-                '´Abc'
-            ),
-            (
-                "u.capitalize('12345AB  __+=12llaksamC')",
-                '12345Ab  __+=12llaksamc'
-            ),
-            (
-                "u.capitalize('9Ç12Opa')",
-                '9Ç12opa'
-            ),
-            (
-                "u.capitalize('12É987G654U012A!')",
-                '12É987g654u012a!'
-            ),
-            (
-                "u.datetime_format(datetime(2020, 10, 21, 16, 43, 48), datetime(2020, 10, 21, 14, 42, 47))",
-                'Hoje há 2 horas, 1 minuto e 1 segundo.'
-            ),
-            (
-                "u.datetime_format(datetime(2020, 10, 21, 16, 43, 48), datetime(2020, 10, 20, 16, 23, 18))",
-                'Ontem há 20 minutos e 30 segundos.'
-            ),
-            (
-                "u.datetime_format(datetime(2020, 10, 21, 16, 43, 48), datetime(2020, 9, 10, 10, 59, 59))",
-                '1 mês, 11 dias e 5 horas.'
-            ),
-            (
-                "u.inverter_string('opa')",
-                'ɐdo'
-            ),
-            (
-                "u.inverter_string('teste1234abc')",
-                'ɔqɐ4321ǝʇsǝʇ'
-            ),
-            (
-                "u.inverter_string('áããçãóṕteste')",
-                'ǝʇsǝʇṕóãçããá'
-            ),
-            (
-                "u.is_number('123')",
-                True
-            ),
-            (
-                "u.is_number('99999a')",
-                False
-            ),
-            (
-                "u.is_number('3.1415')",
-                True
-            ),
-            (
-                "u.is_number('3.1415a')",
-                False
-            ),
-            (
-                "u.is_number('teste')",
-                False
-            ),
-            (
-                "u.convert_to_bool('SIm')",
-                True
-            ),
-            (
-                "u.convert_to_bool('sim')",
-                True
-            ),
-            (
-                "u.convert_to_bool('1')",
-                True
-            ),
-            (
-                "u.convert_to_bool('ye')",
-                True
-            ),
-            (
-                "u.convert_to_bool('aTIvo')",
-                True
-            ),
-            (
-                "u.convert_to_bool('on')",
-                True
-            ),
-            (
-                "u.convert_to_bool('yep')",
-                None
-            ),
-            (
-                "u.convert_to_bool('ava')",
-                None
-            ),
-            (
-                "u.convert_to_bool('teste')",
-                None
-            ),
-            (
-                "u.convert_to_bool('2')",
-                None
-            ),
-            (
-                "u.convert_to_bool('+-=')",
-                None
-            ),
-            (
-                "u.convert_to_bool('çç')",
-                None
-            ),
-            (
-                "u.convert_to_bool('abc')",
-                None
-            ),
-            (
-                "u.convert_to_bool('não')",
-                False
-            ),
-            (
-                "u.convert_to_bool('nao')",
-                False
-            ),
-            (
-                "u.convert_to_bool('No')",
-                False
-            ),
-            (
-                "u.convert_to_bool('0')",
-                False
-            ),
-            (
-                "u.convert_to_bool('faLse')",
-                False
-            ),
-            (
-                "u.convert_to_bool('FALSE')",
-                False
-            ),
-            (
-                "u.convert_to_bool('desaTIvo')",
-                False
-            ),
-            (
-                "u.convert_to_bool('off')",
-                False
-            ),
-            (
-                "u.convert_to_string(True)",
-                'sim'
-            ),
-            (
-                "u.convert_to_string(None)",
-                'nulo'
-            ),
-            (
-                "u.convert_to_string(False)",
-                'não'
-            ),
-            (
-                "u.string_similarity('a', 'a')",
-                1.0
-            ),
-            (
-                "u.string_similarity('a', 'ab')",
-                0.5
-            ),
-            (
-                "u.string_similarity('falei', 'falar')",
-                0.6
-            ),
-            (
-                "u.string_similarity('123', '456')",
-                0.0
-            ),
-            (
-                "u.get_most_similar_item('123', ['123', '234', '321', '679'])",
-                '123'
-            ),
-            (
-                "u.get_most_similar_item('234', ['123', '234', '321', '679'])",
-                '234'
-            ),
-            (
-                "u.get_most_similar_item('5679', ['1234', '2345', '3210', '5679'])",
-                '5679'
-            ),
-            (
-                "u.get_most_similar_item('9234', ['1234', '2345', '3210', '5679'])",
-                '1234'
-            ),
-            (
-                "u.get_most_similar_items('9234', ['1234', '2345', '3210', '5679'])",
-                ['1234', '2345']
-            ),
-            (
-                "u.get_most_similar_items('5678', ['1234', '2345', '3210', '5679'])",
-                ['5679']
-            ),
-            (
-                "u.get_most_similar_items_with_similarity('5678', ['1234', '2345', '3210', '5679'])",
-                [['5679', 0.75]]
-            ),
-            (
-                "u.get_most_similar_items_with_similarity('1243', ['1234', '2345', '3210', '5679'])",
-                [['1234', 0.5]]
-            ),
-            (
-                "u.get_most_similar_items_with_similarity('9234', ['1234', '2345', '3210', '5679'])",
-                [['1234', 0.75], ['2345', 0.5]]
-            ),
-            (
-                "u.difference_between_lists(list(range(0, 20)), list(range(0, 21)))",
-                [20]
-            ),
-            (
-                "u.difference_between_lists(['a', 'b'], ['b', 'c'])",
-                ['a', 'c']
-            ),
-            (
-                "u.prettify_number(123)",
-                '123'
-            ),
-            (
-                "u.prettify_number(1234)",
-                '1.234'
-            ),
-            (
-                "u.prettify_number(123456)",
-                '123.456'
-            ),
-            (
-                "u.prettify_number(123456, br=False)",
-                '123,456'
-            ),
-            (
-                "u.prettify_number(123456.999, truncate=False)",
-                '123.456,999'
-            ),
-            (
-                "u.prettify_number(123456.999, truncate=True)",
-                '123.456,99'
-            ),
-            (
-                "u.prettify_number(123456.000000000001, truncate=True)",
-                '123.456'
-            ),
-            (
-                "u.prettify_number(123456.01, truncate=True)",
-                '123.456,01'
-            ),
-        ]
-
-        for teste, resultado in testes:
-            if eval(teste) != resultado:
-                testes_check = False
-                testes_falhos.append(f'Teste com erro: ```py\n{teste}```'
-                                     f'Resultado esperado: `{resultado}`\n'
-                                     f'Resultado obtido: `{eval(teste)}`')
-        e = discord.Embed(title=f'Resultado dos testes!',
-                          colour=discord.Colour(0xF5F5F5),
-                          description='** **',
-                          timestamp=datetime.utcnow())
-        e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-        if conexao_check:
-            con_emoji = self.bot.configs["emojis"]["ativado"]
-            desc_con = f'Tempo para abrir conexão: `{str(tempo_conexao)}`'
-        else:
-            con_emoji = self.bot.configs["emojis"]["desativado"]
-            desc_con = '** **'
-        if banco_check:
-            banco_emoji = self.bot.configs["emojis"]["ativado"]
-            desc_banco = f'Tempo para executar a query: `{str(tempo_query)}`'
-        else:
-            banco_emoji = self.bot.configs["emojis"]["desativado"]
-            desc_banco = '** **'
-        if testes_check:
-            testes_emoji = self.bot.configs["emojis"]["ativado"]
-            desc_testes = 'Todas as funções estão retornando aquilo que deveriam estar retornando!'
-        else:
-            testes_emoji = self.bot.configs["emojis"]["desativado"]
-            testes_falhos = '\n'.join(testes_falhos)
-            desc_testes = f'{testes_falhos}'
-        e.add_field(name=f'Conexão com o banco: {con_emoji}',
-                    value=desc_con,
-                    inline=False)
-        e.add_field(name=f'Executar uma query no banco: {banco_emoji}',
-                    value=desc_banco,
-                    inline=False)
-        e.add_field(name=f'Funções funcionando: {testes_emoji}',
-                    value=desc_testes,
-                    inline=False)
-        e.add_field(name=f'Latências',
-                    value=f'Tempo para enviar mensagem:\n'
-                          f'`{str(tempo_msg)}`\n'
-                          f'Ping do discord.py:\n'
-                          f'`{int(self.bot.latency * 1000)}ms`',
-                    inline=False)
-        await msg.edit(content='', embed=e)
+        await ctx.send(f'Modo manutenção:\n{self.bot.emoji("off")}')
 
 
 def setup(bot):

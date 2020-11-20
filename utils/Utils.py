@@ -1,161 +1,146 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 # Androxus bot
 # Utils.py
 
 __author__ = 'Rafael'
 
 import datetime
+import string as string_lib
+from datetime import datetime
+from glob import glob
+from json import loads, load
+from random import choice, randint
 from re import sub
 from typing import List
 
+from aiohttp import ClientSession
+from dateutil.relativedelta import relativedelta
+from jellyfish import jaro_winkler_similarity
+from requests import get
 
-def pegar_o_prefixo(bot, message, open_con=True, conn=None) -> str:
+from database.Models.Servidor import Servidor
+from database.Repositories.ServidorRepository import ServidorRepository
+
+
+async def pegar_o_prefixo(bot, message):
     """
-    :param bot: Pode passar None, esse parâmetro não é usado
-    :param message: A mensagem que quer saber o prefixo do bot
-    :param open_con: Parâmetro que servir como flag, para saber se é ou não para abrir uma conexão nova
-    :param conn: Conexão com o banco, caso o "open_con" esteja como False
-    :type bot: discord.ext.commands.Bot
-    :type message: discord.Message
-    :type open_con: bool
-    :type conn: Conexao
-    :return: o prefixo do bot, para está mensagem
-    :rtype: str
+
+    Args:
+        bot (Classes.Androxus.Androxus): Instância do bot
+        message (discord.Message or discord.ext.commands.context.Context): A mensagem que quer saber o prefixo do bot
+
+    Returns:
+        str: o prefixo do bot, para está mensagem
+
     """
-    # pega a classe que mexe com a table dos servidores
-    from database.Repositories.ServidorRepository import ServidorRepository
-    # classe servidor em si
-    from database.Servidor import Servidor
-    # classe que vai abrir a conexão com o banco
-    from database.Conexao import Conexao
-    # função que vai ler as informações do json
-    from utils.Utils import get_configs
     if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
-        if open_con:  # se for para abrir a conexão:
-            conexao = Conexao()
-        else:  # se não for, vai pegar a conexão que for passada
-            conexao = conn
         # vai no banco de dados, e faz um select para ver qual o prefixo
-        servidor = ServidorRepository().get_servidor(conexao, message.guild.id)
+        servidor = await ServidorRepository().get_servidor(bot.db_connection, message.guild.id)
         prefixo = None
         if servidor:
             prefixo = servidor.prefixo
         if prefixo is not None:  # se achou um prefixo, retorna o que achou
-            if open_con:  # se a conexão foi aberta aqui, vai ser fechada
-                conexao.fechar()
             return prefixo
         if servidor is None:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
-            servidor = Servidor(message.guild.id)  # vai criar um objeto Servidor
-            ServidorRepository().create(conexao, servidor)  # e vai mandar ele para o banco
-            if open_con:  # se a conexão foi aberta aqui, vai ser fechada
-                conexao.fechar()
+            servidor = Servidor(message.guild.id, get_configs()['default_prefix'])
+            await ServidorRepository().create(bot.db_connection, servidor)
             # se acabou de criar o registro, o prefixo vai ser o padrão
             return get_configs()['default_prefix']
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
 
 
-def random_color() -> hex:
+def random_color():
     """
-    :return: uma cor "aleatoria" em hexadecimal
-    :rtype: hex
+
+    Returns:
+        hex: uma cor "aleatoria" em hexadecimal
+
     """
-    from random import randint  # função que pega números aleatórios
-    r = lambda: randint(0, 255)  # lambda que vai pegar os números
     # vai escolher os números, e depois transformar em hexadecimal 0x000000
-    return int(f'0x{r():02x}{r():02x}{r():02x}', 16)
+    return int(f'0x{randint(0, 255):02x}{randint(0, 255):02x}{randint(0, 255):02x}', 16)
 
 
-def get_emoji_dance() -> str:
+def get_emoji_dance():
     """
-    :return: um emoji de dança aleatório
-    :rtype: str
+
+    Returns:
+        str: Um emoji de dança aleatório
+
     """
-    from random import choice
     # lista com os emojis
     emojis = [c[-1] for c in get_configs()['emojis']['dances'].items()]
     return choice(emojis)  # retorna o emoji escolhido da lista
 
 
-def get_last_update() -> datetime.datetime:
+def get_last_update():
     """
-    :return: vai retornar o datetime do último commit que teve no github
-    :rtype: datetime.datetime
+
+    Returns:
+        datetime.datetime: O datetime do último commit que teve no github
+
     """
     # função que vai pegar o último update que o bot teve
     # como o bot está no github, a ultima atualização que teve no github, vai ser a ultima atualização do bot
-    from requests import get  # função que vai pegar o html da página
-    from json import loads  # função que vai converter de json pra dicionario
-    from datetime import datetime  # como vai vim uma str do site, vamos converter para um objeto datetime
     url = 'https://api.github.com/repositories/294764564'  # url do repositório do bot
     html = get(url).text  # vai pegar o texto da página
     json = loads(html)  # transformar de json para dicionario
-    data_do_update = json['updated_at']  # aqui, ainda vai estar como string
+    data_do_update = json['pushed_at']  # aqui, ainda vai estar como string
     # esse é um exemplo de como vai chegar a string: 2020-09-19T04:37:37Z
     # da para observer que a formatação é: ano-mes-diaThora:minuto:segundoZ
     data_do_update = datetime.strptime(data_do_update, '%Y-%m-%dT%H:%M:%SZ')  # conversão de string para datetime
     return data_do_update  # retorna o objeto datetime
 
 
-def get_last_commit() -> str:
+def get_last_commit():
     """
-    :return: vai retornar a mensagem do último commit que teve no github do bot
-    :rtype: str
+
+    Returns:
+        str: A mensagem do último commit que teve no github do bot
+
     """
     # função que vai pegar o último commit do github do bot
-    from requests import get  # função que vai pegar o html da página
-    from json import loads  # função que vai converter de json pra dicionario
     url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
     html = get(url).text  # vai pegar o texto da página
     json = loads(html)  # transformar de json para dicionario
     return json[0]['commit']['message']  # vai pegar o último commit que teve, e retornar a mensagem
 
 
-def get_configs() -> dict:
+def get_configs():
     """
-    :return: vai retornar um dicionário com as configurações do arquivo configs.json
-    :rtype: dict
+
+    Returns:
+        dict: Um dicionário com as configurações do arquivo configs.json
+
     """
-    from json import load  # função que vai transformar de json para dict e vice versa
-    from os.path import exists  # função que vai verificar se existe o arquivo json
-    path = None  # Se não entrar em nenhum if, vai continuar como None
-    # lista de possiveis paths do configs.json
-    paths = [
-        'discord_bot/',
-        './',
-        '../',
-        '../../',
-        '../../../',
-        '../../../../'
-    ]
-    # laço que vai verificar em qual path está o configs.json
-    for c in paths:
-        if exists(f'{c}configs.json'):
-            path = f'{c}configs.json'  # se achar, salva o path
-            break
-    if path:
+    path = get_path_from_file('configs.json', 'json/')
+    if path is not None:
         with open(path) as file:
             configs = load(file)
         return configs
     else:
-        exit('Não achei o arquivo de configurações!\nBaixe o arquivo configs.json!\nhttps://github.com/devRMA/Androxus')
+        exit('Não achei o arquivo de configurações!\nBaixe o arquivo configs.json e coloque na pasta json!\n'
+             'https://github.com/devRMA/Androxus')
 
 
-def capitalize(string) -> str:
+def capitalize(string):
     """
-    :param string: string que vai ser formatada
-    :type string: str
-    :return: vai deixar apenas a primeira letra em maiúscula da string
-    :rtype: str
+
+    Args:
+        string (str): String que vai ser formatada
+
+    Returns:
+        str: Vai deixar apenas a primeira letra em maiúscula da string
+
     """
-    from string import ascii_lowercase
     # aqui, vamos pegar o alfabeto em minusculo e adicionar alguma letras com acentuação, que têm maiusculo
-    ascii_lowercase += 'éŕýúíóṕḉĺḱj́ǵśáźçǘńḿẁỳùìòàǜǹm̀ẽỹũĩõãṽñŵêŷûîôâŝĝĥĵẑĉ'
+    char_lowercase = string_lib.ascii_lowercase
+    char_lowercase += 'éŕýúíóṕḉĺḱj́ǵśáźçǘńḿẁỳùìòàǜǹm̀ẽỹũĩõãṽñŵêŷûîôâŝĝĥĵẑĉ'
     if string == '':
         return ''
     new_string = ''
     foi = False
     for char in string:
-        if (char.lower() in ascii_lowercase) and (not foi):
+        if (char.lower() in char_lowercase) and (not foi):
             new_string += char.upper()
             foi = True
         else:
@@ -163,17 +148,17 @@ def capitalize(string) -> str:
     return new_string
 
 
-def datetime_format(date1, date2=None) -> str:
+def datetime_format(date1, date2=None):
     """
-    :param date1: objeto datetime que vai ser subtraido pelo date2
-    :param date2: Parâmetro opcional, se não for passado nada, vai pegar o datetime utc atual
-    :type date1: datetime utc
-    :type date2: datetime utc
-    :return: vai retornar a string formatada, da diferença da date2 pela date1
-    :rtype: str
+
+    Args:
+        date1 (datetime.datetime): Objeto datetime que vai ser subtraido pelo date2
+        date2 (datetime.datetime): Parâmetro opcional, se não for passado, vai pegar o datetime utc atual (Default value = None)
+
+    Returns:
+        str: A string formatada, da diferença da date2 pela date1
+
     """
-    from dateutil.relativedelta import relativedelta
-    from datetime import datetime
     if date2 is None:
         date2 = datetime.utcnow()
     time = relativedelta(date2, date1)
@@ -193,10 +178,10 @@ def datetime_format(date1, date2=None) -> str:
     dados = 0
     dt_str = ''
     if (years == 0) and (months == 0) and (days <= 1):
-        if days == 0:
-            d_str = 'Hoje'
-        elif days == 1:
+        if (days == 1) or (abs(date2.day - date1.day) == 1):
             d_str = 'Ontem'
+        elif (days == 0) or (date1.day == date2.day):
+            d_str = 'Hoje'
         else:
             d_str = ''
         if hours > 1:
@@ -297,12 +282,15 @@ def datetime_format(date1, date2=None) -> str:
     return dt_str
 
 
-def inverter_string(string) -> str:
+def inverter_string(string):
     """
-    :param string: a string que vai ser virada de cabeça para baixo
-    :type string: str
-    :return: a string de cabeça para baixo
-    :rtype: str
+
+    Args:
+        string (str): A string que vai ser virada de cabeça para baixo
+
+    Returns:
+        str: A string de cabeça para baixo
+
     """
     letras = {
         'a': 'ɐ',
@@ -364,14 +352,16 @@ def inverter_string(string) -> str:
     return string_invertida[::-1]
 
 
-def is_number(string) -> bool:
+def is_number(string):
     """
-    :param string: A string que vai ser verificada
-    :type string: str
-    :return: Vai retornar se a string pode ser convertida para float ou int
-    :rtype: bool
+
+    Args:
+        string (str): A string que vai ser verificada
+
+    Returns:
+        bool: Vai retornar se a string pode ser convertida para float ou int
+
     """
-    from string import ascii_lowercase
     try:
         if string.find(',') != -1:
             # se a string vier assim: 2,2
@@ -383,7 +373,7 @@ def is_number(string) -> bool:
         if string.isalpha():
             return False
         # aqui vai verificar se tem alguma letra no meio dos números
-        for char in ascii_lowercase:
+        for char in string_lib.ascii_lowercase:
             if char in string.lower():
                 return False
         float(string)
@@ -392,12 +382,15 @@ def is_number(string) -> bool:
         return False
 
 
-def convert_to_bool(argument: str) -> bool or None:
+def convert_to_bool(argument):
     """
-    :param argument: A string que vai ser convertida para bool
-    :type argument: str
-    :return: Vai retornar o boolean correspondente a string passada
-    :rtype: bool or None
+
+    Args:
+        argument (str): A string que vai ser convertida para bool
+
+    Returns:
+        bool or None: Vai retornar o boolean correspondente a string passada
+
     """
     lowered = argument.lower()
     strings_true = ('sim', 'yes', 'true', '1', 'ativo', 'on')
@@ -411,12 +404,15 @@ def convert_to_bool(argument: str) -> bool or None:
     return None
 
 
-def convert_to_string(argument: bool or None) -> str:
+def convert_to_string(argument):
     """
-    :param argument: O bool que vai ser convertido para string
-    :type argument: bool or None
-    :return: Vai retornar "sim" ou "não" ou "nulo" de acordo com o parâmetro
-    :rtype: bool
+
+    Args:
+        argument (bool or None): O bool que vai ser convertido para string
+
+    Returns:
+        bool: Vai retornar sim/não ou nulo de acordo com o parâmetro
+
     """
     if argument is None:
         return 'nulo'
@@ -426,32 +422,40 @@ def convert_to_string(argument: bool or None) -> str:
         return 'não'
 
 
-def string_similarity(string1, string2) -> float:
+def string_similarity(string1, string2):
     """
-    :param string1: Primeira string que vai ser comparada
-    :param string2: Segunda string que vai ser comparada
-    :type string1: str
-    :type string2: str
-    :return: Vai retornar o quão similar, são as strings, podendo ir de 0.0 a 1.0
-    :rtype: float
+
+    Args:
+        string1 (str): Primeira string que vai ser comparada
+        string2 (str): Segunda string que vai ser comparada
+
+    Returns:
+        float: O quão similar são as strings, podendo ir de 0.0 a 1.0
+
+    Examples:
+        >>> string_similarity('string 1', 'string 1')
+        1.0
+        >>> string_similarity('string 1', 'string 2')
+        0.95
+        >>> string_similarity('abc', 'bcd')
+        0.0
+        >>> string_similarity('apple', 'appel')
+        0.9533333333333333
+
     """
-    import jellyfish
-    difference = jellyfish.levenshtein_distance(string1, string2)
-    if difference == 0:
-        return 1.0
-    max_value = max([len(string1), len(string2)])
-    result = 100 - ((100 * difference) / max_value)
-    return result / 100
+    return jaro_winkler_similarity(str(string1), str(string2))
 
 
-def get_most_similar_item(string: str, list_items: List[str]) -> str or None:
+def get_most_similar_item(string, list_items):
     """
-    :param string: String que vai ser comparada com a lista
-    :param list_items: Uma lista de strings que vão ser comparadas com a primeira string
-    :type string: str
-    :type list_items: List[str]
-    :return: Vai retornar o item da lista mais parecido com a string do parâmetro
-    :rtype: str or None
+
+    Args:
+        string (str): String que vai ser comparada com a lista
+        list_items (List[str]): Uma lista de strings que vão ser comparadas com a primeira string
+
+    Returns:
+        str: O item da lista mais parecido com a string do parâmetro
+
     """
     # lista que vai guardar o item e o score mais alto que teve
     highest_score = [0.0, '']
@@ -466,18 +470,20 @@ def get_most_similar_item(string: str, list_items: List[str]) -> str or None:
     # se algum item ser pelo menos 50% parecido com a string, vai retornar ele
     if highest_score[0] >= 0.5:
         return highest_score[-1]
-    # caso contrario, não retorna nada
+    # caso contrario, retorna nada
     return None
 
 
-def get_most_similar_items(string: str, list_items: List[str]) -> list:
+def get_most_similar_items(string, list_items):
     """
-    :param string: String que vai ser comparada com a lista
-    :param list_items: Uma lista de strings que vão ser comparadas com a primeira string
-    :type string: str
-    :type list_items: List[str]
-    :return: Vai retornar uma lista com os itens mais parecidos com a string base
-    :rtype: list
+
+    Args:
+        string (str): String que vai ser comparada com a lista
+        list_items (List[str]): Uma lista de strings que vão ser comparadas com a primeira string
+
+    Returns:
+        list: Uma lista com os itens mais parecidos com a string base
+
     """
     list_items_cp = list_items.copy()
     ms = []
@@ -491,14 +497,16 @@ def get_most_similar_items(string: str, list_items: List[str]) -> list:
     return ms
 
 
-def get_most_similar_items_with_similarity(string: str, list_items: List[str]) -> list:
+def get_most_similar_items_with_similarity(string, list_items):
     """
-    :param string: String que vai ser comparada com a lista
-    :param list_items: Uma lista de strings que vão ser comparadas com a primeira string
-    :type string: str
-    :type list_items: List[str]
-    :return: Vai retornar uma lista com os itens mais parecidos com a string base e também qual o grau de similaridade
-    :rtype: list
+
+    Args:
+        string (str): String que vai ser comparada com a lista
+        list_items (List[str]): Uma lista de strings que vão ser comparadas com a primeira string
+
+    Returns:
+        list: Uma lista com os itens mais parecidos com a string base e também qual o grau de similaridade
+
     """
     list_items_cp = list_items.copy()
     ms = []
@@ -512,28 +520,47 @@ def get_most_similar_items_with_similarity(string: str, list_items: List[str]) -
     return ms
 
 
-def difference_between_lists(list1: list, list2: list) -> list:
+def difference_between_lists(list1, list2):
     """
-    :param list1: Primeira lista
-    :param list2: Segunda lista
-    :type list1: list
-    :type list2: list
-    :return: Vai retornar uma lista, com os itens que não se repetiram nas listas
-    :rtype: list
+
+    Args:
+        list1 (list): Primeira lista
+        list2 (list): Segunda lista
+
+    Returns:
+        list: Uma lista com os itens que não se repetiram nas listas passadas
+
+    Examples:
+        >>> difference_between_lists([2, 3, 4, 5], [1, 2, 3, 4])
+        [5, 1]
+        >>> difference_between_lists([print, sorted, str], [int, str, sorted])  # funciona com lista de qualquer coisa
+        [<function print>, int]
+        >>> difference_between_lists('abc', 'bcd')  # funciona com string, já que é uma lista de char
+        ['a', 'd']
+
     """
     return list(set(list1) - set(list2)) + list(set(list2) - set(list1))
 
 
-def prettify_number(number: not (not float and not int and not str), br: bool = True, truncate: bool = False) -> str:
+def prettify_number(number, br=True, truncate=False):
     """
-    :param truncate: Parâmetro que vai definir se é ou não para cortar as casas decimais
-    :param number: O valor que vai ser deixado "bonito"
-    :param br: Flag que vai ativar ou não o padrão br: "100.000,00". Se tiver desativado, vai sair assim "100,000.00"
-    :return: A string com o número formatado
-    :type number: float or int or str
-    :type br: bool
-    :type truncate: bool
-    :rtype: str
+
+    Args:
+        number (Any): O valor que vai ser deixado "bonito"
+        br (bool): Flag que vai ativar ou não o padrão br: "100.000,00". Se tiver desativado, vai sair assim "100,000.00"
+        truncate (bool): Parâmetro que vai definir se é ou não para cortar as casas decimais
+
+    Returns:
+        str: A string com o número formatado
+
+    Examples:
+        >>> prettify_number(123456789)
+        '123.456.789'
+        >>> prettify_number(3.141592)
+        '3,1415'
+        >>> prettify_number(3.141592, truncate=True)
+        '3,14'
+
     """
     # se a pessoa não passou um número
     if not is_number(str(number)):
@@ -561,3 +588,72 @@ def prettify_number(number: not (not float and not int and not str), br: bool = 
     number = f'{int(number):_}'.replace('_', separator)
     # depois, é só retornar a string com o número, o separador de casa decimal, e as casas decimais
     return f'{number}{decimal_separator}{decimal}'
+
+
+def get_path_from_file(filename, directory=''):
+    """
+
+    Args:
+        filename (str): Nome do arquivo que quer procurar
+        directory (str): Pastas onde o arquivo vai estar (Default value = '')
+
+    Returns:
+        str: A localização do arquivo
+
+    Examples:
+        # como depende de onde a função está sendo chamada, o mesmo arquivo pode ter diferentes paths
+        >>> get_path_from_file('Utils', 'utils/')
+        '../utils/Utils.py'
+        >>> get_path_from_file('*.py', 'utils/')
+        '../utils/permissions.py'
+        >>> get_path_from_file('Utils.py', '**/')
+        '../utils/Utils.py'
+
+    """
+    path = ''
+    while True:
+        files = glob(f'{path}{directory}{filename}')
+        if len(files) != 0:
+            return files[0]
+        if path == '':
+            path = './'
+        elif path == './':
+            path = '../'
+        else:
+            path += '../'
+        if path.count('../') >= 5:
+            return None
+
+
+async def hastebin_post(content):
+    """
+
+    Args:
+        content (str): O conteúdo que vai ser postado num editor de texto online
+
+    Returns:
+        str: A url do hastebin com o conteúdo postado
+
+    """
+    url_base = None
+    async with ClientSession() as session:
+        # limpando caracteres non utf-8
+        content = ''.join(filter(lambda x: x in string_lib.printable, content))
+        async with session.get('https://hasteb.in/') as resp:
+            if resp.status == 200:
+                url_base = 'https://hasteb.in'
+        # se o hasteb.in não estiver online, vai ver se o hastebin.com está
+        if url_base is None:
+            async with session.get('https://hastebin.com/') as resp:
+                if resp.status == 200:
+                    url_base = 'https://hastebin.com'
+        # se o hasteb.in também estiver offline, vai ver se o pastie.io está
+        if url_base is None:
+            async with session.get('https://pastie.io/') as resp:
+                if resp.status == 200:
+                    url_base = 'https://pastie.io'
+        # se nenhum dos três sites estiver on, retornar nada
+        if url_base is None:
+            return ''
+        async with session.post(f'{url_base}/documents', data=content.strip()) as resp:
+            return f"{url_base}/{loads(await resp.text())['key']}"
