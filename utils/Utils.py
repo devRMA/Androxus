@@ -81,10 +81,10 @@ def get_last_update():
     """
     # função que vai pegar o último update que o bot teve
     # como o bot está no github, a ultima atualização que teve no github, vai ser a ultima atualização do bot
-    url = 'https://api.github.com/repositories/294764564'  # url do repositório do bot
+    url = 'https://api.github.com/repositories/294764564//commits'  # url do repositório do bot
     html = get(url).text  # vai pegar o texto da página
     json = loads(html)  # transformar de json para dicionario
-    data_do_update = json['pushed_at']  # aqui, ainda vai estar como string
+    data_do_update = json[0]['commit']['committer']['date']  # aqui, ainda vai estar como string
     # esse é um exemplo de como vai chegar a string: 2020-09-19T04:37:37Z
     # da para observer que a formatação é: ano-mes-diaThora:minuto:segundoZ
     data_do_update = datetime.strptime(data_do_update, '%Y-%m-%dT%H:%M:%SZ')  # conversão de string para datetime
