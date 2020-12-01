@@ -727,6 +727,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.check(permissions.is_owner)
     async def _oldrank(self, ctx, *, args=None):
+        # TODO
         if args is None:
             member = ctx.author
         else:
