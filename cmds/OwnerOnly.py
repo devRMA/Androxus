@@ -119,7 +119,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 elif not foi and (ctx.guild.id == 405826835793051649):
                     embed = discord.Embed(title=f'O(A) {str(user)} está com o dm privado!',
                                           colour=discord.Colour(random_color()),
-                                          description='** **',
                                           timestamp=datetime.utcnow())
                     embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
                     embed.set_thumbnail(url=user.avatar_url)
@@ -166,7 +165,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             modo = 'i'
             closed = discord.Embed(title=f'Query fechada {self.bot.emoji("check_verde")}',
                                    colour=discord.Colour(0xff6961),
-                                   description='** **',
                                    timestamp=datetime.utcnow())
             closed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             try:
@@ -175,7 +173,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             except:
                 erro = discord.Embed(title=f'{self.bot.emoji("atencao")} Erro ao executar query',
                                      colour=discord.Colour(0xff6961),
-                                     description='** **',
                                      timestamp=datetime.utcnow())
                 erro.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
                 erro.add_field(name='📥 Input',
@@ -196,7 +193,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 return await msg_bot.edit(embed=closed)
             e = discord.Embed(title=f'Query executada com sucesso!',
                               colour=discord.Colour(0xbdecb6),
-                              description='** **',
                               timestamp=datetime.utcnow())
             e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             e.add_field(name='📥 Input',
@@ -264,7 +260,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
 
         closed = discord.Embed(title=f'Eval fechada {self.bot.emoji("check_verde")}',
                                colour=discord.Colour(0xff6961),
-                               description='** **',
                                timestamp=datetime.utcnow())
         closed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         try:
@@ -344,14 +339,12 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         except:
             erro = discord.Embed(title=f'{self.bot.emoji("atencao")} Erro no comando eval',
                                  colour=discord.Colour(0xff6961),
-                                 description='** **',
                                  timestamp=datetime.utcnow())
             erro.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             erro.add_field(name='📥 Input',
                            value=f'```py\n{execute_cmd}```',
                            inline=False)
-            e = [f'- {c}' for c in format_exc().splitlines()]
-            e = '\n'.join(e)
+            e = '\n'.join(f'- {c}' for c in format_exc().splitlines())
             if len(e) >= 500:
                 e = f'{e[:500]}\n...'
                 erro_hastebin = await u.hastebin_post(format_exc())
@@ -373,7 +366,6 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             return await msg_bot.edit(embed=closed)
         e = discord.Embed(title=f'Comando eval executado com sucesso!',
                           colour=discord.Colour(0xbdecb6),
-                          description='** **',
                           timestamp=datetime.utcnow())
         e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         e.add_field(name='📥 Input',

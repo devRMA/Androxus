@@ -147,7 +147,6 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
         stopwatch_banco.stop()
         e1 = discord.Embed(title=f'Calculando ping {self.bot.emoji("loading")}',
                            colour=discord.Colour(random_color()),
-                           description='** **',
                            timestamp=datetime.utcnow())
         e1.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         stopwatch_message = Stopwatch()
@@ -157,7 +156,6 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                                  f'{self.bot.emoji("database")} Tempo de resposta do banco: {stopwatch_banco}!\n'
                                  f'{self.bot.emoji("bob")} Tempo de resposta no discord: {stopwatch_message}!',
                            colour=discord.Colour(random_color()),
-                           description='** **',
                            timestamp=datetime.utcnow())
         e2.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await asyncio.sleep(stopwatch_message.duration * 2)

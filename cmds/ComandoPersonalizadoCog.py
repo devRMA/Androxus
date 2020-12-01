@@ -58,7 +58,6 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         await ComandoPersonalizadoRepository().create(self.bot.db_connection, comando_personalizado)
         in_text_str = capitalize(convert_to_string(in_text))
         embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
-                              description='** **',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         embed.add_field(

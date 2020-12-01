@@ -110,7 +110,6 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         embed = discord.Embed(title=f'🪙 {prettify_number(m_qtd)} {m_from.lower()} = {prettify_number(result)}'
                                     f' {m_to.lower()}',
                               colour=discord.Colour(random_color()),
-                              description='** **',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}',
                          icon_url=ctx.author.avatar_url)

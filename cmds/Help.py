@@ -113,7 +113,6 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                                  inline=True)
                 embed2 = discord.Embed(title=f'Todas as moedas que eu aceito no comando "money"',
                                        colour=discord.Colour(random_color()),
-                                       description='** **',
                                        timestamp=datetime.utcnow())
                 translator = Translator()
                 moedas = ''

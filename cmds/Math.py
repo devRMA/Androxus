@@ -133,7 +133,6 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
             return
         embed = discord.Embed(title=f'{self.bot.emoji("calculator")} Resultado:',
                               colour=discord.Colour(random_color()),
-                              description='** **',
                               timestamp=datetime.utcnow())
         embed.add_field(name=f'Calculo:',
                         value=f'```{args}```',

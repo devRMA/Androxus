@@ -178,9 +178,11 @@ def datetime_format(date1, date2=None):
     dados = 0
     dt_str = ''
     if (years == 0) and (months == 0) and (days <= 1):
-        if (days == 1) or (abs(date2.day - date1.day) == 1):
+        if date1.day == date2.day:
+            d_str = 'Hoje'
+        elif (days == 1) or (abs(date2.day - date1.day) == 1):
             d_str = 'Ontem'
-        elif (days == 0) or (date1.day == date2.day):
+        elif days == 0:
             d_str = 'Hoje'
         else:
             d_str = ''
@@ -446,12 +448,13 @@ def string_similarity(string1, string2):
     return jaro_winkler_similarity(str(string1), str(string2))
 
 
-def get_most_similar_item(string, list_items):
+def get_most_similar_item(string, list_items, key=lambda x: str(x)):
     """
 
     Args:
         string (str): String que vai ser comparada com a lista
         list_items (List[str]): Uma lista de strings que vão ser comparadas com a primeira string
+        key: Função que vai determinar como vai ser comparado os itens da lista (Default value = str(item))
 
     Returns:
         str: O item da lista mais parecido com a string do parâmetro
@@ -461,11 +464,11 @@ def get_most_similar_item(string, list_items):
     highest_score = [0.0, '']
     for item in list_items:
         # vai pegar o quão similar a string é do item
-        similatity = string_similarity(string, item)
+        similarity = string_similarity(string, key(item))
         # se a similaridade for maior do que a registrada
         # vai atualizar
-        if similatity > highest_score[0]:
-            highest_score[0] = similatity
+        if similarity > highest_score[0]:
+            highest_score[0] = similarity
             highest_score[-1] = item
     # se algum item ser pelo menos 50% parecido com a string, vai retornar ele
     if highest_score[0] >= 0.5:
@@ -474,12 +477,13 @@ def get_most_similar_item(string, list_items):
     return None
 
 
-def get_most_similar_items(string, list_items):
+def get_most_similar_items(string, list_items, key=lambda x: str(x)):
     """
 
     Args:
         string (str): String que vai ser comparada com a lista
         list_items (List[str]): Uma lista de strings que vão ser comparadas com a primeira string
+        key: Função que vai determinar como vai ser comparado os itens da lista (Default value = str(item))
 
     Returns:
         list: Uma lista com os itens mais parecidos com a string base
@@ -488,7 +492,7 @@ def get_most_similar_items(string, list_items):
     list_items_cp = list_items.copy()
     ms = []
     for _ in list_items:
-        most_similar = get_most_similar_item(string, list_items_cp)
+        most_similar = get_most_similar_item(string, list_items_cp, key)
         if most_similar is not None:
             list_items_cp.remove(most_similar)
             ms.append(most_similar)
@@ -497,12 +501,13 @@ def get_most_similar_items(string, list_items):
     return ms
 
 
-def get_most_similar_items_with_similarity(string, list_items):
+def get_most_similar_items_with_similarity(string, list_items, key=lambda x: str(x)):
     """
 
     Args:
         string (str): String que vai ser comparada com a lista
         list_items (List[str]): Uma lista de strings que vão ser comparadas com a primeira string
+        key: Função que vai determinar como vai ser comparado os itens da lista (Default value = str(item))
 
     Returns:
         list: Uma lista com os itens mais parecidos com a string base e também qual o grau de similaridade
@@ -510,11 +515,11 @@ def get_most_similar_items_with_similarity(string, list_items):
     """
     list_items_cp = list_items.copy()
     ms = []
-    for c in range(len(list_items)):
-        most_similar = get_most_similar_item(string, list_items_cp)
+    for _ in range(len(list_items)):
+        most_similar = get_most_similar_item(string, list_items_cp, key)
         if most_similar is not None:
             list_items_cp.remove(most_similar)
-            ms.append([most_similar, string_similarity(string, most_similar)])
+            ms.append([most_similar, string_similarity(string, key(most_similar))])
         else:
             break
     return ms
@@ -638,7 +643,7 @@ async def hastebin_post(content):
     url_base = None
     async with ClientSession() as session:
         # limpando caracteres non utf-8
-        content = ''.join(filter(lambda x: x in string_lib.printable, content))
+        content = ''.join(filter(lambda x: str(x) in string_lib.printable, content))
         async with session.get('https://hasteb.in/') as resp:
             if resp.status == 200:
                 url_base = 'https://hasteb.in'
@@ -657,3 +662,44 @@ async def hastebin_post(content):
             return ''
         async with session.post(f'{url_base}/documents', data=content.strip()) as resp:
             return f"{url_base}/{loads(await resp.text())['key']}"
+
+
+def find_user(input, collection, accuracy=0.6):
+    """
+
+    Args:
+        input (str): O input que vai ser procurado na collection de membros/users
+        collection (List[discord.User]): Lista de membros/usuários que vai tentar achar o input
+        accuracy (float): O quão parecido vai precisar ser o input com o usuário, para selecionar ele  (Default value = 0.4)
+
+    Returns:
+        List[discord.User]: O usuário/membro encontrado
+
+    """
+
+    # TODO
+    def exact(u):
+        return any([u.name.lower() == str(input).lower(),
+                    u.display_name.lower() == str(input).lower(),
+                    str(u).lower() == str(input).lower()])
+
+    def similar(u):
+        return any([string_similarity(u.name.lower(), str(input).lower()) >= accuracy,
+                    string_similarity(u.display_name.lower(), str(input).lower()) >= accuracy,
+                    string_similarity(str(u).lower(), str(input).lower()) >= accuracy])
+
+    most_similar_items = list()
+    for item in collection:
+        if is_number(input):
+            try:
+                id_user = int(input)
+            except ValueError:
+                pass
+            else:
+                if item.id == id_user:
+                    return [item]
+        if exact(item):
+            return [item]
+        elif similar(item):
+            most_similar_items.append(item)
+    return []

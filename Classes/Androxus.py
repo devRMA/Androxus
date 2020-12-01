@@ -66,7 +66,7 @@ def _load_cogs(bot):
 
 
 class Androxus(commands.Bot):
-    __version__ = '2.2.0'
+    __version__ = '2.2.1'
     configs: dict = get_configs()
     uptime: datetime
     mudar_status: bool = True
@@ -77,9 +77,7 @@ class Androxus(commands.Bot):
 
     def __init__(self, *args, **kwargs):
         # Intents do discord.py 1.5.0
-        intents = discord.Intents.default()
-        intents.members = True
-        intents.presences = True
+        intents = discord.Intents.all()
         # configurações do .json
         configs = get_configs()
 
@@ -174,13 +172,10 @@ class Androxus(commands.Bot):
             if permissions.can_use_external_emojis(ctx):
                 await ctx.send(self.emoji("hello"))
             return
-        if servidor:
-            for comando_desativado in await ComandoDesativadoRepository().get_commands(self.db_connection, servidor):
-                # aqui, estamos retirando o prefixo da mensagem, e criando uma lista com todas as palavras
-                palavras_formatadas = message.content.lower().replace(prefixo, '').split(' ')
-                # se a primeira palavra, for diferente de '' e o comando desativado estiver nela:
-                if (palavras_formatadas[0] != '') and (
-                        comando_desativado.comando.lower() in palavras_formatadas[0].lower()):
+        if (servidor is not None) and ctx.valid:
+            for comando_desativado_obj in await ComandoDesativadoRepository().get_commands(self.db_connection, servidor):
+                comando_desativado = self.get_command(comando_desativado_obj.comando.lower())
+                if comando_desativado.name == ctx.command.name:
                     return await ctx.send(f'{self.emoji("no_no")} Este comando '
                                           'foi desativado por um administrador do servidor!')
         channel = message.channel

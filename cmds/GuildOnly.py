@@ -14,8 +14,9 @@ from discord.ext import commands
 from Classes import Androxus
 from Classes.erros import InvalidArgument
 from database.Repositories.ServidorRepository import ServidorRepository
+from utils import permissions
 from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity, \
-    prettify_number
+    prettify_number, find_user
 
 
 class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
@@ -45,7 +46,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if ctx.message.mentions:  # se tiver alguma menção na mensagem
             embed = discord.Embed(title=f'Avatar do(a) {str(ctx.message.mentions[0])}!',
                                   colour=discord.Colour(random_color()),
-                                  description='** **',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             embed.set_image(url=ctx.message.mentions[-1].avatar_url)
@@ -71,7 +71,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                         # vai mandar o avatar desta pessoa
                         e = discord.Embed(title=f'Avatar do(a) {str(user)}!',
                                           colour=discord.Colour(random_color()),
-                                          description='** **',
                                           timestamp=datetime.utcnow())
                         e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
                         e.set_image(url=user.avatar_url)
@@ -146,7 +145,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 # se chegou aqui, vai mandar o avatar do user
                 e = discord.Embed(title=f'Avatar do(a) {str(user)}!',
                                   colour=discord.Colour(random_color()),
-                                  description='** **',
                                   timestamp=datetime.utcnow())
                 e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
                 e.set_image(url=user.avatar_url)
@@ -154,7 +152,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             else:  # se a pessoa não passou nenhum argumento:
                 embed = discord.Embed(title=f'Seu avatar!',
                                       colour=discord.Colour(random_color()),
-                                      description='** **',
                                       timestamp=datetime.utcnow())
                 embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
                 embed.set_image(url=ctx.author.avatar_url)
@@ -280,13 +277,13 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                     for role in sorted(user.roles, key=lambda r: r.position, reverse=True):
                         if role.id != ctx.guild.default_role.id:
                             roles.append(role)
-                roles_mention = ', '.join([f'<@&{c}>' for c in map(lambda x: x.id, roles)])
-                roles_name = None
-                if len(roles_mention) > 1000:
-                    roles_name = ', '.join([f'`{c}`' for c in map(lambda x: x.name, roles)])
-                if roles_name is not None and len(roles_name) > 1000:
-                    roles_name = f'{roles_name[:1000]}...'
-                roles = roles_mention if roles_name is None else roles_name
+                    roles_mention = ', '.join([f'<@&{c}>' for c in map(lambda x: x.id, roles)])
+                    roles_name = None
+                    if len(roles_mention) > 1000:
+                        roles_name = ', '.join([f'`{c}`' for c in map(lambda x: x.name, roles)])
+                    if roles_name is not None and len(roles_name) > 1000:
+                        roles_name = f'{roles_name[:1000]}...'
+                    roles = roles_mention if roles_name is None else roles_name
             if hasattr(user, 'top_role'):
                 cor = user.top_role.colour.value
             else:
@@ -341,7 +338,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                     status = self.bot.emoji('offline')
             info1 = discord.Embed(title=f'{badges} {user.display_name} {status}',
                                   colour=cor,
-                                  description='** **',
                                   timestamp=datetime.utcnow())
             info1.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             info1.set_thumbnail(url=user.avatar_url)
@@ -422,7 +418,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                 # só vai mostrar as permissões da pessoa, se ela estiver no server
                 info2 = discord.Embed(title=f'{badges} {user.display_name}',
                                       colour=cor,
-                                      description='** **',
                                       timestamp=datetime.utcnow())
                 info2.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
                 info2.set_thumbnail(url=user.avatar_url)
@@ -552,7 +547,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if ctx.guild.splash_url:
             embed = discord.Embed(title=f'Splash deste servidor!',
                                   colour=discord.Colour(random_color()),
-                                  description='** **',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             embed.set_image(url=ctx.guild.splash_url)
@@ -569,7 +563,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if ctx.guild.discovery_splash_url:
             embed = discord.Embed(title=f'discovery splash deste servidor!',
                                   colour=discord.Colour(random_color()),
-                                  description='** **',
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             embed.set_image(url=ctx.guild.discovery_splash_url)
@@ -642,7 +635,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             return await ctx.send("Este servidor não tem icone.")
         embed = discord.Embed(title=f'Icone deste servidor!',
                               colour=discord.Colour(random_color()),
-                              description='** **',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         embed.set_image(url=ctx.guild.icon_url_as(size=1024))
@@ -659,7 +651,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             return await ctx.send("Este servidor não tem banner.")
         embed = discord.Embed(title=f'Banner deste servidor!',
                               colour=discord.Colour(random_color()),
-                              description='** **',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         embed.set_image(url=ctx.guild.banner_url)
@@ -676,7 +667,6 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
         e = discord.Embed(title=f'Todas as configurações deste servidor!',
                           colour=discord.Colour(random_color()),
-                          description='** **',
                           timestamp=datetime.utcnow())
         e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         if ctx.guild.icon:
@@ -725,6 +715,42 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                         value=f'{self.bot.emoji("desativado")}',
                         inline=True)
         await ctx.send(embed=e)
+
+    @Androxus.comando(name='oldrank',
+                      aliases=['oldmembersrank', 'or', 'membrosantigos'],
+                      description='Eu vou mostrar o rank com os membros mais antigos do servidor.',
+                      parameters=['[me | página | usuário (padrão: me)]'],
+                      examples=['``{prefix}oldrank``'],
+                      hidden=True)
+    @commands.guild_only()
+    @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    @commands.check(permissions.is_owner)
+    async def _oldrank(self, ctx, *, args=None):
+        if args is None:
+            member = ctx.author
+        else:
+            members = find_user(args, ctx.guild.members, 0.7)
+            if len(members) == 0:
+                return await ctx.send('Não achei nenhum membro!')
+            elif len(members) == 1:
+                member = members[0]
+            else:
+                if len(members) > 5:
+                    msg = '\n'.join(f'{u} (ID: {u.id})' for u in members[:5])
+                    msg += f'\nE outro(s) {len(members) - 5} resultado(s)...'
+                else:
+                    msg = '\n'.join(f'{u} (ID: {u.id})' for u in members)
+                return await ctx.send(f'Encontrei mais de um membro!\n{msg}')
+        members = sorted(ctx.guild.members, key=lambda x: x.joined_at)
+
+        def get_pos(m):
+            try:
+                return members.index(m)
+            except:
+                return -1
+
+        await ctx.send(f'Membro: {member}\nPos: {get_pos(member)}')
 
 
 def setup(bot):

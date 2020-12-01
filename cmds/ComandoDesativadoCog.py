@@ -38,28 +38,24 @@ class ComandoDesativadoCog(commands.Cog, command_attrs=dict(category='administra
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _desativar_comando(self, ctx, *, comando: str = None):
         if comando is None:
-            await self.bot.send_help(ctx)
-            return
+            return await self.bot.send_help(ctx)
         comandos_que_nao_podem_ser_desativados = ['desativar_comando',
-                                                  'disable_command',
-                                                  'dc',
                                                   'reativar_comando',
-                                                  'reactivate_command',
-                                                  'change_prefix',
-                                                  'prefixo',
-                                                  'prefix'
-                                                  'help',
-                                                  'ajuda']
-        if comando.lower() in comandos_que_nao_podem_ser_desativados:
-            return await ctx.send(f'Você não pode desativar este comando! {self.bot.emoji("no_no")}')
+                                                  'help']
+        comando_para_desativar = self.bot.get_command(comando)
+        if comando_para_desativar is None:
+            return await ctx.send(f'{ctx.author.mention} não tenho esse comando!')
+        if comando_para_desativar.name in comandos_que_nao_podem_ser_desativados:
+            return await ctx.send(
+                f'{ctx.author.mention} você não pode desativar este comando! {self.bot.emoji("no_no")}')
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
-        comando_desativado = ComandoDesativado(servidor, comando)
+        comando_desativado = ComandoDesativado(servidor, comando_para_desativar.name)
         await ComandoDesativadoRepository().create(self.bot.db_connection, comando_desativado)
         embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour(random_color()),
-                              description=f'Comando desativado: {comando}',
+                              description=f'Comando desativado: {comando_para_desativar.name}',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-        return await ctx.send(content=f'{self.bot.emoji("off")}', embed=embed)
+        return await ctx.send(content=self.bot.emoji('off'), embed=embed)
 
     @Androxus.comando(name='reativar_comando',
                       aliases=['reactivate_command'],
@@ -73,17 +69,17 @@ class ComandoDesativadoCog(commands.Cog, command_attrs=dict(category='administra
     async def _reativar_comando(self, ctx, comando=None):
         if comando is None:
             return await self.bot.send_help(ctx)
-
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
-        comando_desativado = ComandoDesativado(servidor, comando)
-        # verificação para saber se o comando existe no banco
+        comando_para_reativar = self.bot.get_command(comando)
+        if comando_para_reativar is None:
+            return await ctx.send(f'{ctx.author.mention} não tenho esse comando!')
+        comando_desativado = ComandoDesativado(servidor, comando_para_reativar.name)
         comandos_desativados = await ComandoDesativadoRepository().get_commands(self.bot.db_connection, servidor)
-        # se não tiver o comando no banco:
-        if not comando_desativado in [cmd for cmd in comandos_desativados]:
+        if comando_desativado not in [cmd for cmd in comandos_desativados]:
             return await ctx.send(f'{self.bot.emoji("atencao")} Este comando já está ativo!')
         await ComandoDesativadoRepository().delete(self.bot.db_connection, comando_desativado)
         embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour(random_color()),
-                              description=f'Comando reativado: {comando}',
+                              description=f'Comando reativado: {comando_para_reativar.name}',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         return await ctx.send(content=self.bot.emoji('on'), embed=embed)

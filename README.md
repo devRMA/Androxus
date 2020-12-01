@@ -1,6 +1,7 @@
 # Androxus
-[![MIT License][license-shield]][license-url]
 [![ReadMe Card](https://github-readme-stats.vercel.app/api/pin/?username=devRMA&repo=Androxus&theme=blue-green)](https://github.com/anuraghazra/github-readme-stats)
+<br>
+[![MIT License][license-shield]][license-url]
 
 Um bot para o discord feito em python, usando <a href="https://github.com/Rapptz/discord.py">discord.py</a> e PostgreSQL. O bot tem alguns comandos matemáticos, alguns comandos de diversão.
 Caso você fique em dúvida sobre algum comando, acesse a <a href="https://devrma.github.io/Androxus/">documentação</a>.
