@@ -7,6 +7,7 @@ __author__ = 'Rafael'
 import datetime
 import string as string_lib
 from datetime import datetime
+from functools import reduce
 from glob import glob
 from json import loads, load
 from random import choice, randint
@@ -643,7 +644,7 @@ async def hastebin_post(content):
     url_base = None
     async with ClientSession() as session:
         # limpando caracteres non utf-8
-        content = ''.join(filter(lambda x: str(x) in string_lib.printable, content))
+        content = to_utf8(content)
         async with session.get('https://hasteb.in/') as resp:
             if resp.status == 200:
                 url_base = 'https://hasteb.in'
@@ -664,42 +665,71 @@ async def hastebin_post(content):
             return f"{url_base}/{loads(await resp.text())['key']}"
 
 
-def find_user(input, collection, accuracy=0.6):
+def to_utf8(string):
     """
 
     Args:
-        input (str): O input que vai ser procurado na collection de membros/users
+        string: A string que vai ser filtrada
+
+    Returns:
+        str: A string inicial apenas com caracteres utf-8
+
+    """
+    return ''.join(filter(lambda x: str(x) in string_lib.printable, list(str(string))))
+
+
+def find_user(user_input, collection, accuracy=0.6):
+    """
+
+    Args:
+        user_input (str): O input que vai ser procurado na collection de membros/users
         collection (List[discord.User]): Lista de membros/usuários que vai tentar achar o input
-        accuracy (float): O quão parecido vai precisar ser o input com o usuário, para selecionar ele  (Default value = 0.4)
+        accuracy (float): O quão parecido vai precisar ser o input com o usuário, para selecionar ele (Default value = 0.6)
 
     Returns:
         List[discord.User]: O usuário/membro encontrado
 
     """
 
-    # TODO
-    def exact(u):
-        return any([u.name.lower() == str(input).lower(),
-                    u.display_name.lower() == str(input).lower(),
-                    str(u).lower() == str(input).lower()])
+    user_input = to_utf8(user_input)
+    if user_input == '':
+        return []
 
-    def similar(u):
-        return any([string_similarity(u.name.lower(), str(input).lower()) >= accuracy,
-                    string_similarity(u.display_name.lower(), str(input).lower()) >= accuracy,
-                    string_similarity(str(u).lower(), str(input).lower()) >= accuracy])
+    class ItemSimilarity:
+        def __init__(self, value, similarity):
+            self.item = value
+            self.similarity = similarity
 
     most_similar_items = list()
     for item in collection:
-        if is_number(input):
+        if is_number(user_input):
             try:
-                id_user = int(input)
+                int_input = int(user_input)
             except ValueError:
                 pass
             else:
-                if item.id == id_user:
+                if item.id == int_input:
                     return [item]
-        if exact(item):
+        sim_name = string_similarity(to_utf8(item.name).lower(), user_input.lower())
+        if sim_name == 1.0:
             return [item]
-        elif similar(item):
-            most_similar_items.append(item)
+        sim_display_name = string_similarity(to_utf8(item.display_name).lower(), user_input.lower())
+        if sim_display_name == 1:
+            return [item]
+        sim_name_tag = string_similarity(to_utf8(str(item)).lower(), user_input.lower())
+        if sim_name_tag == 1.0:
+            return [item]
+        most_similarity = reduce(lambda x, y: x if x > y else y, [sim_name, sim_display_name, sim_name_tag])
+        if most_similarity >= accuracy:
+            most_similar_items.append(ItemSimilarity(item, most_similarity))
+    if len(most_similar_items) > 0:
+        most_similar_items.sort(key=lambda k: k.similarity,
+                                reverse=True)
+        if most_similar_items[0].similarity >= 0.8:
+            return list(map(lambda x: x.item, filter(lambda x: x.similarity >= 0.9, most_similar_items)))
+        if len(most_similar_items) <= 4:
+            return [reduce(lambda x, y: x if x.similarity > y.similarity else y, most_similar_items).item]
+        else:
+            return list(map(lambda x: x.item, most_similar_items))
     return []
+

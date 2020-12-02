@@ -727,17 +727,16 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     @commands.check(permissions.is_owner)
     async def _oldrank(self, ctx, *, args=None):
-        # TODO
         if args is None:
             member = ctx.author
         else:
-            members = find_user(args, ctx.guild.members, 0.7)
+            members = find_user(args, ctx.guild.members, 0.)
             if len(members) == 0:
                 return await ctx.send('Não achei nenhum membro!')
             elif len(members) == 1:
                 member = members[0]
             else:
-                if len(members) > 5:
+                if len(members) >= 5:
                     msg = '\n'.join(f'{u} (ID: {u.id})' for u in members[:5])
                     msg += f'\nE outro(s) {len(members) - 5} resultado(s)...'
                 else:
@@ -751,7 +750,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             except:
                 return -1
 
-        await ctx.send(f'Membro: {member}\nPos: {get_pos(member)}')
+        await ctx.send(f'Membro: {member}\nPosição: {get_pos(member)}')
 
 
 def setup(bot):
