@@ -13,6 +13,7 @@ from sys import version
 from traceback import format_exc
 
 import discord
+import jishaku
 from asyncpg.pool import Pool
 from discord.ext import commands, tasks
 from requests import get
@@ -45,6 +46,7 @@ def _warn(frase):
 
 def _load_cogs(bot):
     bot.remove_command('help')
+    bot.load_extension('jishaku')
     path_cmds = get_path_from_file('cmds/')
     path_events = get_path_from_file('events/')
     for filename in listdir(path_cmds):
@@ -173,7 +175,8 @@ class Androxus(commands.Bot):
                 await ctx.send(self.emoji("hello"))
             return
         if (servidor is not None) and ctx.valid:
-            for comando_desativado_obj in await ComandoDesativadoRepository().get_commands(self.db_connection, servidor):
+            for comando_desativado_obj in await ComandoDesativadoRepository().get_commands(self.db_connection,
+                                                                                           servidor):
                 comando_desativado = self.get_command(comando_desativado_obj.comando.lower())
                 if comando_desativado.name == ctx.command.name:
                     return await ctx.send(f'{self.emoji("no_no")} Este comando '
@@ -261,6 +264,12 @@ class Androxus(commands.Bot):
                                                        channels=prettify_number(len(set(self.get_all_channels())))
                                                        )
             await self.change_presence(activity=discord.Game(name=status_escolhido))
+
+    async def is_owner(self, user: discord.User):
+        if user.id in self.configs['owners']:
+            return True
+
+        return await super().is_owner(user)
 
     def get_all_categories(self):
         categories = [c[0] for c in self.configs['emojis']['categories'].items()]

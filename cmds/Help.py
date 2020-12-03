@@ -32,8 +32,8 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
 
     @Androxus.comando(name='help',
                       aliases=['ajuda', 'h'],
-                      description='Mostra mais detalhes sobre um comando.\n**Para obter os meus comandos, '
-                                  'digite "cmds"**!',
+                      description='Mostra mais detalhes sobre um comando.\nPara obter os meus comandos, '
+                                  'digite "cmds"!',
                       parameters=['[comando/categoria]'],
                       examples=['``{prefix}help``',
                                 '``{prefix}ajuda`` ``adicionar_comando``'])

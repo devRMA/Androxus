@@ -7,6 +7,7 @@ __author__ = 'Rafael'
 
 import asyncio
 from datetime import datetime
+from random import choice
 
 import discord
 from discord.ext import commands
@@ -719,20 +720,22 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @Androxus.comando(name='oldrank',
                       aliases=['oldmembersrank', 'or', 'membrosantigos'],
                       description='Eu vou mostrar o rank com os membros mais antigos do servidor.',
-                      parameters=['[me | página | usuário (padrão: me)]'],
+                      parameters=['[random/aleatorio | usuário (padrão: autor)]'],
                       examples=['``{prefix}oldrank``'],
                       hidden=True)
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
-    @commands.check(permissions.is_owner)
     async def _oldrank(self, ctx, *, args=None):
         if args is None:
             member = ctx.author
         else:
             members = find_user(args, ctx.guild.members, 0.)
-            if len(members) == 0:
-                return await ctx.send('Não achei nenhum membro!')
+            if (len(members) == 0) or (len(members) == len(ctx.guild.members)):
+                if (args == 'random') or (args == 'aleatorio') or (args == 'aleatório'):
+                    member = choice(ctx.guild.members)
+                else:
+                    return await ctx.send('Não achei nenhum membro!')
             elif len(members) == 1:
                 member = members[0]
             else:
@@ -746,11 +749,59 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
 
         def get_pos(m):
             try:
-                return members.index(m)
+                return members.index(m) + 1
             except:
                 return -1
 
-        await ctx.send(f'Membro: {member}\nPosição: {get_pos(member)}')
+        def to_emoji(number):
+            if number == 1:
+                return ':first_place:'
+            elif number == 2:
+                return ':second_place:'
+            elif number == 3:
+                return ':third_place:'
+            result = prettify_number(number)
+            result = result.replace('0', ':zero:')
+            result = result.replace('1', ':one:')
+            result = result.replace('2', ':two:')
+            result = result.replace('3', ':three:')
+            result = result.replace('4', ':four:')
+            result = result.replace('5', ':five:')
+            result = result.replace('6', ':six:')
+            result = result.replace('7', ':seven:')
+            result = result.replace('8', ':eight:')
+            result = result.replace('9', ':nine:')
+            result = result.replace('.', ' ')
+            return result
+
+        if len(ctx.guild.members) >= 10:
+            if get_pos(member) <= 5:
+                selected = members[:10]
+            else:
+                selected = members[get_pos(member) - 5:get_pos(member) + 5]
+        else:
+            selected = members.copy()
+        e = discord.Embed(title=f'Rank dos membros mais antigos!',
+                          colour=discord.Colour(random_color()),
+                          timestamp=datetime.utcnow())
+        e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+        rank = ''
+        for item in selected:
+            rank += f'{to_emoji(get_pos(item))} '
+            if item == member:
+                rank += f'**{member}** ← '
+            else:
+                rank += f'{item} '
+            if item == ctx.me:
+                rank += '🤖'
+            if item == ctx.guild.owner:
+                rank += '👑'
+            if item.id in self.bot.configs['owners']:
+                rank += self.bot.emoji('dev_badge')
+            rank += '\n'
+        e.add_field(name=f'Este servidor tem {len(ctx.guild.members)} membros.',
+                    value=rank)
+        await ctx.send(embed=e)
 
 
 def setup(bot):

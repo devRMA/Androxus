@@ -154,7 +154,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
         stopwatch_message.stop()
         e2 = discord.Embed(title=f'🏓 Latência da API: {prettify_number(int(self.bot.latency * 1000))}ms!\n'
                                  f'{self.bot.emoji("database")} Tempo de resposta do banco: {stopwatch_banco}!\n'
-                                 f'{self.bot.emoji("bob")} Tempo de resposta no discord: {stopwatch_message}!',
+                                 f'📥 Tempo de resposta no discord: {stopwatch_message}!',
                            colour=discord.Colour(random_color()),
                            timestamp=datetime.utcnow())
         e2.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')

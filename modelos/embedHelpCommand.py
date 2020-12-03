@@ -30,8 +30,16 @@ async def embed_help_command(bot, ctx, comando=None, descricao=None, parametros=
         cor (hex): Cor que vai ser usada no embed (Default value = random)
 
     Returns:
+        discord.Embed: O embed com a mensagem de help do comando
 
     """
+    embed_error = discord.Embed(title='Comando não encontrado',
+                                timestamp=datetime.utcnow())
+    embed_error.set_author(name=ctx.author.name, icon_url=bot.user.avatar_url)
+    if not ctx.valid:
+        return embed_error
+    if ctx.command.hidden or (not hasattr(ctx.command, 'perm_user')):
+        return embed_error
     # se a pessoa usou o comando, mencionando o bot:
     if ctx.prefix.replace("!", "").replace(" ", "") == bot.user.mention:
         # vai pegar o prefixo que está no banco
@@ -101,11 +109,6 @@ async def embed_help_command(bot, ctx, comando=None, descricao=None, parametros=
     embed.add_field(name='🤔 **Como usar?**',
                     value=como_usar,
                     inline=False)
-    if parametros:  # novamente, só vai entrar, se tiver pelo menos 1 item nos parâmetros
-        embed.add_field(
-            name=f'{bot.emoji("atencao")} Tudo que estiver entre **<>** é obrigatório, e tudo que estiver '
-                 'entre **[]** é opcional.',
-            value='** **', inline=False)
     embed.add_field(name='📖 Exemplo',
                     value=exemplo,
                     inline=False)
@@ -128,4 +131,9 @@ async def embed_help_command(bot, ctx, comando=None, descricao=None, parametros=
             name=f"{bot.emoji('atencao')} **O comando foi desativado por algum administrador do server!**",
             value="**Se você usar este comando, eu não irei responder!**",
             inline=False)
+    if parametros:
+        embed.add_field(
+            name='** **',
+            value=f'{bot.emoji("atencao")} Tudo que estiver entre **<>** é obrigatório, e tudo que estiver '
+                  'entre **[]** é opcional.', inline=False)
     return embed

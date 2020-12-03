@@ -82,7 +82,7 @@ def get_last_update():
     """
     # função que vai pegar o último update que o bot teve
     # como o bot está no github, a ultima atualização que teve no github, vai ser a ultima atualização do bot
-    url = 'https://api.github.com/repositories/294764564//commits'  # url do repositório do bot
+    url = 'https://api.github.com/repositories/294764564/commits'  # url do repositório do bot
     html = get(url).text  # vai pegar o texto da página
     json = loads(html)  # transformar de json para dicionario
     data_do_update = json[0]['commit']['committer']['date']  # aqui, ainda vai estar como string
@@ -710,6 +710,8 @@ def find_user(user_input, collection, accuracy=0.6):
             else:
                 if item.id == int_input:
                     return [item]
+        if (user_input == f'<@{item.id}>') or (user_input == f'<@!{item.id}>'):
+            return [item]
         sim_name = string_similarity(to_utf8(item.name).lower(), user_input.lower())
         if sim_name == 1.0:
             return [item]

@@ -508,6 +508,17 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             self.bot.load_extension('events.ErrorCommands')
         await ctx.send(f'Modo manutenção:\n{self.bot.emoji("off")}')
 
+    @Androxus.comando(name='jsk_docs',
+                      aliases=['docs_jsk', 'help_jsk', 'jsk_help', 'jh', 'dj'],
+                      description='Mostra a documentação do jsk',
+                      examples=['``{prefix}jsk_help``',
+                                '``{prefix}jh``'],
+                      perm_user='administrar a conta do bot',
+                      hidden=True)
+    @commands.check(permissions.is_owner)
+    async def _jsk_docs(self, ctx):
+        await ctx.send('Docs do jsk:\nhttps://jishaku.readthedocs.io/en/latest/cog.html')
+
 
 def setup(bot):
     bot.add_cog(OwnerOnly(bot))

@@ -11,5 +11,6 @@ psutil
 py_expression_eval
 python-dateutil
 requests
+jishaku@git+https://github.com/Gorialis/jishaku@master
 stopwatch.py
 testing.postgresql
