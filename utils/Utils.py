@@ -728,7 +728,7 @@ def find_user(user_input, collection, accuracy=0.6):
         most_similar_items.sort(key=lambda k: k.similarity,
                                 reverse=True)
         if most_similar_items[0].similarity >= 0.8:
-            return list(map(lambda x: x.item, filter(lambda x: x.similarity >= 0.9, most_similar_items)))
+            return list(map(lambda x: x.item, filter(lambda x: x.similarity >= 0.8, most_similar_items)))
         if len(most_similar_items) <= 4:
             return [reduce(lambda x, y: x if x.similarity > y.similarity else y, most_similar_items).item]
         else:

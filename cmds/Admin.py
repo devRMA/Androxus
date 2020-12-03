@@ -24,10 +24,10 @@ class BannedMember(commands.Converter):
         if argument:
             if ctx.message.mentions:
                 try:
-                    return await ctx.guild.fetch_ban(discord.Object(id=ctx.message.mentions[0].id))
+                    return await ctx.guild.fetch_ban(discord.Object(id=ctx.message.mentions[-1].id))
                 except discord.NotFound:
                     erro = commands.BadArgument('Membro mencionado não está banido!')
-                    erro.user = ctx.message.mentions[0]
+                    erro.user = ctx.message.mentions[-1]
                     raise erro
             if argument.isdigit():
                 member_id = int(argument, base=10)
@@ -39,7 +39,9 @@ class BannedMember(commands.Converter):
                     raise erro
 
             ban_list = await ctx.guild.bans()
-            entity = discord.utils.find(lambda u: str(u.user) == argument, ban_list)
+            entity = discord.utils.find(lambda u: any([str(u.user) == argument,
+                                                       u.user.name == argument,
+                                                       u.user.discriminator == argument]), ban_list)
 
             if entity is None:
                 erro = commands.BadArgument('Esse membro não está banido!')

@@ -287,8 +287,9 @@ class Androxus(commands.Bot):
         if self.is_category(category):
             for cog in self.cogs:
                 for command in self.get_cog(cog).get_commands():
-                    if (command.category == category) and (not command.hidden):
-                        commands_from_category.append(command)
+                    if hasattr(command, 'category'):
+                        if (command.category == category) and (not command.hidden):
+                            commands_from_category.append(command)
         return sorted(commands_from_category.copy(), key=lambda c: c.name)
 
     def get_emoji_from_category(self, category):
@@ -313,7 +314,7 @@ class Androxus(commands.Bot):
         all_commands = []
         for cog in self.cogs:
             for command in self.get_cog(cog).get_commands():
-                if not command.hidden:
+                if (not command.hidden) and (hasattr(command, 'category')):
                     all_commands.append(command)
         return sorted(all_commands.copy(), key=lambda c: c.name)
 

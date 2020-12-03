@@ -730,7 +730,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if args is None:
             member = ctx.author
         else:
-            members = find_user(args, ctx.guild.members, 0.)
+            members = find_user(args, ctx.guild.members, 0.6)
             if (len(members) == 0) or (len(members) == len(ctx.guild.members)):
                 if (args == 'random') or (args == 'aleatorio') or (args == 'aleatório'):
                     member = choice(ctx.guild.members)

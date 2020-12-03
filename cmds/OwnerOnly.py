@@ -517,7 +517,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                       hidden=True)
     @commands.check(permissions.is_owner)
     async def _jsk_docs(self, ctx):
-        await ctx.send('Docs do jsk:\nhttps://jishaku.readthedocs.io/en/latest/cog.html')
+        await ctx.send('Docs do jsk:\nhttps://jishaku.readthedocs.io/en/latest/cog.html#commands')
 
 
 def setup(bot):
