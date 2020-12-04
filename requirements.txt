@@ -1,8 +1,11 @@
-aiohttp
+aiohttp==3.6.0
 asyncio
 asyncpg
 currency-exchange
 discord.py
+discord
+emojis
+twemoji-parser
 googletrans
 jellyfish
 pandas

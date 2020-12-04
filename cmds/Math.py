@@ -144,7 +144,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
         await ctx.send(embed=embed)
 
     @Androxus.comando(name='regra_de_tres',
-                      aliases=['regra_de_3', 'r3'],
+                      aliases=['regra_de_3', 'r3', 'regradetres'],
                       description='Eu vou fazer uma regra de três simples!',
                       parameters=['<operação(ões)>'],
                       examples=['``{prefix}regra_de_tres``',

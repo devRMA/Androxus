@@ -414,7 +414,7 @@ def convert_to_string(argument):
         argument (bool or None): O bool que vai ser convertido para string
 
     Returns:
-        bool: Vai retornar sim/não ou nulo de acordo com o parâmetro
+        str: Vai retornar sim/não ou nulo de acordo com o parâmetro
 
     """
     if argument is None:

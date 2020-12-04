@@ -5,16 +5,22 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
+from re import compile
 
 import currency_exchange
 import discord
 import googletrans
 from discord.ext import commands
+from discord.ext.commands import BadArgument
+from twemoji_parser import emoji_to_url
+import emojis
 
 from Classes import Androxus
 from database.Repositories.InformacoesRepository import InformacoesRepository
-from utils.Utils import is_number, random_color, prettify_number
+from utils.Utils import is_number, random_color, prettify_number, convert_to_string, datetime_format
 from utils.permissions import check_permissions, bot_check_permissions
+
+EMOJI_REGEX = compile(r'<a?:.+?:([0-9]{15,21})>')
 
 
 class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
@@ -222,6 +228,90 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             await ctx.send(content=f'{ctx.author.mention} {msg}')
         else:
             await self.bot.send_help(ctx)
+
+    @Androxus.comando(name='emoji',
+                      aliases=['emojiinfo', 'infoemoji'],
+                      description='Eu vou mostrar alguns detalhes de algum emoji!',
+                      parameters=['<emoji>'],
+                      examples=['``{prefix}emoji`` ``Hello world!``',
+                                '``{prefix}emoji`` ``Olá Mundo!``'])
+    @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _emoji(self, ctx, *, args=None):
+        if args is None:
+            return await self.bot.send_help(ctx)
+        try:
+            emoji = await commands.EmojiConverter().convert(ctx, args)
+        except BadArgument:
+            try:
+                regex_match = EMOJI_REGEX.match(args)
+                emoji = await commands.PartialEmojiConverter().convert(ctx, regex_match.group())
+            except:
+                emoji = emojis.get(emojis.encode(args))
+                if len(emoji) > 0:
+                    emoji = list(emoji)[0]
+                else:
+                    return await ctx.send('Não encontrei este emoji!')
+        if isinstance(emoji, discord.Emoji) or isinstance(emoji, discord.PartialEmoji):
+            if hasattr(emoji, 'is_unicode_emoji'):
+                if emoji.is_unicode_emoji():
+                    return await ctx.send('Não tenho suporte a esse tipo de emoji!')
+            embed = discord.Embed(title='Emoji personalizado',
+                                  url=str(emoji.url),
+                                  colour=discord.Colour(random_color()),
+                                  timestamp=datetime.utcnow())
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+            embed.set_thumbnail(url=str(emoji.url))
+            embed.add_field(name='Tipo do emoji:',
+                            value='`Animado`' if emoji.animated else '`Estático`',
+                            inline=True)
+            embed.add_field(name='Id:',
+                            value=f'`{emoji.id}`',
+                            inline=True)
+            embed.add_field(name='Nome:',
+                            value=f'`{emoji.name}`',
+                            inline=True)
+            embed.add_field(name='Uso:',
+                            value='`<{}:{}:\u200b{}>`'.format('a' if emoji.animated else '',
+                                                              emoji.name,
+                                                              emoji.id),
+                            inline=False)
+            if isinstance(emoji, discord.Emoji):
+                if emoji.guild == ctx.guild:
+                    embed.add_field(name='Deste servidor!:',
+                                    value='** **',
+                                    inline=True)
+                embed.add_field(name='Criado em:',
+                                value=f'`{emoji.created_at.strftime("%d/%m/%Y")}`({datetime_format(emoji.created_at)})',
+                                inline=True)
+        else:
+            url = await emoji_to_url(emoji)
+            if not url.startswith('https://twemoji.maxcdn.com/v/latest/72x72/'):
+                return await ctx.send('Não consegui achar este emoji!')
+            embed = discord.Embed(title=f'Detalhes sobre o emoji {emoji}',
+                                  description='Infelizmente as informações estão em inglês.',
+                                  url=url,
+                                  colour=discord.Colour(random_color()),
+                                  timestamp=datetime.utcnow())
+            emoji = emojis.db.get_emoji_by_code(emoji)
+            embed.set_thumbnail(url=url)
+            if emoji is not None:
+                embed.add_field(name='Emoji:',
+                                value=f'\\{emoji.emoji}',
+                                inline=False)
+                if len(emoji.aliases) > 0:
+                    embed.add_field(name='aliases:',
+                                    value=f'`{", ".join(emoji.aliases)}`',
+                                    inline=False)
+                if len(emoji.tags) > 0:
+                    embed.add_field(name='Tags:',
+                                    value=f'`{", ".join(emoji.tags)}`',
+                                    inline=False)
+                if emoji.category != '':
+                    embed.add_field(name='Category:',
+                                    value=f'`{emoji.category}`',
+                                    inline=False)
+        return await ctx.send(embed=embed)
 
 
 def setup(bot):
