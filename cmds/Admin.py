@@ -22,6 +22,12 @@ from utils.Utils import random_color, get_emoji_dance, get_configs, pegar_o_pref
 class BannedMember(commands.Converter):
     async def convert(self, ctx, argument):
         if argument:
+            # se a pessoa usou o comando mencionando o bot
+            if ctx.prefix.replace('!', '').replace(' ', '') == ctx.me.mention:
+                # se a pessoa marcou o bot apenas 1 vez
+                if ctx.message.content.replace('!', '').count(ctx.me.mention) == 1:
+                    # vai tirar a menção da mensagem
+                    ctx.message.mentions.pop(0)
             if ctx.message.mentions:
                 try:
                     return await ctx.guild.fetch_ban(discord.Object(id=ctx.message.mentions[-1].id))

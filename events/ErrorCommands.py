@@ -38,7 +38,13 @@ class ErrorCommands(commands.Cog):
         elif isinstance(error, errors.MissingRequiredArgument):
             return await self.bot.send_help(ctx)
         elif isinstance(error, errors.MaxConcurrencyReached):
-            return await ctx.send(f'Calma lá {ctx.author.mention}! Você só pode usar 1 comando por vez!')
+            try:
+                # vai ver se é o dono
+                permissions.is_owner(ctx)
+                # se for, usa o comando
+                await ctx.command.reinvoke(ctx)
+            except errors.NotOwner:  # se não for, dispara o erro
+                return await ctx.send(f'Calma lá {ctx.author.mention}! Você só pode usar 1 comando por vez!')
         elif isinstance(error, errors.NoPrivateMessage):
             return await ctx.send(
                 f'{ctx.author.mention} Este comando só pode ser usado num servidor! {self.bot.emoji("atencao")}')
@@ -56,24 +62,24 @@ class ErrorCommands(commands.Cog):
         elif isinstance(error, Forbidden):
             if not permissions.can_embed(ctx):
                 if ctx.author.permissions_in(ctx.message.channel).administrator:
-                    msg = 'Por favor, me dê permissão de "inserir links", para que eu possa mostrar minhas mensagens ;-;'
+                    msg = 'Por favor, me dê permissão de "inserir links", para que eu possa mostrar minhas mensagens.'
                 else:
                     msg = 'Por favor, peça para um administrador do servidor me dar permissão de "inserir links",' \
-                          ' para que eu possa mostrar minhas mensagens ;-;'
+                          ' para que eu possa mostrar minhas mensagens.'
                 return await ctx.send(msg)
             if not permissions.can_upload(ctx):
                 if ctx.author.permissions_in(ctx.message.channel).administrator:
-                    msg = 'Por favor, me dê permissão de "anexar arquivos", para que eu possa funcionar corretamente ;-;'
+                    msg = 'Por favor, me dê permissão de "anexar arquivos", para que eu possa funcionar corretamente.'
                 else:
                     msg = 'Por favor, peça para um administrador do servidor me dar permissão de "anexar arquivos",' \
-                          ' para que eu possa funcionar corretamente ;-;'
+                          ' para que eu possa funcionar corretamente.'
                 return await ctx.send(msg)
             if not permissions.can_react(ctx):
                 if ctx.author.permissions_in(ctx.message.channel).administrator:
-                    msg = 'Por favor, me dê permissão de "adicionar reações", para que eu possa funcionar corretamente ;-;'
+                    msg = 'Por favor, me dê permissão de "adicionar reações", para que eu possa funcionar corretamente.'
                 else:
                     msg = 'Por favor, peça para um administrador do servidor me dar permissão de "adicionar reações",' \
-                          ' para que eu possa funcionar corretamente ;-;'
+                          ' para que eu possa funcionar corretamente.'
                 return await ctx.send(msg)
             await ctx.send(f'{ctx.author.mention} eu não tenho permissão para executar esse comando, acho que algum' +
                            ' administrador deve ter tirado minhas permissões! Com o comando ``invite``você consegue ' +
@@ -85,13 +91,22 @@ class ErrorCommands(commands.Cog):
                 return await ctx.send(
                     f'{ctx.author.mention} não consegui encontrar um membro banido, com este id: `{error.id}`.')
             elif str(error) == 'Esse membro não está banido!':
-                return await ctx.send(f'{ctx.author.mention} não consegui encontrar o membro banido `{error.member}`.')
+                return await ctx.send(f'{ctx.author.mention} não consegui encontrar o usuário `{error.member}` na lista'
+                                      f' de banidos. Teste usar o comando com aspas entre o nome do usuário caso ele'
+                                      f' tenha um nome com espaços, assim:\n'
+                                      f'`unban "{error.member} nome legal que o cara tem"`')
             elif str(error) == 'Membro mencionado não está banido!':
                 return await ctx.send(
                     f'{ctx.author.mention} não consegui encontrar o membro {error.user.mention} na lista de bans.')
         elif isinstance(error, errors.CommandOnCooldown):
-            await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
-                           f'Tente novamente em {error.retry_after:.2f} segundos.')
+            try:
+                # vai ver se é o dono
+                permissions.is_owner(ctx)
+                # se for, usa o comando
+                await ctx.command.reinvoke(ctx)
+            except errors.NotOwner:  # se não for, dispara o erro
+                await ctx.send(f'Calma lá {ctx.author.mention}, você está usando meus comandos muito rápido!\n' +
+                               f'Tente novamente em {error.retry_after:.2f} segundos.')
         elif isinstance(error, DuplicateBlacklist):
             await ctx.send(
                 f'{self.bot.emoji("atencao")} {ctx.author.mention} Essa pessoa já está na blacklist!')

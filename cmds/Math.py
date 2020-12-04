@@ -17,7 +17,7 @@ from discord.ext import commands
 from py_expression_eval import Parser
 
 from Classes import Androxus
-from utils.Utils import random_color, convert_to_string, prettify_number
+from utils.Utils import random_color, convert_to_string, prettify_number, is_number
 
 
 class Math(commands.Cog, command_attrs=dict(category='matemática')):
@@ -85,10 +85,12 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _calc(self, ctx, *args):
         if len(args) == 0:
-            await self.bot.send_help(ctx)
-            return
+            return await self.bot.send_help(ctx)
         args = ' '.join(args)
-        resultado = 0
+        args = args.replace('pi', 'PI')
+        args = args.replace('Pi', 'PI')
+        args = args.replace('pI', 'PI')
+        args = args.replace('π', 'PI')
         try:
             parser = Parser()
             resultado = parser.parse(args).evaluate({})
@@ -116,22 +118,24 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                 await ctx.send(
                     f'Pare que você esqueceu de abrir ou fechar algum parêntese! {self.bot.emoji("ah_nao")}')
                 return
-            elif 'parity' in exception.args[0]:
+            elif ('parity' in exception.args[0]) or isinstance(exception, TypeError):
                 await ctx.send('Não consigo resolver está operação, verifique se você digitou tudo certo!')
                 return
             elif ('IndexError' in str(exception.__class__)) or ('math domain error' in exception.args[0]):
                 await ctx.send(f'Estamos em {datetime.now().year}, mas ainda não sou capaz de resolver isso.')
                 return
             else:
-                await ctx.send(
-                    f'{self.bot.emoji("sad")} Ocorreu um erro na hora de executar este comando,' +
-                    f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
-                return
+                if self.bot.maintenance_mode:
+                    raise exception
+                else:
+                    return await ctx.send(
+                        f'{self.bot.emoji("sad")} Ocorreu um erro na hora de executar este comando,' +
+                        f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
         if len(str(resultado)) >= 400:
             await ctx.send('O resultado desta operação é tão grande que não consigo enviar a resposta!' +
                            f'\n{self.bot.emoji("sad")}')
             return
-        embed = discord.Embed(title=f'{self.bot.emoji("calculator")} Resultado:',
+        embed = discord.Embed(title=f'{self.bot.emoji("calculator")} Calculadora:',
                               colour=discord.Colour(random_color()),
                               timestamp=datetime.utcnow())
         embed.add_field(name=f'Calculo:',
@@ -207,7 +211,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                    file=discord.File(f'{path}images/regra_de_tres_direta-edited.png'))
                     try:
                         value = await self.bot.wait_for('message', check=check, timeout=30)
-                        if not value.content.isdigit():
+                        if not is_number(value.content):
                             return await ctx.send(f'O valor ``{value.content}`` não é um número válido!')
                         try:
                             value = int(value.content)
@@ -292,7 +296,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                    file=discord.File(f'{path}images/regra_de_tres_inversa-edited.png'))
                     try:
                         value = await self.bot.wait_for('message', check=check, timeout=30)
-                        if not value.content.isdigit():
+                        if not is_number(value.content):
                             return await ctx.send(f'O valor ``{value.content}`` não é um número válido!')
                         try:
                             value = int(value.content)

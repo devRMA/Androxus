@@ -13,7 +13,6 @@ from sys import version
 from traceback import format_exc
 
 import discord
-import jishaku
 from asyncpg.pool import Pool
 from discord.ext import commands, tasks
 from requests import get

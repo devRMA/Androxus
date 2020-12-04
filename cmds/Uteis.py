@@ -128,10 +128,12 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         else:
             ultimo_valor = float(await info.get_dado(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}'))
             await info.update(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
-        if ultimo_valor > um_valor:
-            msg = f'O valor diminuiu {prettify_number((ultimo_valor - um_valor), truncate=True)}! {self.bot.emoji("diminuiu")}'
-        elif ultimo_valor < um_valor:
-            msg = f'O valor aumentou {prettify_number((um_valor - ultimo_valor), truncate=True)}! {self.bot.emoji("aumentou")}'
+        if (ultimo_valor > um_valor) and (float(f'{(ultimo_valor - um_valor):.2f}') > 0.0):
+            msg = f'O valor diminuiu {prettify_number((ultimo_valor - um_valor), truncate=True)}! ' \
+                  f'{self.bot.emoji("diminuiu")}'
+        elif (ultimo_valor < um_valor) and (float(f'{(um_valor - ultimo_valor):.2f}') > 0.0):
+            msg = f'O valor aumentou {prettify_number((um_valor - ultimo_valor), truncate=True)}! ' \
+                  f'{self.bot.emoji("aumentou")}'
         else:
             msg = 'Não teve alteração no valor.'
         embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',

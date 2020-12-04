@@ -717,22 +717,24 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                         inline=True)
         await ctx.send(embed=e)
 
-    @Androxus.comando(name='oldrank',
-                      aliases=['oldmembersrank', 'or', 'membrosantigos'],
+    @Androxus.comando(name='joinrank',
+                      aliases=['oldmembersrank', 'jr', 'membrosantigos'],
                       description='Eu vou mostrar o rank com os membros mais antigos do servidor.',
-                      parameters=['[random/aleatorio | usuário (padrão: autor)]'],
-                      examples=['``{prefix}oldrank``'],
+                      parameters=['["-r" (membro aleatorio) | usuário (padrão: autor)]'],
+                      examples=['``{prefix}joinrank``',
+                                '``{prefix}jr`` ``-r``',
+                                '``{prefix}jr`` ``androxus``'],
                       hidden=True)
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _oldrank(self, ctx, *, args=None):
+    async def _joinrank(self, ctx, *, args=None):
         if args is None:
             member = ctx.author
         else:
             members = find_user(args, ctx.guild.members, 0.6)
             if (len(members) == 0) or (len(members) == len(ctx.guild.members)):
-                if (args == 'random') or (args == 'aleatorio') or (args == 'aleatório'):
+                if args == '-r':
                     member = choice(ctx.guild.members)
                 else:
                     return await ctx.send('Não achei nenhum membro!')
