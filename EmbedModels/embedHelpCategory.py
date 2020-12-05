@@ -12,13 +12,14 @@ from utils.Utils import capitalize
 from utils.Utils import random_color, pegar_o_prefixo
 
 
-async def embed_help_category(bot, ctx, category):
+async def embed_help_category(bot, ctx, category, color=None):
     """
 
     Args:
         bot (Classes.Androxus.Androxus): A instância do bot
         ctx (discord.ext.commands.context.Context): O contexto que vai ser usado para pegar o prefixo
         category (str): Categoria em que ser criado o embed
+        color(hex): A cor que vai ser usada nos embeds (Default value = None)
 
     Returns:
         discord.Embed: O embed com todos os comandos da categoria passada
@@ -31,8 +32,10 @@ async def embed_help_category(bot, ctx, category):
     else:
         # se a pessoa não marcou o bot:
         prefixo = ctx.prefix
+    if color is None:
+        color = random_color()
     e = discord.Embed(title=f'Categoria: {bot.get_emoji_from_category(category)} {capitalize(category)}',
-                      colour=discord.Colour(random_color()),
+                      colour=discord.Colour(color),
                       description='Todos os comandos que estão nesta categoria!\nPara obter mais detalhes sobre '
                                   f'um comando, digite `{prefixo}help comando`!',
                       timestamp=datetime.utcnow())

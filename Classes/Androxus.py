@@ -22,7 +22,7 @@ from database.Repositories.BlacklistRepository import BlacklistRepository
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from modelos.embedHelpCategory import embed_help_category
+from EmbedModels.embedHelpCategory import embed_help_category
 from utils import permissions
 from utils.Utils import get_configs, prettify_number, get_path_from_file, pegar_o_prefixo
 from utils.Utils import string_similarity, get_most_similar_item

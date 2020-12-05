@@ -7,21 +7,25 @@ __author__ = 'Rafael'
 import asyncio
 from datetime import datetime
 from os import getpid
+from re import compile
 from sys import version
 
+import DiscordUtils
 import discord
 import psutil
 from discord.ext import commands
 from stopwatch import Stopwatch
 
 from Classes import Androxus
-from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
+from EmbedModels.embedHelpCategory import embed_help_category
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.InformacoesRepository import InformacoesRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import get_last_commit, capitalize, pegar_o_prefixo, prettify_number
+from utils.Utils import get_last_commit, pegar_o_prefixo, prettify_number
 from utils.Utils import get_last_update, datetime_format
 from utils.Utils import random_color
+
+EMOJI_REGEX = compile(r'<a?:.+?:([0-9]{15,21})>')
 
 
 class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
@@ -213,51 +217,89 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       description='A lista com todos os comandos que eu tenho!',
                       examples=['``{prefix}cmds``', '``{prefix}comandos``'])
     @commands.max_concurrency(1, commands.BucketType.user)
-    @commands.cooldown(1, 4, commands.BucketType.user)
+    @commands.cooldown(1, 30, commands.BucketType.user)
     async def _cmds(self, ctx):
-        e = discord.Embed(title='Todos os meus comandos',
-                          colour=discord.Colour(random_color()),
-                          description=f'Caso você queira saber mais informações sobre um comando, '
-                                      'digite \'help comando\'',
-                          timestamp=datetime.utcnow())
-        e.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
-        e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-        categories = self.bot.get_all_categories()
+        categories = [c for c in self.bot.get_all_categories() if len(self.bot.get_commands_from_category(c)) > 0]
+        paginas = len(categories) + 1
         servidor = None
+        cmds_personalizados = None
         if ctx.guild:
             servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
-            comandos_desativados = [c.comando for c in
-                                    await ComandoDesativadoRepository().get_commands(self.bot.db_connection, servidor)]
+            cmds_personalizados = await ComandoPersonalizadoRepository().get_commands(self.bot.db_connection,
+                                                                                      servidor)
+            if len(cmds_personalizados) >= 1:
+                paginas += 1
+                categories.append('personalizado')
+        cor = 0x6AffED
+        embeds = []
+        paginator = DiscordUtils.Pagination.CustomEmbedPaginator(ctx=ctx,
+                                                                 timeout=60,
+                                                                 auto_footer=False,
+                                                                 remove_reactions=ctx.channel.permissions_for(
+                                                                     ctx.me).manage_messages)
+        embed_home = discord.Embed(title='Todos os meus comandos',
+                                   colour=discord.Colour(cor),
+                                   description=f'Caso você queira saber mais informações sobre um comando '
+                                               'ou categoria, digite \'help comando\' ou \'help categoria\'',
+                                   timestamp=datetime.utcnow())
+        embed_home.add_field(name='Categoria',
+                             value='\n'.join(f'{self.bot.get_emoji_from_category(categories[c])} ── '
+                                             f'{categories[c].capitalize()}' for c in range(paginas - 1)),
+                             inline=True)
+        for c in range(paginas - 1):
+            emoji = self.bot.get_emoji(int(EMOJI_REGEX.match(self.bot.get_emoji_from_category(categories[c])).group(1)))
+            paginator.add_reaction(emoji, f'page {c + 1}')
+        embed_home.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+        embed_home.set_footer(text=f'{ctx.author} ─ 1/{paginas}', icon_url=ctx.author.avatar_url)
+        embeds.append(embed_home)
         for category in categories:
-            commands = self.bot.get_commands_from_category(category)
-            if len(commands) != 0:
-                for i in range(len(commands)):
-                    commands[i] = f'``{commands[i]}``'
-                if servidor:
-                    # vai remover todos os comandos desativados, da lista que vai aparecer na mensagem
-                    for cmds_off in comandos_desativados:
-                        if cmds_off in commands:
-                            try:
-                                commands = commands.remove(cmds_off)
-                            except:
-                                pass
-                e.add_field(
-                    name=f'{self.bot.get_emoji_from_category(category)} {capitalize(category)} ({len(commands)})',
-                    value=f'{", ".join(commands)}.',
-                    inline=False)
+            e = await embed_help_category(self.bot, ctx, category, cor)
+            e.set_footer(text=f'{ctx.author} ─ {categories.index(category) + 2}/{paginas}',
+                         icon_url=ctx.author.avatar_url)
+            embeds.append(e)
         if servidor:
-            cmds_personalizados = await ComandoPersonalizadoRepository().get_commands(self.bot.db_connection, servidor)
-            commands = []
+            comandos_str = []
             if len(cmds_personalizados) >= 1:
                 for comando_personalizado in cmds_personalizados:
-                    commands.append(f'``{comando_personalizado.comando}``')
-                commands.sort()
-                e.add_field(name=f'{self.bot.get_emoji_from_category("personalizado")} Comandos personalizados (são '
-                                 'comandos exclusivos deste servidor e não precisam do prefixo)'
-                                 f'({len(commands)})',
-                            value=f'{", ".join(commands)}.',
+                    comandos_str.append(f'``{comando_personalizado.comando}``')
+                comandos_str.sort()
+                e = discord.Embed(title=f'{self.bot.get_emoji_from_category("personalizado")} Comandos personalizados',
+                                  colour=discord.Colour(cor),
+                                  description='São comandos exclusivos deste servidor. Não precisam do prefixo.',
+                                  timestamp=datetime.utcnow())
+                e.add_field(name=f'📖 Comandos ({len(comandos_str)}):',
+                            value=", ".join(comandos_str),
                             inline=False)
-        await ctx.send(embed=e)
+                e.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+                e.set_footer(text=f'{ctx.author} ─ {paginas}/{paginas}',
+                             icon_url=ctx.author.avatar_url)
+                embeds.append(e)
+        embed_paginator_help = discord.Embed(title='Ajuda com as páginas',
+                                             description='Enquanto um comando estiver com os emojis para você navegar '
+                                                         'entre as páginas, você não pode usar o comando de novo!',
+                                             colour=discord.Colour(cor),
+                                             timestamp=datetime.utcnow())
+        embed_paginator_help.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
+        embed_paginator_help.set_footer(text=f'{ctx.author} ─ Página de ajuda',
+                                        icon_url=ctx.author.avatar_url)
+        emoji_stop = self.bot.emoji('stop')
+        emoji_arrow_red = self.bot.emoji('red_arrow_left')
+        embed_paginator_help.add_field(name='Aqui está a legenda do que cada emoji faz.',
+                                       value=f'{emoji_arrow_red} ─ Para voltar ao início.\n'
+                                             f'{emoji_stop} ─ Para a execução do comando (a execução para '
+                                             f'automaticamente em 60 segundos).\n'
+                                             ':grey_question: ─ Vem para está página de ajuda.',
+                                       inline=True)
+        embeds.append(embed_paginator_help)
+        emoji = self.bot.get_emoji(int(EMOJI_REGEX.match(emoji_arrow_red).group(1)))
+        paginator.add_reaction(emoji, 'page 0')
+        emoji = self.bot.get_emoji(int(EMOJI_REGEX.match(emoji_stop).group(1)))
+        paginator.add_reaction(emoji, 'lock')
+        paginator.add_reaction('❔', f'page {len(embeds)}')
+        msg = await paginator.run(embeds)
+        for reaction in msg.reactions:
+            if reaction.me:
+                await reaction.remove(ctx.me)
 
 
 def setup(bot):

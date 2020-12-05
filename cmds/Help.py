@@ -15,8 +15,8 @@ from googletrans import Translator
 from Classes import Androxus
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from modelos.embedHelpCategory import embed_help_category
-from modelos.embedHelpCommand import embed_help_command
+from EmbedModels.embedHelpCategory import embed_help_category
+from EmbedModels.embedHelpCommand import embed_help_command
 from utils.Utils import random_color, get_most_similar_item, string_similarity, convert_to_string
 
 

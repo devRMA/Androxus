@@ -381,12 +381,12 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             else:
                 return await self.bot.send_help(ctx)
 
-    # @_channel_log.error
-    # async def _channel_log_error(self, ctx, error):
-    # if isinstance(error, commands.BadArgument) or isinstance(error, commands.errors.ChannelNotFound):
-    # await ctx.send(f'{ctx.author.mention} Não consegui encontrar este channel.')
-    # else:
-    # raise error
+    @_channel_log.error
+    async def _channel_log_error(self, ctx, error):
+        if self.bot.maintenance_mode:
+            if isinstance(error, commands.BadArgument) or isinstance(error, commands.errors.ChannelNotFound):
+                return await ctx.send(f'{ctx.author.mention} Não consegui encontrar este channel.')
+        raise error
 
     @Androxus.comando(name='setup_logs',
                       aliases=['logs', 'sl'],

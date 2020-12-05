@@ -5,17 +5,16 @@
 
 __author__ = 'Rafael'
 
-import asyncio
 from datetime import datetime
 from random import choice
 
+import DiscordUtils
 import discord
 from discord.ext import commands
 
 from Classes import Androxus
 from Classes.erros import InvalidArgument
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils import permissions
 from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity, \
     prettify_number, find_user
 
@@ -473,70 +472,21 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                                     value='Este usuário não tem nenhuma permissão, neste chat!', inline=False)
         except InvalidArgument as erro:
             return await ctx.send(erro.msg)
-
-        async def menus_user_info(ctx, msg):
-
-            def check_page1(reaction, user, msg):  # fica verificando a pagina 1, para ver se é para ir para a pagina 2
-                user_check = user.id == ctx.author.id
-                reaction_check = str(reaction.emoji) == '➡'
-                msg_check = msg.id == reaction.message.id
-                return user_check and reaction_check and msg_check
-
-            def check_page2(reaction, user, msg):  # fica verificando a pagina 2, para ver se é para ir para a pagina 1
-                user_check = user.id == ctx.author.id
-                reaction_check = str(reaction.emoji) == '⬅'
-                msg_check = msg.id == reaction.message.id
-                return user_check and reaction_check and msg_check
-
-            async def check_reactions_without_perm(ctx, bot, msg):
-                while True:
-                    while True:
-                        reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                        if check_page1(reaction, user, msg):
-                            break
-                    await msg.delete()
-                    msg = await ctx.send(embed=info2)
-                    await msg.add_reaction('⬅')
-                    while True:
-                        reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                        if check_page2(reaction, user, msg):
-                            break
-                    await msg.delete()
-                    msg = await ctx.send(embed=info1)
-                    await msg.add_reaction('➡')
-
-            async def check_reactions_with_perm(bot, msg):
-                while True:
-                    while True:
-                        reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                        if check_page1(reaction, user, msg):
-                            break
-                    await msg.clear_reactions()
-                    await msg.add_reaction('⬅')
-                    await msg.edit(embed=info2)
-                    while True:
-                        reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                        if check_page2(reaction, user, msg):
-                            break
-                    await msg.clear_reactions()
-                    await msg.add_reaction('➡')
-                    await msg.edit(embed=info1)
-
-            # se o bot tiver perm pra usar o "clear_reactions"
-            if ctx.guild.me.guild_permissions.manage_messages:
-                await check_reactions_with_perm(self.bot, msg)
-            else:  # se o bot não tiver permissão:
-                await check_reactions_without_perm(ctx, self.bot, msg)
-
-        msg_bot = await ctx.send(embed=info1)
-        if info2:
-            # se tiver o info2, significa que foi usado num servidor
-            await msg_bot.add_reaction('➡')
-            try:
-                # vai fica 1 minuto e meio esperando o usuário apertas nas reações
-                await asyncio.wait_for(menus_user_info(ctx, msg_bot), timeout=90.0)
-            except asyncio.TimeoutError:  # se acabar o tempo
-                pass
+        if info2 is not None:
+            paginator = DiscordUtils.Pagination.CustomEmbedPaginator(ctx=ctx,
+                                                                     timeout=60,
+                                                                     auto_footer=False,
+                                                                     remove_reactions=ctx.channel.permissions_for(
+                                                                         ctx.me).manage_messages)
+            paginator.add_reaction('⬅', 'back')
+            paginator.add_reaction('⏹️', 'lock')
+            paginator.add_reaction('➡', 'next')
+            msg = await paginator.run([info1, info2])
+            for reaction in msg.reactions:
+                if reaction.me:
+                    await reaction.remove(ctx.me)
+        else:
+            await ctx.send(embed=info1)
 
     @Androxus.comando(name='splash',
                       aliases=['fundo_convite'],

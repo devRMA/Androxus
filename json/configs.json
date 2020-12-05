@@ -85,6 +85,8 @@
         "idle": "<:idle:768461949041246229>",
         "offline": "<:offline:768461948790243349>",
         "streaming": "<:stream:768461948538454017>",
-        "calculator": "<:calculator:757079712077053982>"
+        "calculator": "<:calculator:757079712077053982>",
+        "stop": "<:stop:784537453519831042>",
+        "red_arrow_left": "<:arrow_red:784543417668468756>"
     }
 }
