@@ -184,12 +184,12 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                value=f'```diff\n{e}```',
                                inline=False)
                 msg_bot = await ctx.send(embed=erro)
-                await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]))
+                await msg_bot.add_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["ativado"]))
                 try:
                     await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
                 except asyncio.TimeoutError:
                     pass
-                await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]), ctx.me)
+                await msg_bot.remove_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["ativado"]), ctx.me)
                 return await msg_bot.edit(embed=closed)
             e = discord.Embed(title=f'Query executada com sucesso!',
                               colour=discord.Colour(0xbdecb6),
@@ -210,8 +210,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                         value=f'Essa mensagem será fechada em 2 minutos 🙂',
                         inline=False)
             msg_bot = await ctx.send(embed=e)
-            await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]))
-            await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]))
+            await msg_bot.add_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["desativado"]))
+            await msg_bot.add_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["cadeado"]))
             try:
                 reaction, _ = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
                 if str(reaction.emoji) == self.bot.emoji("desativado"):
@@ -221,8 +221,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                     await msg_bot.edit(embed=e)
             except asyncio.TimeoutError:
                 await msg_bot.edit(embed=closed)
-            await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]), ctx.me)
-            await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]), ctx.me)
+            await msg_bot.remove_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["desativado"]), ctx.me)
+            await msg_bot.remove_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["cadeado"]), ctx.me)
         else:
             return await self.bot.send_help(ctx)
 
@@ -357,12 +357,12 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                      ' para ver o erro completo.',
                                inline=False)
             msg_bot = await ctx.send(embed=erro)
-            await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]))
+            await msg_bot.add_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["ativado"]))
             try:
                 await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
             except asyncio.TimeoutError:
                 pass
-            await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["ativado"]), ctx.me)
+            await msg_bot.remove_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["ativado"]), ctx.me)
             return await msg_bot.edit(embed=closed)
         e = discord.Embed(title=f'Comando eval executado com sucesso!',
                           colour=discord.Colour(0xbdecb6),
@@ -397,8 +397,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                     value=f'Essa mensagem será fechada em 2 minutos 🙂',
                     inline=False)
         msg_bot = await ctx.send(embed=e)
-        await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]))
-        await msg_bot.add_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]))
+        await msg_bot.add_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["desativado"]))
+        await msg_bot.add_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["cadeado"]))
         try:
             reaction, _ = await self.bot.wait_for('reaction_add', timeout=120.0, check=check)
             if str(reaction.emoji) == self.bot.emoji("desativado"):
@@ -408,8 +408,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 await msg_bot.edit(embed=e)
         except asyncio.TimeoutError:
             await msg_bot.edit(embed=closed)
-        await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["desativado"]), ctx.me)
-        await msg_bot.remove_reaction(self.bot.get_emoji(self.bot.configs["emojis"]["ids"]["cadeado"]), ctx.me)
+        await msg_bot.remove_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["desativado"]), ctx.me)
+        await msg_bot.remove_reaction(self.bot.get_emoji(u.get_emojis_json()["ids"]["cadeado"]), ctx.me)
 
     @Androxus.comando(name='blacklist',
                       aliases=['blacklisted', 'banido'],

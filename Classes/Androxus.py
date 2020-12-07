@@ -4,11 +4,11 @@
 
 __author__ = 'Rafael'
 
+import re
 from datetime import datetime
 from itertools import cycle
 from json import loads
 from os import listdir
-import re
 from string import ascii_letters
 from sys import version
 from traceback import format_exc
@@ -25,7 +25,7 @@ from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoR
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import get_configs, prettify_number, get_path_from_file, pegar_o_prefixo
+from utils.Utils import get_configs, prettify_number, get_path_from_file, pegar_o_prefixo, get_emojis_json
 from utils.Utils import string_similarity, get_most_similar_item
 
 
@@ -271,8 +271,9 @@ class Androxus(commands.Bot):
 
         return await super().is_owner(user)
 
-    def get_all_categories(self):
-        categories = [c[0] for c in self.configs['emojis']['categories'].items()]
+    @staticmethod
+    def get_all_categories():
+        categories = [c[0] for c in get_emojis_json()['categories'].items()]
         # é retornado uma copia da lista só por segurança
         return sorted(list(set(categories)).copy())
 
@@ -296,20 +297,22 @@ class Androxus(commands.Bot):
         category = category.lower()
         if self.is_category(category):
             try:
-                return self.configs['emojis']['categories'][category]
+                return get_emojis_json()['categories'][category]
             except KeyError:
                 return ''
         return ''
 
-    def emoji(self, emoji_name):
+    @staticmethod
+    def emoji(emoji_name):
+        dict_emojis = get_emojis_json()
         try:
-            return self.configs['emojis'][emoji_name]
+            return dict_emojis[emoji_name]
         except KeyError:
             try:
-                return self.configs['emojis']['dances'][emoji_name]
+                return dict_emojis['dances'][emoji_name]
             except KeyError:
                 try:
-                    return self.configs['emojis']['categories'][emoji_name]
+                    return dict_emojis['categories'][emoji_name]
                 except KeyError:
                     return None
 

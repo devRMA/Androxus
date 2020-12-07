@@ -123,6 +123,23 @@ def get_configs():
              'https://github.com/devRMA/Androxus')
 
 
+def get_emojis_json():
+    """
+
+    Returns:
+        dict: Um dicionário com os emojis emojis do emojis.json
+
+    """
+    path = get_path_from_file('emojis.json', 'json/')
+    if path is not None:
+        with open(path) as file:
+            configs = load(file)
+        return configs
+    else:
+        exit('Não achei o arquivo de configurações!\nBaixe o arquivo emojis.json e coloque na pasta json!\n'
+             'https://github.com/devRMA/Androxus')
+
+
 def capitalize(string):
     """
 
@@ -746,4 +763,3 @@ def find_user(user_input, collection, accuracy=0.6):
     elif len(endswith_items) > 0:
         return [endswith_items[0]]
     return []
-
