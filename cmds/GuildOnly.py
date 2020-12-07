@@ -8,15 +8,15 @@ __author__ = 'Rafael'
 from datetime import datetime
 from random import choice
 
-import DiscordUtils
 import discord
+from DiscordUtils.Pagination import CustomEmbedPaginator
 from discord.ext import commands
 
 from Classes import Androxus
-from Classes.erros import InvalidArgument
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity, \
     prettify_number, find_user
+from utils.converters import DiscordUser
 
 
 class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
@@ -33,7 +33,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       aliases=['av'],
                       description='Eu vou mandar a foto de perfil da pessoa que você marcar.',
                       parameters=['[usuário (padrão: quem usou o comando)]'],
-                      examples=['``{prefix}avatar`` {author_mention}'])
+                      examples=['`{prefix}avatar` {author_mention}'])
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _avatar(self, ctx, *args):
@@ -161,268 +161,171 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       aliases=['profile', 'memberinfo', 'ui'],
                       description='Eu vou mandar o máximo de informações sobre um usuário.',
                       parameters=['[usuário (padrão: quem usou o comando)]'],
-                      examples=['``{prefix}userinfo`` {author_mention}'])
+                      examples=['`{prefix}userinfo` {author_mention}'])
+    @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _userinfo(self, ctx, *args):
-        try:
-            user = None
-            # se a pessoa usou o comando mencionando o bot
-            if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
-                # se a pessoa marcou o bot apenas 1 vez
-                if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
-                    # vai tirar a menção da mensagem
-                    ctx.message.mentions.pop(0)
-            if ctx.message.mentions:  # se tiver alguma menção na mensagem
-                user = ctx.message.mentions[-1]  # vai pegar a primeira menção
-            else:  # se a pessoa não mencionou ninguém, entra aqui
-                if args:  # se a pessoa passou pelo menos alguma coisa
-                    try:  # vai tentar converter o primeiro argumento para int
-                        id_user = int(args[0])  # conversão
-                        if ctx.guild:
-                            user = ctx.guild.get_member(id_user)  # vai tentar pegar o membro do server com esse id
-                        if user is None:  # se não achou na guild, vai ver se o bot acha
-                            user = self.bot.get_user(id_user)
-                        # se o bot não achou um user, ele vai pega pela API do discord
-                        if user is None:
-                            try:
-                                user = await self.bot.fetch_user(id_user)
-                            except discord.errors.NotFound:
-                                user = None
-                            except discord.HTTPException:
-                                user = None
-                        # se mesmo assim, não achar o user
-                        if user is None:
-                            return await ctx.send(f'{ctx.author.mention} não consegui um usuário com este id!')
-                    except ValueError:  # se der erro, é porque a pessoa não passou número no primeiro argumento
-                        user = None
-                    # se o user for None
-                    if user is None:
-                        # se entrou aqui, é o user ainda não foi achado
-                        args = ' '.join(args)
-                        # listas que vão ser usadas caso a pessoa digite um nome inválido
-                        name = []
-                        name_tag = []
-                        nickname = []
-                        # se o comando foi usado de um servidor:
-                        if ctx.guild:
-                            # vai procurar o membro passado pela pessoa
-                            for member in ctx.guild.members:
-                                # se a pessoa tiver um nick
-                                if member.nick is not None:
-                                    # vai ver se a pessoa digitou esse nick
-                                    if member.nick.lower() == args.lower():
-                                        user = member
-                                        break
-                                    # lista que vai ser usada caso não ache o membro
-                                    nickname.append(member.nick.lower())
-                                # se a pessoa passou o nome ou nome#tag de algum membro:
-                                if (args.lower() == member.name.lower()) or (args.lower() == str(member).lower()):
-                                    user = member
-                                    break
-                                # listas que vão ser usadas caso não ache o membro
-                                name.append(member.name.lower())
-                                name_tag.append(str(member).lower())
-                        # se não achou a pessoa na guild
-                        if user is None:
-                            # vai ver se o bot acha a pessoa
-                            for _user in self.bot.users:
-                                # se a pessoa passou o nome ou nome#tag de algum user que o bot tem acesso:
-                                if (args.lower() == _user.name) or (args.lower() == str(_user)):
-                                    user = _user
-                                    break
-                                name.append(_user.name.lower())
-                                name_tag.append(str(_user).lower())
-                        # se o bot não achou nem o membro nem a pessoa
-                        if user is None:
-                            # é passado para um set, apenas para eliminar os itens repetidos
-                            name = list(set(name))
-                            name_tag = list(set(name_tag))
-                            nickname = list(set(nickname))
-                            # mensagem padrão
-                            msg = f'{ctx.author.mention} Eu não achei nenhum usuário com este nome/nick.'
-                            user_by_nick = get_most_similar_items_with_similarity(args, nickname)
-                            # se veio pelo menos 1 user pelo nick
-                            if user_by_nick:
-                                # vai pegar o nick mais parecido que veio, e se a similaridade for maior que 60%:
-                                if user_by_nick[0][-1] > 0.6:
-                                    msg += f'\nVocê quis dizer `{capitalize(user_by_nick[0][0])}` ?'
-                                    raise InvalidArgument(msg=msg)
-                            # se não passou pelo return de cima, vai ver se acha algum nome parecido
-                            # com o que a pessoa digitou
-                            user_by_name_tag = get_most_similar_items_with_similarity(args, name_tag)
-                            # se veio pelo menos 1 user pelo nametag
-                            if user_by_name_tag:
-                                # se for pelo menos 60% similar:
-                                if user_by_name_tag[0][-1] > 0.6:
-                                    msg += f'\nVocê quis dizer `{capitalize(user_by_name_tag[0][0])}` ?'
-                                    raise InvalidArgument(msg=msg)
-                            # se não passou pelo return de cima, vai ver se acha algum user#tag parecido com o
-                            # que a pessoa digitou
-                            user_by_name = get_most_similar_items_with_similarity(args, name)
-                            # se veio pelo menos 1 user pelo nametag
-                            if user_by_name:
-                                # vai pegar o nome mais parecido que veio e se a similaridade for maior que 60%:
-                                if user_by_name[0][-1] > 0.6:
-                                    msg += f'\nVocê quis dizer `{capitalize(user_by_name[0][0])}` ?'
-                                    raise InvalidArgument(msg=msg)
-                            # se não passou por nenhum if de cima, vai mandar a mensagem dizendo que não achou
-                            raise InvalidArgument(msg=msg)
-                else:  # se a pessoa não passou nenhum argumento:
-                    user = ctx.author
-            roles = None
-            if hasattr(user, 'roles'):
-                roles = None
-                if len(user.roles) > 1:
-                    roles = []
-                    for role in sorted(user.roles, key=lambda r: r.position, reverse=True):
-                        if role.id != ctx.guild.default_role.id:
-                            roles.append(role)
-                    roles_mention = ', '.join([f'<@&{c}>' for c in map(lambda x: x.id, roles)])
-                    roles_name = None
-                    if len(roles_mention) > 1000:
-                        roles_name = ', '.join([f'`{c}`' for c in map(lambda x: x.name, roles)])
-                    if roles_name is not None and len(roles_name) > 1000:
-                        roles_name = f'{roles_name[:1000]}...'
-                    roles = roles_mention if roles_name is None else roles_name
-            if hasattr(user, 'top_role'):
-                cor = user.top_role.colour.value
+    async def _userinfo(self, ctx, *, user: DiscordUser = None):
+        if user is None:
+            user = ctx.author
+        if hasattr(user, 'top_role'):
+            cor = user.top_role.colour.value
+        else:
+            cor = discord.Colour(random_color())
+        emojis_badges = {
+            'staff': self.bot.get_emoji('staff_badge'),
+            'partner': self.bot.get_emoji('parceiro_badge'),
+            'hypesquad': self.bot.get_emoji('hs_badge'),
+            'bug_hunter': self.bot.get_emoji('bug_hunter_badge'),
+            'hypesquad_bravery': self.bot.get_emoji('hs_bravery_badge'),
+            'hypesquad_brilliance': self.bot.get_emoji('hs_brilliance_badge'),
+            'hypesquad_balance': self.bot.get_emoji('hs_balance_badge'),
+            'early_supporter': self.bot.get_emoji('early_supporter_badge'),
+            'team_user': '',
+            'system': '',
+            'bug_hunter_level_2': self.bot.get_emoji('bug_hunter_badge'),
+            'verified_bot': '',
+            'verified_bot_developer': self.bot.get_emoji('dev_badge')
+        }
+        badges = ''
+        if ctx.guild:
+            if ctx.guild.owner_id == user.id:
+                badges += '👑'
+        if user.bot:
+            badges += str(self.bot.get_emoji('bot_badge'))
+        if hasattr(user, 'public_flags'):
+            for flag, have in iter(user.public_flags):
+                if have:
+                    badges += str(emojis_badges[flag])
+        if user.is_avatar_animated() or (hasattr(user, 'premium_since') and user.premium_since is not None):
+            badges += str(self.bot.get_emoji('nitro'))
+        if hasattr(user, 'premium_since') and user.premium_since is not None:
+            badges += str(self.bot.get_emoji('boost'))
+        status_emoji = ''
+        status_text = None
+        if hasattr(user, 'raw_status'):
+            if user.raw_status == 'online':
+                status_emoji = str(self.bot.get_emoji('online'))
+                status_text = 'online'
+            elif user.raw_status == 'dnd':
+                status_emoji = str(self.bot.get_emoji('dnd'))
+                status_text = 'ocupado'
+            elif user.raw_status == 'idle':
+                status_emoji = str(self.bot.get_emoji('idle'))
+                status_text = 'ausente'
+            elif (user.raw_status == 'offline') or (user.raw_status == 'invisible'):
+                status_emoji = str(self.bot.get_emoji('offline'))
+                status_text = 'offline'
+        embed_base = discord.Embed(title=f'{badges} {user.display_name} {status_emoji}',
+                                   colour=cor,
+                                   timestamp=datetime.utcnow())
+        embeds = []
+        embed1 = embed_base.copy()
+        embed1.set_image(url=user.avatar_url)
+        embed1.add_field(name="📑 Nome e tag:", value=f'`{user}`', inline=True)
+        embed1.add_field(name="🆔 Id: ", value=f'`{user.id}`', inline=True)
+        embed1.add_field(name='🙋‍♂️ Menção:', value=user.mention, inline=True)
+        if hasattr(user, 'nick') and (user.nick is not None):
+            embed1.add_field(name="🔄 Apelido", value=f'`{user.nick}`', inline=True)
+        embeds.append(embed1)
+        embed2 = embed_base.copy()
+        embed2.set_thumbnail(url=user.avatar_url)
+        embed2.add_field(name="🗓 Conta criada em:",
+                         value=f'`{user.created_at.strftime("%d/%m/%Y")}`({datetime_format(user.created_at)})',
+                         inline=True)
+        if hasattr(user, 'joined_at'):
+            rank_members = [str(c) for c in sorted(user.guild.members, key=lambda x: x.joined_at)]
+            embed2.add_field(name="📥 Entrou no servidor em:",
+                             value=f'`{user.joined_at.strftime("%d/%m/%Y")}`({datetime_format(user.joined_at)})',
+                             inline=True)
+            embed2.add_field(name='🏆 rank dos membros mais antigos:',
+                             value=f'**{prettify_number(rank_members.index(str(user)) + 1)}°**/'
+                                   f'{prettify_number(len(rank_members))}',
+                             inline=True)
+            if user.premium_since is not None:
+                embed2.add_field(
+                    name=f'{self.bot.get_emoji("boost")} Começou a dar boost neste servidor em:',
+                    value=f'`{user.premium_since.strftime("%d/%m/%Y")}`('
+                          f'{datetime_format(user.premium_since)})',
+                    inline=True)
+        embeds.append(embed2)
+        if hasattr(user, 'raw_status') and (user.raw_status != 'offline') and \
+                (user.raw_status != 'invisible') and (not user.bot):
+            embed3 = embed_base.copy()
+            embed3.set_thumbnail(url=user.avatar_url)
+            if user.is_on_mobile():
+                plataforma = '📱 Celular'
             else:
-                cor = discord.Colour(random_color())
-            info2 = None
-            badges = ''
-            pf = user.public_flags
-            if ctx.guild:
-                if ctx.guild.owner_id == user.id:
-                    badges += '👑'
-            if pf.staff:
-                badges += self.bot.emoji('staff_badge')
-            if pf.partner:
-                badges += self.bot.emoji('parceiro_badge')
-            if pf.hypesquad:
-                badges += self.bot.emoji('hs_badge')
-            if pf.bug_hunter or pf.bug_hunter_level_2:
-                badges += self.bot.emoji('bug_hunter_badge')
-            if pf.hypesquad_bravery:
-                badges += self.bot.emoji('hs_bravery_badge')
-            if pf.hypesquad_brilliance:
-                badges += self.bot.emoji('hs_brilliance_badge')
-            if pf.hypesquad_balance:
-                badges += self.bot.emoji('hs_balance_badge')
-            if pf.early_supporter:
-                badges += self.bot.emoji('early_supporter_badge')
-            if user.bot:
-                badges += self.bot.emoji('bot_badge')
-            if pf.verified_bot_developer or pf.early_verified_bot_developer:
-                badges += self.bot.emoji('dev_badge')
-            # como o discord não deixar bots verem o profile do user
-            # e no profile que diz se a pessoa tem nitro, vamos ver se 
-            # ela tem um gif no avatar, se tiver, ela tem nitro
-            # ou vamos ver se ela está dando boost no servidor
-            if user.is_avatar_animated():
-                badges += self.bot.emoji('nitro')
-            elif hasattr(user, 'premium_since'):
-                if user.premium_since is not None:
-                    badges += self.bot.emoji('nitro')
-            if hasattr(user, 'premium_since'):
-                if user.premium_since is not None:
-                    badges += self.bot.emoji('boost')
-            status = ''
-            if hasattr(user, 'raw_status'):
-                if user.raw_status == 'online':
-                    status = self.bot.emoji('online')
-                elif user.raw_status == 'dnd':
-                    status = self.bot.emoji('dnd')
-                elif user.raw_status == 'idle':
-                    status = self.bot.emoji('idle')
-                elif (user.raw_status == 'offline') or (user.raw_status == 'invisible'):
-                    status = self.bot.emoji('offline')
-            info1 = discord.Embed(title=f'{badges} {user.display_name} {status}',
-                                  colour=cor,
-                                  timestamp=datetime.utcnow())
-            info1.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-            info1.set_thumbnail(url=user.avatar_url)
-            info1.add_field(name="📑 Nome e tag:", value=f'`{user}`', inline=True)
-            info1.add_field(name="🆔 Id: ", value=f'``{user.id}``', inline=True)
-            if hasattr(user, 'raw_status') and (not user.bot):
-                # se a pessoa não estiver offline ou invisivel
-                if (user.raw_status != 'offline') and (user.raw_status != 'invisible') and (not user.bot):
-                    if user.is_on_mobile():
-                        plataforma = '📱 Celular'
-                    else:
-                        if user.web_status.value != 'offline':
-                            plataforma = '💻 Pc ─ usando o site 🌐'
-                        else:
-                            plataforma = '💻 Pc ─ usando o discord desktop 🖥'
-                    info1.add_field(name="🕵️ Está acessando o discord pelo:", value=f'``{plataforma}``', inline=True)
-            if hasattr(user, 'activities'):
-                activities = user.activities
+                if user.web_status.value != 'offline':
+                    plataforma = '💻 Pc ─ usando o site 🌐'
+                else:
+                    plataforma = '💻 Pc ─ usando o discord desktop 🖥'
+            embed3.add_field(name=f'{self.bot.get_emoji("hacking")} Está acessando o discord pelo:',
+                             value=f'`{plataforma}`',
+                             inline=False)
+            if status_text is not None:
+                embed3.add_field(name=f'🕵️ Status: {status_text}',
+                                 value='** **',
+                                 inline=True)
+            if hasattr(user, 'activities') and len(user.activities) > 0:
                 streaming = False
                 custom = False
                 playing = False
-                if len(activities) != 0:
-                    for activity in activities:
-                        if (activity.type.name == 'streaming') and (not streaming):
-                            info1.add_field(name=f'{self.bot.emoji("streaming")} Fazendo live',
-                                            value=f'**🎙 Plataforma**: `{activity.platform}`\n'
-                                                  f'**🏷 Nome da live**: `{activity.name}`\n'
-                                                  f'**🕛 Começou**: `{datetime_format(activity.created_at)}`',
-                                            inline=True)
-                            streaming = True
-                        elif (activity.type.name == 'custom') and (not custom):
-                            if (activity.emoji is not None) or (activity.name is not None):
-                                if activity.emoji is not None:
-                                    if activity.emoji.id in [c.id for c in self.bot.emojis]:
-                                        emoji = f'{activity.emoji}'
-                                    else:
-                                        emoji = f'❓'
+                for activity in user.activities:
+                    if (activity.type.name == 'streaming') and (not streaming):
+                        embed3.add_field(name=f'{self.bot.emoji("streaming")} Fazendo live',
+                                         value=f'**🎙 Plataforma**: `{activity.platform}`\n'
+                                               f'**🏷 Nome da live**: `{activity.name}`\n'
+                                               f'**🕛 Começou**: `{datetime_format(activity.created_at)}`',
+                                         inline=False)
+                        streaming = True
+                    elif (activity.type.name == 'custom') and (not custom):
+                        if (activity.emoji is not None) or (activity.name is not None):
+                            if activity.emoji is not None:
+                                if activity.emoji.id in [c.id for c in self.bot.emojis]:
+                                    emoji = f'{activity.emoji}'
                                 else:
-                                    emoji = '`🚫 Nulo`'
-                                if activity.name is not None:
-                                    texto = f'`{activity.name}`'
-                                else:
-                                    texto = '`🚫 Nulo`'
-                                info1.add_field(name=f'{self.bot.emoji("disco")} Status personalizado',
-                                                value=f'🔰 Emoji: {emoji}\n'
-                                                      f'🖋 Frase: {texto}',
-                                                inline=True)
-                                custom = True
-                        elif (activity.type.name == 'playing') and (not playing):
-                            if activity.start is not None:
-                                value = f'`{activity.name}`\n**🕛 Começou a jogar:**\n' + \
-                                        f'`{datetime_format(activity.start)}`'
+                                    emoji = f'❓'
                             else:
-                                value = f'`{activity.name}`'
-                            info1.add_field(name='🕹 Jogando',
-                                            value=value,
-                                            inline=True)
-                            playing = True
-            if hasattr(user, 'nick'):
-                if user.nick is not None:
-                    info1.add_field(name="🔄 Nickname", value=f'``{user.nick}``', inline=True)
-            info1.add_field(name="🗓 Conta criada em:",
-                            value=f'``{user.created_at.strftime("%d/%m/%Y")}``({datetime_format(user.created_at)})',
-                            inline=True)
-            if hasattr(user, 'joined_at'):
-                rank_members = [str(c) for c in sorted(user.guild.members, key=lambda x: x.joined_at)]
-                info1.add_field(name="📥 Entrou no servidor em:",
-                                value=f'`{user.joined_at.strftime("%d/%m/%Y")}`({datetime_format(user.joined_at)})'
-                                      f'\n**🏆 Está na `{prettify_number(rank_members.index(str(user)) + 1)}°` posição, '
-                                      'no rank dos membros mais antigos!**',
-                                inline=True)
-                if user.premium_since is not None:
-                    info1.add_field(
-                        name=f'{self.bot.emoji("boost")} Começou a dar boost neste servidor em:',
-                        value=f'`{user.premium_since.strftime("%d/%m/%Y")}`('
-                              f'{datetime_format(user.premium_since)})',
-                        inline=True)
-                # só vai mostrar as permissões da pessoa, se ela estiver no server
-                info2 = discord.Embed(title=f'{badges} {user.display_name}',
-                                      colour=cor,
-                                      timestamp=datetime.utcnow())
-                info2.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-                info2.set_thumbnail(url=user.avatar_url)
-                if roles is not None:
-                    info2.add_field(name=f'🏅 Cargos({len(roles.split(", "))}):', value=roles, inline=False)
+                                emoji = '`🚫 Nulo`'
+                            if activity.name is not None:
+                                texto = f'`{activity.name}`'
+                            else:
+                                texto = '`🚫 Nulo`'
+                            embed3.add_field(name=f'{self.bot.emoji("disco")} Status personalizado',
+                                             value=f'🔰 Emoji: {emoji}\n'
+                                                   f'🖋 Frase: {texto}',
+                                             inline=False)
+                            custom = True
+                    elif (activity.type.name == 'playing') and (not playing):
+                        if activity.start is not None:
+                            value = f'`{activity.name}`\n**🕛 Começou a jogar:**\n' + \
+                                    f'`{datetime_format(activity.start)}`'
+                        else:
+                            value = f'`{activity.name}`'
+                        embed3.add_field(name='🕹 Jogando',
+                                         value=value,
+                                         inline=False)
+                        playing = True
+            embeds.append(embed3)
+        if hasattr(user, 'roles') and len(user.roles) > 1:
+            roles = [role for role in sorted(user.roles, key=lambda r: r.position, reverse=True)
+                     if role.id != ctx.guild.default_role.id]
+            roles_count = len(roles)
+            if roles_count > 0:
+                roles_mention = ', '.join(f'<@&{r.id}>' for r in roles)
+                roles_name = None
+                if len(roles_mention) > 1000:
+                    roles_name = ', '.join(f'`{r.name}`' for r in roles)
+                if roles_name is not None and len(roles_name) > 1000:
+                    roles_name = f'{roles_name[:1000]}...'
+                roles = roles_name or roles_mention
+                roles = f'**{roles}**'
+                embed4 = embed_base.copy()
+                embed4.set_thumbnail(url=user.avatar_url)
+                embed4.add_field(name=f'🏅 Cargos({roles_count}):',
+                                 value=roles,
+                                 inline=False)
+                # estamos pegando e filtrando as permissões que o user tem, neste chat
                 all_perms = user.permissions_in(ctx.message.channel)
                 perms = []
                 for atributo in dir(all_perms):
@@ -460,38 +363,43 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                     # vai substituir os "_" por espaços e tirar o external_emojis
                     for perm_traducao in perms_traduzidas.items():
                         if perm_traducao[0] == perms[c]:
-                            perms[c] = f"``{perm_traducao[-1]}``"
+                            perms[c] = f"`{perm_traducao[-1]}`"
                             break
                 if 'external_emojis' in perms:
                     perms.pop(perms.index('external_emojis'))
                 if len(perms) >= 1:
-                    info2.add_field(name=f'📌 Permissões neste chat({len(perms)}):',
-                                    value=capitalize(', '.join(perms)), inline=False)
+                    embed4.add_field(name=f'📌 Permissões neste chat({len(perms)}):',
+                                     value=capitalize(', '.join(perms)),
+                                     inline=False)
                 else:
-                    info2.add_field(name=f'📌 Permissão neste chat(0):',
-                                    value='Este usuário não tem nenhuma permissão, neste chat!', inline=False)
-        except InvalidArgument as erro:
-            return await ctx.send(erro.msg)
-        if info2 is not None:
-            paginator = DiscordUtils.Pagination.CustomEmbedPaginator(ctx=ctx,
-                                                                     timeout=60,
-                                                                     auto_footer=False,
-                                                                     remove_reactions=ctx.channel.permissions_for(
-                                                                         ctx.me).manage_messages)
-            paginator.add_reaction('⬅', 'back')
-            paginator.add_reaction('⏹️', 'lock')
-            paginator.add_reaction('➡', 'next')
-            msg = await paginator.run([info1, info2])
-            for reaction in msg.reactions:
-                if reaction.me:
-                    await reaction.remove(ctx.me)
-        else:
-            await ctx.send(embed=info1)
+                    embed4.add_field(name=f'📌 Permissão neste chat(0):',
+                                     value='Este usuário não tem possui permissões, neste chat!',
+                                     inline=False)
+                embeds.append(embed4)
+        for pos, embed in enumerate(embeds):
+            embed.set_footer(text=f'{ctx.author} ─ {pos + 1}/{len(embeds)}',
+                             icon_url=ctx.author.avatar_url)
+        paginator = CustomEmbedPaginator(ctx=ctx,
+                                         timeout=60,
+                                         auto_footer=False,
+                                         remove_reactions=ctx.channel.permissions_for(
+                                             ctx.me).manage_messages)
+        if len(embeds) > 2:
+            paginator.add_reaction('⏮', 'first')
+        paginator.add_reaction('◀️', 'back')
+        paginator.add_reaction('⏹️', 'clear')
+        paginator.add_reaction('▶', 'next')
+        if len(embeds) > 2:
+            paginator.add_reaction('⏭', 'last')
+        msg = await paginator.run(embeds)
+        for reaction in msg.reactions:
+            if reaction.me:
+                await reaction.remove(ctx.me)
 
     @Androxus.comando(name='splash',
                       aliases=['fundo_convite'],
                       description='Eu vou enviar a imagem de fundo do convite deste servidor (se tiver).',
-                      examples=['``{prefix}splash``'])
+                      examples=['`{prefix}splash`'])
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _splash(self, ctx):
@@ -507,7 +415,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
 
     @Androxus.comando(name='discovery_splash',
                       description='Eu vou enviar discovery splash deste servidor (se tiver).',
-                      examples=['``{prefix}discovery_splash``'])
+                      examples=['`{prefix}discovery_splash`'])
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _discovery_splash(self, ctx):
@@ -524,7 +432,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @Androxus.comando(name='serverinfo',
                       aliases=['guildinfo', 'si'],
                       description='Eu vou mandar o máximo de informações sobre um servidor.',
-                      examples=['``{prefix}serverinfo``'])
+                      examples=['`{prefix}serverinfo`'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -578,7 +486,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @Androxus.comando(name='server_avatar',
                       aliases=['icone', 'icon', 'sa'],
                       description='Eu vou enviar o icone do servidor (se tiver).',
-                      examples=['``{prefix}server_avatar``'])
+                      examples=['`{prefix}server_avatar`'])
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _server_avatar(self, ctx):
@@ -594,7 +502,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @Androxus.comando(name='server_banner',
                       aliases=["banner", 'sb'],
                       description='Eu vou enviar o banner do servidor (se tiver).',
-                      examples=['``{prefix}server_banner``'])
+                      examples=['`{prefix}server_banner`'])
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _server_banner(self, ctx):
@@ -610,7 +518,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @Androxus.comando(name='configs',
                       aliases=['configurações', 'configuraçoes', 'settings'],
                       description='Eu vou mostrar todos as configurações deste servidor.',
-                      examples=['``{prefix}configs``'])
+                      examples=['`{prefix}configs`'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -644,19 +552,19 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                         inline=True)
             logs = []
             if servidor.mensagem_deletada:
-                logs.append('``mensagem deletada``')
+                logs.append('`mensagem deletada`')
             if servidor.mensagem_editada:
-                logs.append('``mensagem editada``')
+                logs.append('`mensagem editada`')
             if servidor.avatar_alterado:
-                logs.append('``avatar alterado``')
+                logs.append('`avatar alterado`')
             if servidor.nome_alterado:
-                logs.append('``nome alterado``')
+                logs.append('`nome alterado`')
             if servidor.tag_alterado:
-                logs.append('``tag alterada``')
+                logs.append('`tag alterada`')
             if servidor.nick_alterado:
-                logs.append('``nick alterado``')
+                logs.append('`nick alterado`')
             if servidor.role_alterado:
-                logs.append('``cargo adicionado/removido``')
+                logs.append('`cargo adicionado/removido`')
             if len(logs) != 0:
                 e.add_field(name=f'Logs ativos',
                             value=capitalize(', '.join(logs)),
@@ -671,9 +579,9 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       aliases=['oldmembersrank', 'jr', 'membrosantigos'],
                       description='Eu vou mostrar o rank com os membros mais antigos do servidor.',
                       parameters=['["-r" (membro aleatorio) | usuário (padrão: autor)]'],
-                      examples=['``{prefix}joinrank``',
-                                '``{prefix}jr`` ``-r``',
-                                '``{prefix}jr`` ``androxus``'],
+                      examples=['`{prefix}joinrank`',
+                                '`{prefix}jr` `-r`',
+                                '`{prefix}jr` `androxus`'],
                       hidden=True)
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)

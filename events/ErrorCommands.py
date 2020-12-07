@@ -4,12 +4,16 @@
 
 __author__ = 'Rafael'
 
+from datetime import datetime
+
+import discord
 from discord.errors import Forbidden
 from discord.ext import commands
 from discord.ext.commands import errors
 
 from Classes.erros import *
 from utils import permissions
+from utils.Utils import random_color
 
 
 class ErrorCommands(commands.Cog):
@@ -37,6 +41,19 @@ class ErrorCommands(commands.Cog):
             return await ctx.send(f'{ctx.author.mention} você não é meu criador {self.bot.emoji("no_no")}')
         elif isinstance(error, errors.MissingRequiredArgument):
             return await self.bot.send_help(ctx)
+        elif isinstance(error, MultipleResults):
+            embed = discord.Embed(title='Encontrei mais de um resultado!',
+                                  colour=discord.Colour(random_color()),
+                                  timestamp=datetime.utcnow())
+            results = MultipleResults.results
+            if len(results) >= 5:
+                msg = '\n'.join(f'{u} (ID: {u.id})' for u in results[:5])
+                msg += f'\nE outro(s) {len(results) - 5} resultado(s)...'
+            else:
+                msg = '\n'.join(f'{u} (ID: {u.id})' for u in results)
+            embed.add_field(name=msg,
+                            value='** **')
+            return await ctx.send(embed=embed)
         elif isinstance(error, errors.MaxConcurrencyReached):
             try:
                 # vai ver se é o dono
@@ -44,7 +61,9 @@ class ErrorCommands(commands.Cog):
                 # se for, usa o comando
                 await ctx.command.reinvoke(ctx)
             except errors.NotOwner:  # se não for, dispara o erro
-                return await ctx.send(f'Calma lá {ctx.author.mention}! Você só pode usar 1 comando por vez!')
+                return await ctx.send(f'Calma lá {ctx.author.mention}! Você só pode usar 1 comando por vez! Se o '
+                                      'comando possuir páginas, pare o sistema de paginação, antes de usar o '
+                                      'comando de novo!')
         elif isinstance(error, errors.NoPrivateMessage):
             return await ctx.send(
                 f'{ctx.author.mention} Este comando só pode ser usado num servidor! {self.bot.emoji("atencao")}')
@@ -57,8 +76,8 @@ class ErrorCommands(commands.Cog):
                 f'{ctx.author.mention} Eu não posso executar este comando, pois não tenho permissão de ' +
                 f'``{permissoes}`` neste servidor! {self.bot.emoji("sad")}')
         elif isinstance(error, errors.CheckFailure):
-            return await ctx.send(f'{ctx.author.mention} você não tem permissão para usar este comando!\nDigite ' +
-                                  f'`{ctx.prefix}help {ctx.command}` para ver quais permissões você precisa ter!')
+            return await ctx.send(f'{ctx.author.mention} Você precisa ter permissão de `{ctx.command.perm_user}`'
+                                  ' para usar este comando! ')
         elif isinstance(error, Forbidden):
             if not permissions.can_embed(ctx):
                 if ctx.author.permissions_in(ctx.message.channel).administrator:

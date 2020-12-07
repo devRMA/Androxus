@@ -701,6 +701,8 @@ def find_user(user_input, collection, accuracy=0.6):
             self.similarity = similarity
 
     most_similar_items = list()
+    endswith_items = list()
+    startswith_items = list()
     for item in collection:
         if is_number(user_input):
             try:
@@ -712,26 +714,36 @@ def find_user(user_input, collection, accuracy=0.6):
                     return [item]
         if (user_input == f'<@{item.id}>') or (user_input == f'<@!{item.id}>'):
             return [item]
-        sim_name = string_similarity(to_utf8(item.name).lower(), user_input.lower())
+        name = to_utf8(item.name).lower()
+        display_name = to_utf8(item.display_name).lower()
+        name_tag = to_utf8(str(item)).lower()
+        ui = user_input.lower()
+        sim_name = string_similarity(name, ui)
         if sim_name == 1.0:
             return [item]
-        sim_display_name = string_similarity(to_utf8(item.display_name).lower(), user_input.lower())
+        sim_display_name = string_similarity(display_name, ui)
         if sim_display_name == 1:
             return [item]
-        sim_name_tag = string_similarity(to_utf8(str(item)).lower(), user_input.lower())
+        sim_name_tag = string_similarity(name_tag, ui)
         if sim_name_tag == 1.0:
             return [item]
         most_similarity = reduce(lambda x, y: x if x > y else y, [sim_name, sim_display_name, sim_name_tag])
         if most_similarity >= accuracy:
             most_similar_items.append(ItemSimilarity(item, most_similarity))
+        elif name.startswith(ui) or display_name.startswith(ui) or name_tag.startswith(ui):
+            startswith_items.append(item)
+        elif name.endswith(ui) or display_name.endswith(ui) or name_tag.endswith(ui):
+            endswith_items.append(item)
     if len(most_similar_items) > 0:
         most_similar_items.sort(key=lambda k: k.similarity,
                                 reverse=True)
-        if most_similar_items[0].similarity >= 0.8:
-            return list(map(lambda x: x.item, filter(lambda x: x.similarity >= 0.8, most_similar_items)))
-        if len(most_similar_items) <= 4:
+        if most_similar_items[0].similarity >= 0.8 or len(most_similar_items) <= 4:
             return [reduce(lambda x, y: x if x.similarity > y.similarity else y, most_similar_items).item]
         else:
             return list(map(lambda x: x.item, most_similar_items))
+    elif len(startswith_items) > 0:
+        return [startswith_items[0]]
+    elif len(endswith_items) > 0:
+        return [endswith_items[0]]
     return []
 

@@ -7,7 +7,6 @@ __author__ = 'Rafael'
 import asyncio
 from datetime import datetime
 from os import getpid
-from re import compile
 from sys import version
 
 import DiscordUtils
@@ -24,8 +23,6 @@ from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import get_last_commit, pegar_o_prefixo, prettify_number
 from utils.Utils import get_last_update, datetime_format
 from utils.Utils import random_color
-
-EMOJI_REGEX = compile(r'<a?:.+?:([0-9]{15,21})>')
 
 
 class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
@@ -239,15 +236,16 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                                                                      ctx.me).manage_messages)
         embed_home = discord.Embed(title='Todos os meus comandos',
                                    colour=discord.Colour(cor),
-                                   description=f'Caso você queira saber mais informações sobre um comando '
-                                               'ou categoria, digite \'help comando\' ou \'help categoria\'',
+                                   description=f'Atualmente eu tenho `{len(self.bot.get_all_commands())}` comandos, e '
+                                               'caso você queira saber mais informações '
+                                               'sobre um comando, digite \'help comando\'.',
                                    timestamp=datetime.utcnow())
-        embed_home.add_field(name='Categoria',
+        embed_home.add_field(name='Categorias',
                              value='\n'.join(f'{self.bot.get_emoji_from_category(categories[c])} ── '
                                              f'{categories[c].capitalize()}' for c in range(paginas - 1)),
                              inline=True)
         for c in range(paginas - 1):
-            emoji = self.bot.get_emoji(int(EMOJI_REGEX.match(self.bot.get_emoji_from_category(categories[c])).group(1)))
+            emoji = self.bot.get_emoji(categories[c])
             paginator.add_reaction(emoji, f'page {c + 1}')
         embed_home.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
         embed_home.set_footer(text=f'{ctx.author} ─ 1/{paginas}', icon_url=ctx.author.avatar_url)
@@ -282,8 +280,8 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
         embed_paginator_help.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
         embed_paginator_help.set_footer(text=f'{ctx.author} ─ Página de ajuda',
                                         icon_url=ctx.author.avatar_url)
-        emoji_stop = self.bot.emoji('stop')
-        emoji_arrow_red = self.bot.emoji('red_arrow_left')
+        emoji_stop = self.bot.get_emoji('stop')
+        emoji_arrow_red = self.bot.get_emoji('red_arrow_left')
         embed_paginator_help.add_field(name='Aqui está a legenda do que cada emoji faz.',
                                        value=f'{emoji_arrow_red} ─ Para voltar ao início.\n'
                                              f'{emoji_stop} ─ Para a execução do comando (a execução para '
@@ -291,10 +289,8 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                                              ':grey_question: ─ Vem para está página de ajuda.',
                                        inline=True)
         embeds.append(embed_paginator_help)
-        emoji = self.bot.get_emoji(int(EMOJI_REGEX.match(emoji_arrow_red).group(1)))
-        paginator.add_reaction(emoji, 'page 0')
-        emoji = self.bot.get_emoji(int(EMOJI_REGEX.match(emoji_stop).group(1)))
-        paginator.add_reaction(emoji, 'lock')
+        paginator.add_reaction(emoji_arrow_red, 'page 0')
+        paginator.add_reaction(emoji_stop, 'lock')
         paginator.add_reaction('❔', f'page {len(embeds)}')
         msg = await paginator.run(embeds)
         for reaction in msg.reactions:

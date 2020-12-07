@@ -16,8 +16,14 @@ from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import random_color, difference_between_lists, get_path_from_file
 
 
-class OnUpdateEvent(commands.Cog):
+class LogEvent(commands.Cog):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.Androxus.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @commands.Cog.listener()
@@ -226,12 +232,38 @@ class OnUpdateEvent(commands.Cog):
                     embed.set_thumbnail(url=message.author.avatar_url)
                     await channel.send(embed=embed)
 
+    @commands.Cog.listener()
+    async def on_bulk_message_delete(self, messages):
+        if (self.bot.db_connection is None) or self.bot.maintenance_mode or (messages[0].guild is None) or \
+                (not self.bot.started):
+            return
+        server = await ServidorRepository().get_servidor(self.bot.db_connection, messages[0].guild.id)
+        if server.channel_id_log is not None:
+            channel = self.bot.get_channel(server.channel_id_log)
+            if (channel is not None) and server.mensagem_deletada:
+                messages = list(filter(lambda m: not m.is_system() and len(m.content) != 0, messages))
+                if len(messages) == 0:
+                    return
+                msg = '[day.month.year hour:minute:second] user#tag (id): message\n\n'
+                for message in messages:
+                    msg += f'[{message.created_at.strftime("%d.%m.%Y %H:%M:%S")}] '
+                    msg += f'{message.author} '
+                    msg += f'({message.author.id}): '
+                    msg += f'{message.content}\n'
+                from io import BytesIO
+                data = BytesIO(bytes(msg, 'utf-8'))
+                embed = discord.Embed(title=f'{len(messages)} mensagens deletadas',
+                                      colour=discord.Colour(random_color()),
+                                      description=f'Chat: {messages[0].channel.mention}\n',
+                                      timestamp=datetime.utcnow())
+                embed.set_footer(text=f'{messages[0].author}', icon_url=messages[0].author.avatar_url)
+                file = discord.File(data,
+                                    f'bulk_message_delete_'
+                                    f'{messages[0].guild.name.replace(" ", "_")}-'
+                                    f'{messages[0].channel.name.replace(" ", "_")}-'
+                                    f'{messages[0].created_at.strftime("%d-%m-%Y_%H-%M-%S")}.log')
+                return await channel.send(embed=embed, file=file)
+
 
 def setup(bot):
-    """
-
-    Args:
-        bot (Classes.Androxus.Androxus): Instância do bot
-
-    """
-    bot.add_cog(OnUpdateEvent(bot))
+    bot.add_cog(LogEvent(bot))

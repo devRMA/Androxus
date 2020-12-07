@@ -30,3 +30,10 @@ class DuplicateComandoPersonalizado(Exception):
 
 class DuplicateServidor(Exception):
     pass
+
+
+class MultipleResults(Exception):
+    results: list
+
+    def __init__(self, results):
+        self.results = results

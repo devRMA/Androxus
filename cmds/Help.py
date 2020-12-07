@@ -10,7 +10,6 @@ from datetime import datetime
 import currency_exchange
 import discord
 from discord.ext import commands
-from googletrans import Translator
 
 from Classes import Androxus
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
@@ -105,89 +104,6 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                 e = await embed_help_category(self.bot, ctx, comando)
             # se não passou pelo return , vai atribuir o comando ao ctx.command
             ctx.command = command
-            # o help do comando money é diferente, por isso esta condição
-            if (ctx.command is not None) and (ctx.command.name == 'money'):
-                embed1 = await embed_help_command(self.bot, ctx)
-                embed1.add_field(name=f'Para saber todas as abreviações das moedas que eu aceito, clique em ➡',
-                                 value=f'** **',
-                                 inline=True)
-                embed2 = discord.Embed(title=f'Todas as moedas que eu aceito no comando "money"',
-                                       colour=discord.Colour(random_color()),
-                                       timestamp=datetime.utcnow())
-                translator = Translator()
-                moedas = ''
-                for c in currency_exchange.currencies():
-                    moedas += f'{c}\n'
-                moedas = translator.translate(moedas, dest='pt').text
-                for c in moedas.splitlines():
-                    abreviacao, moeda = c.split(' - ')
-                    embed2.add_field(name=f'**{abreviacao}**',
-                                     value=f'{moeda}',
-                                     inline=True)
-
-                async def menu_help(ctx, msg):
-                    # fica verificando a pagina 1, para ver se é para ir para a pagina 2
-                    def check_page1(reaction, user, msg):
-                        return (user.id == ctx.author.id) and (str(reaction.emoji) == '➡') and (msg == reaction.message)
-
-                    # fica verificando a pagina 2, para ver se é para ir para a pagina 1
-                    def check_page2(reaction, user, msg):
-                        return (user.id == ctx.author.id) and (str(reaction.emoji) == '⬅') and (msg == reaction.message)
-
-                    async def check_reactions_without_perm(ctx, msg, bot):
-                        # mudas as páginas, se o bot não tiver perm pra apagar reações
-                        while True:
-                            while True:
-                                reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                                if check_page1(reaction, user, msg):
-                                    break
-                            await msg.delete()
-                            msg = await ctx.send(embed=embed2)
-                            await msg.add_reaction('⬅')
-                            while True:
-                                reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                                if check_page2(reaction, user, msg):
-                                    break
-                            await msg.delete()
-                            msg = await ctx.send(embed=embed1)
-                            await msg.add_reaction('➡')
-
-                    async def check_reactions_with_perm(msg, bot):
-                        # mudas as páginas, se o bot tiver perm pra apagar reações
-                        while True:
-                            while True:
-                                reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                                if check_page1(reaction, user, msg):
-                                    break
-                            await msg.clear_reactions()
-                            await msg.add_reaction('⬅')
-                            await msg.edit(embed=embed2)
-                            while True:
-                                reaction, user = await bot.wait_for('reaction_add', timeout=900.0)
-                                if check_page2(reaction, user, msg):
-                                    break
-                            await msg.clear_reactions()
-                            await msg.add_reaction('➡')
-                            await msg.edit(embed=embed1)
-
-                    # se foi usado num servidor:
-                    if ctx.guild:
-                        # se o bot tiver perm pra usar o "clear_reactions"
-                        if ctx.guild.me.guild_permissions.manage_messages:
-                            await check_reactions_with_perm(msg, self.bot)
-                        else:  # se o bot não tiver permissão:
-                            await check_reactions_without_perm(ctx, msg, self.bot)
-                    else:  # se não for usado no servidor:
-                        await check_reactions_without_perm(ctx, msg, self.bot)
-
-                msg_bot = await ctx.send(embed=embed1)
-                await msg_bot.add_reaction('➡')
-                try:
-                    # vai fica 1 minuto e meio esperando o usuário apertas nas reações
-                    await asyncio.wait_for(menu_help(ctx, msg_bot), timeout=90.0)
-                except asyncio.TimeoutError:  # se acabar o tempo
-                    pass
-                return
         if e is None:
             e = await embed_help_command(self.bot, ctx)
         return await ctx.send(embed=e)

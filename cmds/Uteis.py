@@ -46,7 +46,10 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                                 '``{prefix}ce`` ``eur``\n(Vou mostrar quanto vale 1 euro em reais)',
                                 '``{prefix}mo`` ``eur`` ``20``\n(Vou mostrar quanto vale 20 euros em reais)',
                                 '``{prefix}money`` ``usd`` ``eur`` ``50``\n(Vou mostrar quanto vale 50 dólares em '
-                                'euros)'])
+                                'euros)',
+                                'Para saber todas as moedas que eu aceito, acesse [este link]'
+                                '(https://github.com/tucnakomet1/Python-Currency-Exchange/blob/master/src/currency_'
+                                'exchange.py#L62)'])
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _money(self, ctx, *args):

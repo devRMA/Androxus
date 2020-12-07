@@ -8,6 +8,7 @@ from datetime import datetime
 from itertools import cycle
 from json import loads
 from os import listdir
+import re
 from string import ascii_letters
 from sys import version
 from traceback import format_exc
@@ -17,12 +18,12 @@ from asyncpg.pool import Pool
 from discord.ext import commands, tasks
 from requests import get
 
+from EmbedModels.embedHelpCategory import embed_help_category
 from database.Factories.ConnectionFactory import ConnectionFactory
 from database.Repositories.BlacklistRepository import BlacklistRepository
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from EmbedModels.embedHelpCategory import embed_help_category
 from utils import permissions
 from utils.Utils import get_configs, prettify_number, get_path_from_file, pegar_o_prefixo
 from utils.Utils import string_similarity, get_most_similar_item
@@ -67,7 +68,7 @@ def _load_cogs(bot):
 
 
 class Androxus(commands.Bot):
-    __version__ = '2.2.1'
+    __version__ = '2.2.2'
     configs: dict = get_configs()
     uptime: datetime
     mudar_status: bool = True
@@ -179,7 +180,7 @@ class Androxus(commands.Bot):
                 comando_desativado = self.get_command(comando_desativado_obj.comando.lower())
                 if comando_desativado.name == ctx.command.name:
                     return await ctx.send(f'{self.emoji("no_no")} Este comando '
-                                          'foi desativado por um administrador do servidor!')
+                                          'foi desativado por um administrador do servidor!', delete_after=10)
         channel = message.channel
         if (servidor is not None) and (ctx.command is None):
             # vai ver se a pessoa usou algum comando personalizado
@@ -307,7 +308,27 @@ class Androxus(commands.Bot):
             try:
                 return self.configs['emojis']['dances'][emoji_name]
             except KeyError:
-                return ''
+                try:
+                    return self.configs['emojis']['categories'][emoji_name]
+                except KeyError:
+                    return None
+
+    def get_emoji(self, args):
+        # alteração para aceitar o id,
+        # o nome do emoji que está no configs.json
+        # e o uso do emoji <:nome:1234>
+        args = str(args).lower()
+        if args.isdigit():
+            return super().get_emoji(int(args))
+        emoji = self.emoji(args)
+        if emoji is None:
+            emoji = args
+        emoji_regex = re.compile(r'<a?:.+?:([0-9]{15,21})>')
+        regex_match = emoji_regex.match(emoji)
+        if regex_match is not None:
+            emoji_id = int(regex_match.group(1))
+            return super().get_emoji(emoji_id)
+        return None
 
     def get_all_commands(self):
         all_commands = []

@@ -15,47 +15,8 @@ from database.Models.Servidor import Servidor
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
 from utils.Utils import random_color, get_emoji_dance, get_configs, pegar_o_prefixo, convert_to_string, \
-    convert_to_bool
-
-
-# font: https://github.com/Rapptz/RoboDanny
-class BannedMember(commands.Converter):
-    async def convert(self, ctx, argument):
-        if argument:
-            # se a pessoa usou o comando mencionando o bot
-            if ctx.prefix.replace('!', '').replace(' ', '') == ctx.me.mention:
-                # se a pessoa marcou o bot apenas 1 vez
-                if ctx.message.content.replace('!', '').count(ctx.me.mention) == 1:
-                    # vai tirar a menção da mensagem
-                    ctx.message.mentions.pop(0)
-            if ctx.message.mentions:
-                try:
-                    return await ctx.guild.fetch_ban(discord.Object(id=ctx.message.mentions[-1].id))
-                except discord.NotFound:
-                    erro = commands.BadArgument('Membro mencionado não está banido!')
-                    erro.user = ctx.message.mentions[-1]
-                    raise erro
-            if argument.isdigit():
-                member_id = int(argument, base=10)
-                try:
-                    return await ctx.guild.fetch_ban(discord.Object(id=member_id))
-                except discord.NotFound:
-                    erro = commands.BadArgument('Esse id não está banido!')
-                    erro.id = member_id
-                    raise erro
-
-            ban_list = await ctx.guild.bans()
-            entity = discord.utils.find(lambda u: any([str(u.user) == argument,
-                                                       u.user.name == argument,
-                                                       u.user.discriminator == argument]), ban_list)
-
-            if entity is None:
-                erro = commands.BadArgument('Esse membro não está banido!')
-                erro.member = argument
-                raise erro
-            return entity
-        else:
-            return None
+    convert_to_bool, is_number
+from utils.converters import BannedMember
 
 
 class Admin(commands.Cog, command_attrs=dict(category='administração')):
@@ -494,6 +455,47 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         await sr.update(self.bot.db_connection, servidor)
         return await ctx.send(f'{ctx.author.mention} configurações feitas com sucesso! Para você ver todas as'
                               ' configurações, digite "configs"')
+
+    @Androxus.comando(name='clear',
+                      aliases=['limpar', 'purge'],
+                      description='Vou limpar o chat.',
+                      parameters=['<número de mensagens>'],
+                      examples=['``{prefix}clear`` ``10``',
+                                '``{prefix}purge`` ``40``'],
+                      perm_user='gerenciar mensagens',
+                      perm_bot='gerenciar mensagens')
+    @permissions.has_permissions(manage_messages=True)
+    @commands.bot_has_permissions(manage_messages=True)
+    @commands.guild_only()
+    @commands.max_concurrency(1, commands.BucketType.user)
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _clear(self, ctx, messages=None):
+        if messages is not None:
+            if is_number(messages):
+                try:
+                    messages = int(messages)
+                except ValueError:
+                    return await ctx.send(f'{ctx.author.mention} Eu só aceito números inteiros!')
+            else:
+                return await ctx.send(f'{ctx.author.mention} Digite um número válido!')
+            if 200 >= messages >= 1:
+                try:
+                    deleted = await ctx.channel.purge(limit=messages + 1, check=lambda m: not m.pinned)
+                except:
+                    return await ctx.send(f'{ctx.author.mention} não consegui deletar as mensagens. Tente novamente.')
+                else:
+                    if (len(deleted) - 1) >= messages:
+                        return await ctx.send(f'{ctx.author.mention} deletou {len(deleted) - 1} mensagens!',
+                                              delete_after=5)
+                    else:
+                        return await ctx.send(f'{ctx.author.mention} não foi(ram) deletada(s) '
+                                              f'{abs(messages - len(deleted) - 1)} mensagem(ns), pois estava(m) '
+                                              f'fixada(s).',
+                                              delete_after=5)
+            else:
+                return await ctx.send(f'{ctx.author.mention} informe um número entre 1 e 200!')
+        else:
+            return await self.bot.send_help(ctx)
 
 
 def setup(bot):
