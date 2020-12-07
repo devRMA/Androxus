@@ -6,7 +6,6 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
-from random import choice
 
 import discord
 from DiscordUtils.Pagination import CustomEmbedPaginator
@@ -15,7 +14,7 @@ from discord.ext import commands
 from Classes import Androxus
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity, \
-    prettify_number, find_user
+    prettify_number
 from utils.converters import DiscordUser
 
 
@@ -36,126 +35,16 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                       examples=['`{prefix}avatar` {author_mention}'])
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _avatar(self, ctx, *args):
-        # se a pessoa usou o comando mencionando o bot
-        if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
-            # se a pessoa marcou o bot apenas 1 vez
-            if ctx.message.content.replace('!', '').count(self.bot.user.mention) == 1:
-                # vai tirar a menção da mensagem
-                ctx.message.mentions.pop(0)
-        if ctx.message.mentions:  # se tiver alguma menção na mensagem
-            embed = discord.Embed(title=f'Avatar do(a) {str(ctx.message.mentions[0])}!',
-                                  colour=discord.Colour(random_color()),
-                                  timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-            embed.set_image(url=ctx.message.mentions[-1].avatar_url)
-            return await ctx.send(embed=embed)
-        else:  # se a pessoa não mencionou ninguém, entra aqui
-            if args:  # se a pessoa passou pelo menos alguma coisa
-                if len(args) == 1:  # se a pessoa passou 1item
-                    try:  # vai tentar converter o argumento para int
-                        id_de_quem_ver_o_avatar = int(args[0])  # conversão
-                        # se chegou aqui, vai tentar pegar o usuário com esse id
-                        user = self.bot.get_user(id_de_quem_ver_o_avatar)
-                        # se o bot não achou um user, ele vai pega pela API do discord
-                        if user is None:
-                            try:
-                                user = await self.bot.fetch_user(id_de_quem_ver_o_avatar)
-                            except discord.errors.NotFound:
-                                user = None
-                            except discord.HTTPException:
-                                user = None
-                        # se mesmo assim, não achar o user
-                        if user is None:
-                            return await ctx.send(f'{ctx.author.mention} não consegui um usuário com este id!')
-                        # vai mandar o avatar desta pessoa
-                        e = discord.Embed(title=f'Avatar do(a) {str(user)}!',
-                                          colour=discord.Colour(random_color()),
-                                          timestamp=datetime.utcnow())
-                        e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-                        e.set_image(url=user.avatar_url)
-                        return await ctx.send(embed=e)
-                    except ValueError:  # se der erro, é porque a pessoa não passou apenas números
-                        pass
-                # se chegou até aqui, é porque a pessoa não passou um id ou passou mais de 1 item
-                user = None
-                args = ' '.join(args)
-                # listas que vão ser usadas caso a pessoa digite um nome inválido
-                name = []
-                name_tag = []
-                nickname = []
-                if ctx.guild:
-                    for member in ctx.guild.members:
-                        # se a pessoa tiver um nick
-                        if member.nick is not None:
-                            # vai ver se a pessoa digitou esse nick
-                            if member.nick.lower() == args.lower():
-                                user = member
-                                break
-                            nickname.append(member.nick.lower())
-                        # se a pessoa passou o nome, nome#tag de algum membro:
-                        if (args.lower() == member.name.lower()) or (args.lower() == str(member).lower()):
-                            user = member
-                            break
-                        name.append(member.name.lower())
-                        name_tag.append(str(member).lower())
-                # se não achou a pessoa na guild
-                if user is None:
-                    for _user in self.bot.users:
-                        # se a pessoa passou o nome ou nome#tag de algum user que o bot tem acesso:
-                        if (args.lower() == _user.name) or (args.lower() == str(_user)):
-                            user = _user
-                            break
-                        name.append(_user.name.lower())
-                        name_tag.append(str(_user).lower())
-                # se o bot não achou a pessoa
-                if user is None:
-                    # vai passar para set, apenas para eliminar itens repetidos
-                    name = list(set(name))
-                    name_tag = list(set(name_tag))
-                    nickname = list(set(nickname))
-                    msg = f'{ctx.author.mention} Eu não achei nenhum usuário com este nome/nick.'
-                    user_by_nick = get_most_similar_items_with_similarity(args, nickname)
-                    # se veio pelo menos 1 user pelo nick
-                    if user_by_nick:
-                        # vai pegar o nick mais parecido que veio, e se a similaridade for maior que 60%:
-                        if user_by_nick[0][-1] > 0.6:
-                            msg += f'\nVocê quis dizer `{user_by_nick[0][0]}` ?'
-                            return await ctx.send(msg)
-                    # se não passou pelo return de cima, vai ver se acha algum nome parecido com o que a pessoa
-                    # digitou
-                    user_by_name_tag = get_most_similar_items_with_similarity(args, name_tag)
-                    # se veio pelo menos 1 user pelo nametag
-                    if user_by_name_tag:
-                        # se for pelo menos 60% similar:
-                        if user_by_name_tag[0][-1] > 0.6:
-                            msg += f'\nVocê quis dizer `{user_by_name_tag[0][0]}` ?'
-                            return await ctx.send(msg)
-                    # se não passou pelo return de cima, vai ver se acha algum user#tag parecido com o que a pessoa
-                    # digitou
-                    user_by_name = get_most_similar_items_with_similarity(args, name)
-                    # se veio pelo menos 1 user pelo nametag
-                    if user_by_name:
-                        # vai pegar o nome mais parecido que veio e se a similaridade for maior que 60%:
-                        if user_by_name[0][-1] > 0.6:
-                            msg += f'\nVocê quis dizer `{user_by_name[0][0]}` ?'
-                            return await ctx.send(msg)
-                    # se não passou por nenhum if de cima, vai mandar a mensagem dizendo que não achou
-                    return await ctx.send(msg)
-                # se chegou aqui, vai mandar o avatar do user
-                e = discord.Embed(title=f'Avatar do(a) {str(user)}!',
-                                  colour=discord.Colour(random_color()),
-                                  timestamp=datetime.utcnow())
-                e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-                e.set_image(url=user.avatar_url)
-                return await ctx.send(embed=e)
-            else:  # se a pessoa não passou nenhum argumento:
-                embed = discord.Embed(title=f'Seu avatar!',
-                                      colour=discord.Colour(random_color()),
-                                      timestamp=datetime.utcnow())
-                embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-                embed.set_image(url=ctx.author.avatar_url)
-                return await ctx.send(embed=embed)
+    async def _avatar(self, ctx, *, user: DiscordUser = None):
+        if user is None:
+            user = ctx.author
+        e = discord.Embed(title=f'Avatar do(a) {str(user)}!',
+                          colour=discord.Colour(random_color()),
+                          description=f'Clique [aqui]({user.avatar_url}) para baixar o avatar.',
+                          timestamp=datetime.utcnow())
+        e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        e.set_image(url=str(user.avatar_url))
+        return await ctx.send(embed=e)
 
     @Androxus.comando(name='userinfo',
                       aliases=['profile', 'memberinfo', 'ui'],
@@ -586,25 +475,9 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _joinrank(self, ctx, *, args=None):
-        if args is None:
+    async def _joinrank(self, ctx, *, member: DiscordUser = None):
+        if member is None:
             member = ctx.author
-        else:
-            members = find_user(args, ctx.guild.members, 0.6)
-            if (len(members) == 0) or (len(members) == len(ctx.guild.members)):
-                if args == '-r':
-                    member = choice(ctx.guild.members)
-                else:
-                    return await ctx.send('Não achei nenhum membro!')
-            elif len(members) == 1:
-                member = members[0]
-            else:
-                if len(members) >= 5:
-                    msg = '\n'.join(f'{u} (ID: {u.id})' for u in members[:5])
-                    msg += f'\nE outro(s) {len(members) - 5} resultado(s)...'
-                else:
-                    msg = '\n'.join(f'{u} (ID: {u.id})' for u in members)
-                return await ctx.send(f'Encontrei mais de um membro!\n{msg}')
         members = sorted(ctx.guild.members, key=lambda x: x.joined_at)
 
         def get_pos(m):

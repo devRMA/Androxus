@@ -45,7 +45,7 @@ class ErrorCommands(commands.Cog):
             embed = discord.Embed(title='Encontrei mais de um resultado!',
                                   colour=discord.Colour(random_color()),
                                   timestamp=datetime.utcnow())
-            results = MultipleResults.results
+            results = error.results
             if len(results) >= 5:
                 msg = '\n'.join(f'{u} (ID: {u.id})' for u in results[:5])
                 msg += f'\nE outro(s) {len(results) - 5} resultado(s)...'
