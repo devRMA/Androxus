@@ -7,7 +7,7 @@ __author__ = 'Rafael'
 from datetime import datetime
 from re import compile
 
-import currency_exchange
+from dependencies import currency_exchange
 import discord
 import googletrans
 from discord.ext import commands
@@ -283,7 +283,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                             inline=False)
             if isinstance(emoji, discord.Emoji):
                 if emoji.guild == ctx.guild:
-                    embed.add_field(name='Deste servidor!:',
+                    embed.add_field(name='E emoji é deste servidor!',
                                     value='** **',
                                     inline=True)
                 embed.add_field(name='Criado em:',

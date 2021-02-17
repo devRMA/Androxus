@@ -4,18 +4,16 @@
 
 __author__ = 'Rafael'
 
-import asyncio
 from datetime import datetime
 
-import currency_exchange
 import discord
 from discord.ext import commands
 
 from Classes import Androxus
-from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
-from database.Repositories.ServidorRepository import ServidorRepository
 from EmbedModels.embedHelpCategory import embed_help_category
 from EmbedModels.embedHelpCommand import embed_help_command
+from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
+from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import random_color, get_most_similar_item, string_similarity, convert_to_string
 
 

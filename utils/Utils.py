@@ -8,6 +8,7 @@ import datetime
 import string as string_lib
 from datetime import datetime
 from functools import reduce
+from re import compile
 from glob import glob
 from json import loads, load
 from random import choice, randint
@@ -382,24 +383,21 @@ def is_number(string):
         bool: Vai retornar se a string pode ser convertida para float ou int
 
     """
+    if len(string) == 0:
+        return False
+    if not isinstance(string, str):
+        string = str(string)
+    if string.isdecimal() or string.isnumeric():
+        return True
     try:
-        if string.find(',') != -1:
-            # se a string vier assim: 2,2
-            # vai converter para: 2.2
-            string = string.replace(',', '.')
-        # remove espaços
-        string = string.replace(' ', '')
-        # a função isalpha verifica se a string é inteiramente de leras
-        if string.isalpha():
-            return False
-        # aqui vai verificar se tem alguma letra no meio dos números
-        for char in string_lib.ascii_lowercase:
-            if char in string.lower():
-                return False
         float(string)
         return True
     except ValueError:
-        return False
+        try:
+            float(string.replace(',', '.'))
+        except ValueError:
+            return False
+
 
 
 def convert_to_bool(argument):
@@ -695,62 +693,92 @@ def to_utf8(string):
     return ''.join(filter(lambda x: str(x) in string_lib.printable, list(str(string))))
 
 
-def find_user(user_input, collection, accuracy=0.6):
+async def find_user(user_input, ctx, accuracy=0.6, API_search=False):
     """
 
     Args:
         user_input (str): O input que vai ser procurado na collection de membros/users
-        collection (List[discord.User]): Lista de membros/usuários que vai tentar achar o input
+        ctx (discord.ext.commands.Context): Contexto da mensagem
         accuracy (float): O quão parecido vai precisar ser o input com o usuário, para selecionar ele (Default value = 0.6)
+        API_search (bool): Se é ou não para pegar o user pela API do discord, caso o input seja um id (Default value = False)
 
     Returns:
-        List[discord.User]: O usuário/membro encontrado
+        List[discord.User]: O(s) usuário/membro(s) encontrado(s)
 
     """
-
-    user_input = to_utf8(user_input)
-    if user_input == '':
-        return []
-
     class ItemSimilarity:
         def __init__(self, value, similarity):
             self.item = value
             self.similarity = similarity
+        def __eq__(self, other):
+            return isinstance(other, ItemSimilarity) and other.item == self.item
 
-    most_similar_items = list()
-    endswith_items = list()
-    startswith_items = list()
+        def __ne__(self, other):
+            return not self.__eq__(other)
+
+        def __hash__(self):
+            return hash(self.item)
+
+    user_input = to_utf8(user_input).lower()
+    if user_input == '':
+        return []
+    user_input_int = None
+    if is_number(user_input):
+        try:
+            user_input_int = int(user_input)
+        except ValueError:
+            pass
+    # se o input for '<@123456789123456>' vai entrar no regex
+    mention_regex = compile(r'<@!?([0-9]{16,20})>')
+    mention_match = mention_regex.match(user_input)
+    if mention_match is not None:
+        try:
+            # extraindo o id da mention
+            user_input_int = int(mention_match.group(1))
+        except ValueError:
+            pass
+    exact_items = []
+    most_similar_items = []
+    endswith_items = []
+    startswith_items = []
+    collection = []
+    bot = ctx.bot
+    if ctx.guild:
+        collection = ctx.guild.members
+    collection += bot.users
+    collection = list(set(collection))
     for item in collection:
-        if is_number(user_input):
-            try:
-                int_input = int(user_input)
-            except ValueError:
-                pass
-            else:
-                if item.id == int_input:
-                    return [item]
-        if (user_input == f'<@{item.id}>') or (user_input == f'<@!{item.id}>'):
+        if user_input_int is not None and item.id == user_input_int:
             return [item]
         name = to_utf8(item.name).lower()
         display_name = to_utf8(item.display_name).lower()
         name_tag = to_utf8(str(item)).lower()
-        ui = user_input.lower()
-        sim_name = string_similarity(name, ui)
+        sim_name = string_similarity(name, user_input)
         if sim_name == 1.0:
-            return [item]
-        sim_display_name = string_similarity(display_name, ui)
+            exact_items.append(item)
+            continue
+        sim_display_name = string_similarity(display_name, user_input)
         if sim_display_name == 1:
-            return [item]
-        sim_name_tag = string_similarity(name_tag, ui)
+            exact_items.append(item)
+            continue
+        sim_name_tag = string_similarity(name_tag, user_input)
         if sim_name_tag == 1.0:
-            return [item]
+            exact_items.append(item)
+            continue
         most_similarity = reduce(lambda x, y: x if x > y else y, [sim_name, sim_display_name, sim_name_tag])
         if most_similarity >= accuracy:
             most_similar_items.append(ItemSimilarity(item, most_similarity))
-        elif name.startswith(ui) or display_name.startswith(ui) or name_tag.startswith(ui):
+        elif name.startswith(user_input) or display_name.startswith(user_input) or name_tag.startswith(user_input):
             startswith_items.append(item)
-        elif name.endswith(ui) or display_name.endswith(ui) or name_tag.endswith(ui):
+        elif name.endswith(user_input) or display_name.endswith(user_input) or name_tag.endswith(user_input):
             endswith_items.append(item)
+    if len(exact_items) > 0:
+        return exact_items
+    elif API_search and user_input_int is not None:
+        try:
+            return await bot.fetch_user(user_input_int)
+        except:
+            pass
     if len(most_similar_items) > 0:
         most_similar_items.sort(key=lambda k: k.similarity,
                                 reverse=True)
@@ -762,4 +790,5 @@ def find_user(user_input, collection, accuracy=0.6):
         return [startswith_items[0]]
     elif len(endswith_items) > 0:
         return [endswith_items[0]]
-    return []
+
+

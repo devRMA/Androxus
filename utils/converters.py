@@ -34,21 +34,10 @@ class DiscordUser(commands.Converter):
                         return None
                 else:
                     return None
-            all_users = []
-            users = []
-            if ctx.guild is not None:
-                all_users += ctx.guild.members.copy()
-            if len(all_users) > 0:
-                users = find_user(argument, all_users)
-                if len(users) == 1:
-                    return users[0]
-            # se não tiver 1 item na lista e for números, vai tentar pegar o user pela API
-            if str(argument).isdigit():
-                try:
-                    return await ctx.bot.fetch_user(int(argument))
-                except:
-                    pass
-            if len(all_users) == len(users):
+            users = await find_user(argument, ctx=ctx)
+            if len(users) == 1:
+                return users[0]
+            if len(users) == 0:
                 return None
             if len(users) > 1:
                 raise MultipleResults(users)

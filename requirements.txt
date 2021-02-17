@@ -1,7 +1,7 @@
-aiohttp==3.6.0
+aiohttp
 asyncio
 asyncpg
-currency-exchange
+bs4
 discord
 discord.py
 DiscordUtils@git+https://github.com/devRMA/DiscordUtils@master

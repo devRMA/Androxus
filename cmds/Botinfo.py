@@ -251,10 +251,11 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
         embed_home.set_footer(text=f'{ctx.author} ─ 1/{paginas}', icon_url=ctx.author.avatar_url)
         embeds.append(embed_home)
         for category in categories:
-            e = await embed_help_category(self.bot, ctx, category, cor)
-            e.set_footer(text=f'{ctx.author} ─ {categories.index(category) + 2}/{paginas}',
-                         icon_url=ctx.author.avatar_url)
-            embeds.append(e)
+            if category.lower() != 'personalizado':
+                e = await embed_help_category(self.bot, ctx, category, cor)
+                e.set_footer(text=f'{ctx.author} ─ {categories.index(category) + 2}/{paginas}',
+                             icon_url=ctx.author.avatar_url)
+                embeds.append(e)
         if servidor:
             comandos_str = []
             if len(cmds_personalizados) >= 1:
@@ -266,7 +267,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                                   description='São comandos exclusivos deste servidor. Não precisam do prefixo.',
                                   timestamp=datetime.utcnow())
                 e.add_field(name=f'📖 Comandos ({len(comandos_str)}):',
-                            value=", ".join(comandos_str),
+                            value=', '.join(comandos_str),
                             inline=False)
                 e.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
                 e.set_footer(text=f'{ctx.author} ─ {paginas}/{paginas}',
