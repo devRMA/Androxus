@@ -91,7 +91,7 @@ class Androxus(commands.Bot):
         kwargs['owner_id'] = configs['owners'] if len(configs['owners']) > 1 else configs['owners'][0]
         kwargs['case_insensitive'] = True
         kwargs['intents'] = intents
-        # iniciando ele
+        # iniciando o bot
 
         super().__init__(*args, **kwargs)
 
