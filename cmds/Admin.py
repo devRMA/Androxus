@@ -63,13 +63,13 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
                 return await ctx.send(f'{ctx.author.mention} você não pode banir o dono do servidor! ' +
-                                      f'{self.bot.emoji("ah_nao")}')
+                                      f'{self.bot.get_emoji("ah_nao")}')
             elif member == ctx.author:
                 return await ctx.send(f'{ctx.author.mention} você não pode se banir! ' +
-                                      f'{self.bot.emoji("ah_nao")}')
+                                      f'{self.bot.get_emoji("ah_nao")}')
             elif member == self.bot.user:
                 return await ctx.send(f'{ctx.author.mention} eu não posso me banir! ' +
-                                      f'{self.bot.emoji("ah_nao")}')
+                                      f'{self.bot.get_emoji("ah_nao")}')
             elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
@@ -82,7 +82,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             # se a pessoa não passou nada:
             return await self.bot.send_help(ctx)
-        embed = discord.Embed(title=f'{self.bot.emoji("banned")} Usuário banido!',
+        embed = discord.Embed(title=f'{self.bot.get_emoji("banned")} Usuário banido!',
                               colour=discord.Colour(random_color()),
                               description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
                                           f'{str(reason).replace("None", "nulo")}',
@@ -105,7 +105,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 await msg.delete()
             except:
                 pass
-            await ctx.send(f'Eu não tenho permissão para banir este usuário. {self.bot.emoji("sad")}')
+            await ctx.send(f'Eu não tenho permissão para banir este usuário. {self.bot.get_emoji("sad")}')
         else:
             await ctx.send(embed=embed)
 
@@ -145,13 +145,13 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
                 return await ctx.send(f'{ctx.author.mention} você não pode expulsar o dono do servidor! ' +
-                                      f'{self.bot.emoji("ah_nao")}')
+                                      f'{self.bot.get_emoji("ah_nao")}')
             elif member == ctx.author:
                 return await ctx.send(f'{ctx.author.mention} você não pode se expulsar! ' +
-                                      f'{self.bot.emoji("ah_nao")}')
+                                      f'{self.bot.get_emoji("ah_nao")}')
             elif member == self.bot.user:
                 return await ctx.send(f'{ctx.author.mention} eu não posso me expulsar! ' +
-                                      f'{self.bot.emoji("ah_nao")}')
+                                      f'{self.bot.get_emoji("ah_nao")}')
             elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
@@ -184,7 +184,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             await ctx.guild.kick(member, reason=reason)
         except discord.errors.Forbidden:
             await msg.delete()
-            await ctx.send(f'Eu não tenho permissão para expulsar esse usuário. {self.bot.emoji("sad")}')
+            await ctx.send(f'Eu não tenho permissão para expulsar esse usuário. {self.bot.get_emoji("sad")}')
         else:
             await ctx.send(content=get_emoji_dance(), embed=embed)
 

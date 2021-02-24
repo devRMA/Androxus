@@ -70,7 +70,7 @@ def get_emoji_dance():
 
     """
     # lista com os emojis
-    emojis = [c[-1] for c in get_configs()['emojis']['dances'].items()]
+    emojis = [c[-1] for c in get_emojis_json()['dances'].items()]
     return choice(emojis)  # retorna o emoji escolhido da lista
 
 
