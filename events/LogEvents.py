@@ -13,7 +13,7 @@ from PIL import Image
 from discord.ext import commands
 
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import random_color, difference_between_lists, get_path_from_file
+from utils.Utils import difference_between_lists, get_path_from_file
 
 
 class LogEvent(commands.Cog):
@@ -40,7 +40,7 @@ class LogEvent(commands.Cog):
                 if before.nick != after.nick:
                     if server.nick_alterado:
                         embed = discord.Embed(title='Nick alterado',
-                                              colour=discord.Colour(random_color()),
+                                              colour=discord.Colour.random(),
                                               description=f'O(A) {after.name} mudou de nick!\n'
                                                           f'User: {after.mention}\n'
                                                           f'Id: {after.id}\n'
@@ -66,7 +66,7 @@ class LogEvent(commands.Cog):
                             elif len(cargos) > 1:
                                 desc = 'Cargos removidos: ' + ', '.join(cargos)
                         embed = discord.Embed(title='Cargos alterados',
-                                              colour=discord.Colour(random_color()),
+                                              colour=discord.Colour.random(),
                                               description=f'O(A) {after.name} sofreu alteração nos cargos!\n'
                                                           f'User: {after.mention}\n'
                                                           f'Id: {after.id}\n'
@@ -99,7 +99,7 @@ class LogEvent(commands.Cog):
             return
         if before.name != after.name:
             embed = discord.Embed(title='Nome alterado',
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   description=f'O(A) {after.name} mudou de nome!\n'
                                               f'User: {after.mention}\n'
                                               f'Id: {after.id}\n'
@@ -114,7 +114,7 @@ class LogEvent(commands.Cog):
                         await channel.send(embed=embed)
         if before.discriminator != after.discriminator:
             embed = discord.Embed(title='Tag alterada',
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   description=f'O(A) {after.name} mudou a tag!\n'
                                               f'User: {after.mention}\n'
                                               f'Id: {after.id}\n'
@@ -150,7 +150,7 @@ class LogEvent(commands.Cog):
                 base.paste(avatar_antigo, (0, 0))
                 base.paste(avatar_novo, (512, 0))
                 embed = discord.Embed(title='Avatar alterado',
-                                      colour=discord.Colour(random_color()),
+                                      colour=discord.Colour.random(),
                                       description=f'O(A) {after.name} mudou o avatar!\n'
                                                   f'User: {after.mention}\n'
                                                   f'Id: {after.id}\n'
@@ -193,7 +193,7 @@ class LogEvent(commands.Cog):
                     else:
                         msg_nova = f'```{after.content}```'
                     embed = discord.Embed(title='Mensagem editada',
-                                          colour=discord.Colour(random_color()),
+                                          colour=discord.Colour.random(),
                                           description=f'Autor: {after.author.name}\n'
                                                       f'Menção: {after.author.mention}\n'
                                                       f'Id: {after.author.id}\n'
@@ -222,7 +222,7 @@ class LogEvent(commands.Cog):
                         msg_escaped = f'```{message.content}```'
                     embed = discord.Embed(
                         title=f'Mensagem deletada',
-                        colour=discord.Colour(random_color()),
+                        colour=discord.Colour.random(),
                         description=f'Autor: {message.author.name}\n'
                                     f'Menção: {message.author.mention}\n'
                                     f'Id: {message.author.id}\n'
@@ -253,7 +253,7 @@ class LogEvent(commands.Cog):
                 from io import BytesIO
                 data = BytesIO(bytes(msg, 'utf-8'))
                 embed = discord.Embed(title=f'{len(messages)} mensagens deletadas',
-                                      colour=discord.Colour(random_color()),
+                                      colour=discord.Colour.random(),
                                       description=f'Chat: {messages[0].channel.mention}\n',
                                       timestamp=datetime.utcnow())
                 embed.set_footer(text=f'{messages[0].author}', icon_url=messages[0].author.avatar_url)

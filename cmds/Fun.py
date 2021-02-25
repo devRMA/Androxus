@@ -63,7 +63,7 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
             except:
                 pass
         seed(asci_value)
-        await ctx.send(f'{choice(respostas)}')
+        await ctx.reply(f'{choice(respostas)}', mention_author=False)
 
     @Androxus.comando(name='cara_coroa',
                       aliases=['cc', 'coinflip'],
@@ -72,7 +72,7 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _cara_coroa(self, ctx):
         respostas = ['🙂 Cara.', '👑 Coroa.']
-        await ctx.send(f'{choice(respostas)}')
+        await ctx.reply(choice(respostas), mention_author=False)
 
     @Androxus.comando(name='girar',
                       aliases=['side-down', 'inverter'],
@@ -86,9 +86,9 @@ class Fun(commands.Cog, command_attrs=dict(category='diversão')):
             args = args.replace(f'@', '@\uFEFF')
             args = args.replace(f'&', '&\uFEFF')
             if len(args) <= 200:
-                await ctx.send(f'{ctx.author.mention} 🙃 {inverter_string(args)}')
+                await ctx.reply(inverter_string(args))
             else:
-                await ctx.send(f'{ctx.author.mention} você não acha que essa mensagem está grande não? \'-\'')
+                await ctx.reply(f'Você não acha que essa mensagem está grande não? \'-\'\nO limite é 200 caracteres')
         else:
             await self.bot.send_help(ctx)
 

@@ -5,10 +5,9 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
+from random import randint
 
 import discord
-
-from utils.Utils import random_color
 
 
 def get_paginator_help(bot, ctx, color=None):
@@ -24,7 +23,7 @@ def get_paginator_help(bot, ctx, color=None):
 
     """
     if color is None:
-        color = random_color()
+        color = int(f'0x{randint(0, 255):02x}{randint(0, 255):02x}{randint(0, 255):02x}', 16)
     e = discord.Embed(title='Ajuda com as páginas',
                       description='Enquanto um comando estiver com os emojis para você navegar entre as páginas, '
                                   'você não pode usar o comando de novo!',

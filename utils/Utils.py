@@ -51,17 +51,6 @@ async def pegar_o_prefixo(bot, message):
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
 
 
-def random_color():
-    """
-
-    Returns:
-        hex: uma cor "aleatoria" em hexadecimal
-
-    """
-    # vai escolher os números, e depois transformar em hexadecimal 0x000000
-    return int(f'0x{randint(0, 255):02x}{randint(0, 255):02x}{randint(0, 255):02x}', 16)
-
-
 def get_emoji_dance():
     """
 
@@ -399,7 +388,6 @@ def is_number(string):
             return False
 
 
-
 def convert_to_bool(argument):
     """
 
@@ -706,10 +694,12 @@ async def find_user(user_input, ctx, accuracy=0.6, API_search=False):
         List[discord.User]: O(s) usuário/membro(s) encontrado(s)
 
     """
+
     class ItemSimilarity:
         def __init__(self, value, similarity):
             self.item = value
             self.similarity = similarity
+
         def __eq__(self, other):
             return isinstance(other, ItemSimilarity) and other.item == self.item
 
@@ -790,5 +780,3 @@ async def find_user(user_input, ctx, accuracy=0.6, API_search=False):
         return [startswith_items[0]]
     elif len(endswith_items) > 0:
         return [endswith_items[0]]
-
-

@@ -13,7 +13,6 @@ from discord.ext.commands import errors
 
 from Classes.erros import *
 from utils import permissions
-from utils.Utils import random_color
 
 
 class ErrorCommands(commands.Cog):
@@ -43,7 +42,7 @@ class ErrorCommands(commands.Cog):
             return await self.bot.send_help(ctx)
         elif isinstance(error, MultipleResults):
             embed = discord.Embed(title='Encontrei mais de um resultado!',
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   timestamp=datetime.utcnow())
             results = error.results
             if len(results) >= 5:
