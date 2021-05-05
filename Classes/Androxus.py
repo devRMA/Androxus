@@ -74,7 +74,6 @@ class Androxus(commands.Bot):
     mudar_status: bool = True
     dm_channel_log: discord.TextChannel = None
     maintenance_mode: bool = False
-    started: bool = False
     db_connection: Pool = None
 
     def __init__(self, *args, **kwargs):
@@ -117,11 +116,10 @@ class Androxus(commands.Bot):
                   f'Versão que você está usando: {self.__version__}')
 
     async def on_ready(self):
-        if not self.started:
+        if self.is_ready():
             self.uptime = datetime.utcnow()
             self.dm_channel_log = self.get_channel(self.configs['dm_channel'])
             self.db_connection = await ConnectionFactory.get_connection()
-            self.started = True
             print(('-=' * 10) + 'Androxus Online!' + ('-=' * 10))
             print(f'Logado em {self.user}')
             print(f'ID: {self.user.id}')
@@ -137,7 +135,7 @@ class Androxus(commands.Bot):
                 pass
 
     async def on_message(self, message):
-        if (not self.started) or (self.db_connection is None):
+        if self.is_ready() or self.db_connection is None:
             return
         ctx = await self.get_context(message)
         banido = (await BlacklistRepository().get_pessoa(self.db_connection, ctx.author.id))[0]
