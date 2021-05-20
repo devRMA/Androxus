@@ -29,7 +29,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         if after.bot or self.bot.maintenance_mode \
-                or (not self.bot.started) or (self.bot.db_connection is None):
+                or (not self.bot.is_ready()) or (self.bot.db_connection is None):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, after.guild.id)
         if server is None:
@@ -89,7 +89,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_user_update(self, before, after):
         if after.bot or self.bot.maintenance_mode \
-                or (not self.bot.started) or (self.bot.db_connection is None):
+                or (not self.bot.is_ready()) or (self.bot.db_connection is None):
             return
         servers_with_user = []
         for guild in self.bot.guilds:
@@ -172,7 +172,7 @@ class LogEvent(commands.Cog):
     async def on_message_edit(self, before, after):
         if after.author.bot or after.is_system() or self.bot.maintenance_mode \
                 or ((after.guild is None) or (before.guild is None)) \
-                or (not self.bot.started) or (before.content == after.content) \
+                or (not self.bot.is_ready()) or (before.content == after.content) \
                 or (self.bot.db_connection is None):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, after.guild.id)
@@ -208,7 +208,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         if message.author.bot or message.is_system() or self.bot.maintenance_mode \
-                or (message.guild is None) or (not self.bot.started) or (len(message.content) == 0) \
+                or (message.guild is None) or (not self.bot.is_ready()) or (len(message.content) == 0) \
                 or (self.bot.db_connection is None):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, message.guild.id)
@@ -235,7 +235,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_bulk_message_delete(self, messages):
         if (self.bot.db_connection is None) or self.bot.maintenance_mode or (messages[0].guild is None) or \
-                (not self.bot.started):
+                (not self.bot.is_ready()):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, messages[0].guild.id)
         if server.channel_id_log is not None:

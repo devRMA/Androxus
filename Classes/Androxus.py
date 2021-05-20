@@ -68,13 +68,12 @@ def _load_cogs(bot):
 
 
 class Androxus(commands.Bot):
-    __version__ = '2.2.3'
+    __version__ = '2.3'
     configs: dict = get_configs()
-    uptime: datetime
+    uptime: datetime = None
     mudar_status: bool = True
     server_log: discord.TextChannel = None
     maintenance_mode: bool = False
-    started: bool = False
     db_connection: Pool = None
 
     def __init__(self, *args, **kwargs):
@@ -115,11 +114,10 @@ class Androxus(commands.Bot):
                   f'Versão que você está usando: {self.__version__}')
 
     async def on_ready(self):
-        if not self.started:
+        if self.db_connection is None:
             self.uptime = datetime.utcnow()
             self.server_log = self.get_channel(self.configs['channels_log']['servers'])
             self.db_connection = await ConnectionFactory.get_connection()
-            self.started = True
             print(('-=' * 10) + 'Androxus Online!' + ('-=' * 10))
             print(f'Logado em {self.user}')
             print(f'ID: {self.user.id}')
@@ -135,7 +133,7 @@ class Androxus(commands.Bot):
                 pass
 
     async def on_message(self, message):
-        if (not self.started) or (self.db_connection is None):
+        if (not self.is_ready()) or (self.db_connection is None):
             return
         ctx = await self.get_context(message)
         banido = (await BlacklistRepository().get_pessoa(self.db_connection, ctx.author.id))[0]
@@ -150,22 +148,6 @@ class Androxus(commands.Bot):
         servidor = await ServidorRepository().get_servidor(self.db_connection, ctx.guild.id) if \
             ctx.guild is not None else None
         prefixo = await pegar_o_prefixo(self, message)
-        # if isinstance(message.channel, discord.DMChannel):  # se a mensagem foi enviada no dm
-        #     embed = discord.Embed(title=f'O(A) {ctx.author} mandou mensagem no meu dm',
-        #                           colour=0xfdfd96,
-        #                           description=message.content,
-        #                           timestamp=datetime.utcnow())
-        #     embed.set_footer(text=str(ctx.author.id),
-        #                      icon_url='https://media-exp1.licdn.com/dms/image/C510BAQHhOjPujl' +
-        #                               'cgfQ/company-logo_200_200/0?e=2159024400&v=beta&t=49' +
-        #                               'Ex7j5UkZroF7-uzYIxMXPCiV7dvtvMNDz3syxcLG8')
-        #     if len(message.attachments) != 0:
-        #         for index, attachment in enumerate(message.attachments):
-        #             embed.add_field(name=f'{index + 1} attachment',
-        #                             value=attachment.url,
-        #                             inline=False)
-        #     embed.set_thumbnail(url=message.author.avatar_url)
-        #     await self.dm_channel_log.send(embed=embed)
         if (f'<@{self.user.id}>' == message.content) or (f'<@!{self.user.id}>' == message.content):
             await ctx.reply(f'Use o comando ``{prefixo}cmds`` para obter todos os meus comandos!',
                             mention_author=False)
@@ -302,6 +284,15 @@ class Androxus(commands.Bot):
 
     @staticmethod
     def emoji(emoji_name):
+        """
+
+        Args:
+            emoji_name (str): O nome do emoji no .json
+
+        Returns:
+            str: O que achou no json.
+
+        """
         dict_emojis = get_emojis_json()
         try:
             return dict_emojis[emoji_name]
@@ -341,6 +332,17 @@ class Androxus(commands.Bot):
 
     async def send_help(self, ctx):
         await self.get_command('help')(ctx)
+
+    async def language(self, ctx):
+        """
+
+        Args:
+            ctx (discord.ext.commands.context.Context): O contexto que vai ser usado para pegar o prefixo
+
+        Returns:
+
+        """
+        pass
 
 
 class _BaseComando(commands.Command):

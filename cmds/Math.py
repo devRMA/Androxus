@@ -4,11 +4,11 @@
 
 __author__ = 'Rafael'
 
+import asyncio
 from datetime import datetime
 from os import remove
 from os.path import exists
 
-import asyncio
 import discord
 from PIL import Image
 from PIL import ImageDraw
@@ -134,7 +134,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                         f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
         if len(str(resultado)) >= 400:
             await ctx.reply('O resultado desta operação é tão grande que não consigo enviar a resposta!' +
-                           f'\n{self.bot.emoji("sad")}')
+                            f'\n{self.bot.emoji("sad")}')
             return
         embed = discord.Embed(title=f'{self.bot.emoji("calculator")} Calculadora:',
                               colour=discord.Colour.random(),

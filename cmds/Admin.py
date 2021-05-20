@@ -4,14 +4,13 @@
 
 __author__ = 'Rafael'
 
+import asyncio
 from datetime import datetime
 
-import asyncio
 import discord
 from discord.ext import commands
 
 from Classes import Androxus
-from database.Models.Servidor import Servidor
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
 from utils.Utils import get_emoji_dance, get_configs, pegar_o_prefixo, convert_to_string, \
@@ -250,7 +249,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             # se a pessoa não marcou o bot:
             prefixo_antigo = ctx.prefix
-        servidor = Servidor(ctx.guild.id, prefixo_novo)
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
         await ServidorRepository().update(self.bot.db_connection, servidor)
         if prefixo_novo != self.bot.configs['default_prefix']:
             embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour.random(),

@@ -4,12 +4,12 @@
 
 __author__ = 'Rafael'
 
+import asyncio
 from datetime import datetime
 from os import getpid
 from sys import version
 
 import DiscordUtils
-import asyncio
 import discord
 import psutil
 from discord.ext import commands
@@ -189,7 +189,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}',
                          icon_url=ctx.author.avatar_url)
-        embed.add_field(name='Atualização feita em:',
+        embed.add_field(name='Atualização feita há:',
                         value=f'{datetime_format(get_last_update())}',
                         inline=True)
         await ctx.reply(embed=embed, mention_author=False)

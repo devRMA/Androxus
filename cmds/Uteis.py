@@ -284,7 +284,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                             inline=False)
             if isinstance(emoji, discord.Emoji):
                 if emoji.guild == ctx.guild:
-                    embed.add_field(name='E emoji é deste servidor!',
+                    embed.add_field(name='O emoji é deste servidor!',
                                     value='** **',
                                     inline=True)
                 embed.add_field(name='Criado em:',

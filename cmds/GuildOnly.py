@@ -466,9 +466,9 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @Androxus.comando(name='joinrank',
                       aliases=['oldmembersrank', 'jr', 'membrosantigos'],
                       description='Eu vou mostrar o rank com os membros mais antigos do servidor.',
-                      parameters=['["-r" (membro aleatorio) | usuário (padrão: autor)]'],
+                      parameters=['[Usuário (padrão: autor)]'],
                       examples=['`{prefix}joinrank`',
-                                '`{prefix}jr` `-r`',
+                                '`{prefix}jr`',
                                 '`{prefix}jr` `androxus`'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
