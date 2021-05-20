@@ -5,11 +5,12 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
+from random import randint
 
 import discord
 
 from utils.Utils import capitalize
-from utils.Utils import random_color, pegar_o_prefixo
+from utils.Utils import pegar_o_prefixo
 
 
 async def embed_help_category(bot, ctx, category, color=None):
@@ -33,7 +34,7 @@ async def embed_help_category(bot, ctx, category, color=None):
         # se a pessoa não marcou o bot:
         prefixo = ctx.prefix
     if color is None:
-        color = random_color()
+        color = int(f'0x{randint(0, 255):02x}{randint(0, 255):02x}{randint(0, 255):02x}', 16)
     e = discord.Embed(title=f'Categoria: {bot.get_emoji_from_category(category)} {capitalize(category)}',
                       colour=discord.Colour(color),
                       description='Todos os comandos que estão nesta categoria!\nPara obter mais detalhes sobre '

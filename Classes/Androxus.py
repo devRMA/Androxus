@@ -58,9 +58,9 @@ def _load_cogs(bot):
             except:
                 print(f'⚠ - Módulo {filename[:-3]} deu erro na hora de carregar!\n{format_exc()}')
     for filename in listdir(path_events):  # vai listar todas os arquivos que tem na pasta "events"
-        if filename.endswith('.py'):  # se o arquivo terminar com ".py"
-            try:  # vai verificar se o arquivo tem o "def setup"
-                bot.load_extension(f'events.{filename[:-3]}')  # vai adicionar ao bot
+        if filename.endswith('.py'):
+            try:
+                bot.load_extension(f'events.{filename[:-3]}')
             except commands.NoEntryPointError:
                 pass  # se não achar o def setup
             except:
@@ -68,11 +68,11 @@ def _load_cogs(bot):
 
 
 class Androxus(commands.Bot):
-    __version__ = '2.2.2'
+    __version__ = '2.3'
     configs: dict = get_configs()
-    uptime: datetime
+    uptime: datetime = None
     mudar_status: bool = True
-    dm_channel_log: discord.TextChannel = None
+    server_log: discord.TextChannel = None
     maintenance_mode: bool = False
     db_connection: Pool = None
 
@@ -91,9 +91,7 @@ class Androxus(commands.Bot):
         kwargs['case_insensitive'] = True
         kwargs['intents'] = intents
         # iniciando o bot
-
         super().__init__(*args, **kwargs)
-
         _load_cogs(self)
         # vai verificar se a pessoa está com a versão mais atual do bot
         url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
@@ -116,9 +114,9 @@ class Androxus(commands.Bot):
                   f'Versão que você está usando: {self.__version__}')
 
     async def on_ready(self):
-        if self.is_ready():
+        if self.db_connection is None:
             self.uptime = datetime.utcnow()
-            self.dm_channel_log = self.get_channel(self.configs['dm_channel'])
+            self.server_log = self.get_channel(self.configs['channels_log']['servers'])
             self.db_connection = await ConnectionFactory.get_connection()
             print(('-=' * 10) + 'Androxus Online!' + ('-=' * 10))
             print(f'Logado em {self.user}')
@@ -135,40 +133,24 @@ class Androxus(commands.Bot):
                 pass
 
     async def on_message(self, message):
-        if self.is_ready() or self.db_connection is None:
+        if (not self.is_ready()) or (self.db_connection is None):
             return
         ctx = await self.get_context(message)
         banido = (await BlacklistRepository().get_pessoa(self.db_connection, ctx.author.id))[0]
-        if (ctx.author.id == self.user.id) or (message.is_system()) \
-                or (not permissions.can_send(ctx)) or ctx.author.bot or banido:
+        if message.is_system() or not permissions.can_send(ctx) or ctx.author.bot or banido:
             return
         try:
             permissions.is_owner(ctx)
         except discord.ext.commands.errors.NotOwner:
-            # se a pessoa não for dona do self, e ele estiver em manutenção, simplesmente ignora a mensagem
+            # se a pessoa não for dona do bot, e ele estiver em manutenção, simplesmente ignora a mensagem
             if self.maintenance_mode:
                 return
         servidor = await ServidorRepository().get_servidor(self.db_connection, ctx.guild.id) if \
             ctx.guild is not None else None
         prefixo = await pegar_o_prefixo(self, message)
-        if isinstance(message.channel, discord.DMChannel):  # se a mensagem foi enviada no dm
-            embed = discord.Embed(title=f'O(A) {ctx.author} mandou mensagem no meu dm',
-                                  colour=0xfdfd96,
-                                  description=message.content,
-                                  timestamp=datetime.utcnow())
-            embed.set_footer(text=str(ctx.author.id),
-                             icon_url='https://media-exp1.licdn.com/dms/image/C510BAQHhOjPujl' +
-                                      'cgfQ/company-logo_200_200/0?e=2159024400&v=beta&t=49' +
-                                      'Ex7j5UkZroF7-uzYIxMXPCiV7dvtvMNDz3syxcLG8')
-            if len(message.attachments) != 0:
-                for index, attachment in enumerate(message.attachments):
-                    embed.add_field(name=f'{index + 1} attachment',
-                                    value=attachment.url,
-                                    inline=False)
-            embed.set_thumbnail(url=message.author.avatar_url)
-            await self.dm_channel_log.send(embed=embed)
-        if (f'<@{str(self.user.id)}>' == message.content) or (f'<@!{str(self.user.id)}>' == message.content):
-            await ctx.send(f'Use o comando ``{prefixo}cmds`` para obter todos os meus comandos!')
+        if (f'<@{self.user.id}>' == message.content) or (f'<@!{self.user.id}>' == message.content):
+            await ctx.reply(f'Use o comando ``{prefixo}cmds`` para obter todos os meus comandos!',
+                            mention_author=False)
             if permissions.can_use_external_emojis(ctx):
                 await ctx.send(self.emoji("hello"))
             return
@@ -177,8 +159,9 @@ class Androxus(commands.Bot):
                                                                                            servidor):
                 comando_desativado = self.get_command(comando_desativado_obj.comando.lower())
                 if comando_desativado.name == ctx.command.name:
-                    return await ctx.send(f'{self.emoji("no_no")} Este comando '
-                                          'foi desativado por um administrador do servidor!', delete_after=10)
+                    return await ctx.reply(f'{self.emoji("no_no")} Este comando '
+                                           'foi desativado por um administrador do servidor!', delete_after=10,
+                                           mention_author=False)
         channel = message.channel
         if (servidor is not None) and (ctx.command is None):
             # vai ver se a pessoa usou algum comando personalizado
@@ -186,8 +169,8 @@ class Androxus(commands.Bot):
                                                                                              servidor):
                 if comando_personalizado.comando.lower() in message.content.lower():
                     enviar_mensagem = True
-                    if (not comando_personalizado.in_text) and (not message.content.lower() ==
-                                                                    comando_personalizado.comando.lower()):
+                    if not comando_personalizado.in_text and (not message.content.lower() ==
+                                                                  comando_personalizado.comando.lower()):
                         enviar_mensagem = False
                     if enviar_mensagem:
                         resposta = comando_personalizado.resposta
@@ -224,13 +207,13 @@ class Androxus(commands.Bot):
             for command in self.get_all_commands():
                 if comando.lower() == command.category:
                     e = await embed_help_category(self, ctx, comando)
-                    return await ctx.send(embed=e)
+                    return await ctx.reply(embed=e, mention_author=False)
                 commands.append(command.name)
                 commands.append(command.category)
                 for alias in command.aliases:
                     commands.append(alias)
             if mostrar_erro:
-                msg = f'{ctx.author.mention} {self.emoji("sad")} eu não achei consegui ' \
+                msg = f'{self.emoji("sad")} eu não achei consegui ' \
                       f'achar o comando "{comando}".'
                 sugestao = get_most_similar_item(comando, commands)
                 if sugestao is not None:
@@ -238,7 +221,7 @@ class Androxus(commands.Bot):
                     if string_similarity(comando, sugestao) >= 0.4:
                         msg += f'\nVocê quis dizer ``{sugestao}``?'
                 msg += f'\nPara desativar esta mensagem, use o comando ``desativar_sugestão``'
-                return await ctx.send(msg, delete_after=10)
+                return await ctx.reply(msg, delete_after=10, mention_author=False)
         await self.process_commands(message)
 
     @tasks.loop(minutes=1)
@@ -286,9 +269,8 @@ class Androxus(commands.Bot):
         if self.is_category(category):
             for cog in self.cogs:
                 for command in self.get_cog(cog).get_commands():
-                    if hasattr(command, 'category'):
-                        if (command.category == category) and (not command.hidden):
-                            commands_from_category.append(command)
+                    if hasattr(command, 'category') and (command.category == category) and (not command.hidden):
+                        commands_from_category.append(command)
         return sorted(commands_from_category.copy(), key=lambda c: c.name)
 
     def get_emoji_from_category(self, category):
@@ -302,6 +284,15 @@ class Androxus(commands.Bot):
 
     @staticmethod
     def emoji(emoji_name):
+        """
+
+        Args:
+            emoji_name (str): O nome do emoji no .json
+
+        Returns:
+            str: O que achou no json.
+
+        """
         dict_emojis = get_emojis_json()
         try:
             return dict_emojis[emoji_name]
@@ -341,6 +332,17 @@ class Androxus(commands.Bot):
 
     async def send_help(self, ctx):
         await self.get_command('help')(ctx)
+
+    async def language(self, ctx):
+        """
+
+        Args:
+            ctx (discord.ext.commands.context.Context): O contexto que vai ser usado para pegar o prefixo
+
+        Returns:
+
+        """
+        pass
 
 
 class _BaseComando(commands.Command):

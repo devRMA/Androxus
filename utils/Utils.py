@@ -8,14 +8,13 @@ import datetime
 import string as string_lib
 from datetime import datetime
 from functools import reduce
-from re import compile
 from glob import glob
 from json import loads, load
-from random import choice, randint
+from random import choice
+from re import compile
 from re import sub
 from typing import List
 
-from aiohttp import ClientSession
 from dateutil.relativedelta import relativedelta
 from jellyfish import jaro_winkler_similarity
 from requests import get
@@ -49,17 +48,6 @@ async def pegar_o_prefixo(bot, message):
             # se acabou de criar o registro, o prefixo vai ser o padrão
             return get_configs()['default_prefix']
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
-
-
-def random_color():
-    """
-
-    Returns:
-        hex: uma cor "aleatoria" em hexadecimal
-
-    """
-    # vai escolher os números, e depois transformar em hexadecimal 0x000000
-    return int(f'0x{randint(0, 255):02x}{randint(0, 255):02x}{randint(0, 255):02x}', 16)
 
 
 def get_emoji_dance():
@@ -399,7 +387,6 @@ def is_number(string):
             return False
 
 
-
 def convert_to_bool(argument):
     """
 
@@ -646,40 +633,6 @@ def get_path_from_file(filename, directory=''):
             return None
 
 
-async def hastebin_post(content):
-    """
-
-    Args:
-        content (str): O conteúdo que vai ser postado num editor de texto online
-
-    Returns:
-        str: A url do hastebin com o conteúdo postado
-
-    """
-    url_base = None
-    async with ClientSession() as session:
-        # limpando caracteres non utf-8
-        content = to_utf8(content)
-        async with session.get('https://hasteb.in/') as resp:
-            if resp.status == 200:
-                url_base = 'https://hasteb.in'
-        # se o hasteb.in não estiver online, vai ver se o hastebin.com está
-        if url_base is None:
-            async with session.get('https://hastebin.com/') as resp:
-                if resp.status == 200:
-                    url_base = 'https://hastebin.com'
-        # se o hasteb.in também estiver offline, vai ver se o pastie.io está
-        if url_base is None:
-            async with session.get('https://pastie.io/') as resp:
-                if resp.status == 200:
-                    url_base = 'https://pastie.io'
-        # se nenhum dos três sites estiver on, retornar nada
-        if url_base is None:
-            return ''
-        async with session.post(f'{url_base}/documents', data=content.strip()) as resp:
-            return f"{url_base}/{loads(await resp.text())['key']}"
-
-
 def to_utf8(string):
     """
 
@@ -693,23 +646,25 @@ def to_utf8(string):
     return ''.join(filter(lambda x: str(x) in string_lib.printable, list(str(string))))
 
 
-async def find_user(user_input, ctx, accuracy=0.6, API_search=False):
+async def find_user(user_input, ctx, accuracy=0.6, API_search=True):
     """
 
     Args:
         user_input (str): O input que vai ser procurado na collection de membros/users
         ctx (discord.ext.commands.Context): Contexto da mensagem
         accuracy (float): O quão parecido vai precisar ser o input com o usuário, para selecionar ele (Default value = 0.6)
-        API_search (bool): Se é ou não para pegar o user pela API do discord, caso o input seja um id (Default value = False)
+        API_search (bool): Se é ou não para pegar o user pela API do discord, caso o input seja um id (Default value = True)
 
     Returns:
         List[discord.User]: O(s) usuário/membro(s) encontrado(s)
 
     """
+
     class ItemSimilarity:
         def __init__(self, value, similarity):
             self.item = value
             self.similarity = similarity
+
         def __eq__(self, other):
             return isinstance(other, ItemSimilarity) and other.item == self.item
 
@@ -748,8 +703,10 @@ async def find_user(user_input, ctx, accuracy=0.6, API_search=False):
     collection += bot.users
     collection = list(set(collection))
     for item in collection:
-        if user_input_int is not None and item.id == user_input_int:
-            return [item]
+        if user_input_int is not None:
+            if item.id == user_input_int:
+                return [item]
+            continue
         name = to_utf8(item.name).lower()
         display_name = to_utf8(item.display_name).lower()
         name_tag = to_utf8(str(item)).lower()
@@ -776,7 +733,7 @@ async def find_user(user_input, ctx, accuracy=0.6, API_search=False):
         return exact_items
     elif API_search and user_input_int is not None:
         try:
-            return await bot.fetch_user(user_input_int)
+            return [await bot.fetch_user(user_input_int)]
         except:
             pass
     if len(most_similar_items) > 0:
@@ -790,5 +747,141 @@ async def find_user(user_input, ctx, accuracy=0.6, API_search=False):
         return [startswith_items[0]]
     elif len(endswith_items) > 0:
         return [endswith_items[0]]
+    return []
 
 
+# https://stackoverflow.com/questions/3229419/how-to-pretty-print-nested-dictionaries
+def pretty_i(iterable, indent_char='\t', new_line_char='\n', indent=0):
+    """
+
+    Args:
+        iterable (any): Iterable que vai ser formatado. (não funciona com generators).
+        indent_char (str): Char que vai ser usado na indentação (Default value = '\t')
+        new_line_char (str): Char que vai ser usado para quebrar as linhas  (Default value = '\n')
+        indent (int): Parâmetro que é usado internamente na recursão  (Default value = 0)
+
+    Returns:
+        str: Uma string, com o iterable formatado.
+
+    """
+    new_line = new_line_char + indent_char * (indent + 1)
+    extremities = ''
+    if isinstance(iterable, dict):
+        items = []
+        for key, value in iterable.items():
+            items.append(f'{new_line}{repr(key)}: {pretty_i(value, indent_char, new_line_char, indent + 1)}')
+        extremities = '{}'
+    elif isinstance(iterable, (list, tuple, set, frozenset)):
+        items = [new_line + pretty_i(item, indent_char, new_line_char, indent + 1) for item in iterable]
+        if isinstance(iterable, list):
+            extremities = '[]'
+        elif isinstance(iterable, tuple):
+            extremities = '()'
+        elif isinstance(iterable, set):
+            extremities = '{}'
+        elif isinstance(iterable, frozenset):
+            extremities = 'frozenset()'
+    else:
+        return repr(iterable)
+    return extremities[:-1] + (','.join(items) + new_line_char + indent_char * indent) + extremities[-1:]
+
+
+def info(object_):
+    """
+
+    Args:
+        object_: O objeto que vai ser extraido, as informações
+
+    Returns:
+        dict: As informações extraidas
+
+    """
+    import inspect
+    methods = []
+    magic_methods = []
+    functions = []
+    async_functions = []
+    attributes = []
+    classes = []
+    all_attrs = {}
+    try:
+        all_attrs['classes'] = inspect.getmro(object_)
+    except AttributeError:
+        all_attrs['class'] = str(type(object_)).split("'")[1]
+    if isinstance(object_, (int, float, bool, str)):
+        all_attrs['type'] = 'built-in type'
+        del all_attrs['class']
+    elif isinstance(object_, (list, tuple, set, dict, frozenset)):
+        all_attrs['type'] = 'data structure'
+        all_attrs['length'] = len(object_)
+    elif inspect.ismodule(object_):
+        del all_attrs['class']
+        all_attrs['type'] = 'module'
+        if hasattr(all_attrs, 'version'):
+            all_attrs['version'] = object_.__version__
+        if hasattr(all_attrs, 'author'):
+            all_attrs['author'] = object_.__author__
+    elif inspect.isclass(object_):
+        all_attrs['type'] = 'class'
+    elif inspect.isbuiltin(object_):
+        all_attrs['type'] = 'built-in function or method'
+    elif inspect.isgeneratorfunction(object_):
+        all_attrs['type'] = 'generator function'
+    elif inspect.isgenerator(object_):
+        all_attrs['type'] = 'generator'
+    elif inspect.isasyncgenfunction(object_):
+        all_attrs['type'] = 'async generator function'
+    elif inspect.isasyncgen(object_):
+        all_attrs['type'] = 'async generator'
+    elif callable(object_):
+        all_attrs['type'] = 'function'
+        try:
+            all_attrs['signature'] = f'{object_.__qualname__}{inspect.signature(object_)}'
+        except ValueError:
+            pass
+        except TypeError:
+            pass
+    else:
+        all_attrs['type'] = 'object'
+    for attr_name in dir(object_):
+        try:
+            attr = getattr(object_, attr_name)
+        except AttributeError:
+            continue
+        if inspect.iscoroutinefunction(attr):
+            async_functions.append(f'{attr_name}{inspect.signature(attr)}')
+        elif inspect.isfunction(attr):
+            if all_attrs['type'] == 'module' and inspect.getmodule(attr) != object_: continue
+            if attr_name.startswith('__') and attr_name.endswith('__'):
+                magic_methods.append(f'{attr_name}{inspect.signature(attr)}')
+            else:
+                functions.append(f'{attr_name}{inspect.signature(attr)}')
+        elif inspect.ismethod(attr):
+            if all_attrs['type'] == 'module' and inspect.getmodule(attr) != object_: continue
+            if attr_name.startswith('__') and attr_name.endswith('__'):
+                magic_methods.append(attr_name)
+            else:
+                methods.append(f'{attr_name}{inspect.signature(attr)}')
+        elif inspect.isclass(attr) and all_attrs['type'] == 'module':
+            classes.append(attr_name)
+        elif callable(attr):
+            if all_attrs['type'] == 'module' and inspect.getmodule(attr) != object_: continue
+            if attr_name.startswith('__') and attr_name.endswith('__'):
+                magic_methods.append(attr_name)
+            else:
+                functions.append(attr_name)
+        else:
+            attributes.append(attr_name)
+    if len(functions) > 0:
+        all_attrs['functions'] = tuple(functions)
+    if len(async_functions) > 0:
+        all_attrs['async functions'] = tuple(async_functions)
+    if len(methods) > 0:
+        all_attrs['methods'] = tuple(methods)
+    if len(magic_methods) > 0:
+        all_attrs['magic methods'] = tuple(magic_methods)
+    if len(classes) > 0:
+        all_attrs['classes'] = tuple(classes)
+    if len(attributes) > 0:
+        all_attrs['attributes'] = tuple(attributes)
+    return all_attrs

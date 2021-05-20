@@ -5,12 +5,13 @@
 __author__ = 'Rafael'
 
 from datetime import datetime
+from random import randint
 
 import discord
 
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import random_color, pegar_o_prefixo
+from utils.Utils import pegar_o_prefixo
 
 
 async def embed_help_command(bot, ctx, comando=None, descricao=None, parametros=None, exemplos=None,
@@ -48,7 +49,7 @@ async def embed_help_command(bot, ctx, comando=None, descricao=None, parametros=
         # se a pessoa não marcou o bot:
         prefixo = ctx.prefix
     # se a cor não for passada, vai ser usada uma cor aleatória
-    cor_a_usar = cor or random_color()
+    cor_a_usar = cor or int(f'0x{randint(0, 255):02x}{randint(0, 255):02x}{randint(0, 255):02x}', 16)
     if comando is None:
         comando = ctx.command.name
     if descricao is None:

@@ -7,17 +7,17 @@ __author__ = 'Rafael'
 from datetime import datetime
 from re import compile
 
-from dependencies import currency_exchange
 import discord
+import emojis
 import googletrans
 from discord.ext import commands
 from discord.ext.commands import BadArgument
 from twemoji_parser import emoji_to_url
-import emojis
 
 from Classes import Androxus
 from database.Repositories.InformacoesRepository import InformacoesRepository
-from utils.Utils import is_number, random_color, prettify_number, convert_to_string, datetime_format
+from dependencies import currency_exchange
+from utils.Utils import is_number, prettify_number, datetime_format
 from utils.permissions import check_permissions, bot_check_permissions
 
 EMOJI_REGEX = compile(r'<a?:.+?:([0-9]{15,21})>')
@@ -118,7 +118,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         um_valor = float(f'{float(um_valor):.2f}')
         embed = discord.Embed(title=f'🪙 {prettify_number(m_qtd)} {m_from.lower()} = {prettify_number(result)}'
                                     f' {m_to.lower()}',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}',
                          icon_url=ctx.author.avatar_url)
@@ -143,7 +143,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                         value=f'Fonte: [x-rates](https://www.x-rates.com/calculator/?from={m_from}&to='
                               f'{m_to}&amount={m_qtd})',
                         inline=True)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='say',
                       aliases=['fale', 'falar'],
@@ -210,6 +210,8 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _traduzir(self, ctx, dest=None, *, frase=''):
+        return await ctx.send('Comando em manutenção')
+        # TODO
         if dest and frase:
             from googletrans.constants import LANGUAGES
             dests = []
@@ -258,12 +260,11 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                 else:
                     return await ctx.send('Não encontrei este emoji!')
         if isinstance(emoji, discord.Emoji) or isinstance(emoji, discord.PartialEmoji):
-            if hasattr(emoji, 'is_unicode_emoji'):
-                if emoji.is_unicode_emoji():
-                    return await ctx.send('Não tenho suporte a esse tipo de emoji!')
+            if hasattr(emoji, 'is_unicode_emoji') and emoji.is_unicode_emoji():
+                return await ctx.reply('Não tenho suporte a esse tipo de emoji!', mention_author=False)
             embed = discord.Embed(title='Emoji personalizado',
                                   url=str(emoji.url),
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             embed.set_thumbnail(url=str(emoji.url))
@@ -283,7 +284,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                             inline=False)
             if isinstance(emoji, discord.Emoji):
                 if emoji.guild == ctx.guild:
-                    embed.add_field(name='E emoji é deste servidor!',
+                    embed.add_field(name='O emoji é deste servidor!',
                                     value='** **',
                                     inline=True)
                 embed.add_field(name='Criado em:',
@@ -292,11 +293,11 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         else:
             url = await emoji_to_url(emoji)
             if not url.startswith('https://twemoji.maxcdn.com/v/latest/72x72/'):
-                return await ctx.send('Não consegui achar este emoji!')
+                return await ctx.reply('Não consegui achar este emoji!', mention_author=False)
             embed = discord.Embed(title=f'Detalhes sobre o emoji {emoji}',
                                   description='Infelizmente as informações estão em inglês.',
                                   url=url,
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   timestamp=datetime.utcnow())
             emoji = emojis.db.get_emoji_by_code(emoji)
             embed.set_thumbnail(url=url)
@@ -316,7 +317,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                     embed.add_field(name='Category:',
                                     value=f'`{emoji.category}`',
                                     inline=False)
-        return await ctx.send(embed=embed)
+        return await ctx.reply(embed=embed, mention_author=False)
 
 
 def setup(bot):

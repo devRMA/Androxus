@@ -22,7 +22,6 @@ from database.Repositories.InformacoesRepository import InformacoesRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils.Utils import get_last_commit, pegar_o_prefixo, prettify_number
 from utils.Utils import get_last_update, datetime_format
-from utils.Utils import random_color
 
 
 class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
@@ -53,7 +52,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
             # se a pessoa não marcou o bot:
             prefixo = ctx.prefix
         embed = discord.Embed(title=f'{self.bot.emoji("info")} Detalhes sobre mim!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description=f'Caso você queira saber meus outros comandos, use ``{prefixo}cmds``!',
                               timestamp=datetime.utcnow())
         embed.set_author(name=self.bot.user.name,
@@ -115,7 +114,7 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
         embed.add_field(name=':watch: Última atualização que tive foi:',
                         value=f'``{datetime_format(get_last_update())}``',
                         inline=True)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='source',
                       aliases=['github', 'programação', 's'],
@@ -123,18 +122,18 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       examples=['``{prefix}source``'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _source(self, ctx):
-        embed = discord.Embed(title=f'{self.bot.emoji("python")} Olá {ctx.author.name}, eu sou um bot feito em ' +
+        embed = discord.Embed(title=f'{self.bot.emoji("python")} Olá {ctx.author.display_name}, eu sou um bot feito em '
                                     'python, com a API do discord e um banco de dados!',
-                              colour=discord.Colour(random_color()),
-                              description='Caso você queira ver o meu código fonte, clique [aqui]' +
-                                          '(https://github.com/devRMA/Androxus)\n' +
-                                          'Caso você queira ver a documentação da API do discord ' +
-                                          'para python, clique [aqui](https://discordpy.readthedo' +
+                              colour=discord.Colour.random(),
+                              description='Caso você queira ver o meu código fonte, clique [aqui]'
+                                          '(https://github.com/devRMA/Androxus)\n'
+                                          'Caso você queira ver a documentação da API do discord '
+                                          'para python, clique [aqui](https://discordpy.readthedo'
                                           'cs.io/en/latest/index.html).',
                               timestamp=datetime.utcnow())
         embed.set_author(name=self.bot.user.name, icon_url=f'{self.bot.user.avatar_url}')
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='ping',
                       aliases=['latency', 'latência', 'p'],
@@ -147,20 +146,20 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
             await conn.fetch('select version();')
         stopwatch_banco.stop()
         e1 = discord.Embed(title=f'Calculando ping {self.bot.emoji("loading")}',
-                           colour=discord.Colour(random_color()),
+                           colour=discord.Colour.random(),
                            timestamp=datetime.utcnow())
         e1.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         stopwatch_message = Stopwatch()
-        mensagem_do_bot = await ctx.send(embed=e1)
+        mensagem_do_bot = await ctx.reply(embed=e1, mention_author=False)
         stopwatch_message.stop()
         e2 = discord.Embed(title=f'🏓 Latência da API: {prettify_number(int(self.bot.latency * 1000))}ms!\n'
                                  f'{self.bot.emoji("database")} Tempo de resposta do banco: {stopwatch_banco}!\n'
                                  f'📥 Tempo de resposta no discord: {stopwatch_message}!',
-                           colour=discord.Colour(random_color()),
+                           colour=discord.Colour.random(),
                            timestamp=datetime.utcnow())
         e2.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         await asyncio.sleep(stopwatch_message.duration * 2)
-        await mensagem_do_bot.edit(embed=e2)
+        await mensagem_do_bot.edit(embed=e2, allowed_mentions=discord.AllowedMentions(replied_user=False))
 
     @Androxus.comando(name='invite',
                       aliases=['convidar', 'convite', 'i'],
@@ -169,13 +168,13 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _invite(self, ctx):
         e = discord.Embed(title=f'Invite',
-                          colour=discord.Colour(random_color()),
+                          colour=discord.Colour.random(),
                           description=f'Clique [aqui](https://discord.com/oauth2/authorize?client_id={self.bot.user.id}'
                                       '&scope=bot&permissions=604892375) para me adicionar em outro servidor!'
                                       f'{self.bot.emoji("love")}',
                           timestamp=datetime.utcnow())
         e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e, mention_author=False)
 
     @Androxus.comando(name='changelog',
                       aliases=['ultima_att', 'última_att', 'att_log'],
@@ -185,15 +184,15 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _changelog(self, ctx):
         embed = discord.Embed(title=f'Ultima atualização que eu tive:',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description=f'```{get_last_commit()}```',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}',
                          icon_url=ctx.author.avatar_url)
-        embed.add_field(name='Atualização feita em:',
+        embed.add_field(name='Atualização feita há:',
                         value=f'{datetime_format(get_last_update())}',
                         inline=True)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='uptime',
                       aliases=['tempo_on', 'ut', 'u'],
@@ -203,11 +202,11 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
     async def _uptime(self, ctx):
         embed = discord.Embed(title=f':timer: Quando eu liguei:',
                               description=f'``{datetime_format(self.bot.uptime)}``',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.set_author(name=self.bot.user.name, icon_url=f'{self.bot.user.avatar_url}')
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='cmds',
                       aliases=['comandos', 'listar_comandos', 'list_cmds'],

@@ -14,7 +14,7 @@ from database.Models.ComandoPersonalizado import ComandoPersonalizado
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import random_color, get_emoji_dance, convert_to_bool, capitalize, convert_to_string
+from utils.Utils import get_emoji_dance, convert_to_bool, capitalize, convert_to_string
 
 
 class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='administração')):
@@ -43,11 +43,11 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
     async def _adicionar_comando(self, ctx, comando='', resposta='', in_text='t'):
         in_text = convert_to_bool(in_text)
         if in_text is None:
-            return await ctx.send(
+            return await ctx.reply(
                 f'Valor ``{in_text}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
         if ctx.message.content.count('"') < 4:
-            return await ctx.send('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n' +
-                                  f'{ctx.prefix}adicionar_comando **"**comando**"** **"**resposta**"**')
+            return await ctx.reply('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n'
+                                   f'{ctx.prefix}adicionar_comando **"**comando**"** **"**resposta**"**')
         if (comando.replace(' ', '') == '') or (resposta.replace(' ', '') == ''):
             return await self.bot.send_help(ctx)
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
@@ -57,14 +57,14 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
                                                      in_text)
         await ComandoPersonalizadoRepository().create(self.bot.db_connection, comando_personalizado)
         in_text_str = capitalize(convert_to_string(in_text))
-        embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour(random_color()),
+        embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         embed.add_field(
             name=f'Comando: {comando.lower()}\nResposta: {resposta}\nIgnorar a posição do comando: {in_text_str}',
             value=f'** **',
             inline=False)
-        await ctx.send(content=get_emoji_dance(), embed=embed)
+        await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
 
     @Androxus.comando(name='remover_comando',
                       aliases=['remove_command', 'rc'],
@@ -86,14 +86,14 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         if comando_personalizado not in [cmd for cmd in
                                          await ComandoPersonalizadoRepository().get_commands(self.bot.db_connection,
                                                                                              servidor)]:
-            return await ctx.send(f'{self.bot.emoji("atencao")} Este comando não existe!')
+            return await ctx.reply(f'{self.bot.emoji("atencao")} Este comando não existe!')
         await ComandoPersonalizadoRepository().delete(self.bot.db_connection, comando_personalizado)
         embed = discord.Embed(title=f'Comando removido com sucesso!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description=f'Comando: {comando}',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-        return await ctx.send(content=get_emoji_dance(), embed=embed)
+        return await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
 
     @Androxus.comando(name='modificar_comando',
                       aliases=['update_command', 'mc'],
@@ -109,11 +109,11 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
     async def _modificar_comando(self, ctx, comando='', resposta='', in_text='t'):
         in_text = convert_to_bool(in_text)
         if in_text is None:
-            await ctx.send(f'Valor ``{in_text}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
+            await ctx.reply(f'Valor ``{in_text}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
             return
         if ctx.message.content.count('"') != 4:
-            return await ctx.send('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n' +
-                                  f'{ctx.prefix}modificar_comando **"**comando**"** **"**resposta**"**')
+            return await ctx.reply('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n' +
+                                   f'{ctx.prefix}modificar_comando **"**comando**"** **"**resposta**"**')
         if (comando.replace(' ', '') == '') or (resposta.replace(' ', '') == ''):
             return await self.bot.send_help(ctx)
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
@@ -126,15 +126,15 @@ class ComandoPersonalizadoCog(commands.Cog, command_attrs=dict(category='adminis
         if comando_personalizado not in [cmd for cmd in
                                          await ComandoPersonalizadoRepository().get_commands(self.bot.db_connection,
                                                                                              servidor)]:
-            return await ctx.send(f'{self.bot.emoji("atencao")} Este comando não existe!')
+            return await ctx.reply(f'{self.bot.emoji("atencao")} Este comando não existe!')
         await ComandoPersonalizadoRepository().update(self.bot.db_connection, comando_personalizado)
         in_text_str = capitalize(convert_to_string(in_text))
-        embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour(random_color()),
+        embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour.random(),
                               description=f'Comando: {comando}\nResposta: {resposta}\n'
                                           f'Ignorar a posição do comando: {in_text_str}',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
-        await ctx.send(content=get_emoji_dance(), embed=embed)
+        await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
 
 
 def setup(bot):

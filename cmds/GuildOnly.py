@@ -13,8 +13,7 @@ from discord.ext import commands
 
 from Classes import Androxus
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import random_color, capitalize, datetime_format, get_most_similar_items_with_similarity, \
-    prettify_number
+from utils.Utils import capitalize, datetime_format, prettify_number
 from utils.converters import DiscordUser
 
 
@@ -39,12 +38,12 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if user is None:
             user = ctx.author
         e = discord.Embed(title=f'Avatar do(a) {str(user)}!',
-                          colour=discord.Colour(random_color()),
+                          colour=discord.Colour.random(),
                           description=f'Clique [aqui]({user.avatar_url}) para baixar o avatar.',
                           timestamp=datetime.utcnow())
         e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         e.set_image(url=str(user.avatar_url))
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e, mention_author=False)
 
     @Androxus.comando(name='userinfo',
                       aliases=['profile', 'memberinfo', 'ui'],
@@ -59,7 +58,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if hasattr(user, 'top_role'):
             cor = user.top_role.colour.value
         else:
-            cor = discord.Colour(random_color())
+            cor = discord.Colour.random()
         emojis_badges = {
             'staff': self.bot.get_emoji('staff_badge'),
             'partner': self.bot.get_emoji('parceiro_badge'),
@@ -294,13 +293,13 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     async def _splash(self, ctx):
         if ctx.guild.splash_url:
             embed = discord.Embed(title=f'Splash deste servidor!',
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
             embed.set_image(url=ctx.guild.splash_url)
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed, mention_author=False)
         else:
-            await ctx.send(f'{ctx.author.mention} este servidor não tem uma foto de fundo no convite! ;-;')
+            await ctx.reply('Este servidor não tem uma foto de fundo no convite!')
 
     @Androxus.comando(name='discovery_splash',
                       description='Eu vou enviar discovery splash deste servidor (se tiver).',
@@ -310,13 +309,13 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     async def _discovery_splash(self, ctx):
         if ctx.guild.discovery_splash_url:
             embed = discord.Embed(title=f'discovery splash deste servidor!',
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   timestamp=datetime.utcnow())
             embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
             embed.set_image(url=ctx.guild.discovery_splash_url)
-            return await ctx.send(embed=embed)
+            return await ctx.reply(embed=embed, mention_author=False)
         else:
-            return await ctx.send(f'{ctx.author.mention} este servidor não tem discovery splash ;-;')
+            return await ctx.reply('Este servidor não tem discovery splash!')
 
     @Androxus.comando(name='serverinfo',
                       aliases=['guildinfo', 'si'],
@@ -331,7 +330,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             if member.bot:
                 bots += 1
         embed = discord.Embed(title=f'Informações sobre este servidor!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description='O máximo de informação que eu consegui encontrar sobre este servidor.',
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
@@ -370,7 +369,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
                               f'Estou na posição `{prettify_number(rank_members.index(str(ctx.guild.me)) + 1)}°` no '
                               'rank dos membros mais antigos.',
                         inline=True)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='server_avatar',
                       aliases=['icone', 'icon', 'sa'],
@@ -380,13 +379,13 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _server_avatar(self, ctx):
         if not ctx.guild.icon:
-            return await ctx.send("Este servidor não tem icone.")
+            return await ctx.reply('Este servidor não tem icone.')
         embed = discord.Embed(title=f'Icone deste servidor!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         embed.set_image(url=ctx.guild.icon_url_as(size=1024))
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='server_banner',
                       aliases=["banner", 'sb'],
@@ -398,11 +397,11 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         if not ctx.guild.banner:
             return await ctx.send("Este servidor não tem banner.")
         embed = discord.Embed(title=f'Banner deste servidor!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         embed.set_image(url=ctx.guild.banner_url)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='configs',
                       aliases=['configurações', 'configuraçoes', 'settings'],
@@ -414,7 +413,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
     async def _configs(self, ctx):
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
         e = discord.Embed(title=f'Todas as configurações deste servidor!',
-                          colour=discord.Colour(random_color()),
+                          colour=discord.Colour.random(),
                           timestamp=datetime.utcnow())
         e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         if ctx.guild.icon:
@@ -462,16 +461,15 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             e.add_field(name=f'Log',
                         value=f'{self.bot.emoji("desativado")}',
                         inline=True)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e, mention_author=False)
 
     @Androxus.comando(name='joinrank',
                       aliases=['oldmembersrank', 'jr', 'membrosantigos'],
                       description='Eu vou mostrar o rank com os membros mais antigos do servidor.',
-                      parameters=['["-r" (membro aleatorio) | usuário (padrão: autor)]'],
+                      parameters=['[Usuário (padrão: autor)]'],
                       examples=['`{prefix}joinrank`',
-                                '`{prefix}jr` `-r`',
-                                '`{prefix}jr` `androxus`'],
-                      hidden=True)
+                                '`{prefix}jr`',
+                                '`{prefix}jr` `androxus`'])
     @commands.guild_only()
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -515,7 +513,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
         else:
             selected = members.copy()
         e = discord.Embed(title=f'Rank dos membros mais antigos!',
-                          colour=discord.Colour(random_color()),
+                          colour=discord.Colour.random(),
                           timestamp=datetime.utcnow())
         e.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
         rank = ''
@@ -534,7 +532,7 @@ class GuildOnly(commands.Cog, command_attrs=dict(category='info')):
             rank += '\n'
         e.add_field(name=f'Este servidor tem {len(ctx.guild.members)} membros.',
                     value=rank)
-        await ctx.send(embed=e)
+        await ctx.reply(embed=e, mention_author=False)
 
 
 def setup(bot):

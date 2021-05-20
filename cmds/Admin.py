@@ -11,10 +11,9 @@ import discord
 from discord.ext import commands
 
 from Classes import Androxus
-from database.Models.Servidor import Servidor
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import random_color, get_emoji_dance, get_configs, pegar_o_prefixo, convert_to_string, \
+from utils.Utils import get_emoji_dance, get_configs, pegar_o_prefixo, convert_to_string, \
     convert_to_bool, is_number
 from utils.converters import BannedMember
 
@@ -59,22 +58,22 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 except:
                     member = None
                 if member is None:  # se não achou o membro:
-                    return await ctx.send(f'Não consegui encontrar o membro com id `{id}`!')
+                    return await ctx.reply(f'Não consegui encontrar o membro com id `{id}`!', mention_author=False)
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
-                return await ctx.send(f'{ctx.author.mention} você não pode banir o dono do servidor! ' +
-                                      f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.reply(f'Você não pode banir o dono do servidor! '
+                                       f'{self.bot.get_emoji("ah_nao")}')
             elif member == ctx.author:
-                return await ctx.send(f'{ctx.author.mention} você não pode se banir! ' +
-                                      f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.reply(f'Você não pode se banir! '
+                                       f'{self.bot.get_emoji("ah_nao")}')
             elif member == self.bot.user:
-                return await ctx.send(f'{ctx.author.mention} eu não posso me banir! ' +
-                                      f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.reply(f'Eu não posso me banir! '
+                                       f'{self.bot.get_emoji("ah_nao")}')
             elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
-                return await ctx.send(f'{ctx.author.mention} você só pode banir pessoas que tenham cargo mais ' +
-                                      'baixo que o seu!')
+                return await ctx.reply('Você só pode banir pessoas que tenham cargo mais '
+                                       'baixo que o seu!')
             # se sobrou algum argumento, é porque a pessoa passou um motivo
             reason = None
             if args:
@@ -83,7 +82,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             # se a pessoa não passou nada:
             return await self.bot.send_help(ctx)
         embed = discord.Embed(title=f'{self.bot.get_emoji("banned")} Usuário banido!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
                                           f'{str(reason).replace("None", "nulo")}',
                               timestamp=datetime.utcnow())
@@ -105,9 +104,11 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 await msg.delete()
             except:
                 pass
-            await ctx.send(f'Eu não tenho permissão para banir este usuário. {self.bot.get_emoji("sad")}')
+            await ctx.reply(f'Eu não tenho permissão para banir este usuário. {self.bot.get_emoji("sad")}',
+                            mention_author=False)
         else:
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed,
+                            mention_author=False)
 
     @Androxus.comando(name='kick',
                       aliases=['expulsar'],
@@ -141,22 +142,22 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 # vai tentar achar o membro com esse id
                 member = ctx.guild.get_member(id)
                 if not member:  # se não achou o membro:
-                    return await ctx.send(f'Não consegui encontrar o membro com id `{id}`!')
+                    return await ctx.reply(f'Não consegui encontrar o membro com id `{id}`!')
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
-                return await ctx.send(f'{ctx.author.mention} você não pode expulsar o dono do servidor! ' +
-                                      f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.reply(f'Você não pode expulsar o dono do servidor! '
+                                       f'{self.bot.get_emoji("ah_nao")}')
             elif member == ctx.author:
-                return await ctx.send(f'{ctx.author.mention} você não pode se expulsar! ' +
-                                      f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.reply(f'Você não pode se expulsar! '
+                                       f'{self.bot.get_emoji("ah_nao")}')
             elif member == self.bot.user:
-                return await ctx.send(f'{ctx.author.mention} eu não posso me expulsar! ' +
-                                      f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.reply(f'Eu não posso me expulsar! '
+                                       f'{self.bot.get_emoji("ah_nao")}')
             elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
-                return await ctx.send(f'{ctx.author.mention} você só pode expulsar pessoas que tenham cargo mais ' +
-                                      'baixo que o seu!')
+                return await ctx.reply(f'Você só pode expulsar pessoas que tenham cargo mais '
+                                       'baixo que o seu!')
             # se sobrou algum argumento, é porque a pessoa passou um motivo
             reason = None
             if args:
@@ -165,7 +166,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             # se a pessoa não passou nada:
             return await self.bot.send_help(ctx)
         embed = discord.Embed(title=f'Usuário expulso!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
                                           f'{str(reason).replace("None", "nulo")}',
                               timestamp=datetime.utcnow())
@@ -184,9 +185,11 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             await ctx.guild.kick(member, reason=reason)
         except discord.errors.Forbidden:
             await msg.delete()
-            await ctx.send(f'Eu não tenho permissão para expulsar esse usuário. {self.bot.get_emoji("sad")}')
+            await ctx.reply(f'Eu não tenho permissão para expulsar esse usuário. {self.bot.get_emoji("sad")}',
+                            mention_author=False)
         else:
-            await ctx.send(content=get_emoji_dance(), embed=embed)
+            await ctx.reply(content=get_emoji_dance(), embed=embed,
+                            mention_author=False)
 
     @Androxus.comando(name='unban',
                       aliases=['desbanir', 'revogar_ban'],
@@ -208,7 +211,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         if args:
             reason = ' '.join(args)
         embed = discord.Embed(title=f'Ban revogado!',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description=f'Usuário: {member.user}\nId: {member.user.id}\nMotivo: ' +
                                           f'{str(reason).replace("None", "nulo")}',
                               timestamp=datetime.utcnow())
@@ -222,11 +225,12 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         try:
             await ctx.guild.unban(member.user, reason=reason)
         except discord.Forbidden:
-            await ctx.send('Não tenho permissão para revogar banimentos!')
+            await ctx.reply('Não tenho permissão para revogar banimentos!')
         except discord.HTTPException:
-            await ctx.send('Desculpe, mas ocorreu um erro na hora de executar o comando, tente novamente mais tarde.')
+            await ctx.reply('Desculpe, mas ocorreu um erro na hora de executar o comando, tente novamente mais tarde.',
+                            mention_author=False)
         else:
-            await ctx.send(content=get_emoji_dance(), embed=embed)
+            await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
 
     @Androxus.comando(name='change_prefix',
                       aliases=['prefixo', 'prefix'],
@@ -245,10 +249,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             # se a pessoa não marcou o bot:
             prefixo_antigo = ctx.prefix
-        servidor = Servidor(ctx.guild.id, prefixo_novo)
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
         await ServidorRepository().update(self.bot.db_connection, servidor)
         if prefixo_novo != self.bot.configs['default_prefix']:
-            embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour(random_color()),
+            embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour.random(),
                                   description=f'Prefixo antigo: {prefixo_antigo}\n' +
                                               f'Prefixo novo: {prefixo_novo}',
                                   timestamp=datetime.utcnow())
@@ -257,9 +261,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                                  f'\n{get_emoji_dance()}',
                             value='** **',
                             inline=False)
-            await ctx.send(embed=embed)
+            await ctx.reply(embed=embed)
         else:
-            await ctx.send(f'Agora estou com o prefixo padrão! {get_emoji_dance()}')
+            await ctx.reply(f'Agora estou com o prefixo padrão! {get_emoji_dance()}')
 
     @Androxus.comando(name='desativar_sugestão',
                       aliases=['ds', 'desativar_sugestao'],
@@ -276,9 +280,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         if servidor.sugestao_de_comando:
             servidor.sugestao_de_comando = False
             await ServidorRepository().update(self.bot.db_connection, servidor)
-            return await ctx.send('Sugestões desativadas!')
+            return await ctx.reply('Sugestões desativadas!')
         else:
-            return await ctx.send('As sugestões já estavam desativadas!')
+            return await ctx.reply('As sugestões já estavam desativadas!')
 
     @Androxus.comando(name='reativar_sugestão',
                       aliases=['rs', 'reativar_sugestao'],
@@ -295,9 +299,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         if not servidor.sugestao_de_comando:
             servidor.sugestao_de_comando = True
             await ServidorRepository().update(self.bot.db_connection, servidor)
-            return await ctx.send('Sugestões reativadas!')
+            return await ctx.reply('Sugestões reativadas!')
         else:
-            return await ctx.send('As sugestões já estavam ativadas!')
+            return await ctx.reply('As sugestões já estavam ativadas!')
 
     @Androxus.comando(name='channel_log',
                       aliases=['chat_log', 'cl'],
@@ -314,39 +318,39 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         if channel is not None:
             perms = channel.permissions_for(ctx.me)
             if not perms.send_messages:
-                return await ctx.send(f'{ctx.author.mention} eu não tenho permissão para enviar mensagem neste chat.')
+                return await ctx.reply(f'Eu não tenho permissão para enviar mensagem neste chat.')
             elif not perms.embed_links:
-                return await ctx.send(f'{ctx.author.mention} eu não tenho permissão de inserir links na '
-                                      f'mensagem, neste chat.')
+                return await ctx.reply(f'Eu não tenho permissão de inserir links na '
+                                       f'mensagem, neste chat.')
             elif not perms.attach_files:
-                return await ctx.send(f'{ctx.author.mention} eu não tenho permissão enviar arquivos neste chat.')
+                return await ctx.reply(f'Eu não tenho permissão enviar arquivos neste chat.')
             elif channel.guild.id != ctx.guild.id:
-                return await ctx.send(f'{ctx.author.mention} você precisa me dizer um chat **deste** servidor')
+                return await ctx.reply(f'Você precisa me dizer um chat **deste** servidor')
             servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
             if servidor.channel_id_log is None:
                 servidor.channel_id_log = channel.id
                 await ServidorRepository().update(self.bot.db_connection, servidor)
-                return await ctx.send(f'{ctx.author.mention} Log ativado com sucesso em {channel.mention}!')
+                return await ctx.reply(f' Log ativado com sucesso em {channel.mention}!')
             else:
                 log_antigo = servidor.channel_id_log
                 servidor.channel_id_log = channel.id
                 await ServidorRepository().update(self.bot.db_connection, servidor)
-                return await ctx.send(f'{ctx.author.mention} Chat de logs alterado com sucesso!\n'
-                                      f'Antigo: <#{log_antigo}>\nNovo: <#{channel.id}>')
+                return await ctx.reply('Chat de logs alterado com sucesso!\n'
+                                       f'Antigo: <#{log_antigo}>\nNovo: <#{channel.id}>')
         else:
             servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
             if servidor.channel_id_log is not None:
                 servidor.channel_id_log = None
                 await ServidorRepository().update(self.bot.db_connection, servidor)
-                return await ctx.send(f'{ctx.author.mention} Log desativado!')
+                return await ctx.reply(f'Log desativado!')
             else:
                 return await self.bot.send_help(ctx)
 
     @_channel_log.error
     async def _channel_log_error(self, ctx, error):
-        if self.bot.maintenance_mode:
-            if isinstance(error, commands.BadArgument) or isinstance(error, commands.errors.ChannelNotFound):
-                return await ctx.send(f'{ctx.author.mention} Não consegui encontrar este channel.')
+        if self.bot.maintenance_mode and (
+                isinstance(error, commands.BadArgument) or isinstance(error, commands.errors.ChannelNotFound)):
+            return await ctx.reply(f'Não consegui encontrar este channel.')
         raise error
 
     @Androxus.comando(name='setup_logs',
@@ -359,11 +363,12 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _setup_logs(self, ctx):
+        # TODO
         sr = ServidorRepository()
         servidor = await sr.get_servidor(self.bot.db_connection, ctx.guild.id)
         if servidor.channel_id_log is None:
-            return await ctx.send(f'{ctx.author.mention} Você precisa configurar um chat para os logs primeiro!'
-                                  ' Use o comando ``channel_log``')
+            return await ctx.reply(f'Você precisa configurar um chat para os logs primeiro!'
+                                   ' Use o comando ``channel_log``')
 
         def check(message):
             return message.author == ctx.author
@@ -475,9 +480,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 try:
                     messages = int(messages)
                 except ValueError:
-                    return await ctx.send(f'{ctx.author.mention} Eu só aceito números inteiros!')
+                    return await ctx.reply(f'Eu só aceito números inteiros!')
             else:
-                return await ctx.send(f'{ctx.author.mention} Digite um número válido!')
+                return await ctx.reply(f'Digite um número válido!')
             if 200 >= messages >= 1:
                 try:
                     deleted = await ctx.channel.purge(limit=messages + 1, check=lambda m: not m.pinned)
@@ -493,7 +498,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                                               f'fixada(s).',
                                               delete_after=5)
             else:
-                return await ctx.send(f'{ctx.author.mention} informe um número entre 1 e 200!')
+                return await ctx.reply(f'Informe um número entre 1 e 200!')
         else:
             return await self.bot.send_help(ctx)
 

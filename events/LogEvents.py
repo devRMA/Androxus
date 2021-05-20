@@ -13,7 +13,7 @@ from PIL import Image
 from discord.ext import commands
 
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import random_color, difference_between_lists, get_path_from_file
+from utils.Utils import difference_between_lists, get_path_from_file
 
 
 class LogEvent(commands.Cog):
@@ -29,7 +29,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         if after.bot or self.bot.maintenance_mode \
-                or (not self.bot.started) or (self.bot.db_connection is None):
+                or (not self.bot.is_ready()) or (self.bot.db_connection is None):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, after.guild.id)
         if server is None:
@@ -40,7 +40,7 @@ class LogEvent(commands.Cog):
                 if before.nick != after.nick:
                     if server.nick_alterado:
                         embed = discord.Embed(title='Nick alterado',
-                                              colour=discord.Colour(random_color()),
+                                              colour=discord.Colour.random(),
                                               description=f'O(A) {after.name} mudou de nick!\n'
                                                           f'User: {after.mention}\n'
                                                           f'Id: {after.id}\n'
@@ -66,7 +66,7 @@ class LogEvent(commands.Cog):
                             elif len(cargos) > 1:
                                 desc = 'Cargos removidos: ' + ', '.join(cargos)
                         embed = discord.Embed(title='Cargos alterados',
-                                              colour=discord.Colour(random_color()),
+                                              colour=discord.Colour.random(),
                                               description=f'O(A) {after.name} sofreu alteração nos cargos!\n'
                                                           f'User: {after.mention}\n'
                                                           f'Id: {after.id}\n'
@@ -89,7 +89,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_user_update(self, before, after):
         if after.bot or self.bot.maintenance_mode \
-                or (not self.bot.started) or (self.bot.db_connection is None):
+                or (not self.bot.is_ready()) or (self.bot.db_connection is None):
             return
         servers_with_user = []
         for guild in self.bot.guilds:
@@ -99,7 +99,7 @@ class LogEvent(commands.Cog):
             return
         if before.name != after.name:
             embed = discord.Embed(title='Nome alterado',
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   description=f'O(A) {after.name} mudou de nome!\n'
                                               f'User: {after.mention}\n'
                                               f'Id: {after.id}\n'
@@ -114,7 +114,7 @@ class LogEvent(commands.Cog):
                         await channel.send(embed=embed)
         if before.discriminator != after.discriminator:
             embed = discord.Embed(title='Tag alterada',
-                                  colour=discord.Colour(random_color()),
+                                  colour=discord.Colour.random(),
                                   description=f'O(A) {after.name} mudou a tag!\n'
                                               f'User: {after.mention}\n'
                                               f'Id: {after.id}\n'
@@ -150,7 +150,7 @@ class LogEvent(commands.Cog):
                 base.paste(avatar_antigo, (0, 0))
                 base.paste(avatar_novo, (512, 0))
                 embed = discord.Embed(title='Avatar alterado',
-                                      colour=discord.Colour(random_color()),
+                                      colour=discord.Colour.random(),
                                       description=f'O(A) {after.name} mudou o avatar!\n'
                                                   f'User: {after.mention}\n'
                                                   f'Id: {after.id}\n'
@@ -172,7 +172,7 @@ class LogEvent(commands.Cog):
     async def on_message_edit(self, before, after):
         if after.author.bot or after.is_system() or self.bot.maintenance_mode \
                 or ((after.guild is None) or (before.guild is None)) \
-                or (not self.bot.started) or (before.content == after.content) \
+                or (not self.bot.is_ready()) or (before.content == after.content) \
                 or (self.bot.db_connection is None):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, after.guild.id)
@@ -193,7 +193,7 @@ class LogEvent(commands.Cog):
                     else:
                         msg_nova = f'```{after.content}```'
                     embed = discord.Embed(title='Mensagem editada',
-                                          colour=discord.Colour(random_color()),
+                                          colour=discord.Colour.random(),
                                           description=f'Autor: {after.author.name}\n'
                                                       f'Menção: {after.author.mention}\n'
                                                       f'Id: {after.author.id}\n'
@@ -208,7 +208,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_message_delete(self, message):
         if message.author.bot or message.is_system() or self.bot.maintenance_mode \
-                or (message.guild is None) or (not self.bot.started) or (len(message.content) == 0) \
+                or (message.guild is None) or (not self.bot.is_ready()) or (len(message.content) == 0) \
                 or (self.bot.db_connection is None):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, message.guild.id)
@@ -222,7 +222,7 @@ class LogEvent(commands.Cog):
                         msg_escaped = f'```{message.content}```'
                     embed = discord.Embed(
                         title=f'Mensagem deletada',
-                        colour=discord.Colour(random_color()),
+                        colour=discord.Colour.random(),
                         description=f'Autor: {message.author.name}\n'
                                     f'Menção: {message.author.mention}\n'
                                     f'Id: {message.author.id}\n'
@@ -235,7 +235,7 @@ class LogEvent(commands.Cog):
     @commands.Cog.listener()
     async def on_bulk_message_delete(self, messages):
         if (self.bot.db_connection is None) or self.bot.maintenance_mode or (messages[0].guild is None) or \
-                (not self.bot.started):
+                (not self.bot.is_ready()):
             return
         server = await ServidorRepository().get_servidor(self.bot.db_connection, messages[0].guild.id)
         if server.channel_id_log is not None:
@@ -253,7 +253,7 @@ class LogEvent(commands.Cog):
                 from io import BytesIO
                 data = BytesIO(bytes(msg, 'utf-8'))
                 embed = discord.Embed(title=f'{len(messages)} mensagens deletadas',
-                                      colour=discord.Colour(random_color()),
+                                      colour=discord.Colour.random(),
                                       description=f'Chat: {messages[0].channel.mention}\n',
                                       timestamp=datetime.utcnow())
                 embed.set_footer(text=f'{messages[0].author}', icon_url=messages[0].author.avatar_url)

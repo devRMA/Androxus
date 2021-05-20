@@ -17,7 +17,7 @@ from discord.ext import commands
 from py_expression_eval import Parser
 
 from Classes import Androxus
-from utils.Utils import random_color, convert_to_string, prettify_number, is_number
+from utils.Utils import convert_to_string, prettify_number, is_number
 
 
 class Math(commands.Cog, command_attrs=dict(category='matemática')):
@@ -36,6 +36,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                       examples=['``{prefix}operações``', '{prefix}ops'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _operators(self, ctx):
+        # TODO
         operators = {
             'Operador: ``+``': 'Adição\nEx: ``2 + 2``\nVou responder: ``4``',
             'Operador: ``-``': 'Subtração\nEx: ``3 - 1``\nVou responder: ``2``',
@@ -60,7 +61,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
             'Função: ``exp(x)``': 'Expoente de x,\nEx: ``exp(2)``\nVou responder: ``7.3890``'
         }
         embed = discord.Embed(title=f'Operações',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               description='Todas as operações que eu suporto no comando ``calc``!',
                               timestamp=datetime.utcnow())
         embed.set_author(name=self.bot.user.name,
@@ -71,7 +72,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
             embed.add_field(name=ope_ex[0],
                             value=ope_ex[-1],
                             inline=True)
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='calc',
                       aliases=['calcular'],
@@ -102,41 +103,41 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
             resultado = '∞'
         except Exception as exception:
             if 'unexpected' in exception.args[0]:
-                await ctx.send(
+                await ctx.reply(
                     f'Parece que há um erro de digitação!\n```{args}```{self.bot.emoji("ah_nao")}')
                 return
             elif 'undefined variable' in exception.args[0]:
                 variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
-                await ctx.send(
+                await ctx.reply(
                     f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` {self.bot.emoji("sad")}')
                 return
             elif 'unknown character' in exception.args[0]:
-                await ctx.send(
+                await ctx.reply(
                     f'Desculpe, mas você digitou algum caracter que eu não conheço. {self.bot.emoji("sad")}')
                 return
             elif 'unmatched "()"' in exception.args[0]:
-                await ctx.send(
+                await ctx.reply(
                     f'Pare que você esqueceu de abrir ou fechar algum parêntese! {self.bot.emoji("ah_nao")}')
                 return
             elif ('parity' in exception.args[0]) or isinstance(exception, TypeError):
-                await ctx.send('Não consigo resolver está operação, verifique se você digitou tudo certo!')
+                await ctx.reply('Não consigo resolver está operação, verifique se você digitou tudo certo!')
                 return
             elif ('IndexError' in str(exception.__class__)) or ('math domain error' in exception.args[0]):
-                await ctx.send(f'Estamos em {datetime.now().year}, mas ainda não sou capaz de resolver isso.')
+                await ctx.reply(f'Estamos em {datetime.now().year}, mas ainda não sou capaz de resolver isso.')
                 return
             else:
                 if self.bot.maintenance_mode:
                     raise exception
                 else:
-                    return await ctx.send(
+                    return await ctx.reply(
                         f'{self.bot.emoji("sad")} Ocorreu um erro na hora de executar este comando,' +
                         f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
         if len(str(resultado)) >= 400:
-            await ctx.send('O resultado desta operação é tão grande que não consigo enviar a resposta!' +
-                           f'\n{self.bot.emoji("sad")}')
+            await ctx.reply('O resultado desta operação é tão grande que não consigo enviar a resposta!' +
+                            f'\n{self.bot.emoji("sad")}')
             return
         embed = discord.Embed(title=f'{self.bot.emoji("calculator")} Calculadora:',
-                              colour=discord.Colour(random_color()),
+                              colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.add_field(name=f'Calculo:',
                         value=f'```{args}```',
@@ -145,7 +146,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                         value=f'```{prettify_number(resultado)}```',
                         inline=False)
         embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed, mention_author=False)
 
     @Androxus.comando(name='regra_de_tres',
                       aliases=['regra_de_3', 'r3', 'regradetres'],
@@ -157,10 +158,9 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _regra_de_tres(self, ctx):
         # TODO
-        await ctx.send(
-            f'Olá {ctx.author.mention}!\nPrimeiro, qual regra de três você quer que eu faça? ' +
-            '(``inversamente``/``diretamente``)'
-        )
+        await ctx.reply(
+            f'Olá {ctx.author.mention}!\nPrimeiro, qual regra de três você quer que eu faça? '
+            '(``inversamente``/``diretamente``)')
 
         def check(message):
             return message.author == ctx.author
@@ -232,7 +232,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                 mult = valores_user[-1] * valores_user[1]
                 resp = mult / valores_user[0]
                 embed = discord.Embed(title=f'Regra de 3!',
-                                      colour=discord.Colour(random_color()),
+                                      colour=discord.Colour.random(),
                                       description='Passo a passo da resolução:\n' +
                                                   f'**{valores_user[0]}x = {valores_user[-1]}×{valores_user[1]}**\n' +
                                                   f'**{valores_user[0]}x = {mult}**\n' +
@@ -317,7 +317,7 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                 mult = valores_user[0] * valores_user[1]
                 resp = mult / valores_user[-1]
                 embed = discord.Embed(title=f'Regra de 3!',
-                                      colour=discord.Colour(random_color()),
+                                      colour=discord.Colour.random(),
                                       description='Passo a passo da resolução:\n' +
                                                   f'**{valores_user[-1]}x = {valores_user[0]}×{valores_user[1]}**\n' +
                                                   f'**{valores_user[-1]}x = {mult}**\n' +

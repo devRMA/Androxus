@@ -14,7 +14,7 @@ from EmbedModels.embedHelpCategory import embed_help_category
 from EmbedModels.embedHelpCommand import embed_help_command
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import random_color, get_most_similar_item, string_similarity, convert_to_string
+from utils.Utils import get_most_similar_item, string_similarity, convert_to_string
 
 
 class Help(commands.Cog, command_attrs=dict(category='bot_info')):
@@ -53,7 +53,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                     for cmd_pers in comandos_personalizados:
                         if cmd_pers.comando == comando:
                             e = discord.Embed(title=f'{self.bot.emoji("loop_fun")} Comando personalizado',
-                                              colour=discord.Colour(random_color()),
+                                              colour=discord.Colour.random(),
                                               description=f'**Este comando só existe neste servidor!**',
                                               timestamp=datetime.utcnow())
                             e.set_author(name=self.bot.user.name, icon_url=f'{self.bot.user.avatar_url}')
@@ -63,7 +63,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                                              f'Ignorar posição: ```{convert_to_string(cmd_pers.in_text)}```',
                                         value='** **',
                                         inline=False)
-                            return await ctx.send(embed=e)
+                            return await ctx.reply(embed=e, mention_author=False)
                 # se achou um comando "escondido"
                 if (command is not None) and command.hidden:
                     command = None
@@ -95,7 +95,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
                     embed.add_field(name='**Possiveis soluções:**',
                                     value=f'{msg}```',
                                     inline=False)
-                    return await ctx.send(embed=embed)
+                    return await ctx.reply(embed=embed, mention_author=False)
             else:
                 # se a pessoa usou o comando "help diversão" vai mostrar todos os comandos
                 # que estão nessa categoria
@@ -104,7 +104,7 @@ class Help(commands.Cog, command_attrs=dict(category='bot_info')):
             ctx.command = command
         if e is None:
             e = await embed_help_command(self.bot, ctx)
-        return await ctx.send(embed=e)
+        return await ctx.reply(embed=e, mention_author=False)
 
 
 def setup(bot):
