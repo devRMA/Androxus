@@ -750,7 +750,7 @@ async def find_user(user_input, ctx, accuracy=0.6, API_search=True):
     return []
 
 
-# https://stackoverflow.com/questions/3229419/how-to-pretty-print-nested-dictionaries
+# base: https://stackoverflow.com/questions/3229419/how-to-pretty-print-nested-dictionaries
 def pretty_i(iterable, indent_char='\t', new_line_char='\n', indent=0):
     """
 
