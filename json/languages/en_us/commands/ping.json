@@ -1,0 +1,33 @@
+[
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar_url}"
+            },
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "title": "Calculating ping {loading}"
+        }
+    },
+    {
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar_url}"
+            },
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "title": "\uD83C\uDFD3 API latency: {api_ping}ms!\n{database} Database response time: {db_ping}!\n\uD83D\uDCE5 Discord response time: {dc_ping}"
+        }
+    }
+]

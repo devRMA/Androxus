@@ -1,0 +1,7 @@
+[
+    {
+        "old_ban_reason": "Old ban:",
+        "reason_audit_log_no_reason": "Unbanned by: {ctx.author}",
+        "reason_audit_log": "Unbanned by: {ctx.author} —— Reason: {reason}"
+    }
+]

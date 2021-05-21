@@ -22,6 +22,7 @@ class Servidor:
     nick_alterado: bool
     role_alterado: bool
     sugestao_de_comando: bool
+    lang: str
 
     def __init__(self,
                  id,
@@ -34,7 +35,8 @@ class Servidor:
                  tagAlterado=False,
                  nickAlterado=False,
                  roleAlterado=False,
-                 sugestaoDeComando=True):
+                 sugestaoDeComando=True,
+                 lang='en_us'):
         self.id = id
         self.prefixo = prefix
         self.channel_id_log = channelIdLog
@@ -46,3 +48,4 @@ class Servidor:
         self.nick_alterado = nickAlterado
         self.role_alterado = roleAlterado
         self.sugestao_de_comando = sugestaoDeComando
+        self.lang = lang

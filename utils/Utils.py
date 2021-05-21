@@ -837,9 +837,7 @@ def info(object_):
         all_attrs['type'] = 'function'
         try:
             all_attrs['signature'] = f'{object_.__qualname__}{inspect.signature(object_)}'
-        except ValueError:
-            pass
-        except TypeError:
+        except:
             pass
     else:
         all_attrs['type'] = 'object'

@@ -40,75 +40,53 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _ban(self, ctx, member: discord.Member = None, *args):
-        if isinstance(args, tuple):
-            # se chegar como tupla, vai transformar em lista
-            args = list(args)
-        # se a pessoa passou pelo menos o membro, ou algum argumento
-        if args or member:
-            if not member:
-                try:
-                    id = int(args[0])
-                except ValueError:
-                    return await self.bot.send_help(ctx)
-                else:
-                    args.pop(0)
-                try:
-                    member = await ctx.guild.fetch_member(id)
-                except:
-                    member = None
-                if member is None:  # se não achou o membro:
-                    return await ctx.reply(f'Não consegui encontrar o membro com id `{id}`!', mention_author=False)
+    async def _ban(self, ctx, member: discord.Member = None, *, reason=None):
+        messages_error = await self.bot.translate(ctx, error_='ban', values_={
+            'ah_nao': self.bot.get_emoji('ah_nao'),
+            'sad': self.bot.get_emoji('sad')
+        })
+        # se a pessoa passou o membro
+        if member:
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
-                return await ctx.reply(f'Você não pode banir o dono do servidor! '
-                                       f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.send(**messages_error[0])
             elif member == ctx.author:
-                return await ctx.reply(f'Você não pode se banir! '
-                                       f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.send(**messages_error[1])
             elif member == self.bot.user:
-                return await ctx.reply(f'Eu não posso me banir! '
-                                       f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.send(**messages_error[2])
             elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
-                return await ctx.reply('Você só pode banir pessoas que tenham cargo mais '
-                                       'baixo que o seu!')
-            # se sobrou algum argumento, é porque a pessoa passou um motivo
-            reason = None
-            if args:
-                reason = ' '.join(args)
+                return await ctx.send(**messages_error[3])
         else:
-            # se a pessoa não passou nada:
+            # se a pessoa não passou o membro:
             return await self.bot.send_help(ctx)
-        embed = discord.Embed(title=f'{self.bot.get_emoji("banned")} Usuário banido!',
-                              colour=discord.Colour.random(),
-                              description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
-                                          f'{str(reason).replace("None", "nulo")}',
-                              timestamp=datetime.utcnow())
-        embed.set_footer(text=str(ctx.author),
-                         icon_url=ctx.author.avatar_url)
-        msg_ban = f'{member.mention} Você foi banido do servidor {ctx.guild}!'
-        if reason:
-            msg_ban += f'\nPelo motivo: {reason}'
+        messages = await self.bot.translate(ctx, values_={
+            'banned': self.bot.get_emoji('banned'),
+            'member': member,
+            'reason': reason
+        })
+        reasons = (await self.bot.translate(ctx, others_='ban', values_={
+            'reason': reason
+        }))[0]
         try:
             if not member.bot:
-                msg = await member.send(msg_ban)
+                msg = await member.send(reasons['member_no_reason' if reason is None else 'member_reason'])
         except:
             pass
-        reason = f'Banido por: {ctx.author} —— Motivo: {str(reason).replace("None", "nulo")}'
         try:
-            await ctx.guild.ban(member, reason=reason)
+            reason_audit = reasons['reason_audit_log_no_reason' if reason is None else 'reason_audit_log']
+            await ctx.guild.ban(member, reason=reason_audit)
         except discord.errors.Forbidden:
             try:
-                await msg.delete()
+                if not member.bot:
+                    await msg.delete()
             except:
                 pass
-            await ctx.reply(f'Eu não tenho permissão para banir este usuário. {self.bot.get_emoji("sad")}',
-                            mention_author=False)
+            await ctx.send(**messages_error[4])
         else:
-            await ctx.reply(embed=embed,
-                            mention_author=False)
+            message_successful = messages[0] if reason else messages[1]
+            await ctx.send(**message_successful)
 
     @Androxus.comando(name='kick',
                       aliases=['expulsar'],
@@ -122,74 +100,52 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.bot_has_permissions(kick_members=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _kick(self, ctx, member: discord.Member = None, *args):
-        if isinstance(args, tuple):
-            # se chegar como tupla, vai transformar em lista
-            args = list(args)
-        # se a pessoa passou pelo menos o membro, ou algum argumento
-        if args or member:
-            if not member:  # se o membro não foi marcado
-                # vai ver se a pessoa passou um id
-                try:
-                    # vai tentar converter para int, o primeiro valor que a pessoa passou
-                    id = int(args[0])
-                except ValueError:
-                    # se não conseguir:
-                    return await self.bot.send_help(ctx)
-                else:
-                    # se não entrou no except
-                    args.pop(0)
-                # vai tentar achar o membro com esse id
-                member = ctx.guild.get_member(id)
-                if not member:  # se não achou o membro:
-                    return await ctx.reply(f'Não consegui encontrar o membro com id `{id}`!')
+    async def _kick(self, ctx, member: discord.Member = None, *, reason=None):
+        messages_error = await self.bot.translate(ctx, error_='kick', values_={
+            'ah_nao': self.bot.get_emoji('ah_nao'),
+            'sad': self.bot.get_emoji('sad')
+        })
+        # se a pessoa passou o membro
+        if member:
             # vai verificar se a pessoa pode usar o comando
             if ctx.guild.owner == member:
-                return await ctx.reply(f'Você não pode expulsar o dono do servidor! '
-                                       f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.send(**messages_error[0])
             elif member == ctx.author:
-                return await ctx.reply(f'Você não pode se expulsar! '
-                                       f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.send(**messages_error[1])
             elif member == self.bot.user:
-                return await ctx.reply(f'Eu não posso me expulsar! '
-                                       f'{self.bot.get_emoji("ah_nao")}')
+                return await ctx.send(**messages_error[2])
             elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
-                return await ctx.reply(f'Você só pode expulsar pessoas que tenham cargo mais '
-                                       'baixo que o seu!')
-            # se sobrou algum argumento, é porque a pessoa passou um motivo
-            reason = None
-            if args:
-                reason = ' '.join(args)
+                return await ctx.send(**messages_error[3])
         else:
-            # se a pessoa não passou nada:
+            # se a pessoa não passou o membro:
             return await self.bot.send_help(ctx)
-        embed = discord.Embed(title=f'Usuário expulso!',
-                              colour=discord.Colour.random(),
-                              description=f'Usuário: {member}\nId: {member.id}\nMotivo: ' +
-                                          f'{str(reason).replace("None", "nulo")}',
-                              timestamp=datetime.utcnow())
-        embed.set_footer(text=str(ctx.author),
-                         icon_url=ctx.author.avatar_url)
-        msg_kick = f'{member.mention} Você foi expulso do servidor {ctx.guild}!'
-        if reason:
-            msg_kick += f'\nPelo motivo: {reason}'
+        messages = await self.bot.translate(ctx, values_={
+            'member': member,
+            'reason': reason
+        })
+        reasons = (await self.bot.translate(ctx, others_='kick', values_={
+            'reason': reason
+        }))[0]
         try:
             if not member.bot:
-                msg = await member.send(msg_kick)
+                msg = await member.send(reasons['member_no_reason' if reason is None else 'member_reason'])
         except:
             pass
-        reason = f'Expulso por: {ctx.author} —— Motivo: {str(reason).replace("None", "nulo")}'
         try:
-            await ctx.guild.kick(member, reason=reason)
+            reason_audit = reasons['reason_audit_log_no_reason' if reason is None else 'reason_audit_log']
+            await ctx.guild.kick(member, reason=reason_audit)
         except discord.errors.Forbidden:
-            await msg.delete()
-            await ctx.reply(f'Eu não tenho permissão para expulsar esse usuário. {self.bot.get_emoji("sad")}',
-                            mention_author=False)
+            try:
+                if not member.bot:
+                    await msg.delete()
+            except:
+                pass
+            await ctx.send(**messages_error[4])
         else:
-            await ctx.reply(content=get_emoji_dance(), embed=embed,
-                            mention_author=False)
+            message_successful = messages[0] if reason else messages[1]
+            await ctx.send(**message_successful)
 
     @Androxus.comando(name='unban',
                       aliases=['desbanir', 'revogar_ban'],
@@ -204,88 +160,104 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _unban(self, ctx, member: BannedMember = None, *args):
+    async def _unban(self, ctx, member: BannedMember = None, *, reason=None):
         if member is None:
             return await self.bot.send_help(ctx)
-        reason = None
-        if args:
-            reason = ' '.join(args)
-        embed = discord.Embed(title=f'Ban revogado!',
-                              colour=discord.Colour.random(),
-                              description=f'Usuário: {member.user}\nId: {member.user.id}\nMotivo: ' +
-                                          f'{str(reason).replace("None", "nulo")}',
-                              timestamp=datetime.utcnow())
+        messages = await self.bot.translate(ctx, values_={
+            'member': member,
+            'reason': reason
+        })
+        others = (await self.bot.translate(ctx, others_='unban', values_={
+            'reason': reason
+        }))[0]
+        erros = await self.bot.translate(ctx, error_='unban')
+        message_successful = messages[0 if reason else 1]
         if member.reason:
-            embed.add_field(name='Antigo ban:',
-                            value=f'{member.reason}',
-                            inline=False)
-        embed.set_footer(text=str(ctx.author),
-                         icon_url=ctx.author.avatar_url)
-        reason = f'Ban revogado por: {ctx.author} —— Motivo: {str(reason).replace("None", "nulo")}'
+            message_successful['embed'].add_field(name=others['old_ban_reason'],
+                                                  value=str(member.reason),
+                                                  inline=False)
         try:
-            await ctx.guild.unban(member.user, reason=reason)
+            reason_audit = others['reason_audit_log_no_reason' if reason is None else 'reason_audit_log']
+            await ctx.guild.unban(member.user, reason=reason_audit)
         except discord.Forbidden:
-            await ctx.reply('Não tenho permissão para revogar banimentos!')
+            await ctx.send(**erros[0])
         except discord.HTTPException:
-            await ctx.reply('Desculpe, mas ocorreu um erro na hora de executar o comando, tente novamente mais tarde.',
-                            mention_author=False)
+            await ctx.send(**erros[1])
         else:
-            await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
+            await ctx.send(**message_successful)
 
     @Androxus.comando(name='change_prefix',
                       aliases=['prefixo', 'prefix'],
                       description='Comando que é usado para mudar o meu prefixo',
-                      parameters=['``[prefixo (padrão: "--")]``'],
+                      parameters=['[prefixo (padrão: "--")]'],
                       examples=['``{prefix}change_prefix`` ``!!``',
                                 '``{prefix}prefixo``'],
                       perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _change_prefix(self, ctx, prefixo_novo=get_configs()['default_prefix']):
-        if ctx.prefix.replace("!", "").replace(" ", "") == self.bot.user.mention:
-            # vai pegar o prefixo que está no banco
-            prefixo_antigo = await pegar_o_prefixo(self.bot, ctx)
+    async def _change_prefix(self, ctx, new_prefix=get_configs()['default_prefix']):
+        if len(new_prefix) <= 20:
+            servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+            old_prefix = servidor.prefixo
+            servidor.prefixo = new_prefix
+            await ServidorRepository().update(self.bot.db_connection, servidor)
+            messages = await self.bot.translate(ctx, values_={
+                'new_prefix': new_prefix,
+                'old_prefix': old_prefix,
+                'dance': get_emoji_dance()
+            })
+            if new_prefix != self.bot.configs['default_prefix']:
+                await ctx.send(**messages[0])
+            else:
+                await ctx.send(**messages[1])
         else:
-            # se a pessoa não marcou o bot:
-            prefixo_antigo = ctx.prefix
-        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
-        await ServidorRepository().update(self.bot.db_connection, servidor)
-        if prefixo_novo != self.bot.configs['default_prefix']:
-            embed = discord.Embed(title=f'Prefixo alterado com sucesso!', colour=discord.Colour.random(),
-                                  description=f'Prefixo antigo: {prefixo_antigo}\n' +
-                                              f'Prefixo novo: {prefixo_novo}',
-                                  timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
-            embed.add_field(name=f'Caso queria voltar para o prefixo padrão, basta digitar ``{prefixo_novo}prefixo``!'
-                                 f'\n{get_emoji_dance()}',
-                            value='** **',
-                            inline=False)
-            await ctx.reply(embed=embed)
-        else:
-            await ctx.reply(f'Agora estou com o prefixo padrão! {get_emoji_dance()}')
+            erro = (await self.bot.translate(ctx, error_='change_prefix'))[0]
+            await ctx.send(**erro)
 
-    @Androxus.comando(name='desativar_sugestão',
-                      aliases=['ds', 'desativar_sugestao'],
+    @Androxus.comando(name='change_lang',
+                      aliases=['language', 'lingua', 'língua', 'lang'],
+                      description='Comando que é usado para mudar a língua',
+                      parameters=['[lingua (padrão: "en_us")]'],
+                      examples=['``{prefix}change_prefix`` ``!!``',
+                                '``{prefix}prefixo``'],
+                      perm_user='administrador')
+    @permissions.has_permissions(administrator=True)
+    @commands.check(permissions.is_owner)
+    @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _change_lang(self, ctx, new_lang='en_us'):
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        if new_lang.lower() in self.bot.supported_langs:
+            servidor.lang = new_lang.lower()
+            await ServidorRepository().update(self.bot.db_connection, servidor)
+            messages = await self.bot.translate(ctx)
+            await ctx.send(**messages[0])
+        else:
+            await self.bot.send_help(ctx)
+
+    @Androxus.comando(name='desativar_sugestao',
+                      aliases=['ds', 'desativar_sugestão'],
                       description='Comando que é usado para desativar as sugestões, quando a pessoa usar meu prefixo, '
                                   'com um comando que não existe',
-                      examples=['``{prefix}desativar_sugestão``',
+                      examples=['{prefix}desativar_sugestão',
                                 '``{prefix}ds``'],
                       perm_user='administrador')
     @permissions.has_permissions(administrator=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _desativar_sugestao(self, ctx):
+        messages = await self.bot.translate(ctx)
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
         if servidor.sugestao_de_comando:
             servidor.sugestao_de_comando = False
             await ServidorRepository().update(self.bot.db_connection, servidor)
-            return await ctx.reply('Sugestões desativadas!')
+            return await ctx.send(**messages[0])
         else:
-            return await ctx.reply('As sugestões já estavam desativadas!')
+            return await ctx.send(**messages[1])
 
-    @Androxus.comando(name='reativar_sugestão',
-                      aliases=['rs', 'reativar_sugestao'],
+    @Androxus.comando(name='reativar_sugestao',
+                      aliases=['rs', 'reativar_sugestão'],
                       description='Comando que é usado para reativar as sugestões, quando a pessoa usar meu prefixo, '
                                   'com um comando que não existe',
                       examples=['``{prefix}reativar_sugestão``',
@@ -295,13 +267,14 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _reativar_sugestao(self, ctx):
+        messages = await self.bot.translate(ctx)
         servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
         if not servidor.sugestao_de_comando:
             servidor.sugestao_de_comando = True
             await ServidorRepository().update(self.bot.db_connection, servidor)
-            return await ctx.reply('Sugestões reativadas!')
+            return await ctx.send(**messages[0])
         else:
-            return await ctx.reply('As sugestões já estavam ativadas!')
+            return await ctx.send(**messages[1])
 
     @Androxus.comando(name='channel_log',
                       aliases=['chat_log', 'cl'],
@@ -315,43 +288,40 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _channel_log(self, ctx, channel: discord.TextChannel = None):
+        erros = await self.bot.translate(ctx, error_='channel_log')
+        messages = await self.bot.translate(ctx, values_={
+            'channel': channel or ctx.channel,  # passando o ctx.channel só para não dar erro na hora do format
+            'old_log': ''  # passando em branco, pois só usa em um caso específico
+        })
         if channel is not None:
             perms = channel.permissions_for(ctx.me)
             if not perms.send_messages:
-                return await ctx.reply(f'Eu não tenho permissão para enviar mensagem neste chat.')
+                return await ctx.send(**erros[0])
             elif not perms.embed_links:
-                return await ctx.reply(f'Eu não tenho permissão de inserir links na '
-                                       f'mensagem, neste chat.')
+                return await ctx.send(**erros[1])
             elif not perms.attach_files:
-                return await ctx.reply(f'Eu não tenho permissão enviar arquivos neste chat.')
-            elif channel.guild.id != ctx.guild.id:
-                return await ctx.reply(f'Você precisa me dizer um chat **deste** servidor')
+                return await ctx.send(**erros[2])
             servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
             if servidor.channel_id_log is None:
                 servidor.channel_id_log = channel.id
                 await ServidorRepository().update(self.bot.db_connection, servidor)
-                return await ctx.reply(f' Log ativado com sucesso em {channel.mention}!')
+                await ctx.send(**messages[0])
             else:
-                log_antigo = servidor.channel_id_log
+                messages = await self.bot.translate(ctx, values_={
+                    'channel': channel,
+                    'old_log': servidor.channel_id_log
+                })
                 servidor.channel_id_log = channel.id
                 await ServidorRepository().update(self.bot.db_connection, servidor)
-                return await ctx.reply('Chat de logs alterado com sucesso!\n'
-                                       f'Antigo: <#{log_antigo}>\nNovo: <#{channel.id}>')
+                await ctx.send(**messages[1])
         else:
             servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
             if servidor.channel_id_log is not None:
                 servidor.channel_id_log = None
                 await ServidorRepository().update(self.bot.db_connection, servidor)
-                return await ctx.reply(f'Log desativado!')
+                await ctx.send(**messages[2])
             else:
                 return await self.bot.send_help(ctx)
-
-    @_channel_log.error
-    async def _channel_log_error(self, ctx, error):
-        if self.bot.maintenance_mode and (
-                isinstance(error, commands.BadArgument) or isinstance(error, commands.errors.ChannelNotFound)):
-            return await ctx.reply(f'Não consegui encontrar este channel.')
-        raise error
 
     @Androxus.comando(name='setup_logs',
                       aliases=['logs', 'sl'],

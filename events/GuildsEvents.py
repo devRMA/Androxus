@@ -22,7 +22,7 @@ class GuildsEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
         # se o bot for adicionado num server antes dele iniciar, vai esperar até o bot iniciar
-        while (not self.bot.started) or (self.bot.db_connection is None):
+        while (not self.bot.is_ready()) or (self.bot.db_connection is None):
             await asyncio.sleep(0.5)
 
         e = discord.Embed(title=f'📥 Bot foi adicionado no servidor `{guild.name}`!',
@@ -77,7 +77,7 @@ class GuildsEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_remove(self, guild):
         # se o bot for removido de um server antes dele iniciar, vai esperar até o bot iniciar
-        while (not self.bot.started) or (self.bot.db_connection is None):
+        while (not self.bot.is_ready()) or (self.bot.db_connection is None):
             await asyncio.sleep(0.5)
         e = discord.Embed(title=f'📤 Bot foi removido do servidor {guild.name}.',
                           colour=discord.Colour.red(),

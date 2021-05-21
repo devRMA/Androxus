@@ -2,6 +2,21 @@
 # Androxus bot
 # converters.py
 
+"""
+- IMPORTANT:
+
+The following code has been copied and modified from a third party
+code and it is protected by the MPL 2.0 license, as described in
+the following license notice:
+
+This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+To get the original code, see:
+https://github.com/Rapptz/RoboDanny/blob/rewrite/cogs/mod.py#L109
+"""
+
 __author__ = 'Rafael'
 
 import discord
@@ -44,7 +59,6 @@ class DiscordUser(commands.Converter):
         return None
 
 
-# font: https://github.com/Rapptz/RoboDanny
 class BannedMember(commands.Converter):
     async def convert(self, ctx, argument):
         if argument:

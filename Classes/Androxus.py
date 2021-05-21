@@ -7,7 +7,7 @@ __author__ = 'Rafael'
 import re
 from datetime import datetime
 from itertools import cycle
-from json import loads
+from json import loads, load
 from os import listdir
 from string import ascii_letters
 from sys import version
@@ -75,6 +75,7 @@ class Androxus(commands.Bot):
     server_log: discord.TextChannel = None
     maintenance_mode: bool = False
     db_connection: Pool = None
+    supported_langs = []
 
     def __init__(self, *args, **kwargs):
         # Intents do discord.py 1.5.0
@@ -118,6 +119,7 @@ class Androxus(commands.Bot):
             self.uptime = datetime.utcnow()
             self.server_log = self.get_channel(self.configs['channels_log']['servers'])
             self.db_connection = await ConnectionFactory.get_connection()
+            self.supported_langs = listdir('json/languages/')
             print(('-=' * 10) + 'Androxus Online!' + ('-=' * 10))
             print(f'Logado em {self.user}')
             print(f'ID: {self.user.id}')
@@ -333,16 +335,107 @@ class Androxus(commands.Bot):
     async def send_help(self, ctx):
         await self.get_command('help')(ctx)
 
-    async def language(self, ctx):
+    async def translate(self, ctx, error_=None, help_=None, others_=None, values_=None):
         """
 
         Args:
             ctx (discord.ext.commands.context.Context): O contexto que vai ser usado para pegar o prefixo
+            error_ (str): Caso a mensagem seja de um erro, passe nesse parâmetro o erro (Default value = None)
+            help_ (str): Caso a mensagem seja de um help, passe nesse parâmetro (Default value = None)
+            others_ (str): Caso seja um outro tipo de mensagem (Default value = None)
+            values_ (dict): Os valores dinamicos do json.
 
         Returns:
+            [dict]: Uma lista de dicts com os parametros para usar no discord.abc.Messageable.send
 
         """
-        pass
+        if values_ is None:
+            values_ = {}
+        values_['ctx'] = ctx
+        values_['bot'] = ctx.bot
+        language = 'en_us'
+        if ctx.guild:
+            async with ctx.bot.db_connection.acquire() as conn:
+                language = tuple((await conn.fetch('SELECT lang FROM servidor WHERE serverId = $1;', ctx.guild.id)
+                                  )[0])[0]
+        messages = []
+        if error_:
+            path = get_path_from_file(f'{error_}.json', f'json/languages/{language}/erros/')
+        elif help_:
+            path = get_path_from_file(f'{help_}.json', f'json/languages/{language}/help/')
+        elif others_:
+            path = get_path_from_file(f'{others_}.json', f'json/languages/{language}/others/')
+        else:
+            path = get_path_from_file(f'{ctx.command.name}.json', f'json/languages/{language}/commands/')
+        with open(path, encoding='utf-8') as file:
+            messages_raw = load(file)
+        for message_raw in messages_raw:
+            message = {}
+            embed = None
+            for key, value in message_raw.items():
+                if key == 'embed':
+                    embed = value
+                elif key == 'reference':
+                    message[key] = ctx.message
+                elif key == 'allowed_mentions':
+                    message[key] = discord.AllowedMentions(**value)
+                else:
+                    message[key] = value.format(**values_) if isinstance(value, str) else value
+            if embed is not None:
+                ctor = {}
+                ctor_params = ['title', 'type', 'description', 'url', 'timestamp', 'color', 'type']
+                footer = None
+                image = None
+                thumbnail = None
+                fields = None
+                author = None
+                for key, value in embed.items():
+                    if key in ctor_params:
+                        if key == 'color' and value == 'random':
+                            ctor['color'] = discord.Colour.random()
+                        elif key == 'timestamp' and value == 'now':
+                            ctor['timestamp'] = datetime.utcnow()
+                        else:
+                            ctor[key] = value.format(**values_)
+                    elif key == 'footer':
+                        footer = {}
+                        for k2, v2 in value.items():
+                            footer[k2] = v2.format(**values_)
+                    elif key == 'image':
+                        image = {}
+                        for k2, v2 in value.items():
+                            image[k2] = v2.format(**values_)
+                    elif key == 'thumbnail':
+                        thumbnail = {}
+                        for k2, v2 in value.items():
+                            thumbnail[k2] = v2.format(**values_)
+                    elif key == 'fields':
+                        fields = []
+                        for field in value:
+                            temp_dict = {}
+                            for k2, v2 in field.items():
+                                temp_dict[k2] = v2.format(**values_) if isinstance(v2, str) else v2
+                            fields.append(temp_dict)
+                            del temp_dict
+                    elif key == 'author':
+                        author = {}
+                        for k2, v2 in value.items():
+                            author[k2] = v2.format(**values_)
+                discord_embed = discord.Embed(**ctor)
+                if footer is not None:
+                    discord_embed.set_footer(**footer)
+                if image is not None:
+                    discord_embed.set_image(**image)
+                if thumbnail is not None:
+                    discord_embed.set_thumbnail(**thumbnail)
+                if fields is not None:
+                    for field in fields:
+                        discord_embed.add_field(**field)
+                if author is not None:
+                    discord_embed.set_author(**author)
+                message['embed'] = discord_embed
+            messages.append(message)
+        return messages
 
 
 class _BaseComando(commands.Command):

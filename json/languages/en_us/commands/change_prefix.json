@@ -1,0 +1,33 @@
+[
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar_url}"
+            },
+            "fields": [
+                {
+                    "inline": false,
+                    "name": "If you want to go back to the default prefix, just type `{new_prefix}prefix`!\n{dance}",
+                    "value": "** **"
+                }
+            ],
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "description": "Old prefix: `{old_prefix}`\nNew prefix: `{new_prefix}`",
+            "title": "Prefix changed successfully!"
+        }
+    },
+    {
+        "content": "Now I will answer with the default prefix (`{new_prefix}`)! {dance}",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        }
+    }
+]

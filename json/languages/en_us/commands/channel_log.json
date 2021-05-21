@@ -1,0 +1,14 @@
+[
+    {
+        "content": "Log successfully activated in {channel.mention}!",
+        "reference": "message"
+    },
+    {
+        "content": "Log channel changed successfully !\nOld: <#{old_log}>\nNew: {channel.mention}!",
+        "reference": "message"
+    },
+    {
+        "content": "Log have been disabled!",
+        "reference": "message"
+    }
+]

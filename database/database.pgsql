@@ -33,6 +33,11 @@ ADD COLUMN logNickAlterado BOOLEAN DEFAULT FALSE,
 ADD COLUMN logRoleAlterado BOOLEAN DEFAULT FALSE,
 ADD COLUMN sugestaoDeComando BOOLEAN DEFAULT TRUE;
 
+-- Na versão 2.3 foi adicionado o sistema de multi lang.
+
+ALTER TABLE servidor
+ADD COLUMN lang TEXT DEFAULT 'en_us';
+
 -- Table que vai guardar todos os comandos desativados
 CREATE TABLE IF NOT EXISTS comandos_off(
     serverId BIGINT NOT NULL,
@@ -276,7 +281,8 @@ RETURNS
         logTagAlterado BOOLEAN,
         logNickAlterado BOOLEAN,
         logRoleAlterado BOOLEAN,
-        sugestaoDeComando BOOLEAN
+        sugestaoDeComando BOOLEAN,
+        lang TEXT
     )
 AS
 $$
@@ -290,7 +296,8 @@ $$
         logTagAlterado,
         logNickAlterado,
         logRoleAlterado,
-        sugestaoDeComando
+        sugestaoDeComando,
+        lang
     FROM
         servidor
     WHERE
@@ -310,7 +317,9 @@ CREATE PROCEDURE server_update
     BOOLEAN, -- 8 - logNickAlterado
     BOOLEAN, -- 9 - logRoleAlterado
     BOOLEAN, -- 10 - sugestaoDeComando
-    BIGINT -- 11 - serverId
+    TEXT, -- 11 - lang
+    BIGINT -- 12 - serverId
+
 )
 AS
 $$
@@ -325,9 +334,10 @@ $$
             logTagAlterado = $7,
             logNickAlterado = $8,
             logRoleAlterado = $9,
-            sugestaoDeComando = $10
+            sugestaoDeComando = $10,
+            lang = $11
     WHERE
-        serverId = $11;
+        serverId = $12;
 $$
 LANGUAGE SQL;
 

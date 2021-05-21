@@ -141,25 +141,29 @@ class Botinfo(commands.Cog, command_attrs=dict(category='bot_info')):
                       examples=['``{prefix}ping``'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _ping(self, ctx):
+        messages = await self.bot.translate(ctx, values_={
+            'loading': self.bot.emoji('loading'),
+            'database': self.bot.emoji('database'),
+            'api_ping': '',
+            'db_ping': '',
+            'dc_ping': ''
+        })
         stopwatch_banco = Stopwatch()
         async with self.bot.db_connection.acquire() as conn:
             await conn.fetch('select version();')
         stopwatch_banco.stop()
-        e1 = discord.Embed(title=f'Calculando ping {self.bot.emoji("loading")}',
-                           colour=discord.Colour.random(),
-                           timestamp=datetime.utcnow())
-        e1.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
         stopwatch_message = Stopwatch()
-        mensagem_do_bot = await ctx.reply(embed=e1, mention_author=False)
+        mensagem_do_bot = await ctx.send(**messages[0])
         stopwatch_message.stop()
-        e2 = discord.Embed(title=f'🏓 Latência da API: {prettify_number(int(self.bot.latency * 1000))}ms!\n'
-                                 f'{self.bot.emoji("database")} Tempo de resposta do banco: {stopwatch_banco}!\n'
-                                 f'📥 Tempo de resposta no discord: {stopwatch_message}!',
-                           colour=discord.Colour.random(),
-                           timestamp=datetime.utcnow())
-        e2.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        messages = await self.bot.translate(ctx, values_={
+            'loading': self.bot.emoji('loading'),
+            'database': self.bot.emoji('database'),
+            'api_ping': prettify_number(int(self.bot.latency * 1000)),
+            'db_ping': str(stopwatch_banco),
+            'dc_ping': str(stopwatch_message)
+        })
         await asyncio.sleep(stopwatch_message.duration * 2)
-        await mensagem_do_bot.edit(embed=e2, allowed_mentions=discord.AllowedMentions(replied_user=False))
+        await mensagem_do_bot.edit(**messages[1])
 
     @Androxus.comando(name='invite',
                       aliases=['convidar', 'convite', 'i'],

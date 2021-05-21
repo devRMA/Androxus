@@ -1,0 +1,14 @@
+[
+    {
+        "content": "I don't have permission to send messages in this chat!",
+        "reference": "message"
+    },
+    {
+        "content": "I don't have permission to embed links in this chat!",
+        "reference": "message"
+    },
+    {
+        "content": "I don't have permission to attach files in this chat!",
+        "reference": "message"
+    }
+]

@@ -66,7 +66,7 @@ class ServidorRepository(IServidorRepository):
             if resposta:  # se vier alguma coisa:
                 # apenas encurtando a variavel, para que a linha do return não fique muito grande
                 r = resposta[0]
-                return Servidor(serverId, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9])
+                return Servidor(serverId, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9], r[10])
             return None  # se não veio nada, retorna Nulo
 
     async def update(self, pool, servidor):
@@ -84,7 +84,7 @@ class ServidorRepository(IServidorRepository):
         if not await self._existe(pool, servidor):
             return await self.create(pool, servidor)
         async with pool.acquire() as conn:
-            query = 'CALL server_update($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);'
+            query = 'CALL server_update($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);'
             await conn.execute(query, servidor.prefixo,
                                servidor.channel_id_log,
                                servidor.mensagem_deletada,
@@ -95,6 +95,7 @@ class ServidorRepository(IServidorRepository):
                                servidor.nick_alterado,
                                servidor.role_alterado,
                                servidor.sugestao_de_comando,
+                               servidor.lang,
                                servidor.id)
             return True
 

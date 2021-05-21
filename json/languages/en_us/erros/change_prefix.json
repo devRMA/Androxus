@@ -1,0 +1,9 @@
+[
+    {
+        "content": "You cannot enter a prefix with more than 20 letters!",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": true
+        }
+    }
+]

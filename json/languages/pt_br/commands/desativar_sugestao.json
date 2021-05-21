@@ -1,0 +1,16 @@
+[
+    {
+        "content": "Sugestões desativadas",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": true
+        }
+    },
+    {
+        "content": "As sugestões já estavam desativadas!",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": true
+        }
+    }
+]

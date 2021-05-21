@@ -1,0 +1,9 @@
+[
+    {
+        "content": "Você não pode colocar um prefixo com mais de 20 letras!",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": true
+        }
+    }
+]

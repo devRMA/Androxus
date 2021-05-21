@@ -1,0 +1,8 @@
+[
+    {
+        "member_no_reason": "Você foi expulso do servidor {ctx.guild}!",
+        "member_reason": "Você foi expulso do servidor {ctx.guild}!\nPelo motivo: {reason}",
+        "reason_audit_log_no_reason": "Expulso por: {ctx.author}",
+        "reason_audit_log": "Expulso por: {ctx.author} —— Motivo: {reason}"
+    }
+]

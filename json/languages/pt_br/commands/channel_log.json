@@ -1,0 +1,14 @@
+[
+    {
+        "content": "Log ativado com sucesso em {channel.mention}!",
+        "reference": "message"
+    },
+    {
+        "content": "Chat de logs alterado com sucesso!\nAntigo: <#{old_log}>\nNovo: {channel.mention}!",
+        "reference": "message"
+    },
+    {
+        "content": "Log desativado!",
+        "reference": "message"
+    }
+]
