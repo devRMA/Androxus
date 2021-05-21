@@ -446,29 +446,34 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _clear(self, ctx, messages=None):
         if messages is not None:
+            erros = await self.bot.translate(ctx, error_='clear')
             if is_number(messages):
                 try:
                     messages = int(messages)
                 except ValueError:
-                    return await ctx.reply(f'Eu só aceito números inteiros!')
+                    return await ctx.send(**erros[0])
             else:
-                return await ctx.reply(f'Digite um número válido!')
+                return await ctx.send(**erros[1])
             if 200 >= messages >= 1:
                 try:
                     deleted = await ctx.channel.purge(limit=messages + 1, check=lambda m: not m.pinned)
                 except:
-                    return await ctx.send(f'{ctx.author.mention} não consegui deletar as mensagens. Tente novamente.')
+                    return await ctx.send(**erros[2])
                 else:
+                    keep = abs(messages - (len(deleted) - 1))
+                    translated_messages = await self.bot.translate(ctx, values_={
+                        'deleted': len(deleted) - 1,
+                        'keep': keep
+                    })
                     if (len(deleted) - 1) >= messages:
-                        return await ctx.send(f'{ctx.author.mention} deletou {len(deleted) - 1} mensagens!',
-                                              delete_after=5)
+                        return await ctx.send(**translated_messages[0])
                     else:
-                        return await ctx.send(f'{ctx.author.mention} não foi(ram) deletada(s) '
-                                              f'{abs(messages - len(deleted) - 1)} mensagem(ns), pois estava(m) '
-                                              f'fixada(s).',
-                                              delete_after=5)
+                        if keep > 1:
+                            return await ctx.send(**translated_messages[1])
+                        else:
+                            return await ctx.send(**translated_messages[2])
             else:
-                return await ctx.reply(f'Informe um número entre 1 e 200!')
+                return await ctx.send(**erros[3])
         else:
             return await self.bot.send_help(ctx)
 
