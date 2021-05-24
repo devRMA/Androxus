@@ -8,6 +8,7 @@ from stopwatch import Stopwatch
 
 
 class TestResult:
+    __slots__ = ('erros', 'tests', 'execution_time', 'result')
     erros: list
     tests: list
     execution_time: Stopwatch

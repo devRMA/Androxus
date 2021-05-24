@@ -1,0 +1,14 @@
+[
+    {
+        "content": "Você precisa configurar um chat para os logs primeiro! Use o comando `channel_log #chat-logs`!",
+        "reference": "message"
+    },
+    {
+        "content": "Tempo esgotado! Alterações foram descartadas! Use o comando novamente, caso queira reiniciar a configuração!",
+        "reference": "message"
+    },
+    {
+        "content": "Eu não sei o que é `{user_input}`! Eu só aceito `sim` ou `não`!",
+        "reference": "message"
+    }
+]

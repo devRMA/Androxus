@@ -369,6 +369,9 @@ class Androxus(commands.Bot):
             path = get_path_from_file(f'{ctx.command.name}.json', f'json/languages/{language}/commands/')
         with open(path, encoding='utf-8') as file:
             messages_raw = load(file)
+        is_list = isinstance(messages_raw, list)
+        if not is_list:
+            messages_raw = [messages_raw]
         for message_raw in messages_raw:
             message = {}
             embed = None
@@ -435,7 +438,7 @@ class Androxus(commands.Bot):
                     discord_embed.set_author(**author)
                 message['embed'] = discord_embed
             messages.append(message)
-        return messages
+        return messages if is_list else messages[0]
 
 
 class _BaseComando(commands.Command):

@@ -1,8 +1,6 @@
-[
-    {
-        "member_no_reason": "You have been kicked from the server {ctx.guild}!",
-        "member_reason": "You have been kicked from the server {ctx.guild}!\nFor the reason: {reason}",
-        "reason_audit_log_no_reason": "Kicked by: {ctx.author}",
-        "reason_audit_log": "Kicked by: {ctx.author} —— Reason: {reason}"
-    }
-]
+{
+    "member_no_reason": "You have been kicked from the server {ctx.guild}!",
+    "member_reason": "You have been kicked from the server {ctx.guild}!\nFor the reason: {reason}",
+    "reason_audit_log_no_reason": "Kicked by: {ctx.author}",
+    "reason_audit_log": "Kicked by: {ctx.author} —— Reason: {reason}"
+}

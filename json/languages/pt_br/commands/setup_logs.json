@@ -1,0 +1,19 @@
+[
+    {
+        "reference": "message",
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar_url}"
+            },
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "title": "Você quer ativar esse log?"
+        }
+    },
+    {
+        "content": "Configurações salvas com sucesso! Para você ver as configurações atuais, use o comando 'configs'!",
+        "reference": "message"
+    }
+]

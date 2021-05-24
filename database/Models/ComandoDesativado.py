@@ -8,6 +8,7 @@ from database.Models.Servidor import Servidor
 
 
 class ComandoDesativado:
+    __slots__ = ('servidor', 'comando')
     servidor: Servidor
     comando: str
 

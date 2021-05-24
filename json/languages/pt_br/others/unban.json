@@ -1,7 +1,6 @@
-[
-    {
-        "old_ban_reason": "Antigo ban:",
-        "reason_audit_log_no_reason": "Ban revogado por: {ctx.author}",
-        "reason_audit_log": "Ban revogado por: {ctx.author} —— Motivo: {reason}"
-    }
-]
+{
+
+    "old_ban_reason": "Antigo ban:",
+    "reason_audit_log_no_reason": "Ban revogado por: {ctx.author}",
+    "reason_audit_log": "Ban revogado por: {ctx.author} —— Motivo: {reason}"
+}

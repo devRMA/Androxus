@@ -5,7 +5,6 @@
 __author__ = 'Rafael'
 
 import asyncio
-from datetime import datetime
 
 import discord
 from discord.ext import commands
@@ -13,8 +12,7 @@ from discord.ext import commands
 from Classes import Androxus
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import get_emoji_dance, get_configs, pegar_o_prefixo, convert_to_string, \
-    convert_to_bool, is_number
+from utils.Utils import get_emoji_dance, get_configs, convert_to_bool, is_number
 from utils.converters import BannedMember
 
 
@@ -27,6 +25,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
 
         """
         self.bot = bot
+        self.sr = ServidorRepository()
 
     @Androxus.comando(name='ban',
                       aliases=['banir'],
@@ -66,9 +65,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             'member': member,
             'reason': reason
         })
-        reasons = (await self.bot.translate(ctx, others_='ban', values_={
+        reasons = await self.bot.translate(ctx, others_='ban', values_={
             'reason': reason
-        }))[0]
+        })
         try:
             if not member.bot:
                 msg = await member.send(reasons['member_no_reason' if reason is None else 'member_reason'])
@@ -125,9 +124,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             'member': member,
             'reason': reason
         })
-        reasons = (await self.bot.translate(ctx, others_='kick', values_={
+        reasons = await self.bot.translate(ctx, others_='kick', values_={
             'reason': reason
-        }))[0]
+        })
         try:
             if not member.bot:
                 msg = await member.send(reasons['member_no_reason' if reason is None else 'member_reason'])
@@ -167,9 +166,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             'member': member,
             'reason': reason
         })
-        others = (await self.bot.translate(ctx, others_='unban', values_={
+        others = await self.bot.translate(ctx, others_='unban', values_={
             'reason': reason
-        }))[0]
+        })
         erros = await self.bot.translate(ctx, error_='unban')
         message_successful = messages[0 if reason else 1]
         if member.reason:
@@ -198,10 +197,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _change_prefix(self, ctx, new_prefix=get_configs()['default_prefix']):
         if len(new_prefix) <= 20:
-            servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+            servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
             old_prefix = servidor.prefixo
             servidor.prefixo = new_prefix
-            await ServidorRepository().update(self.bot.db_connection, servidor)
+            await self.sr.update(self.bot.db_connection, servidor)
             messages = await self.bot.translate(ctx, values_={
                 'new_prefix': new_prefix,
                 'old_prefix': old_prefix,
@@ -227,10 +226,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _change_lang(self, ctx, new_lang='en_us'):
-        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
         if new_lang.lower() in self.bot.supported_langs:
             servidor.lang = new_lang.lower()
-            await ServidorRepository().update(self.bot.db_connection, servidor)
+            await self.sr.update(self.bot.db_connection, servidor)
             messages = await self.bot.translate(ctx)
             await ctx.send(**messages[0])
         else:
@@ -248,10 +247,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _desativar_sugestao(self, ctx):
         messages = await self.bot.translate(ctx)
-        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
         if servidor.sugestao_de_comando:
             servidor.sugestao_de_comando = False
-            await ServidorRepository().update(self.bot.db_connection, servidor)
+            await self.sr.update(self.bot.db_connection, servidor)
             return await ctx.send(**messages[0])
         else:
             return await ctx.send(**messages[1])
@@ -268,10 +267,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _reativar_sugestao(self, ctx):
         messages = await self.bot.translate(ctx)
-        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
         if not servidor.sugestao_de_comando:
             servidor.sugestao_de_comando = True
-            await ServidorRepository().update(self.bot.db_connection, servidor)
+            await self.sr.update(self.bot.db_connection, servidor)
             return await ctx.send(**messages[0])
         else:
             return await ctx.send(**messages[1])
@@ -301,10 +300,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 return await ctx.send(**erros[1])
             elif not perms.attach_files:
                 return await ctx.send(**erros[2])
-            servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+            servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
             if servidor.channel_id_log is None:
                 servidor.channel_id_log = channel.id
-                await ServidorRepository().update(self.bot.db_connection, servidor)
+                await self.sr.update(self.bot.db_connection, servidor)
                 await ctx.send(**messages[0])
             else:
                 messages = await self.bot.translate(ctx, values_={
@@ -312,19 +311,19 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                     'old_log': servidor.channel_id_log
                 })
                 servidor.channel_id_log = channel.id
-                await ServidorRepository().update(self.bot.db_connection, servidor)
+                await self.sr.update(self.bot.db_connection, servidor)
                 await ctx.send(**messages[1])
         else:
-            servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+            servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
             if servidor.channel_id_log is not None:
                 servidor.channel_id_log = None
-                await ServidorRepository().update(self.bot.db_connection, servidor)
+                await self.sr.update(self.bot.db_connection, servidor)
                 await ctx.send(**messages[2])
             else:
                 return await self.bot.send_help(ctx)
 
     @Androxus.comando(name='setup_logs',
-                      aliases=['logs', 'sl'],
+                      aliases=['logs', 'sl', 'setupLogs'],
                       description='Comando que é usado para configurar os logs.',
                       examples=['``{prefix}setup_logs``',
                                 '``{prefix}sl``'],
@@ -333,103 +332,38 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _setup_logs(self, ctx):
-        # TODO
-        sr = ServidorRepository()
-        servidor = await sr.get_servidor(self.bot.db_connection, ctx.guild.id)
+        servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
+        erros = await self.bot.translate(ctx, error_='setup_logs', values_={
+            'user_input': ''
+        })
         if servidor.channel_id_log is None:
-            return await ctx.reply(f'Você precisa configurar um chat para os logs primeiro!'
-                                   ' Use o comando ``channel_log``')
-
-        def check(message):
-            return message.author == ctx.author
-
-        await ctx.send(f'{ctx.author.mention} Você quer que eu envie as mensagem deleta? (atual: '
-                       f'{convert_to_string(servidor.mensagem_deletada)})(sim/não)')
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            return await ctx.send('Tempo esgotado!')
-        value = convert_to_bool(msg.content)
-        if value is None:
-            return await ctx.send(
-                f'{ctx.author.mention} Eu não sei o que é {msg.content}. Eu só aceito ``sim`` ou ``não``')
-        servidor.mensagem_deletada = value
-
-        await ctx.send(f'{ctx.author.mention} Você quer que eu envie as mensagem editadas? (atual: '
-                       f'{convert_to_string(servidor.mensagem_editada)})(sim/não)')
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            return await ctx.send('Tempo esgotado!')
-        value = convert_to_bool(msg.content)
-        if value is None:
-            return await ctx.send(
-                f'{ctx.author.mention} Eu não sei o que é {msg.content}. Eu só aceito ``sim`` ou ``não``')
-        servidor.mensagem_editada = value
-
-        await ctx.send(f'{ctx.author.mention} Você quer que eu envie quando algum membro mudar o avatar? (atual: '
-                       f'{convert_to_string(servidor.avatar_alterado)})(sim/não)')
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            return await ctx.send('Tempo esgotado!')
-        value = convert_to_bool(msg.content)
-        if value is None:
-            return await ctx.send(
-                f'{ctx.author.mention} Eu não sei o que é {msg.content}. Eu só aceito ``sim`` ou ``não``')
-        servidor.avatar_alterado = value
-
-        await ctx.send(f'{ctx.author.mention} Você quer que eu envie quando algum membro mudar o nome? (atual: '
-                       f'{convert_to_string(servidor.nome_alterado)})(sim/não)')
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            return await ctx.send('Tempo esgotado!')
-        value = convert_to_bool(msg.content)
-        if value is None:
-            return await ctx.send(
-                f'{ctx.author.mention} Eu não sei o que é {msg.content}. Eu só aceito ``sim`` ou ``não``')
-        servidor.nome_alterado = value
-
-        await ctx.send(f'{ctx.author.mention} Você quer que eu envie quando algum membro mudar a tag? (atual: '
-                       f'{convert_to_string(servidor.tag_alterado)})(sim/não)')
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            return await ctx.send('Tempo esgotado!')
-        value = convert_to_bool(msg.content)
-        if value is None:
-            return await ctx.send(
-                f'{ctx.author.mention} Eu não sei o que é {msg.content}. Eu só aceito ``sim`` ou ``não``')
-        servidor.tag_alterado = value
-
-        await ctx.send(f'{ctx.author.mention} Você quer que eu envie quando algum membro de nick? (atual: '
-                       f'{convert_to_string(servidor.nick_alterado)})(sim/não)')
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            return await ctx.send('Tempo esgotado!')
-        value = convert_to_bool(msg.content)
-        if value is None:
-            return await ctx.send(
-                f'{ctx.author.mention} Eu não sei o que é {msg.content}. Eu só aceito ``sim`` ou ``não``')
-        servidor.nick_alterado = value
-
-        await ctx.send(
-            f'{ctx.author.mention} Você quer que eu envie quando algum cargo, de algum membro, for alterado? (atual: '
-            f'{convert_to_string(servidor.role_alterado)})(sim/não)')
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=30)
-        except asyncio.TimeoutError:
-            return await ctx.send('Tempo esgotado!')
-        value = convert_to_bool(msg.content)
-        if value is None:
-            return await ctx.send(
-                f'{ctx.author.mention} Eu não sei o que é {msg.content}. Eu só aceito ``sim`` ou ``não``')
-        servidor.role_alterado = value
-        await sr.update(self.bot.db_connection, servidor)
-        return await ctx.send(f'{ctx.author.mention} configurações feitas com sucesso! Para você ver todas as'
-                              ' configurações, digite "configs"')
+            return await ctx.send(**erros[0])
+        messages = await self.bot.translate(ctx)
+        others = await self.bot.translate(ctx, others_='setup_logs', values_={
+            'ativado': self.bot.get_emoji('ativado'),
+            'desativado': self.bot.get_emoji('desativado')
+        })
+        for field_name, attr in others['logs_attr'].items():
+            message = messages[0].copy()
+            message['embed'] = messages[0]['embed'].copy()
+            message['embed'].add_field(name=field_name, value='** **', inline=False)
+            message['embed'].add_field(name=others['Now'], value=others[str(getattr(servidor, attr))], inline=False)
+            await ctx.send(**message)
+            try:
+                msg_user = await self.bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=30)
+            except asyncio.TimeoutError:
+                return await ctx.send(**erros[1])
+            value = convert_to_bool(msg_user.content)
+            if value is None:
+                erros = await self.bot.translate(ctx, error_='setup_logs', values_={
+                    'user_input': msg_user.content
+                })
+                return await ctx.send(**erros[2])
+            setattr(servidor, attr, value)
+            if ctx.channel.permissions_for(ctx.me).manage_messages:
+                await ctx.channel.purge(limit=2, check=lambda m: m.author in [ctx.me, ctx.author])
+        await self.sr.update(self.bot.db_connection, servidor)
+        return await ctx.send(**messages[1])
 
     @Androxus.comando(name='clear',
                       aliases=['limpar', 'purge'],

@@ -398,8 +398,8 @@ def convert_to_bool(argument):
 
     """
     lowered = argument.lower()
-    strings_true = ('sim', 'yes', 'true', '1', 'ativo', 'on')
-    strings_false = ('não', 'nao', 'no', 'false', '0', 'desativo', 'off')
+    strings_true = ('sim', 'yes', 'true', '1', 'ativo', 'on', 'active')
+    strings_false = ('não', 'nao', 'no', 'false', '0', 'desativo', 'off', 'deactivated')
     for string in strings_true:
         if string.startswith(lowered):
             return True
