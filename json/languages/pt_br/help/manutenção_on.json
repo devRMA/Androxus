@@ -1,0 +1,9 @@
+{
+    "description": "Ativa o modo de manutenção do bot.\nNinguém vai conseguir usar os comandos, e o tratamento de erro é desligado.",
+    "examples": [
+        "`{prefix}man_on`",
+        "`{prefix}manutenção_on`"
+    ],
+    "how_to_use": "`{prefix}manutenção_on`",
+    "perm_user": "administrar a conta do bot"
+}

@@ -1,0 +1,58 @@
+[
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "author": {
+                "name": "{bot.user.name}",
+                "icon_url": "{bot.user.avatar.url}"
+            },
+            "fields": [
+                {
+                    "inline": false,
+                    "name": "**Possiveis soluções:**",
+                    "value": "```ini\n[•] Veja se você não digitou algo errado.\n[•] Você quis dizer '{suggestion}'?```"
+                }
+            ],
+            "color": "16711680",
+            "timestamp": "now",
+            "type": "rich",
+            "description": "Desculpe, mas não achei a ajuda para o comando `{command_name}`.",
+            "title": "Comando não encontrado {sad}."
+        }
+    },
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "author": {
+                "name": "{bot.user.name}",
+                "icon_url": "{bot.user.avatar.url}"
+            },
+            "fields": [
+                {
+                    "inline": false,
+                    "name": "**Possiveis soluções:**",
+                    "value": "```ini\n[•] Veja se você não digitou algo errado.```"
+                }
+            ],
+            "color": "16711680",
+            "timestamp": "now",
+            "type": "rich",
+            "description": "Desculpe, mas não achei a ajuda para o comando `{command_name}`.",
+            "title": "Comando não encontrado {sad}."
+        }
+    }
+]

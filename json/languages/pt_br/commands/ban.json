@@ -7,16 +7,16 @@
         "embed": {
             "footer": {
                 "text": "{ctx.author}",
-                "icon_url": "{ctx.author.avatar_url}"
+                "icon_url": "{ctx.author.avatar.url}"
             },
             "author": {
                 "name": "{ctx.me.name}",
-                "icon_url": "{ctx.me.avatar_url}"
+                "icon_url": "{ctx.me.avatar.url}"
             },
             "color": "random",
             "timestamp": "now",
             "type": "rich",
-            "description": "Usuário: {member}\nId: {member.id}\nMotivo: {reason}",
+            "description": "Usuário: {member}\nId: {member_id}\nMotivo: {reason}",
             "title": "{banned} Usuário banido!"
         }
     },
@@ -28,16 +28,16 @@
         "embed": {
             "footer": {
                 "text": "{ctx.author}",
-                "icon_url": "{ctx.author.avatar_url}"
+                "icon_url": "{ctx.author.avatar.url}"
             },
             "author": {
                 "name": "{ctx.me.name}",
-                "icon_url": "{ctx.me.avatar_url}"
+                "icon_url": "{ctx.me.avatar.url}"
             },
             "color": "random",
             "timestamp": "now",
             "type": "rich",
-            "description": "Usuário: {member}\nId: {member.id}",
+            "description": "Usuário: {member}\nId: {member_id}",
             "title": "{banned} Usuário banido!"
         }
     }

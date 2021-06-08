@@ -1,0 +1,9 @@
+{
+    "description": "Executa um código em python.",
+    "examples": [
+        "`{prefix}e` `await ctx.send('opa :)')`",
+        "`{prefix}eval` `1 + 1`"
+    ],
+    "how_to_use": "`{prefix}eval` `<código>`",
+    "perm_user": "administrar a conta do bot"
+}

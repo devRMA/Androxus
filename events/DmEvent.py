@@ -21,7 +21,7 @@ class DmEvent(commands.Cog):
                                    'Você pode usar meus comandos aqui sem precisar do prefixo!\n'
                                    'Para saber todos os meus comandos, digite `cmds`!\n'
                                    'Para me adicionar num servidor, digite `invite`!\n'
-                                   f'{self.bot.emoji("love")}')
+                                   f'{self.bot.get_emoji("love")}')
 
 
 def setup(bot):

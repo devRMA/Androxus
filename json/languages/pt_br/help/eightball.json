@@ -1,0 +1,8 @@
+{
+    "description": "Consulta o sábio 8ball.",
+    "examples": [
+        "`{prefix}8ball` `Existe alguém mais lindo do que eu?`",
+        "`{prefix}eightball` `Vou ganhar na loteria este ano?`"
+    ],
+    "how_to_use": "`{prefix}8ball` `<pergunta>`"
+}

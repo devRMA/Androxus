@@ -1,0 +1,6 @@
+[
+    {
+        "content": "{atencao} {display_name} não foi você que usou este comando, então você não pode interagir com os botões, caso queria interagir, digite `{ctx.message.content}`!",
+        "ephemeral": true
+    }
+]

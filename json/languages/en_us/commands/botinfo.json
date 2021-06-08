@@ -1,0 +1,110 @@
+[
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "fields": [
+                {
+                    "name": ":calendar: Date I was created:",
+                    "value": "`{created_at}`",
+                    "inline": true
+                },
+                {
+                    "name": ":older_adult: I was created:",
+                    "value": "`{age}`",
+                    "inline": true
+                },
+                {
+                    "name": ":robot: My profile:",
+                    "value": "`{bot.user}`",
+                    "inline": true
+                },
+                {
+                    "name": ":id: My id:",
+                    "value": "`{bot.user.id}`",
+                    "inline": true
+                },
+                {
+                    "name": "{owner_emoji} My creator:",
+                    "value": "`{owner}`",
+                    "inline": true
+                },
+                {
+                    "name": "{pato} How many servers are using me:",
+                    "value": "`{guilds}`",
+                    "inline": true
+                },
+                {
+                    "name": "{parrot} How many people have access to me:",
+                    "value": "`{users}`",
+                    "inline": true
+                },
+                {
+                    "name": ":ping_pong: API latency:",
+                    "value": "`{api_ping}ms`",
+                    "inline": true
+                },
+                {
+                    "name": "{database} Database latency:",
+                    "value": "`{db_ping}`",
+                    "inline": true
+                },
+                {
+                    "name": "{loading} CPU usage:",
+                    "value": "`{cpu_usage}%`",
+                    "inline": true
+                },
+                {
+                    "name": ":frog: RAM usage:",
+                    "value": "`{ram_usage}Mb/512Mb`",
+                    "inline": true
+                },
+                {
+                    "name": "{discordpy} Discord.py version:",
+                    "value": "`{dpy_version}`",
+                    "inline": true
+                },
+                {
+                    "name": "{python} Python version:",
+                    "value": "`{py_version}`",
+                    "inline": true
+                },
+                {
+                    "name": ":bank: Database I'm using::",
+                    "value": "`{db}`",
+                    "inline": true
+                },
+                {
+                    "name": ":desktop: How many commands do I have:",
+                    "value": "`{commands}`",
+                    "inline": true
+                },
+                {
+                    "name": ":stopwatch: When I started:",
+                    "value": "`{uptime}`",
+                    "inline": true
+                },
+                {
+                    "name": ":watch: Last update I had was:",
+                    "value": "`{last_att}`",
+                    "inline": true
+                }
+            ],
+            "author": {
+                "name": "{bot.user.name}",
+                "icon_url": "{bot.user.avatar.url}"
+            },
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "description": "If you want to know all my commands, use `{prefix}help`!",
+            "title": "{info} Details about me!"
+        }
+    }    
+]

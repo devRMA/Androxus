@@ -1,0 +1,10 @@
+{
+    "description": "Eu vou converter moedas, com a cotação atual e ainda dizer se a moeda valorizou ou desvalorizou com base no valor do último comando usado!",
+    "examples": [
+        "`{prefix}money`",
+        "`{prefix}ce` `10`",
+        "`{prefix}ce` `eur` `20`",
+        "`{prefix}ce` `eur` `usd` `30`"
+    ],
+    "how_to_use": "`{prefix}money` `[moeda base (padrão=USD)]` `[moeda final (padrão=BRL)]` `[quantidade (padrão=1)]`"
+}

@@ -1,4 +1,3 @@
-
 [
     {
         "content": "{ctx.author.mention} deleted {deleted} messages!",

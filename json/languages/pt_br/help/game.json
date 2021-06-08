@@ -1,0 +1,9 @@
+{
+    "description": "Muda o meu status.",
+    "examples": [
+        "`{prefix}game`",
+        "`{prefix}game` `olá mundo!`"
+    ],
+    "how_to_use": "`{prefix}ativar_erros` `[texto (padrão = alterando)]`",
+    "perm_user": "administrar a conta do bot"
+}

@@ -37,7 +37,7 @@ class ErrorCommands(commands.Cog):
         if isinstance(error, ignored):
             return
         elif isinstance(error, errors.NotOwner):
-            return await ctx.send(f'{ctx.author.mention} você não é meu criador {self.bot.emoji("no_no")}')
+            return await ctx.send(f'{ctx.author.mention} você não é meu criador {self.bot.get_emoji("no_no")}')
         elif isinstance(error, errors.MissingRequiredArgument):
             return await self.bot.send_help(ctx)
         elif isinstance(error, MultipleResults):
@@ -65,7 +65,7 @@ class ErrorCommands(commands.Cog):
                                       'comando de novo!')
         elif isinstance(error, errors.NoPrivateMessage):
             return await ctx.send(
-                f'{ctx.author.mention} Este comando só pode ser usado num servidor! {self.bot.emoji("atencao")}')
+                f'{ctx.author.mention} Este comando só pode ser usado num servidor! {self.bot.get_emoji("atencao")}')
         elif isinstance(error, errors.BotMissingPermissions):
             if len(error.missing_perms) == 1:
                 permissoes = error.missing_perms[0]
@@ -73,7 +73,7 @@ class ErrorCommands(commands.Cog):
                 permissoes = ', '.join(error.missing_perms)
             return await ctx.send(
                 f'{ctx.author.mention} Eu não posso executar este comando, pois não tenho permissão de ' +
-                f'``{permissoes}`` neste servidor! {self.bot.emoji("sad")}')
+                f'``{permissoes}`` neste servidor! {self.bot.get_emoji("sad")}')
         elif isinstance(error, errors.CheckFailure):
             return await ctx.send(f'{ctx.author.mention} Você precisa ter permissão de `{ctx.command.perm_user}`'
                                   ' para usar este comando! ')
@@ -127,23 +127,23 @@ class ErrorCommands(commands.Cog):
                                f'Tente novamente em {error.retry_after:.2f} segundos.')
         elif isinstance(error, DuplicateBlacklist):
             await ctx.send(
-                f'{self.bot.emoji("atencao")} {ctx.author.mention} Essa pessoa já está na blacklist!')
+                f'{self.bot.get_emoji("atencao")} {ctx.author.mention} Essa pessoa já está na blacklist!')
         elif isinstance(error, DuplicateComandoDesativado):
             await ctx.send(
-                f'{self.bot.emoji("atencao")} {ctx.author.mention} Esse comando já está desativado!')
+                f'{self.bot.get_emoji("atencao")} {ctx.author.mention} Esse comando já está desativado!')
         elif isinstance(error, ComandoDesativadoNotFound):
             await ctx.send(
-                f'{self.bot.emoji("atencao")} {ctx.author.mention} Esse comando já está ativado!')
+                f'{self.bot.get_emoji("atencao")} {ctx.author.mention} Esse comando já está ativado!')
         elif isinstance(error, DuplicateComandoPersonalizado):
             await ctx.send(
-                f'{self.bot.emoji("atencao")} {ctx.author.mention} Esse comando já está cadastrado!')
+                f'{self.bot.get_emoji("atencao")} {ctx.author.mention} Esse comando já está cadastrado!')
         elif isinstance(error, DuplicateServidor):
             pass
         else:
             try:
                 return await ctx.send(
                     f'Ocorreu o erro:```py\n{error}```Na execução do comando ```{ctx.message.content}```'
-                    f'{self.bot.emoji("sad")}')
+                    f'{self.bot.get_emoji("sad")}')
             except:
                 print(f'Ocorreu o erro: {error}\nNa execução do comando {ctx.message.content}')
 

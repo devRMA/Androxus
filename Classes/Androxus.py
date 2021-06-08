@@ -14,19 +14,22 @@ from sys import version
 from traceback import format_exc
 
 import discord
+from aiohttp.client import ClientSession
 from asyncpg.pool import Pool
+from discord import AllowedMentions, Colour
 from discord.ext import commands, tasks
+from discord.ext.commands.view import StringView
+from discord.utils import utcnow
 from requests import get
 
-from EmbedModels.embedHelpCategory import embed_help_category
 from database.Factories.ConnectionFactory import ConnectionFactory
 from database.Repositories.BlacklistRepository import BlacklistRepository
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import get_configs, prettify_number, get_path_from_file, pegar_o_prefixo, get_emojis_json
-from utils.Utils import string_similarity, get_most_similar_item
+from utils.Utils import get_configs, prettify_number, get_path_from_file, pegar_o_prefixo, get_emojis_json, pretty_i, \
+    get_most_similar_item, string_similarity
 
 
 def _warn(frase):
@@ -49,22 +52,22 @@ def _load_cogs(bot):
     bot.load_extension('jishaku')
     path_cmds = get_path_from_file('cmds/')
     path_events = get_path_from_file('events/')
-    for filename in listdir(path_cmds):
-        if filename.endswith('.py'):
-            try:
-                bot.load_extension(f'cmds.{filename[:-3]}')  # vai adicionar ao bot
-            except commands.NoEntryPointError:
-                print(f'⚠ - Módulo {filename[:-3]} ignorado! "def setup" não encontrado!!')
-            except:
-                print(f'⚠ - Módulo {filename[:-3]} deu erro na hora de carregar!\n{format_exc()}')
-    for filename in listdir(path_events):  # vai listar todas os arquivos que tem na pasta "events"
-        if filename.endswith('.py'):
-            try:
-                bot.load_extension(f'events.{filename[:-3]}')
-            except commands.NoEntryPointError:
-                pass  # se não achar o def setup
-            except:
-                print(f'⚠ - Módulo {filename[:-3]} não foi carregado!\n{format_exc()}')
+    cmds_files = list(map(lambda f: f[:-3], filter(lambda f: f.endswith('.py'), listdir(path_cmds))))
+    events_files = list(map(lambda f: f[:-3], filter(lambda f: f.endswith('.py'), listdir(path_events))))
+    for file in cmds_files:
+        try:
+            bot.load_extension(f'cmds.{file}')  # vai adicionar ao bot
+        except commands.NoEntryPointError:
+            print(f'⚠ - Módulo {file} ignorado! "def setup" não encontrado!!')
+        except:
+            print(f'⚠ - Módulo {file} deu erro na hora de carregar!\n{format_exc()}')
+    for file in events_files:
+        try:
+            bot.load_extension(f'events.{file}')
+        except commands.NoEntryPointError:
+            pass  # se não achar o def setup
+        except:
+            print(f'⚠ - Módulo {file} não foi carregado!\n{format_exc()}')
 
 
 class Androxus(commands.Bot):
@@ -75,7 +78,8 @@ class Androxus(commands.Bot):
     server_log: discord.TextChannel = None
     maintenance_mode: bool = False
     db_connection: Pool = None
-    supported_langs = []
+    supported_langs: list = []
+    session: ClientSession = None
 
     def __init__(self, *args, **kwargs):
         # Intents do discord.py 1.5.0
@@ -91,6 +95,8 @@ class Androxus(commands.Bot):
         kwargs['owner_id'] = configs['owners'] if len(configs['owners']) > 1 else configs['owners'][0]
         kwargs['case_insensitive'] = True
         kwargs['intents'] = intents
+        kwargs['strip_after_prefix'] = True
+        kwargs['activity'] = discord.Game(name='Starting ...')
         # iniciando o bot
         super().__init__(*args, **kwargs)
         _load_cogs(self)
@@ -120,10 +126,65 @@ class Androxus(commands.Bot):
             self.server_log = self.get_channel(self.configs['channels_log']['servers'])
             self.db_connection = await ConnectionFactory.get_connection()
             self.supported_langs = listdir('json/languages/')
+            self.session = self.http._HTTPClient__session
+            self._status = cycle(['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
+                                  'Eu estou divertindo {servers} servidores!',
+                                  'Estou divertindo {pessoas} pessoas',
+                                  'Estou ouvindo {channels} chats!',
+                                  'Caso você precise de ajuda, basta me mencionar!',
+                                  '🤔 como que eu estou "jogando" se eu sou um bot?',
+                                  'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
+                                  'Caso você queira ver meu código fonte, use o comando "source"!',
+                                  'Para saber todos os meus comandos, digite "cmds"!',
+                                  'Para obter mais informações sobre um comando, use o comando "help comando"!'
+                                  ])
+
+            def send_message_mod(
+                    channel_id,
+                    content,
+                    *,
+                    tts=False,
+                    embed=None,
+                    nonce=None,
+                    allowed_mentions=None,
+                    message_reference=None,
+                    components=None,
+            ):
+                from discord.http import Route
+                r = Route('POST', '/channels/{channel_id}/messages', channel_id=channel_id)
+                payload = {}
+
+                if content:
+                    payload['content'] = content
+
+                if tts:
+                    payload['tts'] = True
+
+                if embed:
+                    payload['embed'] = embed
+
+                if nonce:
+                    payload['nonce'] = nonce
+
+                if allowed_mentions:
+                    payload['allowed_mentions'] = allowed_mentions
+
+                if message_reference:
+                    payload['message_reference'] = message_reference
+
+                if components:
+                    payload['components'] = components
+                print(pretty_i(payload))
+                return self.http.request(r, json=payload)
+
+            # self.http.send_message = send_message_mod
             print(('-=' * 10) + 'Androxus Online!' + ('-=' * 10))
             print(f'Logado em {self.user}')
             print(f'ID: {self.user.id}')
-            print(f'{len(self.get_all_commands())} comandos!')
+            all_commands = []
+            for group in self.get_all_groups():
+                all_commands += group.commands
+            print(f'{len(all_commands)} comandos!')
             print(f'{len(set(self.get_all_members()))} usuários!')
             print(f'{len(self.guilds)} servidores!')
             print(f'Versão do discord.py: {discord.__version__}')
@@ -138,8 +199,8 @@ class Androxus(commands.Bot):
         if (not self.is_ready()) or (self.db_connection is None):
             return
         ctx = await self.get_context(message)
-        banido = (await BlacklistRepository().get_pessoa(self.db_connection, ctx.author.id))[0]
-        if message.is_system() or not permissions.can_send(ctx) or ctx.author.bot or banido:
+        banned = (await BlacklistRepository().get_pessoa(self.db_connection, ctx.author.id))[0]
+        if message.is_system() or not permissions.can_send(ctx) or ctx.author.bot or banned:
             return
         try:
             permissions.is_owner(ctx)
@@ -147,174 +208,199 @@ class Androxus(commands.Bot):
             # se a pessoa não for dona do bot, e ele estiver em manutenção, simplesmente ignora a mensagem
             if self.maintenance_mode:
                 return
-        servidor = await ServidorRepository().get_servidor(self.db_connection, ctx.guild.id) if \
-            ctx.guild is not None else None
-        prefixo = await pegar_o_prefixo(self, message)
+        if not ctx.valid and ctx.prefix:
+            message_without_prefix = message.content.removeprefix(ctx.prefix)
+            view = StringView(message_without_prefix)
+            group = self.get_command_group(view.get_word())
+            if group:
+                original_content = message.content
+                message.content = f'{ctx.prefix}{group.name} {message_without_prefix}'
+                new_ctx = await self.get_context(message)
+                if new_ctx.valid:
+                    ctx = new_ctx
+                message.content = original_content
+        server = await ServidorRepository().get_servidor(self.db_connection, ctx.guild.id) if ctx.guild else None
+        prefixes = await self.get_prefix(message)
+        prefix = prefixes[-1]
         if (f'<@{self.user.id}>' == message.content) or (f'<@!{self.user.id}>' == message.content):
-            await ctx.reply(f'Use o comando ``{prefixo}cmds`` para obter todos os meus comandos!',
-                            mention_author=False)
-            if permissions.can_use_external_emojis(ctx):
-                await ctx.send(self.emoji("hello"))
-            return
-        if (servidor is not None) and ctx.valid:
-            for comando_desativado_obj in await ComandoDesativadoRepository().get_commands(self.db_connection,
-                                                                                           servidor):
-                comando_desativado = self.get_command(comando_desativado_obj.comando.lower())
-                if comando_desativado.name == ctx.command.name:
-                    return await ctx.reply(f'{self.emoji("no_no")} Este comando '
-                                           'foi desativado por um administrador do servidor!', delete_after=10,
-                                           mention_author=False)
-        channel = message.channel
-        if (servidor is not None) and (ctx.command is None):
+            messages = await self.translate(ctx, help_='mention', values_={
+                'prefix': prefix
+            })
+            return await ctx.send(**messages[0])
+        if server and ctx.valid:
+            for cmd_disabled in await ComandoDesativadoRepository().get_commands(self.db_connection, server):
+                if self.get_command(cmd_disabled.comando.lower()).name == ctx.command.name:
+                    erros = await self.translate(ctx, error_='cmd_disabled', values_={
+                        'no_no': self.get_emoji('no_no')
+                    })
+                    return await ctx.send(**erros[0])
+        if server and not ctx.valid:
             # vai ver se a pessoa usou algum comando personalizado
-            for comando_personalizado in await ComandoPersonalizadoRepository().get_commands(self.db_connection,
-                                                                                             servidor):
-                if comando_personalizado.comando.lower() in message.content.lower():
-                    enviar_mensagem = True
-                    if not comando_personalizado.in_text and (not message.content.lower() ==
-                                                                  comando_personalizado.comando.lower()):
-                        enviar_mensagem = False
-                    if enviar_mensagem:
-                        resposta = comando_personalizado.resposta
-                        variaveis = {
-                            '{author_mention}': message.author.mention,
+            for cmd_pers in await ComandoPersonalizadoRepository().get_commands(self.db_connection, server):
+                if cmd_pers.comando.lower() in message.content.lower():
+                    send_message = True
+                    if not cmd_pers.in_text and (not message.content.lower() == cmd_pers.comando.lower()):
+                        send_message = False
+                    if send_message:
+                        answer = cmd_pers.resposta
+                        variables = {
                             '{author_name}': message.author.name,
                             '{author_nametag}': str(message.author),
                             '{author_nick}': message.author.display_name,
+                            '{author_mention}': message.author.mention,
                             '{author_id}': message.author.id,
                             '{channel_mention}': message.channel.mention,
                             '{channel_name}': message.channel.name
                         }
-                        for key_value in variaveis.items():
+                        for key, value in variables.items():
                             # estamos dando um replace em vez de .format
                             # pois, se der um .format e o usuário colocou um {abc} por exemplo
                             # iria dar erro, pois eu não estaria passando o valor de abc
-                            resposta = resposta.replace(key_value[0], str(key_value[-1]))
-                        return await channel.send(resposta)
+                            answer = answer.replace(key, str(value))
+                        return await ctx.send(answer)
         if not ctx.valid:
-            if isinstance(message.channel, discord.DMChannel):
+            if isinstance(ctx.channel, discord.DMChannel) or not server or not ctx.prefix:
                 return
-            if not message.content.startswith(prefixo):
+            filtered_message = message.content.removeprefix(ctx.prefix)
+            if filtered_message[0] not in ascii_letters:
                 return
-            # vai pegar toda a mensagem, depois do prefixo
-            comando = message.content.lower()[len(prefixo):]
-            if len(comando) == 0:
+            if server.sugestao_de_comando:
+                all_names = []
+                for cmd_name, cmd in self.all_commands.items():
+                    try:
+                        if await cmd.can_run(ctx):
+                            all_names.append(cmd_name)
+                    except:
+                        pass
+                    if isinstance(cmd, commands.core.Group):
+                        for cmd2_name, cmd2 in cmd.all_commands.items():
+                            try:
+                                if await cmd2.can_run(ctx):
+                                    all_names.append(cmd2_name)
+                            except:
+                                pass
+                command_name = filtered_message.split(' ')[0]
+                all_names = list(set(all_names))
+                suggestion = get_most_similar_item(command_name, all_names)
+                use_suggestion = False
+                messages = await self.translate(ctx, error_='find_command', values_={
+                    'sad': self.get_emoji('sad'),
+                    'suggestion': suggestion,
+                    'command_name': command_name,
+                    'prefix': prefix
+                })
+                # se a sugestão for pelo menos 50% semelhante ao comando
+                if suggestion is not None and string_similarity(command_name, suggestion) >= 0.5:
+                    use_suggestion = True
+                return await ctx.send(**messages[0 if use_suggestion else 1])
+            else:
                 return
-            # se o primeiro caracter da mensagem, não for uma letra
-            if comando[0] not in ascii_letters:
-                return
-            comando = comando.split(' ')[0]
-            mostrar_erro = servidor.sugestao_de_comando
-            commands = []
-            for command in self.get_all_commands():
-                if comando.lower() == command.category:
-                    e = await embed_help_category(self, ctx, comando)
-                    return await ctx.reply(embed=e, mention_author=False)
-                commands.append(command.name)
-                commands.append(command.category)
-                for alias in command.aliases:
-                    commands.append(alias)
-            if mostrar_erro:
-                msg = f'{self.emoji("sad")} eu não achei consegui ' \
-                      f'achar o comando "{comando}".'
-                sugestao = get_most_similar_item(comando, commands)
-                if sugestao is not None:
-                    # se a sugestão for pelo menos 40% semelhante ao comando
-                    if string_similarity(comando, sugestao) >= 0.4:
-                        msg += f'\nVocê quis dizer ``{sugestao}``?'
-                msg += f'\nPara desativar esta mensagem, use o comando ``desativar_sugestão``'
-                return await ctx.reply(msg, delete_after=10, mention_author=False)
-        await self.process_commands(message)
+        await self.invoke(ctx)
+
+    def get_command(self, name):
+        """
+
+        Args:
+            name (str): Nome do comando
+
+        Returns:
+            discord.ext.command.Command
+
+        """
+        command = super().get_command(name)
+        if command is None:
+            for group in self.get_all_groups():
+                command = super().get_command(f'{group.name} {name}')
+                if command is not None:
+                    break
+        return command
+
+    def get_command_group(self, command_name):
+        """
+
+        Args:
+            command_name (str): Nome do comando
+
+        Returns:
+            discord.ext.command.Group
+
+        """
+        command = self.get_command(command_name)
+        if command:
+            return command.parent
+        return None
 
     @tasks.loop(minutes=1)
     async def _change_status(self):  # loop que vai ficar alterando o status do bot
         if self.mudar_status:
-            # lista com os status
-            status = cycle(['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
-                            'Eu estou divertindo {servers} servidores!',
-                            'Estou divertindo {pessoas} pessoas',
-                            'Estou ouvindo {channels} chats!',
-                            'Caso você precise de ajuda, basta me mencionar!',
-                            '🤔 como que eu estou "jogando" se eu sou um bot?',
-                            'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
-                            'Caso você queira ver meu código fonte, use o comando "source"!',
-                            'Para saber todos os meus comandos, digite "cmds"!',
-                            'Para obter mais informações sobre um comando, use o comando "help comando"!'
-                            ])
-            status_escolhido = next(status)  # escolhe o próximo status
+            status_escolhido = next(self._status)  # escolhe o próximo status
             status_escolhido = status_escolhido.format(servers=prettify_number(len(self.guilds)),
                                                        pessoas=prettify_number(len(self.users)),
                                                        channels=prettify_number(len(set(self.get_all_channels())))
                                                        )
             await self.change_presence(activity=discord.Game(name=status_escolhido))
 
-    async def is_owner(self, user: discord.User):
+    async def is_owner(self, user):
         if user.id in self.configs['owners']:
             return True
 
         return await super().is_owner(user)
 
-    @staticmethod
-    def get_all_categories():
-        categories = [c[0] for c in get_emojis_json()['categories'].items()]
-        # é retornado uma copia da lista só por segurança
-        return sorted(list(set(categories)).copy())
+    def get_all_groups(self):
+        """
 
-    def is_category(self, argument):
-        for category in self.get_all_categories():
-            if argument.lower() == category.lower():
-                return True
-        return False
+        Returns:
+            List[discord.ext.command.Group]
 
-    def get_commands_from_category(self, category):
-        commands_from_category = []
-        if self.is_category(category):
-            for cog in self.cogs:
-                for command in self.get_cog(cog).get_commands():
-                    if hasattr(command, 'category') and (command.category == category) and (not command.hidden):
-                        commands_from_category.append(command)
-        return sorted(commands_from_category.copy(), key=lambda c: c.name)
+        """
+        groups = filter(lambda c: isinstance(c, commands.core.Group) and c.name.lower() != 'jishaku',
+                        self.commands)
+        return sorted(groups, key=lambda c: c.name)
 
-    def get_emoji_from_category(self, category):
-        category = category.lower()
-        if self.is_category(category):
-            try:
-                return get_emojis_json()['categories'][category]
-            except KeyError:
-                return ''
-        return ''
+    def get_all_commands(self):
+        """
+
+        Returns:
+            List[discord.ext.command.Command]
+
+        """
+        all_commands = []
+        for group in self.get_all_groups():
+            all_commands += group.commands
+        return all_commands
 
     @staticmethod
-    def emoji(emoji_name):
+    def get_emoji_from_group(group_name):
         """
 
         Args:
-            emoji_name (str): O nome do emoji no .json
+            group_name (str): O nome do grupo
 
         Returns:
-            str: O que achou no json.
+            str
 
         """
-        dict_emojis = get_emojis_json()
-        try:
-            return dict_emojis[emoji_name]
-        except KeyError:
-            try:
-                return dict_emojis['dances'][emoji_name]
-            except KeyError:
-                try:
-                    return dict_emojis['categories'][emoji_name]
-                except KeyError:
-                    return None
+        return get_emojis_json()['categories'].get(group_name.lower(), '')
 
     def get_emoji(self, args):
-        # alteração para aceitar o id,
-        # o nome do emoji que está no configs.json
-        # e o uso do emoji <:nome:1234>
+        """
+
+        Args:
+            args (str): Nome ou id ou nome do emoji que está no configs.json ou o uso do emoji
+
+        Returns:
+            discord.Emoji
+
+        """
         args = str(args).lower()
         if args.isdigit():
             return super().get_emoji(int(args))
-        emoji = self.emoji(args)
+        dict_emojis = get_emojis_json()
+        emoji = dict_emojis['categories'].get(args)
+        if emoji is None:
+            emoji = dict_emojis['dances'].get(args)
+            if emoji is None:
+                emoji = dict_emojis.get(args)
         if emoji is None:
             emoji = args
         emoji_regex = re.compile(r'<a?:.+?:([0-9]{15,21})>')
@@ -323,14 +409,6 @@ class Androxus(commands.Bot):
             emoji_id = int(regex_match.group(1))
             return super().get_emoji(emoji_id)
         return None
-
-    def get_all_commands(self):
-        all_commands = []
-        for cog in self.cogs:
-            for command in self.get_cog(cog).get_commands():
-                if (not command.hidden) and (hasattr(command, 'category')):
-                    all_commands.append(command)
-        return sorted(all_commands.copy(), key=lambda c: c.name)
 
     async def send_help(self, ctx):
         await self.get_command('help')(ctx)
@@ -346,18 +424,31 @@ class Androxus(commands.Bot):
             values_ (dict): Os valores dinamicos do json.
 
         Returns:
-            [dict]: Uma lista de dicts com os parametros para usar no discord.abc.Messageable.send
+            Optional[dict]: Uma lista de dicts com os parametros para usar no discord.abc.Messageable.send
 
         """
         if values_ is None:
             values_ = {}
         values_['ctx'] = ctx
         values_['bot'] = ctx.bot
-        language = 'en_us'
-        if ctx.guild:
-            async with ctx.bot.db_connection.acquire() as conn:
-                language = tuple((await conn.fetch('SELECT lang FROM servidor WHERE serverId = $1;', ctx.guild.id)
-                                  )[0])[0]
+
+        def _recursively_format_items(i):
+            if isinstance(i, list):
+                new_iterable = []
+                for c in i:
+                    new_iterable.append(_recursively_format_items(c))
+            elif isinstance(i, dict):
+                new_iterable = {}
+                for k, v in i.items():
+                    new_iterable[k] = _recursively_format_items(v)
+            elif isinstance(i, str):
+                return i.format_map(values_)
+            else:
+                return i
+            return new_iterable
+
+        values_ = DictForFormat(values_)
+        language = await self.get_language(ctx)
         messages = []
         if error_:
             path = get_path_from_file(f'{error_}.json', f'json/languages/{language}/erros/')
@@ -374,101 +465,47 @@ class Androxus(commands.Bot):
             messages_raw = [messages_raw]
         for message_raw in messages_raw:
             message = {}
+            message_raw_formatted = _recursively_format_items(message_raw)
             embed = None
-            for key, value in message_raw.items():
+            for key, value in message_raw_formatted.items():
                 if key == 'embed':
                     embed = value
                 elif key == 'reference':
                     message[key] = ctx.message
                 elif key == 'allowed_mentions':
-                    message[key] = discord.AllowedMentions(**value)
+                    message[key] = AllowedMentions(**value)
                 else:
-                    message[key] = value.format(**values_) if isinstance(value, str) else value
+                    message[key] = value
             if embed is not None:
-                ctor = {}
-                ctor_params = ['title', 'type', 'description', 'url', 'timestamp', 'color', 'type']
-                footer = None
-                image = None
-                thumbnail = None
-                fields = None
-                author = None
                 for key, value in embed.items():
-                    if key in ctor_params:
-                        if key == 'color' and value == 'random':
-                            ctor['color'] = discord.Colour.random()
-                        elif key == 'timestamp' and value == 'now':
-                            ctor['timestamp'] = datetime.utcnow()
+                    if key == 'color':
+                        if value == 'random':
+                            embed[key] = Colour.random().value
                         else:
-                            ctor[key] = value.format(**values_)
-                    elif key == 'footer':
-                        footer = {}
-                        for k2, v2 in value.items():
-                            footer[k2] = v2.format(**values_)
-                    elif key == 'image':
-                        image = {}
-                        for k2, v2 in value.items():
-                            image[k2] = v2.format(**values_)
-                    elif key == 'thumbnail':
-                        thumbnail = {}
-                        for k2, v2 in value.items():
-                            thumbnail[k2] = v2.format(**values_)
-                    elif key == 'fields':
-                        fields = []
-                        for field in value:
-                            temp_dict = {}
-                            for k2, v2 in field.items():
-                                temp_dict[k2] = v2.format(**values_) if isinstance(v2, str) else v2
-                            fields.append(temp_dict)
-                            del temp_dict
-                    elif key == 'author':
-                        author = {}
-                        for k2, v2 in value.items():
-                            author[k2] = v2.format(**values_)
-                discord_embed = discord.Embed(**ctor)
-                if footer is not None:
-                    discord_embed.set_footer(**footer)
-                if image is not None:
-                    discord_embed.set_image(**image)
-                if thumbnail is not None:
-                    discord_embed.set_thumbnail(**thumbnail)
-                if fields is not None:
-                    for field in fields:
-                        discord_embed.add_field(**field)
-                if author is not None:
-                    discord_embed.set_author(**author)
-                message['embed'] = discord_embed
+                            embed[key] = int(value)
+                    elif key == 'timestamp' and value == 'now':
+                        embed[key] = str(utcnow())
+                message['embed'] = discord.Embed.from_dict(embed)
             messages.append(message)
         return messages if is_list else messages[0]
 
+    async def get_language(self, ctx):
+        """
 
-class _BaseComando(commands.Command):
-    def __init__(self, func, **kwargs):
-        super().__init__(func, **kwargs)
-        self.category = kwargs.get('category', 'outros')
-        self.parameters = kwargs.get('parameters', [])
-        self.examples = kwargs.get('examples', [])
-        self.perm_user = kwargs.get('perm_user', None)
-        self.perm_bot = kwargs.get('perm_bot', None)
+        Args:
+            ctx (discord.ext.commands.Context): Contexto da mensagem
+
+        Returns:
+            str: A lingua do servidor, que está registrado no banco de dados, se não tiver, vai retornar o padrão
+
+        """
+        if ctx.guild:
+            lang = (await ServidorRepository().get_servidor(self.db_connection, ctx.guild.id)).lang
+        else:
+            lang = self.configs['default_lang']
+        return lang
 
 
-def comando(*args, **kwargs):
-    """
-    
-    Example:
-        @Androxus.comando(name='comando',
-                          aliases=['alias1', 'alias2'],
-                          description='Descrição do comando',
-                          parameters=['<parâmetro obrigatorio>', '[parâmetro opcional]'],
-                          examples=['`{prefix}comando` `exemplo de uso do comando tal`',
-                                    '`{prefix}alias1` `outro exemplo`'],
-                          # f'Você precisa ter permissão de `{perm_user}` para usar este comando!'
-                          perm_user='permissão que o usuário precisa ter',
-                          # f'Eu preciso ter permissão de `{perm_bot}` para realizar este comando!'
-                          perm_bot='permissão que o bot precisa ter para executar o comando',
-                          category='Categoria do comando',
-                          hidden=False)
-        async def _comando(self, ctx, parametro_obrigatorio, parametro_opcional='valor default')
-            pass
-
-    """
-    return commands.command(*args, **kwargs, cls=_BaseComando)
+class DictForFormat(dict):
+    def __missing__(self, k):
+        return k.join("{}")

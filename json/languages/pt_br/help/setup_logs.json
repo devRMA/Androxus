@@ -1,0 +1,9 @@
+{
+    "description": "Comando que é usado para configurar os logs.",
+    "examples": [
+        "`{prefix}setup_logs`",
+        "`{prefix}setupLogs`"
+    ],
+    "how_to_use": "`{prefix}setup_logs`",
+    "perm_user": "gerenciar mensagens"
+}

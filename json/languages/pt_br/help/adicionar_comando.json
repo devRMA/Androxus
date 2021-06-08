@@ -1,0 +1,9 @@
+{
+    "description": "Cria um comando personalizado!",
+    "examples": [
+        "`{prefix}ac` `\"bom dia\"` `\"{author_nametag} bom dia!\"`",
+        "`{prefix}ac` `\"hello world!\"` `\"olá mundo!\"` `não`"
+    ],
+    "how_to_use": "`{prefix}adicionar_comando` `\"<comando>\"` `\"<resposta>\"` `[ignorar a posição do comando (sim/nao) (padrão: sim)]`",
+    "perm_user": "gerenciar mensagens"
+}

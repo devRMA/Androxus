@@ -1,0 +1,9 @@
+{
+    "description": "Comando que é usado para desativar as sugestões, quando a pessoa usar meu prefixo, com um comando que não existe.",
+    "examples": [
+        "`{prefix}desativar_sugestão`",
+        "`{prefix}ds`"
+    ],
+    "how_to_use": "`{prefix}desativar_sugestão`",
+    "perm_user": "gerenciar mensagens"
+}

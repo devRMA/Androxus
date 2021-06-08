@@ -1,0 +1,14 @@
+{
+    "title": "\uD83D\uDD11 Detalhes sobre o comando `{command_name}`",
+    "description": "Descrição do comando: `{description}`",
+    "how_to_use": "\uD83E\uDD14 **Como usar?**",
+    "example": "\uD83D\uDCD6 Exemplo",
+    "examples": "\uD83D\uDCD6 Exemplos",
+    "aliases": "\uD83D\uDD00 Sinônimos",
+    "perm_user": "Você precisa ter permissão de `{perm_user}` para usar este comando!\n",
+    "perm_bot": "Eu preciso ter permissão de `{perm_bot}` para realizar este comando!",
+    "requirements": "\uD83D\uDCDB Requisitos:",
+    "disabled_command_name": "{atencao} **O comando foi desativado por algum administrador do server!**",
+    "disabled_command_value": "**Se você usar este comando, eu não irei responder!**",
+    "parameters": "{atencao} Não digite <> nem [] - `<>` significa que o parametro é obrigatório e `[]` significa que ele é opcional."
+}

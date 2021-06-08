@@ -14,7 +14,7 @@ from discord.ext import commands
 from discord.ext.commands import BadArgument
 from twemoji_parser import emoji_to_url
 
-from Classes import Androxus
+from EmbedGenerators.HelpGroup import embed_help_group
 from database.Repositories.InformacoesRepository import InformacoesRepository
 from dependencies import currency_exchange
 from utils.Utils import is_number, prettify_number, datetime_format
@@ -23,7 +23,7 @@ from utils.permissions import check_permissions, bot_check_permissions
 EMOJI_REGEX = compile(r'<a?:.+?:([0-9]{15,21})>')
 
 
-class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
+class Uteis(commands.Cog):
     def __init__(self, bot):
         """
 
@@ -33,23 +33,13 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         """
         self.bot = bot
 
-    @Androxus.comando(name='money',
-                      aliases=['money_converter', 'currency_exchange', 'ce', 'mon'],
-                      description='Eu vou converter moedas, com a cotação atual e ainda dizer se a moeda valorizou ou '
-                                  'desvalorizou!',
-                      parameters=['[moeda base (padrão=USD)]',
-                                  '[moeda final (padrão=BRL)]',
-                                  '[quantidade (padrão=1)]'],
-                      examples=['``{prefix}money``\n(Vou mostrar quanto vale 1 dólar em reais)',
-                                '``{prefix}currency_exchange`` ``10``\n(Vou mostrar quanto vale 10 '
-                                'dólares em reais)',
-                                '``{prefix}ce`` ``eur``\n(Vou mostrar quanto vale 1 euro em reais)',
-                                '``{prefix}mo`` ``eur`` ``20``\n(Vou mostrar quanto vale 20 euros em reais)',
-                                '``{prefix}money`` ``usd`` ``eur`` ``50``\n(Vou mostrar quanto vale 50 dólares em '
-                                'euros)',
-                                'Para saber todas as moedas que eu aceito, acesse [este link]'
-                                '(https://github.com/tucnakomet1/Python-Currency-Exchange/blob/master/src/currency_'
-                                'exchange.py#L62)'])
+    @commands.group(name='úteis', case_insensitive=True, invoke_without_command=True, ignore_extra=False,
+                    aliases=['uteis', 'utils'])
+    async def uteis_gp(self, ctx):
+        await ctx.reply(embed=await embed_help_group(ctx), mention_author=False)
+
+    @uteis_gp.command(name='money', aliases=['money_converter', 'moneyconverter', 'currency_exchange',
+                                             'currencyexchange', 'ce'])
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _money(self, ctx, *args):
@@ -121,7 +111,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                               colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.set_footer(text=f'{ctx.author}',
-                         icon_url=ctx.author.avatar_url)
+                         icon_url=ctx.author.avatar.url)
         info = InformacoesRepository()
         # se ainda não tiver essa conversão no banco:
         if await info.get_dado(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}') is None:
@@ -133,10 +123,10 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             await info.update(self.bot.db_connection, f'{m_from.upper()} to {m_to.upper()}', f'{um_valor:.2f}')
         if (ultimo_valor > um_valor) and (float(f'{(ultimo_valor - um_valor):.2f}') > 0.0):
             msg = f'O valor diminuiu {prettify_number((ultimo_valor - um_valor), truncate=True)}! ' \
-                  f'{self.bot.emoji("diminuiu")}'
+                  f'{self.bot.get_emoji("diminuiu")}'
         elif (ultimo_valor < um_valor) and (float(f'{(um_valor - ultimo_valor):.2f}') > 0.0):
             msg = f'O valor aumentou {prettify_number((um_valor - ultimo_valor), truncate=True)}! ' \
-                  f'{self.bot.emoji("aumentou")}'
+                  f'{self.bot.get_emoji("aumentou")}'
         else:
             msg = 'Não teve alteração no valor.'
         embed.add_field(name=f'Com base na última vez que esse comando foi usado:\n{msg}',
@@ -145,13 +135,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                         inline=True)
         await ctx.reply(embed=embed, mention_author=False)
 
-    @Androxus.comando(name='say',
-                      aliases=['fale', 'falar'],
-                      description='Eu vou repetir o que você falar!',
-                      parameters=['[channel (padrão: o chat atual)]', '<frase>'],
-                      examples=['``{prefix}say`` ``Hello World!!``',
-                                '``{prefix}fale`` ``Olá Mundo!``'],
-                      perm_user='gerenciar mensagens')
+    @uteis_gp.command(name='say', aliases=['fale', 'falar', 'speak', 'repeat', 'repita', 'diga'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _say(self, ctx, *, frase=''):
         if len(frase) == 0:
@@ -171,7 +155,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                     channel = ctx
                 if channel is None:
                     return await ctx.send(f'{ctx.author.mention} Não consegui achar o chat que você me informou.'
-                                          f' {self.bot.emoji("sad")}')
+                                          f' {self.bot.get_emoji("sad")}')
             else:
                 channel = ctx
             if channel != ctx:
@@ -192,7 +176,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         except discord.Forbidden:
             return await ctx.send(
                 f'{ctx.author.mention} eu não tenho permissão para enviar mensagem no chat {channel.mention}.'
-                f' {self.bot.emoji("sad")}')
+                f' {self.bot.get_emoji("sad")}')
         if channel != ctx:
             await ctx.send(f'{ctx.author.mention} Mensagem enviada no chat {channel.mention} com sucesso!')
         else:  # se o channel for igual ao ctx
@@ -200,13 +184,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             if await bot_check_permissions(ctx, manage_messages=True):
                 await ctx.message.delete()
 
-    @Androxus.comando(name='traduzir',
-                      aliases=['tradutor', 'traduza', 'translate', 'translator'],
-                      description='Eu vou traduzir alguma frase!',
-                      parameters=['<língua final>', '<frase>'],
-                      examples=['``{prefix}traduzir`` ``pt`` ``Hello world!``',
-                                '``{prefix}translate`` ``en`` ``Olá Mundo!``',
-                                '``{prefix}traduza`` ``pt`` ``Здравствуйте!``'])
+    @uteis_gp.command(name='traduzir', aliases=['tradutor', 'traduza', 'translate', 'translator'])
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _traduzir(self, ctx, dest=None, *, frase=''):
@@ -222,7 +200,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
             if not dest in dests:  # se o "dest" que a pessoa passou não for válido:
                 return await ctx.send(f'Não encontrei nenhuma lingua chamada ``{dest}``!\n' +
                                       'Por favor, verifique se você digitou a abreviação certa!\n' +
-                                      f'{self.bot.emoji("sad")}')
+                                      f'{self.bot.get_emoji("sad")}')
             # anti mention:
             if ctx.message.mentions:  # se tiver alguma menção na mensagem
                 for mention in ctx.message.mentions:
@@ -236,12 +214,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
         else:
             await self.bot.send_help(ctx)
 
-    @Androxus.comando(name='emoji',
-                      aliases=['emojiinfo', 'infoemoji'],
-                      description='Eu vou mostrar alguns detalhes de algum emoji!',
-                      parameters=['<emoji>'],
-                      examples=['``{prefix}emoji`` ``Hello world!``',
-                                '``{prefix}emoji`` ``Olá Mundo!``'])
+    @uteis_gp.command(name='emoji', aliases=['emojiinfo', 'emoji_info', 'infoemoji', 'info_emoji'])
     @commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _emoji(self, ctx, *, args=None):
@@ -266,7 +239,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                                   url=str(emoji.url),
                                   colour=discord.Colour.random(),
                                   timestamp=datetime.utcnow())
-            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar.url)
             embed.set_thumbnail(url=str(emoji.url))
             embed.add_field(name='Tipo do emoji:',
                             value='`Animado`' if emoji.animated else '`Estático`',
@@ -288,7 +261,7 @@ class Uteis(commands.Cog, command_attrs=dict(category='úteis')):
                                     value='** **',
                                     inline=True)
                 embed.add_field(name='Criado em:',
-                                value=f'`{emoji.created_at.strftime("%d/%m/%Y")}`({datetime_format(emoji.created_at)})',
+                                value=f'`{emoji.created_at.strftime("%d/%m/%Y")}`({datetime_format(emoji.created_at, lang="pt_br")})',
                                 inline=True)
         else:
             url = await emoji_to_url(emoji)

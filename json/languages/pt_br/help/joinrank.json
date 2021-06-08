@@ -1,0 +1,8 @@
+{
+    "description": "Eu vou mostrar o rank com os membros mais antigos do servidor.",
+    "examples": [
+        "`{prefix}jr` `{ctx.bot.display_name}`",
+        "`{prefix}jr`"
+    ],
+    "how_to_use": "`{prefix}joinrank` `[membro (padrão: quem usou o comando)]`"
+}

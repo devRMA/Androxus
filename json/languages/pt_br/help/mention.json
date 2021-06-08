@@ -1,0 +1,9 @@
+[
+    {
+        "content": "Use o comando `{prefix}help` para obter todos os meus comandos!",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        }
+    }
+]

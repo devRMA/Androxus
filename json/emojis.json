@@ -6,14 +6,13 @@
     },
     "categories": {
         "administração": "<:staffs:763807585174290452>",
-        "bot_info": "<:bot:763808270426177538>",
         "diversão": "<a:loop_fun:763809373046702110>",
         "info": "<:Info:756712227221930102>",
         "matemática": "<:pi_emoji:763806073227575346>",
         "owner": "<:dev_tag:763812174514487346>",
         "úteis": "<a:disco:763811701589803098>",
         "outros": "<:outro:763812448054018098>",
-        "personalizado": "<:gordin:763875622199623690>"
+        "personalizado": "<:gear:850133070304510002>"
     },
     "dances": {
         "pato": "<a:pato:755774683348992060>",
@@ -36,7 +35,7 @@
         "SquidwardMilos": "<a:SquidwardMilos:755774682174586890>"
     },
     "ah_nao": "<:ah_nao:758003636822474887>",
-    "sad": "<a:sad:755774681008832623>",
+    "sad": "<:pepo_sad:850931214348976169>",
     "banned": "<a:banned:756138595882107002>",
     "info": "<:Info:756712227221930102>",
     "owner": "<:WumpusCrown:756712226978660392>",
@@ -80,5 +79,7 @@
     "calculator": "<:calculator:757079712077053982>",
     "stop": "<:stop:784537453519831042>",
     "red_arrow_left": "<:arrow_red:784543417668468756>",
-    "hacking": "<a:rooHacker:785490491500003338>"
+    "hacking": "<a:rooHacker:785490491500003338>",
+    "discordpy": "<:discordpy:846464538538147860>",
+    "stage": "<:stage:851458310397755422>"
 }

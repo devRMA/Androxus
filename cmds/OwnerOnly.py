@@ -17,6 +17,7 @@ from discord.ext import commands
 from stopwatch import Stopwatch
 
 from Classes import Androxus
+from EmbedGenerators.HelpGroup import embed_help_group
 from database.Models.ComandoDesativado import ComandoDesativado
 from database.Models.ComandoPersonalizado import ComandoPersonalizado
 from database.Models.Servidor import Servidor
@@ -29,7 +30,7 @@ from utils import permissions
 from utils.Utils import get_emoji_dance, datetime_format, get_emojis_json, is_number, prettify_number, pretty_i
 
 
-class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
+class OwnerOnly(commands.Cog):
     # algumas outras funções que só o dono do bot pode usar
     def __init__(self, bot):
         """
@@ -40,35 +41,25 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         """
         self.bot = bot
 
-    @Androxus.comando(name='desativar_erros',
-                      aliases=['desativar_tratamento_de_erro', 'erros_off'],
-                      description='Vou desativar o tratamento de erros.',
-                      examples=['``{prefix}erros_off``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @commands.group(name='owner', case_insensitive=True, invoke_without_command=True, ignore_extra=False,
+                    aliases=['dev_only', 'owner_only', 'dono'])
+    @commands.check(permissions.is_owner)
+    async def owner_gp(self, ctx):
+        await ctx.reply(embed=await embed_help_group(ctx), mention_author=False)
+
+    @owner_gp.command(name='desativar_erros', aliases=['desativar_tratamento_de_erro', 'erros_off'])
     @commands.check(permissions.is_owner)
     async def _desativar_erros(self, ctx):
         self.bot.unload_extension('events.ErrorCommands')
         await ctx.reply('Tratamento de erro desativado!', mention_author=False)
 
-    @Androxus.comando(name='ativar_erros',
-                      aliases=['ativar_tratamento_de_erro', 'erros_on'],
-                      description='Vou reativar o tratamento de erros.',
-                      examples=['``{prefix}erros_on``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='ativar_erros', aliases=['ativar_tratamento_de_erro', 'erros_on'])
     @commands.check(permissions.is_owner)
     async def _ativar_erros(self, ctx):
         self.bot.load_extension('events.ErrorCommands')
         await ctx.reply('Tratamento de erro ativado!', mention_author=False)
 
-    @Androxus.comando(name='game',
-                      aliases=['jogar', 'status'],
-                      description='Muda o meu status.',
-                      parameters=['[frase]'],
-                      examples=['``{prefix}game`` ``olá mundo!``', '``{prefix}game`` ``-1``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='game', aliases=['jogar', 'status'])
     @commands.check(permissions.is_owner)
     async def _game(self, ctx, *, name=None):
         if name is None:
@@ -77,8 +68,8 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                   colour=discord.Colour.random(),
                                   description=get_emoji_dance(),
                                   timestamp=datetime.utcnow())
-            embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
-            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+            embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar.url)
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar.url)
         else:
             self.bot.mudar_status = False
             await self.bot.change_presence(activity=discord.Game(name=name))
@@ -86,29 +77,18 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                   colour=discord.Colour.random(),
                                   description=f'Agora eu estou jogando ``{name}``',
                                   timestamp=datetime.utcnow())
-            embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar_url)
-            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar_url)
+            embed.set_author(name=self.bot.user.name, icon_url=self.bot.user.avatar.url)
+            embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar.url)
         await ctx.reply(embed=embed, mention_author=False)
 
-    @Androxus.comando(name='kill',
-                      aliases=['reboot', 'reiniciar'],
-                      description='Reinicia o bot.',
-                      examples=['``{prefix}reboot``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='kill', aliases=['reboot', 'reiniciar', 'shutdown', 'poweroff'])
     @commands.check(permissions.is_owner)
     async def _kill(self, ctx):
         await ctx.reply(f'Reiniciando {self.bot.get_emoji("loading")}', mention_author=False)
-        await self.bot.logout()
+        await self.bot.close()
         raise SystemExit('Rebooting...')
 
-    @Androxus.comando(name='sql',
-                      aliases=['query', 'query_sql'],
-                      description='Executa uma query sql no banco de dados.',
-                      parameters=['<query sql>'],
-                      examples=['``{prefix}sql`` ``select version();``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='sql', aliases=['query', 'query_sql', 'dbeval'])
     @commands.check(permissions.is_owner)
     async def _sql(self, ctx, *, query=None):
         if query is not None:
@@ -138,7 +118,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             closed_embed = discord.Embed(title=f'Query fechada {emojis["check_verde"]}',
                                          colour=discord.Colour(0xff6961),
                                          timestamp=datetime.utcnow())
-            closed_embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            closed_embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
             try:
                 async with self.bot.db_connection.acquire() as conn:
                     await conn.execute(query)
@@ -146,14 +126,14 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 erro_embed = discord.Embed(title=f'{emojis["atencao"]} Erro ao executar query',
                                            colour=discord.Colour(0xff6961),
                                            timestamp=datetime.utcnow())
-                erro_embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                erro_embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
                 erro_embed.add_field(name='📥 Input',
                                      value=f'```sql\n{query}```',
                                      inline=False)
 
                 msg_erro = '\n'.join(f'- {c}' for c in format_exc().splitlines())
                 if len(msg_erro) <= 1_000:
-                    erro_embed.add_field(name=f'{self.bot.emoji("warning_flag")} Erro',
+                    erro_embed.add_field(name=f'{self.bot.get_emoji("warning_flag")} Erro',
                                          value=f'```diff\n{msg_erro}```',
                                          inline=False)
                 else:
@@ -181,7 +161,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 embed = discord.Embed(title=f'{emojis["check_verde"]} Query executada com sucesso!',
                                       colour=discord.Colour(0xbdecb6),
                                       timestamp=datetime.utcnow())
-                embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
                 embed.add_field(name='📥 Input',
                                 value=f'```sql\n{query}```',
                                 inline=False)
@@ -197,9 +177,9 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                                 select_result.append(tuple(record))
                         select_result = tuple(select_result)
                         if len(select_result) == 1:
-                            select_result_str = pretty_i(select_result[0])
+                            select_result_str = str(pretty_i(select_result[0]))
                         elif len(select_result) > 1:
-                            select_result_str = pretty_i(select_result)
+                            select_result_str = str(pretty_i(select_result))
                         else:
                             select_result_str = '()'
                         if len(select_result_str) <= 1_000:
@@ -254,13 +234,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         if isinstance(body[-1], ast.With):
             self.__insert_returns(body[-1].body)
 
-    @Androxus.comando(name='eval',
-                      aliases=['ev', 'e'],
-                      description='Executa um script em python.',
-                      parameters=['<script>'],
-                      examples=['``{prefix}eval`` ``return \'opa\'``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='eval', aliases=['ev', 'e'])
     @commands.check(permissions.is_owner)
     async def _eval(self, ctx, *, cmd):
         emojis = {
@@ -286,7 +260,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         closed = discord.Embed(title=f'Eval fechada {emojis["check_verde"]}',
                                colour=discord.Colour(0xff6961),
                                timestamp=datetime.utcnow())
-        closed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        closed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
         execute_cmd = ''
         try:
             fn_name = '_eval_function'
@@ -356,7 +330,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             erro_embed = discord.Embed(title=f'{emojis["atencao"]} Erro no comando eval',
                                        colour=discord.Colour(0xff6961),
                                        timestamp=datetime.utcnow())
-            erro_embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+            erro_embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
             erro_embed.add_field(name='📥 Input',
                                  value=f'```py\n{execute_cmd}```',
                                  inline=False)
@@ -391,7 +365,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 e = discord.Embed(title=f'Comando eval executado com sucesso!',
                                   colour=discord.Colour(0xbdecb6),
                                   timestamp=datetime.utcnow())
-                e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+                e.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
                 e.add_field(name='📥 Input',
                             value=f'```py\n{execute_cmd}```',
                             inline=False)
@@ -399,7 +373,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
                 if is_number(str(result)):
                     result_str = prettify_number(str(result))
                 else:
-                    result_str = pretty_i(result)
+                    result_str = str(pretty_i(result))
                 if len(result_str) <= 1_000:
                     e.add_field(name='📤 Output',
                                 value=f'```py\n{result_str}```',
@@ -445,9 +419,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             else:
                 await ctx.message.add_reaction(emojis['ativado'])
 
-    @Androxus.comando(name='blacklist',
-                      aliases=['blacklisted', 'banido'],
-                      hidden=True)
+    @owner_gp.command(name='blacklist', aliases=['blacklisted', 'banido'])
     @commands.check(permissions.is_owner)
     async def _blacklist(self, ctx, *args):
         if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
@@ -463,13 +435,11 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         if not blacklisted[0]:
             msg = f'O usuário <@!{user_id}> pode usar meus comandos! {get_emoji_dance()}'
         else:
-            msg = f'{self.bot.emoji("no_no")} O usuário <@!{user_id}> foi banido de me usar!' + \
-                  f'\nMotivo: `{blacklisted[1]}`\nQuando: `{datetime_format(blacklisted[-1])}`'
+            msg = f'{self.bot.get_emoji("no_no")} O usuário <@!{user_id}> foi banido de me usar!' + \
+                  f'\nMotivo: `{blacklisted[1]}`\nQuando: `{datetime_format(blacklisted[-1], lang="pt_br")}`'
         return await ctx.reply(msg, mention_author=False)
 
-    @Androxus.comando(name='add_blacklist',
-                      aliases=['ab'],
-                      hidden=True)
+    @owner_gp.command(name='add_blacklist', aliases=['ab'])
     @commands.check(permissions.is_owner)
     async def _add_blacklist(self, ctx, *args):
         if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
@@ -491,12 +461,10 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         else:
             motivo = 'nulo'
         await BlacklistRepository().create(self.bot.db_connection, user_id, motivo)
-        return await ctx.reply(f'O usuário <@!{user_id}> não vai poder usar meus comandos! {self.bot.emoji("banido")}'
+        return await ctx.reply(f'O usuário <@!{user_id}> não vai poder usar meus comandos! {self.bot.get_emoji("banido")}'
                                f'\nCom o motivo: {motivo}', mention_author=False)
 
-    @Androxus.comando(name='remove_blacklist',
-                      aliases=['rb', 'whitelist'],
-                      hidden=True)
+    @owner_gp.command(name='remove_blacklist', aliases=['rb', 'whitelist'])
     @commands.check(permissions.is_owner)
     async def _remove_blacklist(self, ctx, *args):
         if ctx.prefix.replace('!', '').replace(' ', '') == self.bot.user.mention:
@@ -511,13 +479,7 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
         await BlacklistRepository().delete(self.bot.db_connection, user_id)
         return await ctx.reply(f'Usuário <@!{user_id}> perdoado! {get_emoji_dance()}', mention_author=False)
 
-    @Androxus.comando(name='manutenção_on',
-                      aliases=['ativar_manutenção', 'man_on'],
-                      description='Ativa o modo "em manutenção" do bot.',
-                      examples=['``{prefix}manutenção_on``',
-                                '``{prefix}ativar_manutenção``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='manutenção_on', aliases=['ativar_manutenção', 'man_on'])
     @commands.check(permissions.is_owner)
     async def _manutencao_on(self, ctx):
         if not self.bot.maintenance_mode:
@@ -525,30 +487,18 @@ class OwnerOnly(commands.Cog, command_attrs=dict(category='owner')):
             self.bot.mudar_status = False
             await self.bot.change_presence(activity=discord.Game(name='Em manutenção!'))
             self.bot.unload_extension('events.ErrorCommands')
-        await ctx.reply(f'Modo manutenção:\n{self.bot.emoji("on")}', mention_author=False)
+        await ctx.reply(f'Modo manutenção:\n{self.bot.get_emoji("on")}', mention_author=False)
 
-    @Androxus.comando(name='manutenção_off',
-                      aliases=['desativar_manutenção', 'man_off'],
-                      description='Desativa o modo "em manutenção" do bot.',
-                      examples=['``{prefix}manutenção_off``',
-                                '``{prefix}desativar_manutenção``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='manutenção_off', aliases=['desativar_manutenção', 'man_off'])
     @commands.check(permissions.is_owner)
     async def _manutencao_off(self, ctx):
         if self.bot.maintenance_mode:
             self.bot.maintenance_mode = False
             self.bot.mudar_status = True
             self.bot.load_extension('events.ErrorCommands')
-        await ctx.reply(f'Modo manutenção:\n{self.bot.emoji("off")}', mention_author=False)
+        await ctx.reply(f'Modo manutenção:\n{self.bot.get_emoji("off")}', mention_author=False)
 
-    @Androxus.comando(name='jsk_docs',
-                      aliases=['docs_jsk', 'help_jsk', 'jsk_help', 'jh', 'dj'],
-                      description='Mostra a documentação do jsk',
-                      examples=['``{prefix}jsk_help``',
-                                '``{prefix}jh``'],
-                      perm_user='administrar a conta do bot',
-                      hidden=True)
+    @owner_gp.command(name='jsk_docs', aliases=['docs_jsk', 'help_jsk', 'jsk_help', 'jh', 'jd'])
     @commands.check(permissions.is_owner)
     async def _jsk_docs(self, ctx):
         await ctx.reply('Docs do jsk:\nhttps://jishaku.readthedocs.io/en/latest/cog.html#commands',

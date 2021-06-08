@@ -1,0 +1,9 @@
+[
+    {
+        "content": "Este servidor não tem icone!",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        }
+    }
+]

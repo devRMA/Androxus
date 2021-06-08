@@ -2,9 +2,7 @@ aiohttp
 asyncio
 asyncpg
 bs4
-discord
-discord.py
-DiscordUtils@git+https://github.com/devRMA/DiscordUtils@master
+discord.py@git+https://github.com/Rapptz/discord.py@master
 emojis
 googletrans
 jellyfish
@@ -18,3 +16,4 @@ requests
 stopwatch.py
 testing.postgresql
 twemoji-parser
+humanize

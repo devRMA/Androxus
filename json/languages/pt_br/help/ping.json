@@ -1,0 +1,9 @@
+{
+    "description": "Mostra as latências atuais.",
+    "examples": [
+        "`{prefix}ping`",
+        "`{prefix}latency`",
+        "`{prefix}latência`"
+    ],
+    "how_to_use": "`{prefix}ping`"
+}

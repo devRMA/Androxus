@@ -37,3 +37,9 @@ class MultipleResults(Exception):
 
     def __init__(self, results):
         self.results = results
+
+
+class Stop(Exception):
+    """
+    Classe usada para parar laços de repetição
+    """

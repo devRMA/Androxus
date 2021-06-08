@@ -16,11 +16,11 @@ from PIL import ImageFont
 from discord.ext import commands
 from py_expression_eval import Parser
 
-from Classes import Androxus
+from EmbedGenerators.HelpGroup import embed_help_group
 from utils.Utils import convert_to_string, prettify_number, is_number
 
 
-class Math(commands.Cog, command_attrs=dict(category='matemática')):
+class Math(commands.Cog):
     def __init__(self, bot):
         """
 
@@ -30,10 +30,12 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
         """
         self.bot = bot
 
-    @Androxus.comando(name='operações',
-                      aliases=['operators', 'operacoes', 'ops'],
-                      description='Todas as operações que eu suporto no comando ``calc``!',
-                      examples=['``{prefix}operações``', '{prefix}ops'])
+    @commands.group(name='matemática', case_insensitive=True, invoke_without_command=True, ignore_extra=False,
+                    aliases=['math', 'matematica'])
+    async def matematica_gp(self, ctx):
+        await ctx.reply(embed=await embed_help_group(ctx), mention_author=False)
+
+    @matematica_gp.command(name='operacoes', aliases=['operators', 'operações', 'operaçoes', 'operacões', 'ops'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _operators(self, ctx):
         # TODO
@@ -65,24 +67,16 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                               description='Todas as operações que eu suporto no comando ``calc``!',
                               timestamp=datetime.utcnow())
         embed.set_author(name=self.bot.user.name,
-                         icon_url=self.bot.user.avatar_url)
+                         icon_url=self.bot.user.avatar.url)
         embed.set_footer(text=f'{ctx.author}',
-                         icon_url=ctx.author.avatar_url)
+                         icon_url=ctx.author.avatar.url)
         for ope_ex in operators.items():  # vai converter de dicionario para lista
             embed.add_field(name=ope_ex[0],
                             value=ope_ex[-1],
                             inline=True)
         await ctx.reply(embed=embed, mention_author=False)
 
-    @Androxus.comando(name='calc',
-                      aliases=['calcular'],
-                      descricao='Eu vou virar uma calculadora! (Caso você queira saber quais operações eu aceito'
-                                ', use o comando ``operações``)',
-                      parameters=['<operação(ões)>'],
-                      examples=['``{prefix}calc`` ``2 + 5 * 2``',
-                                '``{prefix}calcular`` ``(2 + 5) * 2``',
-                                '``{prefix}calc`` ``5 ^ 5``',
-                                '``{prefix}calc`` ``2.5 * 4``'])
+    @matematica_gp.command(name='calc', aliases=['calcular', 'calculate', 'calculator', 'calculadora'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _calc(self, ctx, *args):
         if len(args) == 0:
@@ -104,20 +98,20 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
         except Exception as exception:
             if 'unexpected' in exception.args[0]:
                 await ctx.reply(
-                    f'Parece que há um erro de digitação!\n```{args}```{self.bot.emoji("ah_nao")}')
+                    f'Parece que há um erro de digitação!\n```{args}```{self.bot.get_emoji("ah_nao")}')
                 return
             elif 'undefined variable' in exception.args[0]:
                 variavel_desconhecida = exception.args[0][exception.args[0].find(':') + 2:]
                 await ctx.reply(
-                    f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` {self.bot.emoji("sad")}')
+                    f'Desculpe, mas eu não sei o que é ``{variavel_desconhecida}`` {self.bot.get_emoji("sad")}')
                 return
             elif 'unknown character' in exception.args[0]:
                 await ctx.reply(
-                    f'Desculpe, mas você digitou algum caracter que eu não conheço. {self.bot.emoji("sad")}')
+                    f'Desculpe, mas você digitou algum caracter que eu não conheço. {self.bot.get_emoji("sad")}')
                 return
             elif 'unmatched "()"' in exception.args[0]:
                 await ctx.reply(
-                    f'Pare que você esqueceu de abrir ou fechar algum parêntese! {self.bot.emoji("ah_nao")}')
+                    f'Pare que você esqueceu de abrir ou fechar algum parêntese! {self.bot.get_emoji("ah_nao")}')
                 return
             elif ('parity' in exception.args[0]) or isinstance(exception, TypeError):
                 await ctx.reply('Não consigo resolver está operação, verifique se você digitou tudo certo!')
@@ -130,13 +124,13 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                     raise exception
                 else:
                     return await ctx.reply(
-                        f'{self.bot.emoji("sad")} Ocorreu um erro na hora de executar este comando,' +
+                        f'{self.bot.get_emoji("sad")} Ocorreu um erro na hora de executar este comando,' +
                         f' por favor informe este erro ao meu criador\n```{exception.args[0]}```')
         if len(str(resultado)) >= 400:
             await ctx.reply('O resultado desta operação é tão grande que não consigo enviar a resposta!' +
-                            f'\n{self.bot.emoji("sad")}')
+                            f'\n{self.bot.get_emoji("sad")}')
             return
-        embed = discord.Embed(title=f'{self.bot.emoji("calculator")} Calculadora:',
+        embed = discord.Embed(title=f'{self.bot.get_emoji("calculator")} Calculadora:',
                               colour=discord.Colour.random(),
                               timestamp=datetime.utcnow())
         embed.add_field(name=f'Calculo:',
@@ -145,15 +139,12 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
         embed.add_field(name=f'Resposta:',
                         value=f'```{prettify_number(resultado)}```',
                         inline=False)
-        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar_url}')
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
         await ctx.reply(embed=embed, mention_author=False)
 
-    @Androxus.comando(name='regra_de_tres',
-                      aliases=['regra_de_3', 'r3', 'regradetres'],
-                      description='Eu vou fazer uma regra de três simples!',
-                      parameters=['<operação(ões)>'],
-                      examples=['``{prefix}regra_de_tres``',
-                                '``{prefix}r3``'])
+    @matematica_gp.command(name='regra_de_tres', aliases=['regradetres', 'regra_de_três',
+                                                          'regradetrês', 'regra_de_3', 'r3', 'rule_of_three',
+                                                          'ruleofthree'])
     @discord.ext.commands.max_concurrency(1, commands.BucketType.user)
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _regra_de_tres(self, ctx):
@@ -240,9 +231,9 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                                   f'**x = {prettify_number(resp)}**',
                                       timestamp=datetime.utcnow())
                 embed.set_author(name=self.bot.user.name,
-                                 icon_url=self.bot.user.avatar_url)
+                                 icon_url=self.bot.user.avatar.url)
                 embed.set_footer(text=f'{ctx.author}',
-                                 icon_url=ctx.author.avatar_url)
+                                 icon_url=ctx.author.avatar.url)
                 img = Image.open(f'{path}images/regra_de_tres_direta.png')
                 draw = ImageDraw.Draw(img)
                 font = ImageFont.truetype(f'{path}fonts/helvetica-normal.ttf', 25)
@@ -325,9 +316,9 @@ class Math(commands.Cog, command_attrs=dict(category='matemática')):
                                                   f'**x = {prettify_number(resp)}**',
                                       timestamp=datetime.utcnow())
                 embed.set_author(name=self.bot.user.name,
-                                 icon_url=self.bot.user.avatar_url)
+                                 icon_url=self.bot.user.avatar.url)
                 embed.set_footer(text=f'{ctx.author}',
-                                 icon_url=ctx.author.avatar_url)
+                                 icon_url=ctx.author.avatar.url)
                 img = Image.open(f'{path}images/regra_de_tres_inversa.png')
                 draw = ImageDraw.Draw(img)
                 font = ImageFont.truetype(f'{path}fonts/helvetica-normal.ttf', 25)

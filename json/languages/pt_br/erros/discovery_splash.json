@@ -1,0 +1,9 @@
+[
+    {
+        "content": "Este servidor não tem discovery splash!",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        }
+    }
+]

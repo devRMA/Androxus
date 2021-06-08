@@ -1,0 +1,5 @@
+{
+    "title": "Categoria: {emoji} {group_name}",
+    "description": "Todos os comandos que estão nesta categoria!\nPara obter mais detalhes sobre um comando, digite `{prefix}ajuda comando`!",
+    "field_name": "\uD83D\uDCD6 Comandos:"
+}

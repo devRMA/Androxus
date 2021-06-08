@@ -1,0 +1,9 @@
+{
+    "description": "Eu vou traduzir algum texto!",
+    "examples": [
+        "`{prefix}traduzir` `pt` `Hello World`",
+        "`{prefix}translate` `ru` `Hello World!`",
+        "`{prefix}traduza` `pt` `Здравствуйте`"
+    ],
+    "how_to_use": "`{prefix}traduzir` `<língua final>` `<texto>`"
+}

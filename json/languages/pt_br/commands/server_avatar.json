@@ -1,0 +1,21 @@
+[
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "image": {
+                "url": "{ctx.guild.icon.url}"
+            },
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "title": "Icone deste servidor!"
+        }
+    }    
+]

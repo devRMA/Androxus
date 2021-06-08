@@ -1,0 +1,8 @@
+{
+    "description": "Mostra todos os meus comandos ou detalhes sobre um comando em especifico.",
+    "examples": [
+        "`{prefix}help`",
+        "`{prefix}ajuda` `adicionar_comando`"
+    ],
+    "how_to_use": "`{prefix}help` `[comando/categoria]`"
+}

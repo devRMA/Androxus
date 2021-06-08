@@ -7,7 +7,7 @@
         "embed": {
             "footer": {
                 "text": "{ctx.author}",
-                "icon_url": "{ctx.author.avatar_url}"
+                "icon_url": "{ctx.author.avatar.url}"
             },
             "fields": [
                 {

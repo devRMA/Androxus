@@ -1,0 +1,30 @@
+[
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "fields": [
+                {
+                    "inline": true,
+                    "name": "Prefixos",
+                    "value": "{ctx.me.mention}, `{prefix}`\n(obs: A menção do bot, é um prefixo que todo servidor vai ter)"
+                },
+                {
+                    "inline": true,
+                    "name": "Mensagem de erro quando o comando não for encontrado",
+                    "value": "{sugestao_cmd}"
+                }
+            ],
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "title": "Todas as configurações deste servidor!"
+        }
+    }
+]

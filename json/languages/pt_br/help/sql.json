@@ -1,0 +1,9 @@
+{
+    "description": "Executa uma query sql no meu banco de dados.",
+    "examples": [
+        "`{prefix}sql` `select version()`",
+        "`{prefix}sql` `select * from server where id = 000`"
+    ],
+    "how_to_use": "`{prefix}sql` `<query sql>`",
+    "perm_user": "administrar a conta do bot"
+}

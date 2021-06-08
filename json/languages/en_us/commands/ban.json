@@ -1,4 +1,3 @@
-
 [
     {
         "reference": "message",
@@ -8,11 +7,11 @@
         "embed": {
             "footer": {
                 "text": "{ctx.author}",
-                "icon_url": "{ctx.author.avatar_url}"
+                "icon_url": "{ctx.author.avatar.url}"
             },
             "author": {
                 "name": "{ctx.me.name}",
-                "icon_url": "{ctx.me.avatar_url}"
+                "icon_url": "{ctx.me.avatar.url}"
             },
             "color": "random",
             "timestamp": "now",
@@ -29,11 +28,11 @@
         "embed": {
             "footer": {
                 "text": "{ctx.author}",
-                "icon_url": "{ctx.author.avatar_url}"
+                "icon_url": "{ctx.author.avatar.url}"
             },
             "author": {
                 "name": "{ctx.me.name}",
-                "icon_url": "{ctx.me.avatar_url}"
+                "icon_url": "{ctx.me.avatar.url}"
             },
             "color": "random",
             "timestamp": "now",

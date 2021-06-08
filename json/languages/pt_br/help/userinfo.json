@@ -1,0 +1,9 @@
+{
+    "description": "Eu vou mandar o máximo de informações sobre um usuário.",
+    "examples": [
+        "`{prefix}userinfo` `{bot.user.id}`",
+        "`{prefix}memberinfo` `{bot.user.display_name}`",
+        "`{prefix}ui`"
+    ],
+    "how_to_use": "`{prefix}userinfo` `[usuário (padrão: quem usou o comando)]`"
+}

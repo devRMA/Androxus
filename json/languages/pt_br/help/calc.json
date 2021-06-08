@@ -1,0 +1,9 @@
+{
+    "description": "Eu viro uma calculadora! (Caso você queira saber quais operações eu aceito, use o comando `{prefix}operações`)",
+    "examples": [
+        "`{prefix}calc` `2 + 5 * 2`",
+        "`{prefix}calcular` `(2 + 5) * 2`",
+        "`{prefix}calculator` `5 ^ 5`"
+    ],
+    "how_to_use": "`{prefix}calc` `<operação(ões)>`"
+}

@@ -28,13 +28,13 @@ class GuildsEvents(commands.Cog):
         e = discord.Embed(title=f'📥 Bot foi adicionado no servidor `{guild.name}`!',
                           colour=discord.Colour.green(),
                           timestamp=datetime.utcnow())
-        e.set_footer(text=str(guild.owner), icon_url=guild.owner.avatar_url)
+        e.set_footer(text=str(guild.owner), icon_url=guild.owner.avatar.url)
         if guild.banner:
             e.set_image(url=guild.banner_url)
         if guild.icon:
             e.set_thumbnail(url=guild.icon_url)
         e.add_field(name='Quando o servidor foi criado',
-                        value=f'`{datetime_format(guild.created_at)}`',
+                        value=f'`{datetime_format(guild.created_at, lang="pt_br")}`',
                         inline=True)
         e.add_field(name='Id do servidor',
                         value=f'`{guild.id}`',
@@ -82,13 +82,13 @@ class GuildsEvents(commands.Cog):
         e = discord.Embed(title=f'📤 Bot foi removido do servidor {guild.name}.',
                           colour=discord.Colour.red(),
                           timestamp=datetime.utcnow())
-        e.set_footer(text=str(guild.owner), icon_url=guild.owner.avatar_url)
+        e.set_footer(text=str(guild.owner), icon_url=guild.owner.avatar.url)
         if guild.banner:
             e.set_image(url=guild.banner_url)
         if guild.icon:
             e.set_thumbnail(url=guild.icon_url)
         e.add_field(name='Quando o servidor foi criado',
-                    value=f'``{datetime_format(guild.created_at)}``',
+                    value=f'``{datetime_format(guild.created_at, lang="pt_br")}``',
                     inline=True)
         e.add_field(name='Id do servidor',
                     value=f'``{guild.id}``',

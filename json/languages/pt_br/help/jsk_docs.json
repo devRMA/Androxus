@@ -1,0 +1,9 @@
+{
+    "description": "Mostra a documentação do jsk.",
+    "examples": [
+        "`{prefix}jsk_docs`",
+        "`{prefix}js`"
+    ],
+    "how_to_use": "`{prefix}jsk_docs`",
+    "perm_user": "administrar a conta do bot"
+}

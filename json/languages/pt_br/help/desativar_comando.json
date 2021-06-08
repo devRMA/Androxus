@@ -1,0 +1,9 @@
+{
+    "description": "Desativa algum comando que eu tenho!",
+    "examples": [
+        "`{prefix}desativar_comando` `say`",
+        "`{prefix}dc` `uptime`"
+    ],
+    "how_to_use": "`{prefix}disable_command` `<comando>`",
+    "perm_user": "gerenciar mensagens"
+}

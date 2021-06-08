@@ -7,6 +7,7 @@ __author__ = 'Rafael'
 import datetime
 import string as string_lib
 from datetime import datetime
+from datetime import timezone
 from functools import reduce
 from glob import glob
 from json import loads, load
@@ -15,7 +16,8 @@ from re import compile
 from re import sub
 from typing import List
 
-from dateutil.relativedelta import relativedelta
+from discord.utils import utcnow
+from humanize import i18n, precisedelta
 from jellyfish import jaro_winkler_similarity
 from requests import get
 
@@ -121,7 +123,7 @@ def get_emojis_json():
     """
     path = get_path_from_file('emojis.json', 'json/')
     if path is not None:
-        with open(path) as file:
+        with open(path, encoding='utf-8', mode='r') as file:
             configs = load(file)
         return configs
     else:
@@ -155,140 +157,33 @@ def capitalize(string):
     return new_string
 
 
-def datetime_format(date1, date2=None):
+def datetime_format(date1, date2=None, lang='en_us'):
     """
 
     Args:
         date1 (datetime.datetime): Objeto datetime que vai ser subtraido pelo date2
         date2 (datetime.datetime): Parâmetro opcional, se não for passado, vai pegar o datetime utc atual (Default value = None)
+        lang (str): A língua que vai ser usada para formatar o timedelta
 
     Returns:
         str: A string formatada, da diferença da date2 pela date1
 
     """
+    if lang == 'en_us':
+        i18n.deactivate()
+    elif lang == 'pt_br':
+        i18n.activate("pt_BR")
     if date2 is None:
-        date2 = datetime.utcnow()
-    time = relativedelta(date2, date1)
-    years = abs(time.years)
-    months = abs(time.months)
-    days = abs(time.days)
-    hours = abs(time.hours)
-    minutes = abs(time.minutes)
-    seconds = abs(time.seconds)
-    """
-        variável que vai controlar quantos dados já foram mostrados
-        para evitar que a string saia muito grande, como:
-        2 anos, 5 meses, 1 dia, 2 horas, 3 minutos e 2 segundos.
-        com a variável limitando, vai sair assim:
-        2 anos, 5 meses e 1 dia.
-    """
-    dados = 0
-    dt_str = ''
-    if (years == 0) and (months == 0) and (days <= 1):
-        if date1.day == date2.day:
-            d_str = 'Hoje'
-        elif (days == 1) or (abs(date2.day - date1.day) == 1):
-            d_str = 'Ontem'
-        elif days == 0:
-            d_str = 'Hoje'
-        else:
-            d_str = ''
-        if hours > 1:
-            h_str = f'{hours} horas'
-        elif hours == 1:
-            h_str = f'{hours} hora'
-        else:
-            h_str = ''
-        if minutes > 1:
-            m_str = f'{minutes} minutos'
-        elif minutes == 1:
-            m_str = f'{minutes} minuto'
-        else:
-            m_str = ''
-        if seconds > 1:
-            s_str = f'{seconds} segundos'
-        elif seconds == 1:
-            s_str = f'{seconds} segundo'
-        else:
-            s_str = ''
-        if h_str and m_str and s_str:
-            dt_str = f'{d_str} há {h_str}, {m_str} e {s_str}.'
-        elif h_str and m_str:
-            dt_str = f'{d_str} há {h_str} e {m_str}.'
-        elif h_str and s_str:
-            dt_str = f'{d_str} há {h_str} e {s_str}.'
-        elif m_str and s_str:
-            dt_str = f'{d_str} há {m_str} e {s_str}.'
-        elif h_str:
-            dt_str = f'{d_str} há {h_str}.'
-        elif m_str:
-            dt_str = f'{d_str} há {m_str}.'
-        elif s_str:
-            dt_str = f'{d_str} há {s_str}.'
-        elif (h_str == '') and (m_str == '') and (s_str == ''):
-            dt_str = f'{d_str}.'
-        return dt_str
-    if years > 1:
-        dt_str += f'{years} anos'
-        dados += 1
-    elif years == 1:
-        dt_str += f'{years} ano'
-        dados += 1
-    if months > 1:
-        if years >= 1:
-            dt_str += ', '
-        dt_str += f'{months} meses'
-        dados += 1
-    elif months == 1:
-        if years >= 1:
-            dt_str += ', '
-        dt_str += f'{months} mês'
-        dados += 1
-    if days > 1:
-        if (years >= 1) or (months >= 1):
-            dt_str += ', '
-        dt_str += f'{days} dias'
-        dados += 1
-    elif days == 1:
-        if (years >= 1) or (months >= 1):
-            dt_str += ', '
-        dt_str += f'{days} dia'
-        dados += 1
-    if dados < 3:
-        if hours > 1:
-            if (years >= 1) or (months >= 1) or (days >= 1):
-                dt_str += ', '
-            dt_str += f'{hours} horas'
-            dados += 1
-        elif hours == 1:
-            if (years >= 1) or (months >= 1) or (days >= 1):
-                dt_str += ', '
-            dt_str += f'{hours} hora'
-            dados += 1
-        if dados < 3:
-            if minutes > 1:
-                if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1):
-                    dt_str += ', '
-                dt_str += f'{minutes} minutos'
-                dados += 1
-            elif minutes == 1:
-                if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1):
-                    dt_str += ', '
-                dt_str += f'{minutes} minuto'
-                dados += 1
-            if dados < 3:
-                if seconds > 1:
-                    if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1) or (minutes >= 1):
-                        dt_str += ', '
-                    dt_str += f'{seconds} segundos'
-                elif seconds == 1:
-                    if (years >= 1) or (months >= 1) or (days >= 1) or (hours >= 1) or (minutes >= 1):
-                        dt_str += ', '
-                    dt_str += f'{seconds} segundo'
-    dt_str += '.'
-    if dt_str.rfind(',') != -1:
-        dt_str = dt_str[:dt_str.rfind(',')] + ' e' + dt_str[dt_str.rfind(',') + 1:]
-    return dt_str
+        date2 = utcnow()
+    date1 = datetime(year=date1.year, month=date1.month,
+                     day=date1.day, hour=date1.hour,
+                     minute=date1.minute, second=date1.second,
+                     microsecond=date1.microsecond, tzinfo=timezone.utc)
+    date_formated = precisedelta(date1 - date2, format='%0.0f')
+    if lang == 'en_us':
+        return date_formated + ' ago'
+    elif lang == 'pt_br':
+        return 'Há ' + date_formated
 
 
 def inverter_string(string):

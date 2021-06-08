@@ -1,0 +1,9 @@
+{
+    "description": "Desativa o modo de manutenção do bot.",
+    "examples": [
+        "`{prefix}man_off`",
+        "`{prefix}manutenção_off`"
+    ],
+    "how_to_use": "`{prefix}manutenção_off`",
+    "perm_user": "administrar a conta do bot"
+}

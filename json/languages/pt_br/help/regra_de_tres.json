@@ -1,0 +1,8 @@
+{
+    "description": "Eu vou fazer uma regra de três simples!",
+    "examples": [
+        "`{prefix}r3`",
+        "`{prefix}rule_of_three`"
+    ],
+    "how_to_use": "`{prefix}regra_de_tres`"
+}

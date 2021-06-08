@@ -1,0 +1,9 @@
+{
+    "description": "Remove um comando personalizado!",
+    "examples": [
+        "`{prefix}remover_comando` `bom dia`",
+        "`{prefix}rc` `hello world!`"
+    ],
+    "how_to_use": "`{prefix}remover_comando` `<comando>`",
+    "perm_user": "gerenciar mensagens"
+}

@@ -1,0 +1,12 @@
+{
+    "groups": {
+        "administração": "Administração",
+        "diversão": "Diversão",
+        "info": "Informações",
+        "matemática": "Matemática",
+        "owner": "Desenvolvedor",
+        "úteis": "Úteis",
+        "outros": "Outros",
+        "personalizado": "Comandos personalizados"
+    }
+}

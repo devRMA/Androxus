@@ -1,0 +1,10 @@
+[
+    {
+        "content": "{no_no} Este comando foi desativado por um administrador do servidor!",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "delete_after": 10
+    }
+]

@@ -1,6 +1,6 @@
 {
-    "True": "Activated",
-    "False": "Disabled",
+    "True": "{ativado} Activated",
+    "False": "{desativado} Disabled",
     "Now": "Current:",
     "logs_attr": {
         "> Log of deleted messages -- Any message that is deleted, I will notify": "mensagem_deletada",

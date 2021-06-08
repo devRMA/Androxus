@@ -5,18 +5,24 @@
 __author__ = 'Rafael'
 
 import asyncio
+from datetime import datetime
 
 import discord
 from discord.ext import commands
 
-from Classes import Androxus
+from EmbedGenerators.HelpGroup import embed_help_group
+from database.Models.ComandoDesativado import ComandoDesativado
+from database.Models.ComandoPersonalizado import ComandoPersonalizado
+from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
+from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import get_emoji_dance, get_configs, convert_to_bool, is_number
+from utils.Utils import get_configs, is_number
+from utils.Utils import get_emoji_dance, convert_to_bool, capitalize, convert_to_string
 from utils.converters import BannedMember
 
 
-class Admin(commands.Cog, command_attrs=dict(category='administração')):
+class Admin(commands.Cog):
     def __init__(self, bot):
         """
 
@@ -27,14 +33,13 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         self.bot = bot
         self.sr = ServidorRepository()
 
-    @Androxus.comando(name='ban',
-                      aliases=['banir'],
-                      description='Vou banir algum membro.',
-                      parameters=['<membro do servidor>', '[motivo (padrão: Nulo)]'],
-                      examples=['``{prefix}ban`` ``@membro#1234`` ``ofendeu membro``',
-                                '``{prefix}banir`` {author_mention}'],
-                      perm_user='banir membros',
-                      perm_bot='banir membros')
+    @commands.group(name='administração', case_insensitive=True, invoke_without_command=True, ignore_extra=False,
+                    aliases=['adm', 'admin', 'administraçao', 'administracão', 'administracao',
+                             'management', 'administration'])
+    async def administracao_gp(self, ctx):
+        await ctx.reply(embed=await embed_help_group(ctx), mention_author=False)
+
+    @administracao_gp.command(name='ban', aliases=['banir'])
     @permissions.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
@@ -87,14 +92,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             message_successful = messages[0] if reason else messages[1]
             await ctx.send(**message_successful)
 
-    @Androxus.comando(name='kick',
-                      aliases=['expulsar'],
-                      description='Vou expulsar algum membro.',
-                      parameters=['<membro do servidor>', '[motivo (padrão: Nulo)]'],
-                      examples=['``{prefix}kick`` ``@membro#1234`` ``não quero você aqui!``',
-                                '``{prefix}expulsar`` {author_mention}'],
-                      perm_user='expulsar membros',
-                      perm_bot='expulsar membros')
+    @administracao_gp.command(name='kick', aliases=['expulsar'])
     @permissions.has_permissions(kick_members=True)
     @commands.bot_has_permissions(kick_members=True)
     @commands.guild_only()
@@ -122,6 +120,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             return await self.bot.send_help(ctx)
         messages = await self.bot.translate(ctx, values_={
             'member': member,
+            'member_id': member.id if hasattr(member, 'id') else 0,
             'reason': reason
         })
         reasons = await self.bot.translate(ctx, others_='kick', values_={
@@ -146,15 +145,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             message_successful = messages[0] if reason else messages[1]
             await ctx.send(**message_successful)
 
-    @Androxus.comando(name='unban',
-                      aliases=['desbanir', 'revogar_ban'],
-                      description='Revoga o banimento de algum membro!',
-                      parameters=['<membro>', '[motivo (padrão: Nulo)]'],
-                      examples=['``{prefix}unban`` ``"membro#1234"`` ``pode voltar``\n**(Observer que para usar ' +
-                                'o comando unban, passando o nome e a tag da pessoa, é necessário usar "")**',
-                                '``{prefix}revogar_ban`` ``123456789``'],
-                      perm_user='banir membros',
-                      perm_bot='banir membros')
+    @administracao_gp.command(name='unban', aliases=['desbanir', 'revogar_ban'])
     @permissions.has_permissions(ban_members=True)
     @commands.bot_has_permissions(ban_members=True)
     @commands.guild_only()
@@ -164,6 +155,7 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             return await self.bot.send_help(ctx)
         messages = await self.bot.translate(ctx, values_={
             'member': member,
+            'member_id': member.id if hasattr(member, 'id') else 0,
             'reason': reason
         })
         others = await self.bot.translate(ctx, others_='unban', values_={
@@ -185,14 +177,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             await ctx.send(**message_successful)
 
-    @Androxus.comando(name='change_prefix',
-                      aliases=['prefixo', 'prefix'],
-                      description='Comando que é usado para mudar o meu prefixo',
-                      parameters=['[prefixo (padrão: "--")]'],
-                      examples=['``{prefix}change_prefix`` ``!!``',
-                                '``{prefix}prefixo``'],
-                      perm_user='administrador')
-    @permissions.has_permissions(administrator=True)
+    @administracao_gp.command(name='change_prefix',
+                              aliases=['prefixo', 'prefix', 'changeprefix', 'set_prefix', 'setprefix'])
+    @permissions.has_permissions(manage_messages=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _change_prefix(self, ctx, new_prefix=get_configs()['default_prefix']):
@@ -214,14 +201,9 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             erro = (await self.bot.translate(ctx, error_='change_prefix'))[0]
             await ctx.send(**erro)
 
-    @Androxus.comando(name='change_lang',
-                      aliases=['language', 'lingua', 'língua', 'lang'],
-                      description='Comando que é usado para mudar a língua',
-                      parameters=['[lingua (padrão: "en_us")]'],
-                      examples=['``{prefix}change_prefix`` ``!!``',
-                                '``{prefix}prefixo``'],
-                      perm_user='administrador')
-    @permissions.has_permissions(administrator=True)
+    @administracao_gp.command(name='change_lang',
+                              aliases=['language', 'lingua', 'língua', 'lang', 'changelang', 'set_lang', 'setlang'])
+    @permissions.has_permissions(manage_messages=True)
     @commands.check(permissions.is_owner)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
@@ -235,14 +217,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             await self.bot.send_help(ctx)
 
-    @Androxus.comando(name='desativar_sugestao',
-                      aliases=['ds', 'desativar_sugestão'],
-                      description='Comando que é usado para desativar as sugestões, quando a pessoa usar meu prefixo, '
-                                  'com um comando que não existe',
-                      examples=['{prefix}desativar_sugestão',
-                                '``{prefix}ds``'],
-                      perm_user='administrador')
-    @permissions.has_permissions(administrator=True)
+    @administracao_gp.command(name='desativar_sugestao', aliases=['ds', 'desativar_sugestão', 'disable_suggestion',
+                                                                  'desativarsugestao', 'desativarsugestão',
+                                                                  'disablesuggestion'])
+    @permissions.has_permissions(manage_messages=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _desativar_sugestao(self, ctx):
@@ -255,14 +233,10 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             return await ctx.send(**messages[1])
 
-    @Androxus.comando(name='reativar_sugestao',
-                      aliases=['rs', 'reativar_sugestão'],
-                      description='Comando que é usado para reativar as sugestões, quando a pessoa usar meu prefixo, '
-                                  'com um comando que não existe',
-                      examples=['``{prefix}reativar_sugestão``',
-                                '``{prefix}rs``'],
-                      perm_user='administrador')
-    @permissions.has_permissions(administrator=True)
+    @administracao_gp.command(name='reativar_sugestao', aliases=['rs', 'reativar_sugestão', 'reactivate_suggestion',
+                                                                 'reativarsugestao', 'reativarsugestão',
+                                                                 'reactivatesuggestion'])
+    @permissions.has_permissions(manage_messages=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _reativar_sugestao(self, ctx):
@@ -275,15 +249,8 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
         else:
             return await ctx.send(**messages[1])
 
-    @Androxus.comando(name='channel_log',
-                      aliases=['chat_log', 'cl'],
-                      description='Comando que é usado para configurar onde que o bot vai mandar os logs. Se não for'
-                                  ' passado nada, vai desativar os logs.',
-                      parameters=['[channel (padrão: nulo)]'],
-                      examples=['``{prefix}chat_log`` {this_channel}',
-                                '``{prefix}cl``'],
-                      perm_user='administrador')
-    @permissions.has_permissions(administrator=True)
+    @administracao_gp.command(name='channel_log', aliases=['chat_log', 'cl', 'channellog', 'chatlog'])
+    @permissions.has_permissions(manage_messages=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _channel_log(self, ctx, channel: discord.TextChannel = None):
@@ -322,13 +289,8 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             else:
                 return await self.bot.send_help(ctx)
 
-    @Androxus.comando(name='setup_logs',
-                      aliases=['logs', 'sl', 'setupLogs'],
-                      description='Comando que é usado para configurar os logs.',
-                      examples=['``{prefix}setup_logs``',
-                                '``{prefix}sl``'],
-                      perm_user='administrador')
-    @permissions.has_permissions(administrator=True)
+    @administracao_gp.command(name='setup_logs', aliases=['logs', 'sl', 'setuplogs'])
+    @permissions.has_permissions(manage_messages=True)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _setup_logs(self, ctx):
@@ -343,14 +305,16 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
             'ativado': self.bot.get_emoji('ativado'),
             'desativado': self.bot.get_emoji('desativado')
         })
-        for field_name, attr in others['logs_attr'].items():
+        messages_to_delete = []
+        for field_name, attr in others.get('logs_attr').items():
             message = messages[0].copy()
             message['embed'] = messages[0]['embed'].copy()
             message['embed'].add_field(name=field_name, value='** **', inline=False)
             message['embed'].add_field(name=others['Now'], value=others[str(getattr(servidor, attr))], inline=False)
-            await ctx.send(**message)
+            messages_to_delete.append(await ctx.send(**message))
             try:
                 msg_user = await self.bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=30)
+                messages_to_delete.append(msg_user)
             except asyncio.TimeoutError:
                 return await ctx.send(**erros[1])
             value = convert_to_bool(msg_user.content)
@@ -361,18 +325,11 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 return await ctx.send(**erros[2])
             setattr(servidor, attr, value)
             if ctx.channel.permissions_for(ctx.me).manage_messages:
-                await ctx.channel.purge(limit=2, check=lambda m: m.author in [ctx.me, ctx.author])
+                await ctx.channel.purge(limit=2, check=lambda m: m in messages_to_delete)
         await self.sr.update(self.bot.db_connection, servidor)
         return await ctx.send(**messages[1])
 
-    @Androxus.comando(name='clear',
-                      aliases=['limpar', 'purge'],
-                      description='Vou limpar o chat.',
-                      parameters=['<número de mensagens>'],
-                      examples=['``{prefix}clear`` ``10``',
-                                '``{prefix}purge`` ``40``'],
-                      perm_user='gerenciar mensagens',
-                      perm_bot='gerenciar mensagens')
+    @administracao_gp.command(name='clear', aliases=['limpar', 'purge', 'purificar'])
     @permissions.has_permissions(manage_messages=True)
     @commands.bot_has_permissions(manage_messages=True)
     @commands.guild_only()
@@ -410,6 +367,146 @@ class Admin(commands.Cog, command_attrs=dict(category='administração')):
                 return await ctx.send(**erros[3])
         else:
             return await self.bot.send_help(ctx)
+
+    @administracao_gp.command(name='desativar_comando', aliases=['disable_command', 'dc', 'desativarcomando'])
+    @permissions.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _desativar_comando(self, ctx, *, comando: str = None):
+        if comando is None:
+            return await self.bot.send_help(ctx)
+        comandos_que_nao_podem_ser_desativados = ['desativar_comando',
+                                                  'reativar_comando',
+                                                  'help']
+        comando_para_desativar = self.bot.get_command(comando)
+        if comando_para_desativar is None:
+            return await ctx.reply(f'não tenho esse comando!')
+        if comando_para_desativar.name in comandos_que_nao_podem_ser_desativados:
+            return await ctx.reply(
+                f'Você não pode desativar este comando! {self.bot.get_emoji("no_no")}')
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        comando_desativado = ComandoDesativado(servidor, comando_para_desativar.name)
+        await ComandoDesativadoRepository().create(self.bot.db_connection, comando_desativado)
+        embed = discord.Embed(title=f'Comando desativado com sucesso!', colour=discord.Colour.random(),
+                              description=f'Comando desativado: {comando_para_desativar.name}',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
+        return await ctx.reply(content=self.bot.get_emoji('off'), embed=embed, mention_author=False)
+
+    @administracao_gp.command(name='reativar_comando',
+                              aliases=['reactivate_command', 'reativarcomando', 'reactivatecommand'])
+    @permissions.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _reativar_comando(self, ctx, comando=None):
+        if comando is None:
+            return await self.bot.send_help(ctx)
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        comando_para_reativar = self.bot.get_command(comando)
+        if comando_para_reativar is None:
+            return await ctx.reply('Não tenho esse comando!')
+        comando_desativado = ComandoDesativado(servidor, comando_para_reativar.name)
+        comandos_desativados = await ComandoDesativadoRepository().get_commands(self.bot.db_connection, servidor)
+        if comando_desativado not in [cmd for cmd in comandos_desativados]:
+            return await ctx.reply(f'{self.bot.get_emoji("atencao")} Este comando já está ativo!')
+        await ComandoDesativadoRepository().delete(self.bot.db_connection, comando_desativado)
+        embed = discord.Embed(title=f'Comando reativado com sucesso!', colour=discord.Colour.random(),
+                              description=f'Comando reativado: {comando_para_reativar.name}',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}', icon_url=f'{ctx.author.avatar.url}')
+        return await ctx.reply(content=self.bot.get_emoji('on'), embed=embed, mention_author=False)
+
+    @administracao_gp.command(name='adicionar_comando', aliases=['add_command', 'ac',
+                                                                 'adicionarcomando', 'addcommand',
+                                                                 'criar_comando', 'criarcomando',
+                                                                 'create_command', 'createcommand'])
+    @permissions.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _adicionar_comando(self, ctx, comando='', resposta='', in_text='t'):
+        in_text = convert_to_bool(in_text)
+        if in_text is None:
+            return await ctx.reply(
+                f'Valor ``{in_text}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
+        if ctx.message.content.count('"') < 4:
+            return await ctx.reply('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n'
+                                   f'{ctx.prefix}adicionar_comando **"**comando**"** **"**resposta**"**')
+        if (comando.replace(' ', '') == '') or (resposta.replace(' ', '') == ''):
+            return await self.bot.send_help(ctx)
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        comando_personalizado = ComandoPersonalizado(servidor,
+                                                     comando.lower(),
+                                                     resposta,
+                                                     in_text)
+        await ComandoPersonalizadoRepository().create(self.bot.db_connection, comando_personalizado)
+        in_text_str = capitalize(convert_to_string(in_text))
+        embed = discord.Embed(title=f'Comando adicionado com sucesso!', colour=discord.Colour.random(),
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar.url)
+        embed.add_field(
+            name=f'Comando: {comando.lower()}\nResposta: {resposta}\nIgnorar a posição do comando: {in_text_str}',
+            value=f'** **',
+            inline=False)
+        await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
+
+    @administracao_gp.command(name='remover_comando',
+                              aliases=['remove_command', 'rc', 'removercomando', 'removecommand'])
+    @permissions.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _remover_comando(self, ctx, *, comando: str = None):
+        if comando is None:
+            return await self.bot.send_help(ctx)
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        # vai verificar se o comando está no banco
+        # aliás, pra remover o comando, ele precisa existir no banco
+        comando_personalizado = ComandoPersonalizado(servidor, comando.lower(), '', False)
+        if comando_personalizado not in [cmd for cmd in
+                                         await ComandoPersonalizadoRepository().get_commands(self.bot.db_connection,
+                                                                                             servidor)]:
+            return await ctx.reply(f'{self.bot.get_emoji("atencao")} Este comando não existe!')
+        await ComandoPersonalizadoRepository().delete(self.bot.db_connection, comando_personalizado)
+        embed = discord.Embed(title=f'Comando removido com sucesso!',
+                              colour=discord.Colour.random(),
+                              description=f'Comando: {comando}',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar.url)
+        return await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
+
+    @administracao_gp.command(name='modificar_comando',
+                              aliases=['update_command', 'mc', 'modificarcomando', 'updatecommand'])
+    @permissions.has_permissions(manage_messages=True)
+    @commands.guild_only()
+    @commands.cooldown(1, 4, commands.BucketType.user)
+    async def _modificar_comando(self, ctx, comando='', resposta='', in_text='t'):
+        in_text = convert_to_bool(in_text)
+        if in_text is None:
+            await ctx.reply(f'Valor ``{in_text}`` inválido! Os valores que eu aceito são: sim, não, yes, no, 0, 1')
+            return
+        if ctx.message.content.count('"') != 4:
+            return await ctx.reply('Parece que você digitou o comando errado!\nVocê deve usar o comando assim:\n' +
+                                   f'{ctx.prefix}modificar_comando **"**comando**"** **"**resposta**"**')
+        if (comando.replace(' ', '') == '') or (resposta.replace(' ', '') == ''):
+            return await self.bot.send_help(ctx)
+        servidor = await ServidorRepository().get_servidor(self.bot.db_connection, ctx.guild.id)
+        comando_personalizado = ComandoPersonalizado(servidor,
+                                                     comando.lower(),
+                                                     resposta,
+                                                     in_text)
+        # vai verificar se o comando está no banco
+        # aliás, pra modificar o comando, ele precisa existir no banco
+        if comando_personalizado not in [cmd for cmd in
+                                         await ComandoPersonalizadoRepository().get_commands(self.bot.db_connection,
+                                                                                             servidor)]:
+            return await ctx.reply(f'{self.bot.get_emoji("atencao")} Este comando não existe!')
+        await ComandoPersonalizadoRepository().update(self.bot.db_connection, comando_personalizado)
+        in_text_str = capitalize(convert_to_string(in_text))
+        embed = discord.Embed(title=f'Comando modificado com sucesso!', colour=discord.Colour.random(),
+                              description=f'Comando: {comando}\nResposta: {resposta}\n'
+                                          f'Ignorar a posição do comando: {in_text_str}',
+                              timestamp=datetime.utcnow())
+        embed.set_footer(text=f'{ctx.author}', icon_url=ctx.author.avatar.url)
+        await ctx.reply(content=get_emoji_dance(), embed=embed, mention_author=False)
 
 
 def setup(bot):

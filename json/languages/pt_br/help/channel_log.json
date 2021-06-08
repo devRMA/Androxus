@@ -1,0 +1,9 @@
+{
+    "description": "Comando que é usado para configurar onde que o bot vai mandar os logs. Se não for passado nada, vai desativar os logs.",
+    "examples": [
+        "`{prefix}chat_log` {ctx.channel.mention}",
+        "`{prefix}cl`"
+    ],
+    "how_to_use": "`{prefix}chat_log` `[channel (padrão: nulo)]`",
+    "perm_user": "gerenciar mensagens"
+}

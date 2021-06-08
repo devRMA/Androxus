@@ -1,0 +1,23 @@
+[
+    {
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "author": {
+                "name": "{bot.user.name}",
+                "icon_url": "{bot.user.avatar.url}"
+            },
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "description": "`{uptime}`",
+            "title": ":timer: When I started:"
+        }
+    }    
+]

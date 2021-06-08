@@ -1,0 +1,10 @@
+{
+    "description": "Vou expulsar algum membro.",
+    "examples": [
+        "`{prefix}kick` `@membro#1234` `não quero você aqui`",
+        "`{prefix}expulsar` {ctx.author.mention}"
+    ],
+    "how_to_use": "`{prefix}kick` `<membro do servidor>` `[motivo (padrão: Nulo)]`",
+    "perm_user": "expulsar membros",
+    "perm_bot": "expulsar membros"
+}

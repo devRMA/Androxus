@@ -47,7 +47,7 @@ class LogEvent(commands.Cog):
                                                           f'Nick antigo: {before.nick}\n'
                                                           f'Nick novo: {after.nick}',
                                               timestamp=datetime.utcnow())
-                        embed.set_thumbnail(url=str(after.avatar_url))
+                        embed.set_thumbnail(url=str(after.avatar.url))
                         await channel.send(embed=embed)
                 if before.roles != after.roles:
                     if server.role_alterado:
@@ -72,7 +72,7 @@ class LogEvent(commands.Cog):
                                                           f'Id: {after.id}\n'
                                                           f'{desc}',
                                               timestamp=datetime.utcnow())
-                        embed.set_thumbnail(url=str(after.avatar_url))
+                        embed.set_thumbnail(url=str(after.avatar.url))
                         await channel.send(embed=embed)
                 if (before.premium_since is None) and (after.premium_since is not None):
                     if server.role_alterado:
@@ -83,7 +83,7 @@ class LogEvent(commands.Cog):
                                                           f'User: {after.mention}\n'
                                                           f'Id: {after.id}\n',
                                               timestamp=datetime.utcnow())
-                        embed.set_thumbnail(url=str(after.avatar_url))
+                        embed.set_thumbnail(url=str(after.avatar.url))
                         await channel.send(embed=embed)
 
     @commands.Cog.listener()
@@ -106,7 +106,7 @@ class LogEvent(commands.Cog):
                                               f'Nome antigo: {before.name}\n'
                                               f'Nome novo: {after.name}',
                                   timestamp=datetime.utcnow())
-            embed.set_thumbnail(url=after.avatar_url)
+            embed.set_thumbnail(url=after.avatar.url)
             for server in servers_with_user:
                 if server.channel_id_log is not None:
                     channel = self.bot.get_channel(server.channel_id_log)
@@ -121,17 +121,17 @@ class LogEvent(commands.Cog):
                                               f'Tag antiga: {before.discriminator}\n'
                                               f'Tag nova: {after.discriminator}',
                                   timestamp=datetime.utcnow())
-            embed.set_thumbnail(url=after.avatar_url)
+            embed.set_thumbnail(url=after.avatar.url)
             for server in servers_with_user:
                 if server.channel_id_log is not None:
                     channel = self.bot.get_channel(server.channel_id_log)
                     if (channel is not None) and server.tag_alterado:
                         await channel.send(embed=embed)
-        if before.avatar_url != after.avatar_url:
-            url_antigo = str(before.avatar_url_as(format='webp'))
+        if before.avatar.url != after.avatar.url:
+            url_antigo = str(before.avatar.with_format(format='webp'))
             if url_antigo.find('?size=') != -1:
                 url_antigo = url_antigo[:url_antigo.rfind('?size=')]
-            url_novo = str(after.avatar_url_as(format='webp'))
+            url_novo = str(after.avatar.with_format(format='webp'))
             path_401_image = get_path_from_file('401.png', 'images/')
             async with aiohttp.ClientSession() as session:
                 async with session.get(url_antigo) as resp:
@@ -154,8 +154,8 @@ class LogEvent(commands.Cog):
                                       description=f'O(A) {after.name} mudou o avatar!\n'
                                                   f'User: {after.mention}\n'
                                                   f'Id: {after.id}\n'
-                                                  f'[Avatar antigo]({before.avatar_url})'
-                                                  f' → [avatar novo]({after.avatar_url})',
+                                                  f'[Avatar antigo]({before.avatar.url})'
+                                                  f' → [avatar novo]({after.avatar.url})',
                                       timestamp=datetime.utcnow())
                 embed.set_image(url='attachment://avatar.png')
                 for server in servers_with_user:
@@ -202,7 +202,7 @@ class LogEvent(commands.Cog):
                                                       f'[Mensagem nova]({after.jump_url}):'
                                                       f'{msg_nova}',
                                           timestamp=datetime.utcnow())
-                    embed.set_thumbnail(url=after.author.avatar_url)
+                    embed.set_thumbnail(url=after.author.avatar.url)
                     await channel.send(embed=embed)
 
     @commands.Cog.listener()
@@ -229,7 +229,7 @@ class LogEvent(commands.Cog):
                                     f'Chat: {message.channel.mention}\n'
                                     f'Mensagem deletada:{msg_escaped}',
                         timestamp=datetime.utcnow())
-                    embed.set_thumbnail(url=message.author.avatar_url)
+                    embed.set_thumbnail(url=message.author.avatar.url)
                     await channel.send(embed=embed)
 
     @commands.Cog.listener()
@@ -256,7 +256,7 @@ class LogEvent(commands.Cog):
                                       colour=discord.Colour.random(),
                                       description=f'Chat: {messages[0].channel.mention}\n',
                                       timestamp=datetime.utcnow())
-                embed.set_footer(text=f'{messages[0].author}', icon_url=messages[0].author.avatar_url)
+                embed.set_footer(text=f'{messages[0].author}', icon_url=messages[0].author.avatar.url)
                 file = discord.File(data,
                                     f'bulk_message_delete_'
                                     f'{messages[0].guild.name.replace(" ", "_")}-'

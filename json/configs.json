@@ -7,5 +7,6 @@
     },
     "token": "token_bot",
     "connection_string": "connection string of db",
-    "default_prefix": "--"
+    "default_prefix": "--",
+    "default_lang": "en_us"
 }

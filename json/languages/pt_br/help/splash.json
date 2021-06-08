@@ -1,0 +1,8 @@
+{
+    "description": "Eu vou enviar a imagem de fundo do convite deste servidor (se tiver).",
+    "examples": [
+        "`{prefix}splash`",
+        "`{prefix}fundo_convite`"
+    ],
+    "how_to_use": "`{prefix}splash`"
+}

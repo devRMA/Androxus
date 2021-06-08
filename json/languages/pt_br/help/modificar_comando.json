@@ -1,0 +1,9 @@
+{
+    "description": "Modifica um comando personalizado já existente!",
+    "examples": [
+        "`{prefix}mc` `\"bom dia\"` `\"{author_nametag} boa noite!\"`",
+        "`{prefix}mc` `\"hello world!\"` `\"olá mundo!\"` `sim`"
+    ],
+    "how_to_use": "`{prefix}modificar_comando` `\"<comando>\"` `\"<resposta>\"` `[ignorar a posição do comando (sim/nao) (padrão: sim)]`",
+    "perm_user": "gerenciar mensagens"
+}

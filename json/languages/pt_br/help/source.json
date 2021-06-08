@@ -1,0 +1,8 @@
+{
+    "description": "Mostra o meu código fonte!",
+    "examples": [
+        "`{prefix}source`",
+        "`{prefix}revogar_ban` `{ctx.author.id}`"
+    ],
+    "how_to_use": "`{prefix}source`"
+}

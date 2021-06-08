@@ -1,0 +1,8 @@
+{
+    "description": "Cara ou coroa?",
+    "examples": [
+        "`{prefix}cara_coroa`",
+        "`{prefix}coinflip`"
+    ],
+    "how_to_use": "`{prefix}coinflip`"
+}
