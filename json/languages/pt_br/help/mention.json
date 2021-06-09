@@ -1,9 +1,33 @@
 [
     {
-        "content": "Use o comando `{prefix}help` para obter todos os meus comandos!",
         "reference": "message",
         "allowed_mentions": {
             "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "thumbnail": {
+                "url": "{bot.user.avatar.url}"
+            },
+            "fields": [
+                {
+                    "inline": false,
+                    "name": "Meu prefixo aqui é:",
+                    "value": "`{prefix}`"
+                },
+                {
+                    "inline": false,
+                    "name": "Para saber todos os meus comandos, digite `{prefix}ajuda`.",
+                    "value": "** **"
+                }
+            ],
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "title": "Olá {ctx.author.display_name}!"
         }
     }
 ]

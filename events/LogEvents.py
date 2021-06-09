@@ -7,13 +7,12 @@ __author__ = 'Rafael'
 from datetime import datetime
 from io import BytesIO
 
-import aiohttp
 import discord
 from PIL import Image
 from discord.ext import commands
 
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import difference_between_lists, get_path_from_file
+from utils.Utils import difference_between_lists, get_path_from_file, cut_string
 
 
 class LogEvent(commands.Cog):
@@ -37,54 +36,51 @@ class LogEvent(commands.Cog):
         if server.channel_id_log is not None:
             channel = self.bot.get_channel(server.channel_id_log)
             if channel is not None:
-                if before.nick != after.nick:
-                    if server.nick_alterado:
-                        embed = discord.Embed(title='Nick alterado',
-                                              colour=discord.Colour.random(),
-                                              description=f'O(A) {after.name} mudou de nick!\n'
-                                                          f'User: {after.mention}\n'
-                                                          f'Id: {after.id}\n'
-                                                          f'Nick antigo: {before.nick}\n'
-                                                          f'Nick novo: {after.nick}',
-                                              timestamp=datetime.utcnow())
-                        embed.set_thumbnail(url=str(after.avatar.url))
-                        await channel.send(embed=embed)
-                if before.roles != after.roles:
-                    if server.role_alterado:
-                        cargos = [f'<@&{c.id}>' for c in difference_between_lists(before.roles, after.roles)]
-                        # se a pessoa ficou com mais cargos, do que ela tinha antes
-                        if len(before.roles) < len(after.roles):
-                            desc = None
-                            if len(cargos) == 1:
-                                desc = f'Novo cargo: {cargos[0]}'
-                            elif len(cargos) > 1:
-                                desc = 'Novos cargo: ' + ', '.join(cargos)
-                        else:  # se foi o contrário
-                            desc = None
-                            if len(cargos) == 1:
-                                desc = f'Cargo removido: {cargos[0]}'
-                            elif len(cargos) > 1:
-                                desc = 'Cargos removidos: ' + ', '.join(cargos)
-                        embed = discord.Embed(title='Cargos alterados',
-                                              colour=discord.Colour.random(),
-                                              description=f'O(A) {after.name} sofreu alteração nos cargos!\n'
-                                                          f'User: {after.mention}\n'
-                                                          f'Id: {after.id}\n'
-                                                          f'{desc}',
-                                              timestamp=datetime.utcnow())
-                        embed.set_thumbnail(url=str(after.avatar.url))
-                        await channel.send(embed=embed)
-                if (before.premium_since is None) and (after.premium_since is not None):
-                    if server.role_alterado:
-                        # pessoa começou a dar boost
-                        embed = discord.Embed(title='Novo booster',
-                                              colour=discord.Colour(0xffdcf4),
-                                              description=f'O(A) {after.name} começou a dar boost!\n'
-                                                          f'User: {after.mention}\n'
-                                                          f'Id: {after.id}\n',
-                                              timestamp=datetime.utcnow())
-                        embed.set_thumbnail(url=str(after.avatar.url))
-                        await channel.send(embed=embed)
+                if before.nick != after.nick and server.nick_alterado:
+                    embed = discord.Embed(title='Nick alterado',
+                                          colour=discord.Colour.random(),
+                                          description=f'O(A) {after.name} mudou de nick!\n'
+                                                      f'User: {after.mention}\n'
+                                                      f'Id: {after.id}\n'
+                                                      f'Nick antigo: {before.nick}\n'
+                                                      f'Nick novo: {after.nick}',
+                                          timestamp=datetime.utcnow())
+                    embed.set_thumbnail(url=str(after.avatar.url))
+                    await channel.send(embed=embed)
+                if before.roles != after.roles and server.role_alterado:
+                    cargos = [f'<@&{c.id}>' for c in difference_between_lists(before.roles, after.roles)]
+                    # se a pessoa ficou com mais cargos, do que ela tinha antes
+                    if len(before.roles) < len(after.roles):
+                        desc = None
+                        if len(cargos) == 1:
+                            desc = f'Novo cargo: {cargos[0]}'
+                        elif len(cargos) > 1:
+                            desc = 'Novos cargo: ' + ', '.join(cargos)
+                    else:  # se foi o contrário
+                        desc = None
+                        if len(cargos) == 1:
+                            desc = f'Cargo removido: {cargos[0]}'
+                        elif len(cargos) > 1:
+                            desc = 'Cargos removidos: ' + ', '.join(cargos)
+                    embed = discord.Embed(title='Cargos alterados',
+                                          colour=discord.Colour.random(),
+                                          description=f'O(A) {after.name} sofreu alteração nos cargos!\n'
+                                                      f'User: {after.mention}\n'
+                                                      f'Id: {after.id}\n'
+                                                      f'{desc}',
+                                          timestamp=datetime.utcnow())
+                    embed.set_thumbnail(url=str(after.avatar.url))
+                    await channel.send(embed=embed)
+                if (before.premium_since is None) and (after.premium_since is not None) and server.role_alterado:
+                    # pessoa começou a dar boost
+                    embed = discord.Embed(title='Novo booster',
+                                          colour=discord.Colour(0xffdcf4),
+                                          description=f'O(A) {after.name} começou a dar boost!\n'
+                                                      f'User: {after.mention}\n'
+                                                      f'Id: {after.id}\n',
+                                          timestamp=datetime.utcnow())
+                    embed.set_thumbnail(url=str(after.avatar.url))
+                    await channel.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_user_update(self, before, after):
@@ -92,9 +88,8 @@ class LogEvent(commands.Cog):
                 or (not self.bot.is_ready()) or (self.bot.db_connection is None):
             return
         servers_with_user = []
-        for guild in self.bot.guilds:
-            if guild.get_member(after.id) is not None:
-                servers_with_user.append(await ServidorRepository().get_servidor(self.bot.db_connection, guild.id))
+        for guild in after.mutual_guilds:
+            servers_with_user.append(await ServidorRepository().get_servidor(self.bot.db_connection, guild.id))
         if len(servers_with_user) == 0:
             return
         if before.name != after.name:
@@ -128,45 +123,41 @@ class LogEvent(commands.Cog):
                     if (channel is not None) and server.tag_alterado:
                         await channel.send(embed=embed)
         if before.avatar.url != after.avatar.url:
-            url_antigo = str(before.avatar.with_format(format='webp'))
-            if url_antigo.find('?size=') != -1:
-                url_antigo = url_antigo[:url_antigo.rfind('?size=')]
-            url_novo = str(after.avatar.with_format(format='webp'))
+            avatar_erros = discord.NotFound, discord.HTTPException, discord.DiscordException
             path_401_image = get_path_from_file('401.png', 'images/')
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url_antigo) as resp:
-                    if resp.status == 200:
-                        response_antigo = BytesIO(await resp.read())
-                    else:
-                        response_antigo = path_401_image
-                async with session.get(url_novo) as resp:
-                    if resp.status == 200:
-                        response_novo = BytesIO(await resp.read())
-                    else:
-                        response_novo = path_401_image
-                avatar_antigo = Image.open(response_antigo).resize((512, 512), Image.ANTIALIAS)
-                avatar_novo = Image.open(response_novo).resize((512, 512), Image.ANTIALIAS)
-                base = Image.new('RGBA', (1024, 512), (0, 0, 0, 0))
-                base.paste(avatar_antigo, (0, 0))
-                base.paste(avatar_novo, (512, 0))
-                embed = discord.Embed(title='Avatar alterado',
-                                      colour=discord.Colour.random(),
-                                      description=f'O(A) {after.name} mudou o avatar!\n'
-                                                  f'User: {after.mention}\n'
-                                                  f'Id: {after.id}\n'
-                                                  f'[Avatar antigo]({before.avatar.url})'
-                                                  f' → [avatar novo]({after.avatar.url})',
-                                      timestamp=datetime.utcnow())
-                embed.set_image(url='attachment://avatar.png')
-                for server in servers_with_user:
-                    if server.channel_id_log is not None:
-                        channel = self.bot.get_channel(server.channel_id_log)
-                        if (channel is not None) and server.avatar_alterado:
-                            arr = BytesIO()
-                            base.save(arr, format='PNG')
-                            arr.seek(0)
-                            file = discord.File(arr, filename='avatar.png')
-                            await channel.send(file=file, embed=embed)
+            try:
+                before_avatar = BytesIO(await before.avatar.replace(format='png', size=512).read())
+            except avatar_erros:
+                before_avatar = path_401_image
+            try:
+                after_avatar = BytesIO(await after.avatar.replace(format='png', size=512).read())
+            except avatar_erros:
+                after_avatar = path_401_image
+            if before_avatar == after_avatar:
+                return
+            avatar_antigo = Image.open(before_avatar).resize((512, 512), Image.ANTIALIAS)
+            avatar_novo = Image.open(after_avatar).resize((512, 512), Image.ANTIALIAS)
+            base = Image.new('RGBA', (1024, 512), (0, 0, 0, 0))
+            base.paste(avatar_antigo, (0, 0))
+            base.paste(avatar_novo, (512, 0))
+            embed = discord.Embed(title='Avatar alterado',
+                                  colour=discord.Colour.random(),
+                                  description=f'O(A) {after.name} mudou o avatar!\n'
+                                              f'User: {after.mention}\n'
+                                              f'Id: {after.id}\n'
+                                              f'[Avatar antigo]({before.avatar.url})'
+                                              f' → [avatar novo]({after.avatar.url})',
+                                  timestamp=datetime.utcnow())
+            embed.set_image(url='attachment://avatar.png')
+            for server in servers_with_user:
+                if server.channel_id_log is not None:
+                    channel = self.bot.get_channel(server.channel_id_log)
+                    if (channel is not None) and server.avatar_alterado:
+                        arr = BytesIO()
+                        base.save(arr, format='PNG')
+                        arr.seek(0)
+                        file = discord.File(arr, filename='avatar.png')
+                        await channel.send(file=file, embed=embed)
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
@@ -180,14 +171,12 @@ class LogEvent(commands.Cog):
             channel = self.bot.get_channel(server.channel_id_log)
             if channel is not None:
                 if server.mensagem_editada:
-                    if len(before.content) >= 800:
-                        before.content = f'{before.content[:800]}...'
+                    before.content = cut_string(before.content, width=800)
                     if before.content.count('`') >= 3:
                         msg_antiga = f'\n{before.content}\n'
                     else:
                         msg_antiga = f'```{before.content}```'
-                    if len(after.content) >= 800:
-                        after.content = f'{after.content[:800]}...'
+                    after.content = cut_string(after.content, width=800)
                     if after.content.count('`') >= 3:
                         msg_nova = f'\n{after.content}\n'
                     else:
@@ -216,6 +205,7 @@ class LogEvent(commands.Cog):
             channel = self.bot.get_channel(server.channel_id_log)
             if channel is not None:
                 if server.mensagem_deletada:
+                    message.content = cut_string(message.content, width=800)
                     if message.content.count('`') >= 3:
                         msg_escaped = f'\n{message.content}\n'
                     else:

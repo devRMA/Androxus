@@ -2,6 +2,7 @@ aiohttp
 asyncio
 asyncpg
 bs4
+discord
 discord.py@git+https://github.com/Rapptz/discord.py@master
 emojis
 googletrans
@@ -12,7 +13,6 @@ pillow
 psutil
 py_expression_eval
 python-dateutil
-requests
 stopwatch.py
 testing.postgresql
 twemoji-parser

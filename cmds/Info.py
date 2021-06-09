@@ -9,7 +9,6 @@ import asyncio
 from asyncio import sleep
 from os import getpid
 from sys import version
-from textwrap import shorten
 from time import monotonic
 
 import discord
@@ -25,8 +24,9 @@ from EmbedGenerators.HelpGroup import embed_help_group
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.InformacoesRepository import InformacoesRepository
 from database.Repositories.ServidorRepository import ServidorRepository
-from utils.Utils import capitalize, datetime_format, prettify_number, get_most_similar_item, string_similarity
-from utils.Utils import get_last_commit, pegar_o_prefixo
+from utils.Utils import capitalize, datetime_format, prettify_number, get_most_similar_item, string_similarity, \
+    cut_string
+from utils.Utils import get_last_commit, get_prefix
 from utils.Utils import get_last_update
 from utils.converters import DiscordUser
 from utils.permissions import is_owner
@@ -210,7 +210,7 @@ class Info(commands.Cog):
                 if len(roles_mention) > 1_000:
                     roles_name = ', '.join(f'`{r.name}`' for r in roles)
                 if roles_name is not None and len(roles_name) > 1_000:
-                    roles_name = shorten(roles_name, width=1_000, placeholder='...')
+                    roles_name = cut_string(roles_name, width=1_000)
                 roles = roles_name or roles_mention
                 roles = f'**{roles}**'
                 embed4 = messages[3].get('embed')
@@ -533,7 +533,7 @@ class Info(commands.Cog):
         # se a pessoa usou o comando, mencionando o bot:
         if ctx.prefix.replace("!", "").replace(" ", "") == self.bot.user.mention:
             # vai pegar o prefixo que está no banco
-            prefixo = await pegar_o_prefixo(self.bot, ctx)
+            prefixo = await get_prefix(self.bot, ctx)
         else:
             # se a pessoa não marcou o bot:
             prefixo = ctx.prefix
@@ -565,7 +565,7 @@ class Info(commands.Cog):
             'db': sql_version[:15],
             'commands': prettify_number(len(all_commands)),
             'uptime': datetime_format(self.bot.uptime, lang=lang),
-            'last_att': datetime_format(get_last_update(), lang=lang)
+            'last_att': datetime_format(await get_last_update(self.bot.session), lang=lang)
         })
         await ctx.send(**messages[0])
 
@@ -621,7 +621,7 @@ class Info(commands.Cog):
         lang = await self.bot.get_language(ctx)
         messages = await self.bot.translate(ctx, values_={
             'last_commit': get_last_commit(),
-            'last_update': datetime_format(get_last_update(), lang=lang)
+            'last_update': datetime_format(await get_last_update(self.bot.session), lang=lang)
         })
         await ctx.send(**messages[0])
 
@@ -683,7 +683,18 @@ class Info(commands.Cog):
                             child.style = ButtonStyle.grey
                     button.style = ButtonStyle.blurple
 
+                async def back_to_home(self, interaction):
+                    btn = getattr(self, '_btn_home')
+                    self.select_button(btn)
+                    self.current_page = 'home'
+                    await interaction.response.edit_message(embed=messages[0]['embed'], view=self)
+
                 async def interaction_check(self, interaction):
+                    if not hasattr(self, '_btn_home'):
+                        setattr(self,
+                                '_btn_home',
+                                list(filter(lambda i: isinstance(i, Button) and str(i.emoji) == '🏠', self.children))[0]
+                                )
                     can_use = self.ctx.author.id == interaction.user.id
                     if not can_use:
                         ephemeral_error = (await self.ctx.bot.translate(ctx, error_='interaction', values_={
@@ -701,6 +712,8 @@ class Info(commands.Cog):
                         self.select_button(button)
                         await interaction.response.edit_message(embed=messages[1], view=self)
                         self.current_page = 'adm'
+                    else:
+                        await self.back_to_home(interaction)
 
                 @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('diversão'), row=0)
                 async def fun_page(self, button, interaction):
@@ -708,6 +721,8 @@ class Info(commands.Cog):
                         self.select_button(button)
                         await interaction.response.edit_message(embed=messages[2], view=self)
                         self.current_page = 'fun'
+                    else:
+                        await self.back_to_home(interaction)
 
                 @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('info'), row=0)
                 async def info_page(self, button, interaction):
@@ -715,6 +730,8 @@ class Info(commands.Cog):
                         self.select_button(button)
                         await interaction.response.edit_message(embed=messages[3], view=self)
                         self.current_page = 'info'
+                    else:
+                        await self.back_to_home(interaction)
 
                 @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('matemática'), row=1)
                 async def math_page(self, button, interaction):
@@ -722,6 +739,8 @@ class Info(commands.Cog):
                         self.select_button(button)
                         await interaction.response.edit_message(embed=messages[4], view=self)
                         self.current_page = 'math'
+                    else:
+                        await self.back_to_home(interaction)
 
                 @ui.button(style=ButtonStyle.blurple, emoji='🏠', row=1)
                 async def home_page(self, button, interaction):
@@ -736,6 +755,8 @@ class Info(commands.Cog):
                         self.select_button(button)
                         await interaction.response.edit_message(embed=messages[5], view=self)
                         self.current_page = 'owner'
+                    else:
+                        await self.back_to_home(interaction)
 
                 @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('úteis'), row=2)
                 async def utils_page(self, button, interaction):
@@ -743,6 +764,8 @@ class Info(commands.Cog):
                         self.select_button(button)
                         await interaction.response.edit_message(embed=messages[6], view=self)
                         self.current_page = 'utils'
+                    else:
+                        await self.back_to_home(interaction)
 
                 @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('personalizado'), row=2, disabled=True)
                 async def pers_page(self, button, interaction):
@@ -750,6 +773,8 @@ class Info(commands.Cog):
                         self.select_button(button)
                         await interaction.response.edit_message(embed=messages[7], view=self)
                         self.current_page = 'pers'
+                    else:
+                        await self.back_to_home(interaction)
 
                 @ui.button(style=ButtonStyle.red, emoji=self.bot.get_emoji('stop'), row=2)
                 async def exit_btn(self, button, interaction):
@@ -797,9 +822,7 @@ class Info(commands.Cog):
                         for alias in cmd.aliases:
                             all_names.append(alias)
                 command_name = ctx.message.content.lower()[len(ctx.prefix):].split(' ')
-                if command_name[0] == 'help':
-                    command_name.pop(0)
-                command_name = command_name[0]
+                command_name = command_name[-1]
                 if ctx.guild:
                     servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
                     all_names += list(

@@ -7,7 +7,7 @@ __author__ = 'Rafael'
 import re
 from datetime import datetime
 from itertools import cycle
-from json import loads, load
+from json import load
 from os import listdir
 from string import ascii_letters
 from sys import version
@@ -20,7 +20,6 @@ from discord import AllowedMentions, Colour
 from discord.ext import commands, tasks
 from discord.ext.commands.view import StringView
 from discord.utils import utcnow
-from requests import get
 
 from database.Factories.ConnectionFactory import ConnectionFactory
 from database.Repositories.BlacklistRepository import BlacklistRepository
@@ -28,7 +27,7 @@ from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoR
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import get_configs, prettify_number, get_path_from_file, pegar_o_prefixo, get_emojis_json, pretty_i, \
+from utils.Utils import get_configs, prettify_number, get_path_from_file, get_prefix, get_emojis_json, pretty_i, \
     get_most_similar_item, string_similarity
 
 
@@ -73,26 +72,45 @@ def _load_cogs(bot):
 class Androxus(commands.Bot):
     __version__ = '2.3'
     configs: dict = get_configs()
-    uptime: datetime = None
+    uptime: datetime = datetime.utcnow()
     mudar_status: bool = True
     server_log: discord.TextChannel = None
     maintenance_mode: bool = False
     db_connection: Pool = None
-    supported_langs: list = []
+    supported_languages: list = []
     session: ClientSession = None
+    _status = cycle(['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
+                     'To add me to a server, just send the message "invite" in my dm!',
+                     'Eu estou divertindo {servers} servidores!',
+                     'I\'m amusing {servers} servers!',
+                     'Estou divertindo {pessoas} pessoas!',
+                     'I\'m having fun {pessoas} people!',
+                     'Estou ouvindo {channels} chats!',
+                     'I\'m listening to {channels} chats!',
+                     'Caso você precise de ajuda, basta me mencionar!',
+                     'If you need help, just mention me!',
+                     '🤔 como que eu estou "jogando" se eu sou um bot?',
+                     '🤔 How am I "playing" if I\'m a bot?',
+                     'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
+                     'If you want to know more details about me, use the "botinfo" command!',
+                     'Caso você queira ver meu código fonte, use o comando "source"!',
+                     'If you want to see my source code, use the "source" command!',
+                     'Para saber todos os meus comandos, digite "ajuda"!',
+                     'To know all my commands, send "help"!',
+                     'Para obter mais informações sobre um comando, use o comando "ajuda comando"!',
+                     'For more information about a command, use the command "help command"!'
+                     ])
 
     def __init__(self, *args, **kwargs):
         # Intents do discord.py 1.5.0
         intents = discord.Intents.all()
-        # configurações do .json
-        configs = get_configs()
 
         async def _prefix_or_mention(bot, message):
-            prefix = await pegar_o_prefixo(bot, message)
+            prefix = await get_prefix(bot, message)
             return commands.when_mentioned_or(prefix)(bot, message)
 
         kwargs['command_prefix'] = _prefix_or_mention
-        kwargs['owner_id'] = configs['owners'] if len(configs['owners']) > 1 else configs['owners'][0]
+        kwargs['owner_id'] = self.configs['owners'] if len(self.configs['owners']) > 1 else self.configs['owners'][0]
         kwargs['case_insensitive'] = True
         kwargs['intents'] = intents
         kwargs['strip_after_prefix'] = True
@@ -100,44 +118,33 @@ class Androxus(commands.Bot):
         # iniciando o bot
         super().__init__(*args, **kwargs)
         _load_cogs(self)
-        # vai verificar se a pessoa está com a versão mais atual do bot
-        url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
-        html = get(url).text
-        json = loads(html)
-        # como os commits, sempre são assim:
-        # Versão x.x.x.x
-        # - alterações
-        # vai pegar a primeira linha do commit e apenas a versão do último commit
-        version_github = json[0]['commit']['message'].splitlines()[0].split(' ')[-1]
-        # e vai comparar com a versão atual
-        if version_github != self.__version__:
-            _warn('========== ATENÇÃO! ==========\n'
-                  'Já você está usando uma versão desatualizada do Androxus!\n'
-                  'Isso não vai impedir que o bot inicie, porém a sua versão pode\n'
-                  'estar com algum bug que já foi resolvido ou algum comando a menos!\n'
-                  'Acesse o repositório original, e baixe a nova versão!\n'
-                  'Link do repositório original:\nhttps://github.com/devRMA/Androxus\n'
-                  f'Nova versão: {version_github}\n'
-                  f'Versão que você está usando: {self.__version__}')
 
     async def on_ready(self):
         if self.db_connection is None:
+            self.session = self.http._HTTPClient__session
+            # vai verificar se a pessoa está com a versão mais atual do bot
+            url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
+            async with self.session.get(url) as resp:
+                json = await resp.json()
+            # como os commits, sempre são assim:
+            # Versão x.x.x.x
+            # - alterações
+            # vai pegar a primeira linha do commit e apenas a versão do último commit
+            version_github = json[0]['commit']['message'].splitlines()[0].split(' ')[-1]
+            # e vai comparar com a versão atual
+            if version_github != self.__version__:
+                _warn('========== ATENÇÃO! ==========\n'
+                      'Já você está usando uma versão desatualizada do Androxus!\n'
+                      'Isso não vai impedir que o bot inicie, porém a sua versão pode\n'
+                      'estar com algum bug que já foi resolvido ou algum comando a menos!\n'
+                      'Acesse o repositório original, e baixe a nova versão!\n'
+                      'Link do repositório original:\nhttps://github.com/devRMA/Androxus\n'
+                      f'Nova versão: {version_github}\n'
+                      f'Versão que você está usando: {self.__version__}')
             self.uptime = datetime.utcnow()
             self.server_log = self.get_channel(self.configs['channels_log']['servers'])
             self.db_connection = await ConnectionFactory.get_connection()
-            self.supported_langs = listdir('json/languages/')
-            self.session = self.http._HTTPClient__session
-            self._status = cycle(['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
-                                  'Eu estou divertindo {servers} servidores!',
-                                  'Estou divertindo {pessoas} pessoas',
-                                  'Estou ouvindo {channels} chats!',
-                                  'Caso você precise de ajuda, basta me mencionar!',
-                                  '🤔 como que eu estou "jogando" se eu sou um bot?',
-                                  'Caso você queira saber mais detalhes sobre mim, use o comando "botinfo"!',
-                                  'Caso você queira ver meu código fonte, use o comando "source"!',
-                                  'Para saber todos os meus comandos, digite "cmds"!',
-                                  'Para obter mais informações sobre um comando, use o comando "help comando"!'
-                                  ])
+            self.supported_languages = listdir('json/languages/')
 
             def send_message_mod(
                     channel_id,
@@ -226,6 +233,8 @@ class Androxus(commands.Bot):
             messages = await self.translate(ctx, help_='mention', values_={
                 'prefix': prefix
             })
+            if permissions.can_react(ctx):
+                await message.add_reaction(self.get_emoji('hello'))
             return await ctx.send(**messages[0])
         if server and ctx.valid:
             for cmd_disabled in await ComandoDesativadoRepository().get_commands(self.db_connection, server):

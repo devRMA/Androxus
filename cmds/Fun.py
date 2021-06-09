@@ -34,7 +34,8 @@ class Fun(commands.Cog):
     async def _eightball(self, ctx, *, args=None):
         if args is None:
             return await self.bot.send_help(ctx)
-        answers = await self.bot.translate(ctx, others_='eightball')
+        others = await self.bot.translate(ctx, others_='eightball')
+        answers = others.get('answers')
         # vai transformar a pergunta em asci, e usar este número como seed para pegar a resposta
         # e a base, vai ser o id da pessoa
         asci_value = ctx.author.id + ctx.channel.id
@@ -51,7 +52,8 @@ class Fun(commands.Cog):
                          aliases=['cc', 'coinflip', 'coin_flip', 'caracoroa'])
     @commands.cooldown(1, 4, commands.BucketType.user)
     async def _cara_coroa(self, ctx):
-        answers = await self.bot.translate(ctx, others_='cara_coroa')
+        others = await self.bot.translate(ctx, others_='cara_coroa')
+        answers = others.get('answers')
         await ctx.reply(choice(answers), mention_author=False)
 
     @diversao_gp.command(name='girar',

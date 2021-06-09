@@ -10,22 +10,22 @@ from datetime import datetime
 from datetime import timezone
 from functools import reduce
 from glob import glob
-from json import loads, load
+from json import load
 from random import choice
 from re import compile
 from re import sub
+from textwrap import TextWrapper
 from typing import List
 
 from discord.utils import utcnow
 from humanize import i18n, precisedelta
 from jellyfish import jaro_winkler_similarity
-from requests import get
 
 from database.Models.Servidor import Servidor
 from database.Repositories.ServidorRepository import ServidorRepository
 
 
-async def pegar_o_prefixo(bot, message):
+async def get_prefix(bot, message):
     """
 
     Args:
@@ -36,19 +36,20 @@ async def pegar_o_prefixo(bot, message):
         str: o prefixo do bot, para está mensagem
 
     """
-    if message.guild:  # se a mensagem tiver um servidor, é porque ela não foi enviada no privado
-        # vai no banco de dados, e faz um select para ver qual o prefixo
-        servidor = await ServidorRepository().get_servidor(bot.db_connection, message.guild.id)
-        prefixo = None
-        if servidor:
-            prefixo = servidor.prefixo
-        if prefixo is not None:  # se achou um prefixo, retorna o que achou
-            return prefixo
-        if servidor is None:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
-            servidor = Servidor(message.guild.id, get_configs()['default_prefix'])
-            await ServidorRepository().create(bot.db_connection, servidor)
+    if message.guild:  # se a mensagem tiver um servidor
+        s_repo = ServidorRepository()
+        # vai no banco de dados, e pega as informações do servidor
+        server = await s_repo.get_servidor(bot.db_connection, message.guild.id)
+        prefix = None
+        if server:
+            prefix = server.prefixo
+        if prefix:  # se achou um prefixo, retorna o que achou
+            return prefix
+        if server is None:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
+            server = Servidor(message.guild.id, bot.configs.get('default_prefix'))
+            await s_repo.create(bot.db_connection, server)
             # se acabou de criar o registro, o prefixo vai ser o padrão
-            return get_configs()['default_prefix']
+            return bot.configs.get('default_prefix')
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
 
 
@@ -64,8 +65,11 @@ def get_emoji_dance():
     return choice(emojis)  # retorna o emoji escolhido da lista
 
 
-def get_last_update():
+async def get_last_update(session):
     """
+
+    Args:
+        session (aiohttp.ClientSession): A session que vai ser usada para fazer o request
 
     Returns:
         datetime.datetime: O datetime do último commit que teve no github
@@ -74,8 +78,8 @@ def get_last_update():
     # função que vai pegar o último update que o bot teve
     # como o bot está no github, a ultima atualização que teve no github, vai ser a ultima atualização do bot
     url = 'https://api.github.com/repositories/294764564/commits'  # url do repositório do bot
-    html = get(url).text  # vai pegar o texto da página
-    json = loads(html)  # transformar de json para dicionario
+    async with session.get(url) as resp:
+        json = await resp.json()
     data_do_update = json[0]['commit']['committer']['date']  # aqui, ainda vai estar como string
     # esse é um exemplo de como vai chegar a string: 2020-09-19T04:37:37Z
     # da para observer que a formatação é: ano-mes-diaThora:minuto:segundoZ
@@ -83,17 +87,19 @@ def get_last_update():
     return data_do_update  # retorna o objeto datetime
 
 
-def get_last_commit():
+async def get_last_commit(session):
     """
+
+    Args:
+        session (aiohttp.ClientSession): A session que vai ser usada para fazer o request
 
     Returns:
         str: A mensagem do último commit que teve no github do bot
 
     """
-    # função que vai pegar o último commit do github do bot
     url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
-    html = get(url).text  # vai pegar o texto da página
-    json = loads(html)  # transformar de json para dicionario
+    async with session.get(url) as resp:
+        json = await resp.json()
     return json[0]['commit']['message']  # vai pegar o último commit que teve, e retornar a mensagem
 
 
@@ -111,7 +117,7 @@ def get_configs():
         return configs
     else:
         exit('Não achei o arquivo de configurações!\nBaixe o arquivo configs.json e coloque na pasta json!\n'
-             'https://github.com/devRMA/Androxus')
+             'https://github.com/devRMA/Androxus/tree/master/json')
 
 
 def get_emojis_json():
@@ -128,7 +134,7 @@ def get_emojis_json():
         return configs
     else:
         exit('Não achei o arquivo de configurações!\nBaixe o arquivo emojis.json e coloque na pasta json!\n'
-             'https://github.com/devRMA/Androxus')
+             'https://github.com/devRMA/Androxus/tree/master/json')
 
 
 def capitalize(string):
@@ -162,7 +168,8 @@ def datetime_format(date1, date2=None, lang='en_us'):
 
     Args:
         date1 (datetime.datetime): Objeto datetime que vai ser subtraido pelo date2
-        date2 (datetime.datetime): Parâmetro opcional, se não for passado, vai pegar o datetime utc atual (Default value = None)
+        date2 (datetime.datetime): Parâmetro opcional, se não for passado, vai pegar o datetime utc atual
+            (Default value = None)
         lang (str): A língua que vai ser usada para formatar o timedelta
 
     Returns:
@@ -179,11 +186,11 @@ def datetime_format(date1, date2=None, lang='en_us'):
                      day=date1.day, hour=date1.hour,
                      minute=date1.minute, second=date1.second,
                      microsecond=date1.microsecond, tzinfo=timezone.utc)
-    date_formated = precisedelta(date1 - date2, format='%0.0f')
+    date_formatted = precisedelta(date1 - date2, format='%0.0f')
     if lang == 'en_us':
-        return date_formated + ' ago'
+        return date_formatted + ' ago'
     elif lang == 'pt_br':
-        return 'Há ' + date_formated
+        return 'Há ' + date_formatted
 
 
 def inverter_string(string):
@@ -450,7 +457,8 @@ def prettify_number(number, br=True, truncate=False):
 
     Args:
         number (Any): O valor que vai ser deixado "bonito"
-        br (bool): Flag que vai ativar ou não o padrão br: "100.000,00". Se tiver desativado, vai sair assim "100,000.00"
+        br (bool): Flag que vai ativar ou não o padrão br: "100.000,00". Se tiver desativado, vai sair
+            assim "100,000.00"
         truncate (bool): Parâmetro que vai definir se é ou não para cortar as casas decimais
 
     Returns:
@@ -547,8 +555,10 @@ async def find_user(user_input, ctx, accuracy=0.6, API_search=True):
     Args:
         user_input (str): O input que vai ser procurado na collection de membros/users
         ctx (discord.ext.commands.Context): Contexto da mensagem
-        accuracy (float): O quão parecido vai precisar ser o input com o usuário, para selecionar ele (Default value = 0.6)
-        API_search (bool): Se é ou não para pegar o user pela API do discord, caso o input seja um id (Default value = True)
+        accuracy (float): O quão parecido vai precisar ser o input com o usuário, para selecionar ele
+            (Default value = 0.6)
+        API_search (bool): Se é ou não para pegar o user pela API do discord, caso o input seja um id
+            (Default value = True)
 
     Returns:
         List[discord.User]: O(s) usuário/membro(s) encontrado(s)
@@ -778,3 +788,24 @@ def info(object_):
     if len(attributes) > 0:
         all_attrs['attributes'] = tuple(attributes)
     return all_attrs
+
+
+def cut_string(text, width=70, placeholder=' [...]', **kwargs):
+    """
+
+    Args:
+        text (str):
+        width (int): Tamanho máximo do texto.  (Default value = 70)
+        placeholder (str): String que vai ser colocada no final, caso o texto tenha sido cortado
+        kwargs: textwrap.TextWrapper kwargs
+
+
+    Returns:
+        str: A string "cortada"
+
+    """
+    wrapper = TextWrapper(width=width, **kwargs)
+    cut_text = wrapper.wrap(text)[0]
+    if cut_text != text:
+        cut_text += placeholder
+    return cut_text

@@ -27,16 +27,10 @@ class ErrorCommands(commands.Cog):
             return
 
         cog = ctx.cog
-        if cog:
-            if cog._get_overridden_method(cog.cog_command_error) is not None:
-                return
-
-        ignored = ()
-
-        error = getattr(error, 'original', error)
-        if isinstance(error, ignored):
+        if cog and cog._get_overridden_method(cog.cog_command_error) is not None:
             return
-        elif isinstance(error, errors.NotOwner):
+        error = getattr(error, 'original', error)
+        if isinstance(error, errors.NotOwner):
             return await ctx.send(f'{ctx.author.mention} você não é meu criador {self.bot.get_emoji("no_no")}')
         elif isinstance(error, errors.MissingRequiredArgument):
             return await self.bot.send_help(ctx)
