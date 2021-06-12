@@ -8,7 +8,6 @@ emojis
 googletrans
 jellyfish
 jishaku@git+https://github.com/Gorialis/jishaku@master
-pandas
 pillow
 psutil
 py_expression_eval
