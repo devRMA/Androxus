@@ -16,7 +16,6 @@ import discord
 from discord.ext import commands
 from stopwatch import Stopwatch
 
-from Classes import Androxus
 from EmbedGenerators.HelpGroup import embed_help_group
 from database.Models.ComandoDesativado import ComandoDesativado
 from database.Models.ComandoPersonalizado import ComandoPersonalizado
@@ -461,8 +460,9 @@ class OwnerOnly(commands.Cog):
         else:
             motivo = 'nulo'
         await BlacklistRepository().create(self.bot.db_connection, user_id, motivo)
-        return await ctx.reply(f'O usuário <@!{user_id}> não vai poder usar meus comandos! {self.bot.get_emoji("banido")}'
-                               f'\nCom o motivo: {motivo}', mention_author=False)
+        return await ctx.reply(
+            f'O usuário <@!{user_id}> não vai poder usar meus comandos! {self.bot.get_emoji("banido")}'
+            f'\nCom o motivo: {motivo}', mention_author=False)
 
     @owner_gp.command(name='remove_blacklist', aliases=['rb', 'whitelist'])
     @commands.check(permissions.is_owner)

@@ -1,6 +1,5 @@
 [
     {
-        "content": "conteudo da mensagem",
         "reference": "message",
         "allowed_mentions": {
             "replied_user": false
@@ -29,7 +28,7 @@
                 {
                     "inline": true,
                     "name": "\uD83D\uDE42 Quantos emojis tem:",
-                    "value": "{emojis}/{emoji_limit}"
+                    "value": "{emojis}"
                 },
                 {
                     "inline": true,
@@ -65,7 +64,6 @@
         }
     },
     {
-        "content": "conteudo da mensagem",
         "reference": "message",
         "allowed_mentions": {
             "replied_user": false
@@ -99,7 +97,7 @@
                 {
                     "inline": true,
                     "name": "\uD83D\uDE42 Quantos emojis tem:",
-                    "value": "{emojis}}"
+                    "value": "{emojis}"
                 },
                 {
                     "inline": true,

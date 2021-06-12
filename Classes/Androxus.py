@@ -395,7 +395,7 @@ class Androxus(commands.Bot):
         """
 
         Args:
-            args (str): Nome ou id ou nome do emoji que está no configs.json ou o uso do emoji
+            args (str or int): Nome ou id ou nome do emoji que está no configs.json ou o uso do emoji
 
         Returns:
             discord.Emoji

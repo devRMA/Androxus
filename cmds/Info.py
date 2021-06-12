@@ -264,13 +264,13 @@ class Info(commands.Cog):
                     self.last_interaction = monotonic()
                 return can_use
 
-            @ui.button(style=ButtonStyle.grey, emoji='⏮', row=0)
+            @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('first_btn'), row=0)
             async def btn_first(self, button, interaction):
                 if self.current_page > 0:
                     self.current_page = 0
                     await interaction.response.edit_message(**self.messages[self.current_page])
 
-            @ui.button(style=ButtonStyle.grey, emoji='◀️', row=0)
+            @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('back_btn'), row=0)
             async def btn_back(self, button, interaction):
                 if self.current_page > 0:
                     self.current_page -= 1
@@ -282,11 +282,11 @@ class Info(commands.Cog):
                     self.current_page = self.last_page
                     await interaction.response.edit_message(**self.messages[self.current_page])
 
-            @ui.button(style=ButtonStyle.red, emoji='⏹️', row=0)
+            @ui.button(style=ButtonStyle.red, emoji=self.bot.get_emoji('stop_btn'), row=0)
             async def btn_stop(self, button, interaction):
                 self.stop()
 
-            @ui.button(style=ButtonStyle.grey, emoji='▶', row=0)
+            @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('next_btn'), row=0)
             async def btn_next(self, button, interaction):
                 if self.current_page < self.last_page:
                     self.current_page += 1
@@ -298,7 +298,7 @@ class Info(commands.Cog):
                     self.current_page = 0
                     await interaction.response.edit_message(**self.messages[self.current_page])
 
-            @ui.button(style=ButtonStyle.grey, emoji='⏭', row=0)
+            @ui.button(style=ButtonStyle.grey, emoji=self.bot.get_emoji('last_btn'), row=0)
             async def btn_last(self, button, interaction):
                 if self.current_page < self.last_page:
                     self.current_page = self.last_page
@@ -620,7 +620,7 @@ class Info(commands.Cog):
     async def _changelog(self, ctx):
         lang = await self.bot.get_language(ctx)
         messages = await self.bot.translate(ctx, values_={
-            'last_commit': get_last_commit(),
+            'last_commit': await get_last_commit(self.bot.session),
             'last_update': datetime_format(await get_last_update(self.bot.session), lang=lang)
         })
         await ctx.send(**messages[0])
