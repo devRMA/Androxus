@@ -13,6 +13,7 @@ from traceback import format_exc
 
 import asyncpg
 import discord
+from colorama import Fore, Style
 from discord.ext import commands
 from stopwatch import Stopwatch
 
@@ -35,7 +36,7 @@ class OwnerOnly(commands.Cog):
         """
 
         Args:
-            bot (Classes.Androxus.Androxus): Instância do bot
+            bot (Classes.General.Androxus): Instância do bot
 
         """
         self.bot = bot
@@ -396,7 +397,7 @@ class OwnerOnly(commands.Cog):
                 if send_file:
                     msg_file = await ctx.send(file=discord.File(
                         filename='result.py',
-                        fp=BytesIO(result_str.encode('utf-8'))
+                        fp=BytesIO(result_str.removeprefix("'").removesuffix("'").encode('utf-8'))
                     ))
                 await msg_bot.add_reaction(emojis['desativado'])
                 await msg_bot.add_reaction(emojis['cadeado'])
@@ -506,4 +507,8 @@ class OwnerOnly(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(OwnerOnly(bot))
+    cog = OwnerOnly(bot)
+    cmds = f'{Fore.BLUE}{len(list(cog.walk_commands()))}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"COG LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

@@ -10,6 +10,7 @@ from re import compile
 import discord
 import emojis
 import googletrans
+from colorama import Fore, Style
 from discord.ext import commands
 from discord.ext.commands import BadArgument
 from twemoji_parser import emoji_to_url
@@ -28,7 +29,7 @@ class Uteis(commands.Cog):
         """
 
         Args:
-            bot (Classes.Androxus.Androxus): Instância do bot
+            bot (Classes.General.Androxus): Instância do bot
 
         """
         self.bot = bot
@@ -294,4 +295,8 @@ class Uteis(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Uteis(bot))
+    cog = Uteis(bot)
+    cmds = f'{Fore.BLUE}{len(list(cog.walk_commands()))}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"COG LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

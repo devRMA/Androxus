@@ -6,7 +6,7 @@ __author__ = 'Rafael'
 
 import asyncpg
 
-from Classes.erros import DuplicateComandoDesativado, ComandoDesativadoNotFound
+from Classes.Erros import DuplicateComandoDesativado, ComandoDesativadoNotFound
 from database.Models.ComandoDesativado import ComandoDesativado
 from database.Models.Servidor import Servidor
 from database.Repositories.Interfaces.IComandoDesativadoRepository import IComandoDesativadoRepository

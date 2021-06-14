@@ -6,7 +6,7 @@ __author__ = 'Rafael'
 
 import asyncpg
 
-from Classes.erros import DuplicateServidor
+from Classes.Erros import DuplicateServidor
 from database.Models.Servidor import Servidor
 from database.Repositories.Interfaces.IServidorRepository import IServidorRepository
 

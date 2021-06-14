@@ -4,11 +4,18 @@
 
 __author__ = 'Rafael'
 
+from colorama import Fore, Style
 from discord.ext import commands
 
 
 class DmEvent(commands.Cog):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.General.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @commands.Cog.listener()
@@ -25,10 +32,8 @@ class DmEvent(commands.Cog):
 
 
 def setup(bot):
-    """
-
-    Args:
-        bot (Classes.Androxus.Androxus): Instância do bot
-
-    """
-    bot.add_cog(DmEvent(bot))
+    cog = DmEvent(bot)
+    cmds = f'{Fore.BLUE}{len(cog.get_listeners())}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"EVENT LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

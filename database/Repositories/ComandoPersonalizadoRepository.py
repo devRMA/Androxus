@@ -6,7 +6,7 @@ __author__ = 'Rafael'
 
 import asyncpg
 
-from Classes.erros import DuplicateComandoPersonalizado
+from Classes.Erros import DuplicateComandoPersonalizado
 from database.Models.ComandoPersonalizado import ComandoPersonalizado
 from database.Repositories.Interfaces.IComandoPersonalizadoRepository import IComandoPersonalizadoRepository
 

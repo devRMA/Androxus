@@ -9,6 +9,7 @@ from io import BytesIO
 
 import discord
 from PIL import Image
+from colorama import Fore, Style
 from discord.ext import commands
 
 from database.Repositories.ServidorRepository import ServidorRepository
@@ -20,7 +21,7 @@ class LogEvent(commands.Cog):
         """
 
         Args:
-            bot (Classes.Androxus.Androxus): Instância do bot
+            bot (Classes.General.Androxus): Instância do bot
 
         """
         self.bot = bot
@@ -256,4 +257,8 @@ class LogEvent(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(LogEvent(bot))
+    cog = LogEvent(bot)
+    cmds = f'{Fore.BLUE}{len(cog.get_listeners())}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"EVENT LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

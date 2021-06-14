@@ -17,6 +17,7 @@ from re import sub
 from textwrap import TextWrapper
 from typing import List
 
+from colorama import Style, Fore
 from discord.utils import utcnow
 from humanize import i18n, precisedelta
 from jellyfish import jaro_winkler_similarity
@@ -29,7 +30,7 @@ async def get_prefix(bot, message):
     """
 
     Args:
-        bot (Classes.Androxus.Androxus): Instância do bot
+        bot (Classes.General.Androxus): Instância do bot
         message (discord.Message or discord.ext.commands.context.Context): A mensagem que quer saber o prefixo do bot
 
     Returns:
@@ -46,10 +47,10 @@ async def get_prefix(bot, message):
         if prefix:  # se achou um prefixo, retorna o que achou
             return prefix
         if server is None:  # se o banco disse que não tem esse servidor cadastrado, vai criar um
-            server = Servidor(message.guild.id, bot.configs.get('default_prefix'))
+            server = Servidor(message.guild.id, bot.configs.default_prefix)
             await s_repo.create(bot.db_connection, server)
             # se acabou de criar o registro, o prefixo vai ser o padrão
-            return bot.configs.get('default_prefix')
+            return bot.configs.default_prefix
     return ''  # se a mensagem foi enviado no privado, não vai ter prefixo
 
 
@@ -809,3 +810,44 @@ def cut_string(text, width=70, placeholder=' [...]', **kwargs):
     if cut_text != text:
         cut_text += placeholder
     return cut_text
+
+
+def print_colorful(text, only_format=True, *, color=None, style=None, values=None):
+    """
+
+    Args:
+        text (str): O texto que vai ser printado.
+        only_format (bool or None): Flag que vai dizer se vai ser só o format, que vai ser colorido, ou tudo
+            (Default value = true)
+        color (str or None): Cor que vai ser usada para colorir o texto (Default value = Fore.CYAN)
+        style (str or None): Estilo que vai ser usado (-1 para não usar estilo) (Default value = Style.BRIGHT)
+        values (dict or None): Valores que vão ser usados para formatar o texto, no print (Default value = {})
+
+    Returns:
+
+    """
+    if color is None:
+        color = Fore.CYAN
+    if style is None:
+        style = Style.BRIGHT
+    elif style == '-1':
+        style = ''
+    if values is None:
+        values = {}
+
+    class DictForFormat(dict):
+        def __missing__(self, k):
+            return k.join("{}")
+
+    values = DictForFormat(values)
+    if only_format:
+        new_lines = []
+        for line in text.splitlines():
+            prefix, rest = line.split('{')
+            variable, suffix = rest.split('}')
+            prefix = f'{prefix}{style + color}' + '{'
+            suffix = '}' + f'{Style.RESET_ALL}{suffix}'
+            new_lines.append(f'{prefix}{variable}{suffix}')
+        print('\n'.join(new_lines).format_map(values))
+    else:
+        print(f'{style + color}{text.format_map(values)}{Style.RESET_ALL}')

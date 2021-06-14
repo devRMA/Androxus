@@ -2,6 +2,7 @@ aiohttp
 asyncio
 asyncpg
 bs4
+colorama
 discord
 discord.py@git+https://github.com/Rapptz/discord.py@master
 emojis

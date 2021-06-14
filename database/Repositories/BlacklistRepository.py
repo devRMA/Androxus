@@ -8,7 +8,7 @@ from datetime import datetime
 
 import asyncpg
 
-from Classes.erros import DuplicateBlacklist
+from Classes.Erros import DuplicateBlacklist
 from database.Repositories.Interfaces.IBlacklistRepository import IBlacklistRepository
 
 

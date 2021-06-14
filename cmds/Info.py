@@ -13,12 +13,13 @@ from time import monotonic
 
 import discord
 import psutil
+from colorama import Fore, Style
 from discord import ui, ButtonStyle
 from discord.ext import commands
 from discord.ui import Button
 from stopwatch import Stopwatch
 
-from Classes.Androxus import DictForFormat
+from Classes.General import DictForFormat
 from EmbedGenerators.HelpCommand import embed_help_command
 from EmbedGenerators.HelpGroup import embed_help_group
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
@@ -37,7 +38,7 @@ class Info(commands.Cog):
         """
 
         Args:
-            bot (Classes.Androxus.Androxus): Instância do bot
+            bot (Classes.General.Androxus): Instância do bot
 
         """
         self.bot = bot
@@ -514,7 +515,7 @@ class Info(commands.Cog):
                 rank += '🤖'
             if item == ctx.guild.owner:
                 rank += '👑'
-            if item.id in self.bot.configs['owners']:
+            if item.id in self.bot.configs.owners:
                 rank += str(self.bot.get_emoji('dev_badge'))
             rank += '\n'
         messages = await self.bot.translate(ctx, values_={
@@ -547,7 +548,7 @@ class Info(commands.Cog):
             'created_at': self.bot.user.created_at.strftime("%d/%m/%Y"),
             'age': datetime_format(self.bot.user.created_at, lang=lang),
             'owner_emoji': self.bot.get_emoji('owner'),
-            'owner': str(self.bot.get_user(self.bot.configs['owners'][0])),
+            'owner': str(self.bot.get_user(self.bot.configs.owners[0])),
             'pato': self.bot.get_emoji('pato'),
             'guilds': prettify_number(len(self.bot.guilds)),
             'parrot': self.bot.get_emoji('parrot'),
@@ -843,4 +844,8 @@ class Info(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Info(bot))
+    cog = Info(bot)
+    cmds = f'{Fore.BLUE}{len(list(cog.walk_commands()))}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"COG LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

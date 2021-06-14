@@ -6,6 +6,7 @@ __author__ = 'Rafael'
 
 from random import choice, seed
 
+from colorama import Style, Fore
 from discord import AllowedMentions
 from discord.ext import commands
 
@@ -18,7 +19,7 @@ class Fun(commands.Cog):
         """
 
         Args:
-            bot (Classes.Androxus.Androxus): Instância do bot
+            bot (Classes.General.Androxus): Instância do bot
 
         """
         self.bot = bot
@@ -71,4 +72,8 @@ class Fun(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Fun(bot))
+    cog = Fun(bot)
+    cmds = f'{Fore.BLUE}{len(list(cog.walk_commands()))}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"COG LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

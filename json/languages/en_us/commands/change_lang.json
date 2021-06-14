@@ -1,5 +1,33 @@
 [
     {
-        "content": "The language has been changed! :)"
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        },
+        "embed": {
+            "footer": {
+                "text": "{ctx.author}",
+                "icon_url": "{ctx.author.avatar.url}"
+            },
+            "fields": [
+                {
+                    "inline": false,
+                    "name": "If you want to go back to the default language, just type `{ctx.clean_prefix}lang`! {dance}",
+                    "value": "** **"
+                }
+            ],
+            "color": "random",
+            "timestamp": "now",
+            "type": "rich",
+            "description": "> Old language: `{old_lang.display_name}`\n> New language: `{new_lang.display_name}`",
+            "title": "Successfully changed language!"
+        }
+    },
+    {
+        "content": "I now have the default language! {dance}",
+        "reference": "message",
+        "allowed_mentions": {
+            "replied_user": false
+        }
     }
 ]

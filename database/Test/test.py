@@ -9,7 +9,7 @@ import asyncio
 import testing.postgresql
 
 from Classes.Test import Test, executar_testes
-from Classes.erros import *
+from Classes.Erros import *
 from database.Factories.ConnectionFactory import ConnectionFactory
 from database.Models.ComandoDesativado import ComandoDesativado
 from database.Models.ComandoPersonalizado import ComandoPersonalizado

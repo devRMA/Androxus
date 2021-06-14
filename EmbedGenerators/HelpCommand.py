@@ -9,8 +9,8 @@ from datetime import datetime
 import discord
 from discord.ext import commands
 
-from Classes.Androxus import Androxus
-from Classes.erros import Stop
+from Classes.General import Androxus
+from Classes.Erros import Stop
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 

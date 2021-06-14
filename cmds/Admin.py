@@ -8,6 +8,7 @@ import asyncio
 from datetime import datetime
 
 import discord
+from colorama import Style, Fore
 from discord.ext import commands
 
 from EmbedGenerators.HelpGroup import embed_help_group
@@ -27,7 +28,7 @@ class Admin(commands.Cog):
         """
 
         Args:
-            bot (Classes.Androxus.Androxus): Instância do bot
+            bot (Classes.General.Androxus): Instância do bot
 
         """
         self.bot = bot
@@ -58,7 +59,7 @@ class Admin(commands.Cog):
                 return await ctx.send(**messages_error[1])
             elif member == self.bot.user:
                 return await ctx.send(**messages_error[2])
-            elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
+            elif ctx.author.id in self.bot.configs.owners or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
                 return await ctx.send(**messages_error[3])
@@ -111,7 +112,7 @@ class Admin(commands.Cog):
                 return await ctx.send(**messages_error[1])
             elif member == self.bot.user:
                 return await ctx.send(**messages_error[2])
-            elif ctx.author.id in self.bot.configs['owners'] or ctx.author == ctx.guild.owner:
+            elif ctx.author.id in self.bot.configs.owners or ctx.author == ctx.guild.owner:
                 pass  # se for o dono do bot, ou dono do servidor, vai ignorar as próxima verificação
             elif ctx.author.top_role <= member.top_role:
                 return await ctx.send(**messages_error[3])
@@ -193,7 +194,7 @@ class Admin(commands.Cog):
                 'old_prefix': old_prefix,
                 'dance': get_emoji_dance()
             })
-            if new_prefix != self.bot.configs['default_prefix']:
+            if new_prefix != self.bot.configs.default_prefix:
                 await ctx.send(**messages[0])
             else:
                 await ctx.send(**messages[1])
@@ -207,15 +208,34 @@ class Admin(commands.Cog):
     @commands.check(permissions.is_owner)
     @commands.guild_only()
     @commands.cooldown(1, 4, commands.BucketType.user)
-    async def _change_lang(self, ctx, new_lang='en_us'):
+    async def _change_lang(self, ctx, *, new_lang=None):
         servidor = await self.sr.get_servidor(self.bot.db_connection, ctx.guild.id)
-        if new_lang.lower() in self.bot.supported_langs:
-            servidor.lang = new_lang.lower()
-            await self.sr.update(self.bot.db_connection, servidor)
-            messages = await self.bot.translate(ctx)
-            await ctx.send(**messages[0])
+        default_lang = self.bot.translations.get(get_configs().get('default_lang'))
+        is_default = False
+        old_lang = self.bot.translations.get(servidor.lang)
+        erros = await self.bot.translate(ctx, error_='change_lang', values_={
+            'new_lang': new_lang,
+            'langs': ', '.join(map(lambda l: f'`{l.name}`', self.bot.translations.supported_languages))
+        })
+        if new_lang is None:
+            new_lang = default_lang
+            is_default = True
         else:
-            await self.bot.send_help(ctx)
+            new_lang = self.bot.translations.get(new_lang.lower())
+        if new_lang:
+            if old_lang != new_lang.name:
+                servidor.lang = new_lang.name
+                await self.sr.update(self.bot.db_connection, servidor)
+                messages = await self.bot.translate(ctx, values_={
+                    'dance': get_emoji_dance(),
+                    'old_lang': old_lang,
+                    'new_lang': new_lang
+                })
+                await ctx.send(**messages[1 if is_default else 0])
+            else:
+                await ctx.send(**erros[0])
+        else:
+            await ctx.send(**erros[1])
 
     @administracao_gp.command(name='desativar_sugestao', aliases=['ds', 'desativar_sugestão', 'disable_suggestion',
                                                                   'desativarsugestao', 'desativarsugestão',
@@ -510,4 +530,8 @@ class Admin(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Admin(bot))
+    cog = Admin(bot)
+    cmds = f'{Fore.BLUE}{len(list(cog.walk_commands()))}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"COG LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

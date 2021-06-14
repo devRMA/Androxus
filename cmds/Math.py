@@ -13,6 +13,7 @@ import discord
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from colorama import Fore, Style
 from discord.ext import commands
 from py_expression_eval import Parser
 
@@ -25,7 +26,7 @@ class Math(commands.Cog):
         """
 
         Args:
-            bot (Classes.Androxus.Androxus): Instância do bot
+            bot (Classes.General.Androxus): Instância do bot
 
         """
         self.bot = bot
@@ -347,4 +348,8 @@ class Math(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Math(bot))
+    cog = Math(bot)
+    cmds = f'{Fore.BLUE}{len(list(cog.walk_commands()))}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"COG LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)

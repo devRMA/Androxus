@@ -1,49 +1,76 @@
 # -*- coding: utf-8 -*-
 # Androxus bot
-# Androxus.py
+# General.py
 
 __author__ = 'Rafael'
 
 import re
 from datetime import datetime
 from itertools import cycle
-from json import load
 from os import listdir
 from string import ascii_letters
 from sys import version
 from traceback import format_exc
+from typing import List, Optional, Union
 
 import discord
 from aiohttp.client import ClientSession
 from asyncpg.pool import Pool
-from discord import AllowedMentions, Colour
+from colorama import Fore
+from discord import AllowedMentions, Colour, Webhook
 from discord.ext import commands, tasks
 from discord.ext.commands.view import StringView
 from discord.utils import utcnow
+from stopwatch import Stopwatch
 
+from Classes.Languages import Translations
 from database.Factories.ConnectionFactory import ConnectionFactory
 from database.Repositories.BlacklistRepository import BlacklistRepository
 from database.Repositories.ComandoDesativadoRepository import ComandoDesativadoRepository
 from database.Repositories.ComandoPersonalizadoRepository import ComandoPersonalizadoRepository
 from database.Repositories.ServidorRepository import ServidorRepository
 from utils import permissions
-from utils.Utils import get_configs, prettify_number, get_path_from_file, get_prefix, get_emojis_json, pretty_i, \
-    get_most_similar_item, string_similarity
+from utils.Utils import get_configs, prettify_number, get_path_from_file, get_prefix, get_emojis_json, \
+    get_most_similar_item, string_similarity, print_colorful
 
 
-def _warn(frase):
-    """
+async def _check_version(bot):
+    # vai verificar se a pessoa está com a versão mais atual do bot
+    url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
+    async with bot.session.get(url) as resp:
+        json = await resp.json()
+    # como os commits, sempre são assim:
+    # Versão x.x.x.x
+    # - alterações
+    # vai pegar a primeira linha do commit e apenas a versão do último commit
+    version_github = json[0]['commit']['message'].splitlines()[0].split(' ')[-1]
+    # e vai comparar com a versão atual
+    if version_github != bot.__version__:
+        print_colorful('========== ATENÇÃO! ==========\n'
+                       'Já você está usando uma versão desatualizada do Androxus!\n'
+                       'Isso não vai impedir que o bot inicie, porém a sua versão pode\n'
+                       'estar com algum bug que já foi resolvido ou algum comando a menos!\n'
+                       'Acesse o repositório original, e baixe a nova versão!\n'
+                       'Link do repositório original:\nhttps://github.com/devRMA/Androxus\n', False, color=Fore.YELLOW)
+        print_colorful('Nova versão: {version_github}', color=Fore.RED, values={'version_github': version_github})
+        print_colorful('Versão que você está usando: {bot_version}', color=Fore.GREEN,
+                       values={'bot_version': bot.__version__})
 
-    Args:
-        frase (str): A frase que vai ser printada, com a cor amarela
 
-    Returns:
-        None
-
-    """
-    print('\033[1;33m')
-    print(frase)
-    print('\033[0;0m')
+def _recursively_format_items(i, values):
+    if isinstance(i, list):
+        new_iterable = []
+        for c in i:
+            new_iterable.append(_recursively_format_items(c, values))
+    elif isinstance(i, dict):
+        new_iterable = {}
+        for k, v in i.items():
+            new_iterable[k] = _recursively_format_items(v, values)
+    elif isinstance(i, str):
+        return i.format_map(values)
+    else:
+        return i
+    return new_iterable
 
 
 def _load_cogs(bot):
@@ -54,31 +81,61 @@ def _load_cogs(bot):
     cmds_files = list(map(lambda f: f[:-3], filter(lambda f: f.endswith('.py'), listdir(path_cmds))))
     events_files = list(map(lambda f: f[:-3], filter(lambda f: f.endswith('.py'), listdir(path_events))))
     for file in cmds_files:
+        # noinspection PyBroadException
         try:
             bot.load_extension(f'cmds.{file}')  # vai adicionar ao bot
         except commands.NoEntryPointError:
             print(f'⚠ - Módulo {file} ignorado! "def setup" não encontrado!!')
-        except:
+        except Exception:
             print(f'⚠ - Módulo {file} deu erro na hora de carregar!\n{format_exc()}')
     for file in events_files:
+        # noinspection PyBroadException
         try:
             bot.load_extension(f'events.{file}')
         except commands.NoEntryPointError:
             pass  # se não achar o def setup
-        except:
+        except Exception:
             print(f'⚠ - Módulo {file} não foi carregado!\n{format_exc()}')
+
+
+class Configurations:
+    __slots__ = ('owners', 'webhook_server', 'webhook_owner', 'db_connection_string', 'default_prefix',
+                 'default_lang', 'token')
+    owners: List[int]
+    webhook_server: Optional[Webhook]
+    webhook_owner: Optional[Webhook]
+    db_connection_string: str
+    default_prefix: str
+    default_lang: str
+    token: str
+    _configs: dict = get_configs()
+
+    def __init__(self):
+        self.owners = self._configs.get('owners')
+        self.webhook_server = None
+        self.webhook_owner = None
+        self.db_connection_string = self._configs.get('connection_string')
+        self.default_prefix = self._configs.get('default_prefix')
+        self.default_lang = self._configs.get('default_lang')
+        self.token = self._configs.get('token')
+
+    async def init_webhooks(self, session):
+        webhooks = self._configs.get('webhooks')
+        wh_server = webhooks.get('server_logs')
+        self.webhook_server = Webhook.partial(wh_server.get('id'), wh_server.get('token'), session=session)
+        wh_owner = webhooks.get('owner_logs')
+        self.webhook_owner = Webhook.partial(wh_owner.get('id'), wh_owner.get('token'), session=session)
 
 
 class Androxus(commands.Bot):
     __version__ = '2.3'
-    configs: dict = get_configs()
+    configs: Configurations
     uptime: datetime = datetime.utcnow()
     mudar_status: bool = True
-    server_log: discord.TextChannel = None
     maintenance_mode: bool = False
     db_connection: Pool = None
-    supported_languages: list = []
     session: ClientSession = None
+    translations: Translations
     _status = cycle(['Para me adicionar em um servidor, basta enviar a mensagem "invite" no meu privado!',
                      'To add me to a server, just send the message "invite" in my dm!',
                      'Eu estou divertindo {servers} servidores!',
@@ -102,6 +159,10 @@ class Androxus(commands.Bot):
                      ])
 
     def __init__(self, *args, **kwargs):
+        self._startup_timer = Stopwatch()
+        self.translations = Translations()
+        self.configs = Configurations()
+
         # Intents do discord.py 1.5.0
         intents = discord.Intents.all()
 
@@ -110,93 +171,40 @@ class Androxus(commands.Bot):
             return commands.when_mentioned_or(prefix)(bot, message)
 
         kwargs['command_prefix'] = _prefix_or_mention
-        kwargs['owner_id'] = self.configs['owners'] if len(self.configs['owners']) > 1 else self.configs['owners'][0]
+        kwargs['owner_id'] = self.configs.owners if len(self.configs.owners) > 1 else self.configs.owners[0]
         kwargs['case_insensitive'] = True
         kwargs['intents'] = intents
         kwargs['strip_after_prefix'] = True
-        kwargs['activity'] = discord.Game(name='Starting ...')
-        # iniciando o bot
+        kwargs['activity'] = discord.Game(name='😴 Starting ...')
         super().__init__(*args, **kwargs)
         _load_cogs(self)
 
     async def on_ready(self):
         if self.db_connection is None:
+            self._startup_timer.stop()
             self.session = self.http._HTTPClient__session
-            # vai verificar se a pessoa está com a versão mais atual do bot
-            url = 'https://api.github.com/repositories/294764564/commits'  # url onde ficam todos os commits do bot
-            async with self.session.get(url) as resp:
-                json = await resp.json()
-            # como os commits, sempre são assim:
-            # Versão x.x.x.x
-            # - alterações
-            # vai pegar a primeira linha do commit e apenas a versão do último commit
-            version_github = json[0]['commit']['message'].splitlines()[0].split(' ')[-1]
-            # e vai comparar com a versão atual
-            if version_github != self.__version__:
-                _warn('========== ATENÇÃO! ==========\n'
-                      'Já você está usando uma versão desatualizada do Androxus!\n'
-                      'Isso não vai impedir que o bot inicie, porém a sua versão pode\n'
-                      'estar com algum bug que já foi resolvido ou algum comando a menos!\n'
-                      'Acesse o repositório original, e baixe a nova versão!\n'
-                      'Link do repositório original:\nhttps://github.com/devRMA/Androxus\n'
-                      f'Nova versão: {version_github}\n'
-                      f'Versão que você está usando: {self.__version__}')
+            await self.configs.init_webhooks(self.session)
+            await _check_version(self)
             self.uptime = datetime.utcnow()
-            self.server_log = self.get_channel(self.configs['channels_log']['servers'])
             self.db_connection = await ConnectionFactory.get_connection()
-            self.supported_languages = listdir('json/languages/')
-
-            def send_message_mod(
-                    channel_id,
-                    content,
-                    *,
-                    tts=False,
-                    embed=None,
-                    nonce=None,
-                    allowed_mentions=None,
-                    message_reference=None,
-                    components=None,
-            ):
-                from discord.http import Route
-                r = Route('POST', '/channels/{channel_id}/messages', channel_id=channel_id)
-                payload = {}
-
-                if content:
-                    payload['content'] = content
-
-                if tts:
-                    payload['tts'] = True
-
-                if embed:
-                    payload['embed'] = embed
-
-                if nonce:
-                    payload['nonce'] = nonce
-
-                if allowed_mentions:
-                    payload['allowed_mentions'] = allowed_mentions
-
-                if message_reference:
-                    payload['message_reference'] = message_reference
-
-                if components:
-                    payload['components'] = components
-                print(pretty_i(payload))
-                return self.http.request(r, json=payload)
-
-            # self.http.send_message = send_message_mod
             print(('-=' * 10) + 'Androxus Online!' + ('-=' * 10))
-            print(f'Logado em {self.user}')
-            print(f'ID: {self.user.id}')
+            print_colorful('Logado em {user}', values={'user': str(self.user)})
+            print_colorful('Id do bot: {id}', values={'id': self.user.id})
             all_commands = []
             for group in self.get_all_groups():
                 all_commands += group.commands
-            print(f'{len(all_commands)} comandos!')
-            print(f'{len(set(self.get_all_members()))} usuários!')
-            print(f'{len(self.guilds)} servidores!')
-            print(f'Versão do discord.py: {discord.__version__}')
-            print(f'Versão do python: {version[0:5]}')
-            print(f'Versão do bot: {self.__version__}')
+            print_colorful('Com {all_commands} comandos!', values={'all_commands': len(all_commands)})
+            print_colorful('Chegando a {all_members} usuários!', values={
+                'all_members': len(set(self.get_all_members()))
+            })
+            print_colorful('Em {guilds} servidores!', values={'guilds': len(self.guilds)})
+            print_colorful('Disponivel em {languages} línguas!', values={
+                'languages': len(self.translations.supported_languages)
+            })
+            print_colorful('Versão do discord.py: {dversion}', values={'dversion': discord.__version__})
+            print_colorful('Versão do python: {pversion}', values={'pversion': version[0:5]})
+            print_colorful('Versão do bot: {bversion}', values={'bversion': self.__version__})
+            print_colorful('Tempo para iniciar: {timer}', values={'timer': self._startup_timer})
             try:
                 self._change_status.start()  # inicia o loop para mudar o status
             except RuntimeError:
@@ -276,17 +284,19 @@ class Androxus(commands.Bot):
             if server.sugestao_de_comando:
                 all_names = []
                 for cmd_name, cmd in self.all_commands.items():
+                    # noinspection PyBroadException
                     try:
                         if await cmd.can_run(ctx):
                             all_names.append(cmd_name)
-                    except:
+                    except Exception:
                         pass
                     if isinstance(cmd, commands.core.Group):
                         for cmd2_name, cmd2 in cmd.all_commands.items():
+                            # noinspection PyBroadException
                             try:
                                 if await cmd2.can_run(ctx):
                                     all_names.append(cmd2_name)
-                            except:
+                            except Exception:
                                 pass
                 command_name = filtered_message.split(' ')[0]
                 all_names = list(set(all_names))
@@ -350,7 +360,7 @@ class Androxus(commands.Bot):
             await self.change_presence(activity=discord.Game(name=status_escolhido))
 
     async def is_owner(self, user):
-        if user.id in self.configs['owners']:
+        if user.id in self.configs.owners:
             return True
 
         return await super().is_owner(user)
@@ -422,18 +432,18 @@ class Androxus(commands.Bot):
     async def send_help(self, ctx):
         await self.get_command('help')(ctx)
 
-    async def translate(self, ctx, error_=None, help_=None, others_=None, values_=None):
+    async def translate(self, ctx, *, error_=None, help_=None, others_=None, values_=None):
         """
 
         Args:
             ctx (discord.ext.commands.context.Context): O contexto que vai ser usado para pegar o prefixo
-            error_ (str): Caso a mensagem seja de um erro, passe nesse parâmetro o erro (Default value = None)
-            help_ (str): Caso a mensagem seja de um help, passe nesse parâmetro (Default value = None)
-            others_ (str): Caso seja um outro tipo de mensagem (Default value = None)
-            values_ (dict): Os valores dinamicos do json.
+            error_ (str or None): Caso a mensagem seja de um erro, passe nesse parâmetro o erro (Default value = None)
+            help_ (str or None): Caso a mensagem seja de um help, passe nesse parâmetro (Default value = None)
+            others_ (str or None): Caso seja um outro tipo de mensagem (Default value = None)
+            values_ (dict or None): Os valores dinamicos do json (Default value = {})
 
         Returns:
-            Optional[dict]: Uma lista de dicts com os parametros para usar no discord.abc.Messageable.send
+            dict or list: Uma lista de dicts com os parametros para usar no discord.abc.Messageable.send
 
         """
         if values_ is None:
@@ -441,40 +451,16 @@ class Androxus(commands.Bot):
         values_['ctx'] = ctx
         values_['bot'] = ctx.bot
 
-        def _recursively_format_items(i):
-            if isinstance(i, list):
-                new_iterable = []
-                for c in i:
-                    new_iterable.append(_recursively_format_items(c))
-            elif isinstance(i, dict):
-                new_iterable = {}
-                for k, v in i.items():
-                    new_iterable[k] = _recursively_format_items(v)
-            elif isinstance(i, str):
-                return i.format_map(values_)
-            else:
-                return i
-            return new_iterable
-
         values_ = DictForFormat(values_)
-        language = await self.get_language(ctx)
+        language = self.translations.get(await self.get_language(ctx))
         messages = []
-        if error_:
-            path = get_path_from_file(f'{error_}.json', f'json/languages/{language}/erros/')
-        elif help_:
-            path = get_path_from_file(f'{help_}.json', f'json/languages/{language}/help/')
-        elif others_:
-            path = get_path_from_file(f'{others_}.json', f'json/languages/{language}/others/')
-        else:
-            path = get_path_from_file(f'{ctx.command.name}.json', f'json/languages/{language}/commands/')
-        with open(path, encoding='utf-8') as file:
-            messages_raw = load(file)
-        is_list = isinstance(messages_raw, list)
+        raw = language.get_translations(command=ctx.command.name, erro=error_, help_=help_, others=others_)
+        is_list = isinstance(raw, list)
         if not is_list:
-            messages_raw = [messages_raw]
-        for message_raw in messages_raw:
+            raw = [raw]
+        for message_raw in raw:
             message = {}
-            message_raw_formatted = _recursively_format_items(message_raw)
+            message_raw_formatted = _recursively_format_items(message_raw, values_)
             embed = None
             for key, value in message_raw_formatted.items():
                 if key == 'embed':
@@ -511,7 +497,7 @@ class Androxus(commands.Bot):
         if ctx.guild:
             lang = (await ServidorRepository().get_servidor(self.db_connection, ctx.guild.id)).lang
         else:
-            lang = self.configs['default_lang']
+            lang = self.configs.default_lang
         return lang
 
 

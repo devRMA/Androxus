@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Androxus bot
-# erros.py
+# Erros.py
 
 __author__ = 'Rafael'
 

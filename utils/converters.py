@@ -22,7 +22,7 @@ __author__ = 'Rafael'
 import discord
 from discord.ext import commands
 
-from Classes.erros import MultipleResults
+from Classes.Erros import MultipleResults
 from utils.Utils import find_user
 
 

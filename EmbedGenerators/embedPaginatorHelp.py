@@ -14,7 +14,7 @@ def get_paginator_help(bot, ctx, color=None):
     """
 
     Args:
-        bot (Classes.Androxus.Androxus): A instância do bot
+        bot (Classes.General.Androxus): A instância do bot
         ctx (discord.ext.commands.context.Context): O contexto do comando
         color(hex): A cor que vai ser usada nos embeds (Default value = None)
 

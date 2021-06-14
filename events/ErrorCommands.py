@@ -7,16 +7,23 @@ __author__ = 'Rafael'
 from datetime import datetime
 
 import discord
+from colorama import Fore, Style
 from discord.errors import Forbidden
 from discord.ext import commands
 from discord.ext.commands import errors
 
-from Classes.erros import *
+from Classes.Erros import *
 from utils import permissions
 
 
 class ErrorCommands(commands.Cog):
     def __init__(self, bot):
+        """
+
+        Args:
+            bot (Classes.General.Androxus): Instância do bot
+
+        """
         self.bot = bot
 
     @commands.Cog.listener()
@@ -143,10 +150,8 @@ class ErrorCommands(commands.Cog):
 
 
 def setup(bot):
-    """
-
-    Args:
-        bot (Classes.Androxus.Androxus): Instância do bot
-
-    """
-    bot.add_cog(ErrorCommands(bot))
+    cog = ErrorCommands(bot)
+    cmds = f'{Fore.BLUE}{len(cog.get_listeners())}{Fore.LIGHTMAGENTA_EX}'
+    print(f'{Style.BRIGHT}{Fore.GREEN}[{"EVENT LOADED":^16}]' +
+          f'{Fore.LIGHTMAGENTA_EX}{cog.qualified_name}({cmds}){Style.RESET_ALL}'.rjust(60))
+    bot.add_cog(cog)
