@@ -63,7 +63,7 @@ class Fun(commands.Cog):
     async def _girar(self, ctx, *, args=None):
         if args:
             if len(args) <= 200:
-                await ctx.reply(inverter_string(args), allowed_entions=AllowedMentions.none())
+                await ctx.reply(inverter_string(args), allowed_mentions=AllowedMentions.none())
             else:
                 erros = await self.bot.translate(ctx, error_='girar')
                 await ctx.send(**erros[0])

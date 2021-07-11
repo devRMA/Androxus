@@ -454,7 +454,10 @@ class Androxus(commands.Bot):
         values_ = DictForFormat(values_)
         language = self.translations.get(await self.get_language(ctx))
         messages = []
-        raw = language.get_translations(command=ctx.command.name, erro=error_, help_=help_, others=others_)
+        raw = language.get_translations(command=ctx.command.name if ctx.command is not None else None,
+                                        erro=error_, help_=help_, others=others_)
+        if raw is None:
+            return None
         is_list = isinstance(raw, list)
         if not is_list:
             raw = [raw]

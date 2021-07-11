@@ -5,6 +5,7 @@ bs4
 colorama
 discord
 discord.py@git+https://github.com/Rapptz/discord.py@master
+emoji
 emojis
 googletrans
 jellyfish
@@ -15,5 +16,4 @@ py_expression_eval
 python-dateutil
 stopwatch.py
 testing.postgresql
-twemoji-parser
 humanize

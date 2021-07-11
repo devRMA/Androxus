@@ -13,7 +13,7 @@ import googletrans
 from colorama import Fore, Style
 from discord.ext import commands
 from discord.ext.commands import BadArgument
-from twemoji_parser import emoji_to_url
+from dependencies.twemoji_parser.twemoji_parser import emoji_to_url
 
 from EmbedGenerators.HelpGroup import embed_help_group
 from database.Repositories.InformacoesRepository import InformacoesRepository
