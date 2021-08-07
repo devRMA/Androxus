@@ -402,7 +402,7 @@ class Info(commands.Cog):
         if ctx.guild.icon:
             embed.set_thumbnail(url=ctx.guild.icon.url)
         if ctx.guild.banner:
-            embed.set_image(url=ctx.guild.banner_url)
+            embed.set_image(url=ctx.guild.banner.url)
         elif ctx.guild.splash:
             embed.set_image(url=ctx.guild.splash.url)
         elif ctx.guild.discovery_splash:
