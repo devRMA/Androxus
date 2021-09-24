@@ -1,8 +1,0 @@
-{
-    "description": "Mostra a quanto tempo eu estou online!",
-    "examples": [
-        "`{prefix}uptime`",
-        "`{prefix}ut`"
-    ],
-    "how_to_use": "`{prefix}uptime`"
-}

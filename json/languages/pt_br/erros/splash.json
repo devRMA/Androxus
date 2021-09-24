@@ -1,9 +1,0 @@
-[
-    {
-        "content": "Este servidor não tem uma foto de fundo no convite!",
-        "reference": "message",
-        "allowed_mentions": {
-            "replied_user": false
-        }
-    }
-]

@@ -1,9 +1,0 @@
-{
-    "description": "Eu vou mandar a foto de perfil da pessoa que você marcar.",
-    "examples": [
-        "`{prefix}avatar` `{bot.user.id}`",
-        "`{prefix}avatar` `{bot.user.display_name}`",
-        "`{prefix}av`"
-    ],
-    "how_to_use": "`{prefix}avatar` `[usuário (padrão: quem usou o comando)]`"
-}

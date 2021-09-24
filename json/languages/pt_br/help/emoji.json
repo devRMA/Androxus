@@ -1,8 +1,0 @@
-{
-    "description": "Eu vou mostrar alguns detalhes do emoji que você me passar!",
-    "examples": [
-        "`{prefix}emoji` `\uD83D\uDE00`",
-        "`{prefix}emojiInfo` `\uD83D\uDE0E`"
-    ],
-    "how_to_use": "`{prefix}emoji` `<emoji>`"
-}

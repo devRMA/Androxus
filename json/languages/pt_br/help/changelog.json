@@ -1,8 +1,0 @@
-{
-    "description": "Mostra quando foi a minha última atualização e também o que foi alterado.",
-    "examples": [
-        "`{prefix}changelog`",
-        "`{prefix}attLog`"
-    ],
-    "how_to_use": "`{prefix}changelog`"
-}

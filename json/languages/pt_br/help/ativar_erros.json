@@ -1,9 +1,0 @@
-{
-    "description": "Vou reativar o tratamento de erros.",
-    "examples": [
-        "`{prefix}ativar_erros`",
-        "`{prefix}erros_on`"
-    ],
-    "how_to_use": "`{prefix}ativar_erros`",
-    "perm_user": "administrar a conta do bot"
-}

@@ -1,9 +1,0 @@
-{
-    "description": "Comando que é usado para mudar a minha língua!",
-    "examples": [
-        "`{prefix}lang` `pt_br`",
-        "`{prefix}lang` `en_us`"
-    ],
-    "how_to_use": "`{prefix}lang` `[lingua (padrão: \"en_us\")]`",
-    "perm_user": "gerenciar mensagens"
-}

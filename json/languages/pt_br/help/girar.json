@@ -1,8 +1,0 @@
-{
-    "description": "Eu vou deixar a frase cabeça pra baixo.",
-    "examples": [
-        "`{prefix}girar` `oi cara de boi`",
-        "`{prefix}side_down` `nice`"
-    ],
-    "how_to_use": "`{prefix}side_down` `<frase>`"
-}

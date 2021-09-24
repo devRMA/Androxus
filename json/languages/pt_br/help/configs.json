@@ -1,8 +1,0 @@
-{
-    "description": "Eu vou mostrar todos as configurações deste servidor.",
-    "examples": [
-        "`{prefix}configs`",
-        "`{prefix}settings`"
-    ],
-    "how_to_use": "`{prefix}configs`"
-}

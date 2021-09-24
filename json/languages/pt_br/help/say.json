@@ -1,9 +1,0 @@
-{
-    "description": "Eu vou repetir o que você falar!",
-    "examples": [
-        "`{prefix}say` `Hello World`",
-        "`{prefix}say` {ctx.channel.mention} `Hello World!`",
-        "`{prefix}say` `xD`"
-    ],
-    "how_to_use": "`{prefix}say` `[channel (padrão: o chat atual)]` `<texto>`"
-}

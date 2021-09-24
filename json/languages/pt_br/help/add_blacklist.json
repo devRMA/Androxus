@@ -1,9 +1,0 @@
-{
-    "description": "Impossibilita um usuário de usar meus comandos.",
-    "examples": [
-        "`{prefix}add_blacklist` `{ctx.author.id}` `abusou de uma falha`",
-        "`{prefix}add_blacklist` `@Fulano` `quebrou o bot`"
-    ],
-    "how_to_use": "`{prefix}add_blacklist` `<usuário>` `[motivo]`",
-    "perm_user": "administrar a conta do bot"
-}

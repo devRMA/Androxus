@@ -1,1 +1,0 @@
-twemoji_parser

@@ -1,9 +1,0 @@
-{
-    "description": "Comando que é usado para mudar o meu prefixo!",
-    "examples": [
-        "`{prefix}change_prefix` `!!`",
-        "`{prefix}prefix`"
-    ],
-    "how_to_use": "`{prefix}prefix` `[prefixo (padrão: \"--\")]`",
-    "perm_user": "gerenciar mensagens"
-}

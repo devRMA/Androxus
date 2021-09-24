@@ -1,8 +1,0 @@
-{
-    "description": "Mostra algumas informações sobre mim!",
-    "examples": [
-        "`{prefix}botinfo`",
-        "`{prefix}about`"
-    ],
-    "how_to_use": "`{prefix}botinfo`"
-}

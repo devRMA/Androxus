@@ -1,8 +1,0 @@
-{
-    "description": "Eu vou enviar o banner do servidor (se tiver).",
-    "examples": [
-        "`{prefix}server_banner`",
-        "`{prefix}banner`"
-    ],
-    "how_to_use": "`{prefix}server_banner`"
-}

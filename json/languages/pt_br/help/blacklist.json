@@ -1,9 +1,0 @@
-{
-    "description": "Verifica se algum usuário está banido de me usar.",
-    "examples": [
-        "`{prefix}blacklisted` `{ctx.author.id}`",
-        "`{prefix}blacklist` `@Fulano`"
-    ],
-    "how_to_use": "`{prefix}blacklist` `<usuário>`",
-    "perm_user": "administrar a conta do bot"
-}

@@ -1,9 +1,0 @@
-{
-    "description": "Comando que é usado para reativar as sugestões, quando a pessoa usar meu prefixo, com um comando que não existe.",
-    "examples": [
-        "`{prefix}reativar_sugestão`",
-        "`{prefix}rs`"
-    ],
-    "how_to_use": "`{prefix}reativar_sugestão`",
-    "perm_user": "gerenciar mensagens"
-}

@@ -1,8 +1,0 @@
-{
-    "description": "Eu vou mandar o máximo de informações sobre este servidor.",
-    "examples": [
-        "`{prefix}serverinfo`",
-        "`{prefix}si`"
-    ],
-    "how_to_use": "`{prefix}serverinfo`"
-}

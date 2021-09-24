@@ -1,8 +1,0 @@
-{
-    "description": "Eu vou enviar discovery splash deste servidor (se tiver).",
-    "examples": [
-        "`{prefix}discovery_splash`",
-        "`{prefix}discoverySplash`"
-    ],
-    "how_to_use": "`{prefix}discovery_splash`"
-}

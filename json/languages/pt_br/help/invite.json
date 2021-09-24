@@ -1,8 +1,0 @@
-{
-    "description": "Mostra o link que você usa para me adicionar em seu servidor.",
-    "examples": [
-        "`{prefix}invite`",
-        "`{prefix}convidar`"
-    ],
-    "how_to_use": "`{prefix}invite`"
-}

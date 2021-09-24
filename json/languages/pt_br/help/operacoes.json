@@ -1,9 +1,0 @@
-{
-    "description": "Todas as operações que eu suporto no comando `calc`!",
-    "examples": [
-        "`{prefix}ops`",
-        "`{prefix}operações`",
-        "`{prefix}operators`"
-    ],
-    "how_to_use": "`{prefix}operacoes`"
-}

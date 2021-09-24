@@ -1,9 +1,0 @@
-{
-    "description": "Vou desativar o tratamento de erros.",
-    "examples": [
-        "`{prefix}desativar_erros`",
-        "`{prefix}erros_off`"
-    ],
-    "how_to_use": "`{prefix}desativar_erros`",
-    "perm_user": "administrar a conta do bot"
-}

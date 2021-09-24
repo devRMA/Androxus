@@ -1,9 +1,0 @@
-{
-    "description": "Reativa algum comando que eu tenho!",
-    "examples": [
-        "`{prefix}reativar_comando` `say`",
-        "`{prefix}reactivate_command` `uptime`"
-    ],
-    "how_to_use": "`{prefix}reativar_comando` `<comando>`",
-    "perm_user": "gerenciar mensagens"
-}

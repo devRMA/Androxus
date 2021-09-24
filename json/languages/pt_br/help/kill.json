@@ -1,9 +1,0 @@
-{
-    "description": "Reinicia a instancia do bot.",
-    "examples": [
-        "`{prefix}reboot`",
-        "`{prefix}shutdown`"
-    ],
-    "how_to_use": "`{prefix}kill`",
-    "perm_user": "administrar a conta do bot"
-}

@@ -1,9 +1,0 @@
-{
-    "description": "Retira um usuário da blacklist.",
-    "examples": [
-        "`{prefix}remove_blacklist` `{ctx.author.id}`",
-        "`{prefix}remove_blacklist` `@Fulano` `se redimiu`"
-    ],
-    "how_to_use": "`{prefix}remove_blacklist` `<usuário>` `[motivo]`",
-    "perm_user": "administrar a conta do bot"
-}
