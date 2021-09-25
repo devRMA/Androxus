@@ -1,8 +1,10 @@
 from typing import Optional, Union
 
-from database.models import Guild
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.orm.session import sessionmaker
+
+from database.models import Guild
 
 
 class GuildRepository:
@@ -10,19 +12,20 @@ class GuildRepository:
     Class to manipulate the "guilds" table
 
     Args:
-        session (sqlalchemy.ext.asyncio.AsyncSession): The session to use to interact with the database.
+        session (sqlalchemy.orm.session.sessionmaker): The session to use to interact with the database.
 
     """
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: sessionmaker):
         self.session = session
 
-    async def __get_by_id(self, session: AsyncSession, guild_id: int) -> Optional[Guild]:
+    @staticmethod
+    async def __get_by_id(session: AsyncSession, guild_id: int) -> Optional[Guild]:
         """
         Get a guild by its id
 
         Args:
-            session (sqlalchemy.orm.session.Session): The session to use to interact with the database.
+            session (sqlalchemy.ext.asyncio.AsyncSession): The session to use to interact with the database.
             guild_id (int): The id of the guild to get.
 
         Returns:
@@ -31,6 +34,20 @@ class GuildRepository:
         """
         stmt = select(Guild).where(Guild.id == guild_id)
         return (await session.execute(stmt)).scalars().first()
+
+    async def __exists(self, guild_id: int) -> bool:
+        """
+        Check if a guild exists
+
+        Args:
+            guild_id (int): The id of the guild to check.
+        
+        Returns:
+            bool: True if the guild exists, False otherwise.
+        
+        """
+        guild = await self.find(guild_id)
+        return guild is not None
 
     async def find(self, guild_id: int) -> Optional[Guild]:
         """
@@ -57,36 +74,25 @@ class GuildRepository:
             database.models.Guild: The guild object.
 
         """
-        async with self.session() as session:
-            try:
-                guild = Guild(guild_id)
-                session.add(guild)
-                await session.commit()
-                return guild
-            except Exception as e:
-                print(e)
-                await session.rollback()
-                return None
+        if await self.__exists(guild_id):
+            return await self.find(guild_id)
+        else:
+            guild = Guild(guild_id)
+            await self.save(guild)
+            return guild
 
-    async def save(self, guild: Guild) -> bool:
+    async def save(self, guild: Guild):
         """
         Save a guild to the database
 
         Args:
             guild (database.models.Guild): The guild to save.
 
-        Returns:
-            bool: True if the guild was saved, False otherwise.
-
         """
-        async with self.session() as session:
-            try:
+        if not (await self.__exists(guild.id)):
+            async with self.session() as session:
                 session.add(guild)
                 await session.commit()
-                return True
-            except:
-                await session.rollback()
-                return False
 
     async def delete(self, guild: Union[Guild, int]) -> bool:
         """
@@ -99,18 +105,19 @@ class GuildRepository:
             bool: True if the guild was deleted, False otherwise.
 
         """
-        async with self.session() as session:
-            try:
-                guild_to_delete = None
-                if isinstance(guild, int):
-                    guild_to_delete = await self.__get_by_id(session, guild)
-                elif isinstance(guild, Guild):
-                    guild_to_delete = guild
-                else:
-                    return False
-                await session.delete(guild_to_delete)
-                await session.commit()
-                return True
-            except:
-                await session.rollback()
+        if isinstance(guild, int):
+            if await self.__exists(guild):
+                guild_to_delete = await self.find(guild)
+            else:
                 return False
+        elif isinstance(guild, Guild):
+            if await self.__exists(guild.id):
+                guild_to_delete = guild
+            else:
+                return False
+        else:
+            return False
+        async with self.session() as session:
+            await session.delete(guild_to_delete)
+            await session.commit()
+            return True
