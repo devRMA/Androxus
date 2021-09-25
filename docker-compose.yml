@@ -6,7 +6,7 @@ services:
   database:
     image: postgres:13.4
     volumes:
-      - ./database_scripts:/docker-entrypoint-initdb.d
+      - ./database_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - postgresql
     environment:
@@ -28,8 +28,13 @@ services:
       - cache
     environment:
       TOKEN: "${TOKEN}"
-      DB_HOST: database
-      DB_PORT: 5432
-      DB_NAME: androxus
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_NAME: "${DB_NAME}"
       DB_USER: "${DB_USER}"
       DB_PASS: "${DB_PASS}"
+      DB_TEST_HOST: "${DB_TEST_HOST}"
+      DB_TEST_NAME: "${DB_TEST_NAME}"
+      DB_TEST_PORT: "${DB_TEST_PORT}"
+      DB_TEST_USER: "${DB_TEST_USER}"
+      DB_TEST_PASS: "${DB_TEST_PASS}"
