@@ -1,0 +1,5 @@
+python-dotenv
+discord.py@git+https://github.com/Rapptz/discord.py@master
+SQLAlchemy==1.4.23
+asyncpg==0.24.0
+colorama==0.4.4
