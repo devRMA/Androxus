@@ -1,0 +1,35 @@
+version: '3.9'
+networks:
+  postgresql:
+  redis:
+services:
+  database:
+    image: postgres:13.4
+    volumes:
+      - ./database_scripts:/docker-entrypoint-initdb.d
+    networks:
+      - postgresql
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASS}"
+  cache:
+    image: redis:6.2.5
+    networks:
+      - redis
+  bot:
+    build: ./bot
+    volumes:
+      - ./bot:/usr/src/bot/
+    networks:
+      - postgresql
+      - redis
+    depends_on:
+      - database
+      - cache
+    environment:
+      TOKEN: "${TOKEN}"
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: androxus
+      DB_USER: "${DB_USER}"
+      DB_PASS: "${DB_PASS}"
