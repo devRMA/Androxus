@@ -94,6 +94,17 @@ class GuildRepository:
                 session.add(guild)
                 await session.commit()
 
+    async def update(self, guild) -> bool:
+        if await self.__exists(guild.id):
+            async with self.session() as session:
+                db_guild = await self.__get_by_id(session, guild.id)
+                db_guild.fill_dict(
+                    db_guild.diff_in_dict(guild)
+                )
+                await session.commit()
+        else:
+            await self.save(guild)
+
     async def delete(self, guild: Union[Guild, int]) -> bool:
         """
         Delete a guild
