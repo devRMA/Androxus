@@ -1,4 +1,3 @@
--- create database if not exists androxus;
+create database androxus_test_db;
 
-SELECT 'CREATE DATABASE androxus'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'androxus');
+--create database androxus;
