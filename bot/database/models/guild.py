@@ -97,7 +97,7 @@ class Guild(Base):
                 diff_dict[key] = other_dict[key]
         return diff_dict
 
-    def fill_dict(self, params: dict):
+    def fill(self, params: dict):
         """
         Update the guild with the given parameters.
 
@@ -109,3 +109,13 @@ class Guild(Base):
             if key == 'id':
                 continue
             setattr(self, key, value)
+    
+    def merge(self, other: Guild):
+        """
+        Merge the guild with another guild.
+
+        Args:
+            other (database.models.guild.Guild): The guild to merge with.
+
+        """
+        self.fill(self.diff_in_dict(other))

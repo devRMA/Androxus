@@ -98,9 +98,7 @@ class GuildRepository:
         if await self.__exists(guild.id):
             async with self.session() as session:
                 db_guild = await self.__get_by_id(session, guild.id)
-                db_guild.fill_dict(
-                    db_guild.diff_in_dict(guild)
-                )
+                db_guild.merge(guild)
                 await session.commit()
         else:
             await self.save(guild)
