@@ -38,3 +38,4 @@ services:
       DB_TEST_PORT: "${DB_TEST_PORT}"
       DB_TEST_USER: "${DB_TEST_USER}"
       DB_TEST_PASS: "${DB_TEST_PASS}"
+      DO_TESTS: "${DO_TESTS}"

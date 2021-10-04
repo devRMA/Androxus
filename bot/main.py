@@ -14,8 +14,8 @@ from asyncio import get_event_loop
 
 async def main():
     from database.tests import make_tests
-    await make_tests()
-
+    if getenv('DO_TESTS') == 'true':
+        await make_tests()
 
 if __name__ == '__main__':
     loop = get_event_loop()
