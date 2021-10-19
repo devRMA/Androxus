@@ -20,12 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from colorama import Fore
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from utils import CYAN, LYELLOW, WHITE, log
 
 from database.models import __models__
-from utils import log
 
 
 async def check_tables(engine: AsyncEngine):
@@ -36,18 +35,19 @@ async def check_tables(engine: AsyncEngine):
         engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
 
     """
-    log('BOOTSTRAPPING DB', 'CHECKING TABLES', Fore.CYAN, Fore.LIGHTYELLOW_EX)
+    log('BOOTSTRAPPING DB', 'CHECKING TABLES',
+        first_color=CYAN, second_color=LYELLOW)
     async with engine.connect() as conn:
         for model in __models__:
             table_name = model.__tablename__
             if not await conn.run_sync(
                     lambda con: inspect(con).has_table(table_name)
             ):
-                log('BOOTSTRAPPING DB',
-                    f'CREATING TABLE "{table_name}"', Fore.CYAN, Fore.LIGHTYELLOW_EX)
+                log('BOOTSTRAPPING DB', f'CREATING TABLE "{table_name}"',
+                    first_color=CYAN, second_color=LYELLOW)
                 await model.create_table(engine)
     log('BOOTSTRAPPING DB', 'TABLES CHECKING COMPLETED',
-        Fore.CYAN, Fore.LIGHTYELLOW_EX)
+        first_color=CYAN, second_color=LYELLOW)
 
 
 async def bootstrap(engine: AsyncEngine):
@@ -58,6 +58,8 @@ async def bootstrap(engine: AsyncEngine):
         engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
 
     """
-    log('BOOTSTRAPPING DB', 'STARTING', Fore.CYAN, Fore.WHITE)
+    log('BOOTSTRAPPING DB', 'STARTING',
+        first_color=CYAN, second_color=WHITE)
     await check_tables(engine)
-    log('BOOTSTRAPPING DB', 'DONE', Fore.CYAN, Fore.WHITE)
+    log('BOOTSTRAPPING DB', 'DONE',
+        first_color=CYAN, second_color=WHITE)

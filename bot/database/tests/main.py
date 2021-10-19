@@ -23,11 +23,9 @@
 from inspect import iscoroutinefunction
 from traceback import format_exc
 
-from colorama import Fore
-
 from database.tests import Configs
 from database.tests.guild_repository import GuildRepositoryTest
-from utils import log
+from utils import CYAN, MAGENTA, log
 
 
 async def make_tests():
@@ -36,8 +34,8 @@ async def make_tests():
     log('TESTING', 'STARTING DATABASE TESTS')
     for test_class in tests_class:
         table_name = test_class.__name__.removesuffix('RepositoryTest')
-        log('TESTING',
-            f'TESTS FOR MODEL "{table_name}"', Fore.CYAN, Fore.MAGENTA)
+        log('TESTING', f'TESTS FOR MODEL "{table_name}"',
+            first_color=CYAN, second_color=MAGENTA)
         tests = sorted(func for func in dir(test_class)
                        if func.startswith('test_'))
         test_obj = test_class()

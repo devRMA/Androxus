@@ -22,11 +22,10 @@
 
 from os import getenv
 
-from colorama import Fore
-
 from database import bootstrap as db_bootstrap
 from database.models import __models__
-from utils import log
+from utils import CYAN, LGREEN, LRED, LYELLOW, RED, log
+
 from ..factories import ConnectionFactory
 
 
@@ -37,7 +36,7 @@ class Configs:
     @staticmethod
     async def setup():
         log('TEST CONFIGS', 'PREPARING THE ENVIRONMENT',
-            Fore.CYAN, Fore.LIGHTYELLOW_EX)
+            first_color=CYAN, second_color=LYELLOW)
         user = getenv('DB_TEST_USER')
         db_pass = getenv('DB_TEST_PASS')
         host = getenv('DB_TEST_HOST')
@@ -51,12 +50,12 @@ class Configs:
         await Configs.__drop_tables()
         await db_bootstrap(Configs.engine)
         log('TEST CONFIGS', 'SUCCESSFULLY CONFIGURED ENVIRONMENT',
-            Fore.CYAN, Fore.LIGHTGREEN_EX)
+            first_color=CYAN, second_color=LGREEN)
 
     @staticmethod
     async def teardown():
         log('TEST CONFIGS', 'CLEANING THE ENVIRONMENT',
-            Fore.CYAN, Fore.LIGHTYELLOW_EX)
+            first_color=CYAN, second_color=LYELLOW)
         await Configs.__drop_tables()
         if Configs.session is not None:
             Configs.session = None
@@ -64,12 +63,13 @@ class Configs:
             await Configs.engine.dispose()
             Configs.engine = None
         log('TEST CONFIGS', 'SUCCESSFULLY CLEAN ENVIRONMENT',
-            Fore.CYAN, Fore.LIGHTGREEN_EX)
+            first_color=CYAN, second_color=LGREEN)
 
     @staticmethod
     async def __drop_tables():
-        log('TEST CONFIGS', 'DELETING TABLES', Fore.CYAN, Fore.RED)
+        log('TEST CONFIGS', 'DELETING TABLES',
+            first_color=CYAN, second_color=RED)
         for model in __models__:
             await model.drop_table(Configs.engine)
         log('TEST CONFIGS', 'TABLES SUCCESSFULLY DELETED',
-            Fore.CYAN, Fore.LIGHTRED_EX)
+            first_color=CYAN, second_color=LRED)
