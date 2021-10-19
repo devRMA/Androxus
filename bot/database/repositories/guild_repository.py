@@ -22,11 +22,10 @@
 
 from typing import Optional, Union
 
+from database.models import Guild
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm.session import sessionmaker
-
-from database.models import Guild
 
 
 class GuildRepository:

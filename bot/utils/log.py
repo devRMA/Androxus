@@ -20,8 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .colors import CYAN, LBLUE, BRIGHT, RESET
 from logging import getLogger
+
+from .colors import BRIGHT, CYAN, LBLUE, RESET
 
 
 def log(tag: str, text: str, level: str = 'info', *,

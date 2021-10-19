@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 from config import Config
-from . import Configs
-from . import Test
+
 from ..models import Guild
 from ..repositories import GuildRepository
+from . import Configs, Test
 
 GUILD_ID_TEST = 123456789
 DEFAULT_PREFIX = Config.DEFAULT_PREFIX

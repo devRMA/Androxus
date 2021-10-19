@@ -22,11 +22,10 @@
 
 from __future__ import annotations
 
+from config import Config
 from sqlalchemy import BigInteger, Column, String
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.ext.declarative import declarative_base
-
-from config import Config
 
 Base = declarative_base()
 
