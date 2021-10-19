@@ -1,3 +1,25 @@
+# MIT License
+
+# Copyright(c) 2021 Rafael
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files(the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 from os import getenv
 
 from colorama import Fore
@@ -14,7 +36,8 @@ class Configs:
 
     @staticmethod
     async def setup():
-        log('TEST CONFIGS', 'PREPARING THE ENVIRONMENT', Fore.CYAN, Fore.LIGHTYELLOW_EX)
+        log('TEST CONFIGS', 'PREPARING THE ENVIRONMENT',
+            Fore.CYAN, Fore.LIGHTYELLOW_EX)
         user = getenv('DB_TEST_USER')
         db_pass = getenv('DB_TEST_PASS')
         host = getenv('DB_TEST_HOST')
@@ -27,22 +50,26 @@ class Configs:
         Configs.session = ConnectionFactory.get_session(Configs.engine)
         await Configs.__drop_tables()
         await db_bootstrap(Configs.engine)
-        log('TEST CONFIGS', 'SUCCESSFULLY CONFIGURED ENVIRONMENT', Fore.CYAN, Fore.LIGHTGREEN_EX)
+        log('TEST CONFIGS', 'SUCCESSFULLY CONFIGURED ENVIRONMENT',
+            Fore.CYAN, Fore.LIGHTGREEN_EX)
 
     @staticmethod
     async def teardown():
-        log('TEST CONFIGS', 'CLEANING THE ENVIRONMENT', Fore.CYAN, Fore.LIGHTYELLOW_EX)
+        log('TEST CONFIGS', 'CLEANING THE ENVIRONMENT',
+            Fore.CYAN, Fore.LIGHTYELLOW_EX)
         await Configs.__drop_tables()
         if Configs.session is not None:
             Configs.session = None
         if Configs.engine is not None:
             await Configs.engine.dispose()
             Configs.engine = None
-        log('TEST CONFIGS', 'SUCCESSFULLY CLEAN ENVIRONMENT', Fore.CYAN, Fore.LIGHTGREEN_EX)
+        log('TEST CONFIGS', 'SUCCESSFULLY CLEAN ENVIRONMENT',
+            Fore.CYAN, Fore.LIGHTGREEN_EX)
 
     @staticmethod
     async def __drop_tables():
         log('TEST CONFIGS', 'DELETING TABLES', Fore.CYAN, Fore.RED)
         for model in __models__:
             await model.drop_table(Configs.engine)
-        log('TEST CONFIGS', 'TABLES SUCCESSFULLY DELETED', Fore.CYAN, Fore.LIGHTRED_EX)
+        log('TEST CONFIGS', 'TABLES SUCCESSFULLY DELETED',
+            Fore.CYAN, Fore.LIGHTRED_EX)
