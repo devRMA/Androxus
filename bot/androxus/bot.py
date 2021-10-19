@@ -20,14 +20,57 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from os import getenv
+from datetime import datetime
+from itertools import cycle
+from os import getenv, listdir
+from os.path import abspath
 
+from aiohttp.client import ClientSession
 from database import bootstrap as db_bootstrap
+from disnake import Game, Intents
 from disnake.ext import commands
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm.session import sessionmaker
+
+# from stopwatch import Stopwatch
+
+
+def _load_cogs(bot):
+    bot.remove_command('help')
+    bot.load_extension('jishaku')
+    for file in listdir(abspath('./') + '/cogs'):
+        if file.endswith('.py'):
+            filename = file.removesuffix('.py')
+            bot.load_extension(f'cogs.{filename}')
 
 
 class Bot(commands.Bot):
+    __version__ = '3.0a'
+    start_date: datetime = datetime.utcnow()
+    maintenance: bool = False
+    db_session: sessionmaker = None
+    http_session: ClientSession = None
+    _status = cycle((
+        'V3 online',
+        'Androxus V3'
+    ))
+
+    def __init__(self, *args, **kwargs):
+        # self._startup_timer = Stopwatch()
+
+        # async def _prefix_or_mention(bot, message):
+        #     prefix = await get_prefix(bot, message)
+        #     return commands.when_mentioned_or(prefix)(bot, message)
+
+        kwargs['command_prefix'] = "!!"
+        kwargs['owner_id'] = int(getenv('OWNER_ID'))
+        kwargs['case_insensitive'] = True
+        kwargs['intents'] = Intents.all()
+        kwargs['strip_after_prefix'] = True
+        kwargs['activity'] = Game(name='😴 Starting ...')
+        kwargs['test_guilds'] = [425864977996578816]
+        super().__init__(*args, **kwargs)
+        _load_cogs(self)
 
     async def on_ready(self):
         user = getenv('DB_USER')
