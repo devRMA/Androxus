@@ -41,7 +41,7 @@ if __name__ == '__main__':
         except RuntimeError:
             loop = new_event_loop()
         loop.run_until_complete(make_tests())
-    bot = Bot(command_prefix='!!')
+    bot = Bot()
     bot.run(getenv('TOKEN'))
 
 # bot = commands.Bot(command_prefix='!!')
