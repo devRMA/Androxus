@@ -22,7 +22,7 @@
 
 from os import getenv
 
-from discord import Permissions
+from disnake import Permissions
 
 
 class Config:
@@ -31,7 +31,7 @@ class Config:
 
     Attributes:
         DEFAULT_PREFIX (str): The default prefix for the bot.
-        REQUIRED_PERMISSIONS (discord.Permissions): The permissions necessary for all bot commands to work.
+        REQUIRED_PERMISSIONS (disnake.Permissions): The permissions necessary for all bot commands to work.
 
     """
     DEFAULT_PREFIX = getenv('DEFAULT_PREFIX', '!')
