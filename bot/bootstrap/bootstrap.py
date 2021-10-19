@@ -21,7 +21,9 @@
 # SOFTWARE.
 
 from .logging import setup_logging
+from dotenv import load_dotenv
 
 
 def init():
+    load_dotenv()
     setup_logging()
