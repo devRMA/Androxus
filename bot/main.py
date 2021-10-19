@@ -27,20 +27,22 @@ from disnake.ext import commands
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from database.tests import make_tests
+from bootstrap import init
 
 from database import bootstrap as db_bootstrap
 from database.repositories.guild_repository import GuildRepository
 
-from asyncio import get_event_loop
+from asyncio import new_event_loop
 
 
 async def main():
-    from database.tests import make_tests
+    init()
     if getenv('DO_TESTS') == 'true':
         await make_tests()
 
 if __name__ == '__main__':
-    loop = get_event_loop()
+    loop = new_event_loop()
     loop.run_until_complete(main())
 
 # init()
