@@ -20,5 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-async def bootstrap():
-    ...
+from .logging import setup_logging
+
+
+def init():
+    setup_logging()
