@@ -20,33 +20,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from asyncio import get_running_loop, new_event_loop
 from os import getenv
 
-from colorama import init
 from disnake.ext import commands
-from dotenv import load_dotenv
+from sqlalchemy import exc
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from database.tests import make_tests
+
+from androxus.bot import Bot
 from bootstrap import init
-
-from database import bootstrap as db_bootstrap
 from database.repositories.guild_repository import GuildRepository
-
-from asyncio import new_event_loop
-
-
-async def main():
-    init()
-    if getenv('DO_TESTS') == 'true':
-        await make_tests()
+from database.tests import make_tests
 
 if __name__ == '__main__':
-    loop = new_event_loop()
-    loop.run_until_complete(main())
+    init()
+    if getenv('DO_TESTS') == 'true':
+        try:
+            loop = get_running_loop()
+        except RuntimeError:
+            loop = new_event_loop()
+        loop.run_until_complete(make_tests())
+    bot = Bot(command_prefix='!!')
+    bot.run(getenv('TOKEN'))
 
-# init()
-# load_dotenv()
 # bot = commands.Bot(command_prefix='!!')
 
 
