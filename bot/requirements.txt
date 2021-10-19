@@ -1,5 +1,5 @@
 python-dotenv
-py-cord@git+https://github.com/Pycord-Development/pycord@master
+disnake@git+https://github.com/EQUENOS/disnake@master
 SQLAlchemy==1.4.23
 asyncpg==0.24.0
 colorama==0.4.4

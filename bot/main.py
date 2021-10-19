@@ -1,7 +1,7 @@
 from os import getenv
 
 from colorama import init
-from discord.ext import commands
+from disnake.ext import commands
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
