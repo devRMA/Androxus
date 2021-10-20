@@ -59,7 +59,8 @@ class ConnectionFactory:
         Creates a session to the database.
 
         Args:
-            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine, optional): An AsyncEngine object.
+            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine, optional):
+            An AsyncEngine object.
 
         Returns:
             sqlalchemy.ext.asyncio.AsyncSession: An AsyncSession object.
