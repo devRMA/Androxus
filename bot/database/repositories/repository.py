@@ -275,6 +275,16 @@ class Repository:
 
         """
         return await self.find(model_id)
+    
+    async def sync(self, model: Model):
+        """
+        Save a model to the database
+
+        Args:
+            model (database.models.Model): The model to save.
+
+        """
+        return await self.save(model)
 
     async def destroy(self, model: Union[Model, int]) -> bool:
         """
