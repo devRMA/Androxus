@@ -20,14 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from config import Config
+from configs import Configs as ConfigsBot
 
 from ..models import Guild
 from ..repositories import GuildRepository
 from . import Configs, Test
 
 GUILD_ID_TEST = 123456789
-DEFAULT_PREFIX = Config.DEFAULT_PREFIX
+DEFAULT_PREFIX = ConfigsBot.default_prefix
 CHANGED_PREFIX = DEFAULT_PREFIX + '..'
 
 

@@ -22,7 +22,7 @@
 
 from __future__ import annotations
 
-from config import Config
+from configs import Configs
 from database.models.model import Model
 from sqlalchemy import BigInteger, Column, String
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
@@ -55,7 +55,7 @@ class Guild(Base, Model):
 
     def __init__(self, id_, prefix=None):
         self.id = id_
-        self.prefix = prefix or Config.DEFAULT_PREFIX
+        self.prefix = prefix or Configs.default_prefix
 
     def __eq__(self, other):
         return isinstance(other, Guild) and (self.id == other.id)
