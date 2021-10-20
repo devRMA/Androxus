@@ -29,6 +29,8 @@ services:
     environment:
       TOKEN: "${TOKEN}"
       OWNER_ID: "${OWNER_ID}"
+      TEST_GUILDS: "${TEST_GUILDS}"
+      DEFAULT_PREFIX: "${DEFAULT_PREFIX}"
       DB_HOST: "${DB_HOST}"
       DB_PORT: "${DB_PORT}"
       DB_NAME: "${DB_NAME}"
