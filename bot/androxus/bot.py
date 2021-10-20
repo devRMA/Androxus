@@ -27,15 +27,24 @@ from os.path import abspath
 
 from aiohttp.client import ClientSession
 from database import bootstrap as db_bootstrap
+from database.factories.connection_factory import ConnectionFactory
 from disnake import Game, Intents
 from disnake.ext import commands
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm.session import sessionmaker
+from disnake.utils import utcnow
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 # from stopwatch import Stopwatch
 
 
 def _load_cogs(bot):
+    """
+    Loads all cogs of the bot.
+
+    Args:
+        bot (Bot): The bot instance.
+
+    """
     bot.remove_command('help')
     bot.load_extension('jishaku')
     for file in listdir(abspath('./') + '/cogs'):
@@ -45,10 +54,23 @@ def _load_cogs(bot):
 
 
 class Bot(commands.Bot):
+    """
+    The main class of the bot.
+
+    Attributes:
+        __version__ (str): The current version of the bot.
+        start_date (datetime): The date when the bot was started.
+        maintenance (bool): Whether the bot is in maintenance mode.
+        db_engine (AsyncEngine): The database engine.
+        db_session (AsyncSession): The database session.
+        http_session (ClientSession): The aiohttp session.
+
+    """
     __version__ = '3.0a'
-    start_date: datetime = datetime.utcnow()
+    start_date: datetime = None
     maintenance: bool = False
-    db_session: sessionmaker = None
+    db_engine: AsyncEngine = None
+    db_session: AsyncSession = None
     http_session: ClientSession = None
     _status = cycle((
         'V3 online',
@@ -58,29 +80,24 @@ class Bot(commands.Bot):
     def __init__(self, *args, **kwargs):
         # self._startup_timer = Stopwatch()
 
-        # async def _prefix_or_mention(bot, message):
-        #     prefix = await get_prefix(bot, message)
-        #     return commands.when_mentioned_or(prefix)(bot, message)
+        async def _prefix_or_mention(bot, message):
+            prefix = await get_prefix(bot, message)
+            return commands.when_mentioned_or(prefix)(bot, message)
 
-        kwargs['command_prefix'] = "!!"
-        kwargs['owner_id'] = int(getenv('OWNER_ID'))
+        kwargs['command_prefix'] = getenv('DEFAULT_PREFIX')
+        kwargs['owner_id'] = getenv('OWNER_ID')
         kwargs['case_insensitive'] = True
         kwargs['intents'] = Intents.all()
         kwargs['strip_after_prefix'] = True
         kwargs['activity'] = Game(name='😴 Starting ...')
-        kwargs['test_guilds'] = [425864977996578816]
+        kwargs['test_guilds'] = getenv('TEST_GUILDS')
         super().__init__(*args, **kwargs)
         _load_cogs(self)
 
     async def on_ready(self):
-        user = getenv('DB_USER')
-        pw = getenv('DB_PASS')
-        host = getenv('DB_HOST')
-        port = getenv('DB_PORT')
-        db_name = getenv('DB_NAME')
-        dsn = f'postgresql+asyncpg://{user}:{pw}@{host}:{port}/{db_name}'
-        engine = create_async_engine(
-            dsn
-        )
-        await db_bootstrap(engine)
-        print(f'Logged in as: {self.user}')
+        if self.db_session is None or self.db_engine is None:
+            self.db_engine = ConnectionFactory.get_engine()
+            self.db_session = ConnectionFactory.get_session(self.db_engine)
+            self.start_date = utcnow()
+            await db_bootstrap(self.db_engine)
+            print(f'Logged in as: {self.user}')
