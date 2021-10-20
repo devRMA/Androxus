@@ -1,3 +1,4 @@
+python-dotenv==0.19.1
 disnake@git+https://github.com/EQUENOS/disnake@master
 jishaku@git+https://github.com/Z1R343L/jishaku@master
 SQLAlchemy==1.4.23
