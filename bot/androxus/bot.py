@@ -34,8 +34,8 @@ from disnake.ext import commands
 from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
-
-# from stopwatch import Stopwatch
+from stopwatch import Stopwatch
+from utils.database import get_prefix
 
 
 def _load_cogs(bot):
@@ -80,13 +80,13 @@ class Bot(commands.Bot):
     ))
 
     def __init__(self, *args, **kwargs):
-        # self._startup_timer = Stopwatch()
+        self._startup_timer = Stopwatch()
 
         async def _prefix_or_mention(bot, message):
             prefix = await get_prefix(bot, message)
             return commands.when_mentioned_or(prefix)(bot, message)
 
-        kwargs['command_prefix'] = self.configs.default_prefix
+        kwargs['command_prefix'] = _prefix_or_mention
         kwargs['owner_id'] = self.configs.owner_id
         kwargs['case_insensitive'] = True
         kwargs['intents'] = Intents.all()
@@ -98,6 +98,8 @@ class Bot(commands.Bot):
 
     async def on_ready(self):
         if self.db_session is None or self.db_engine is None:
+            # Todo : Mostrar o tempo que demorou para iniciar
+            self._startup_timer.stop()
             self.db_engine = ConnectionFactory.get_engine()
             self.db_session = ConnectionFactory.get_session(self.db_engine)
             self.start_date = utcnow()
