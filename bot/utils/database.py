@@ -24,11 +24,12 @@ from typing import Union
 
 from disnake import Message
 from disnake.ext.commands import Context
+from database.models.guild import Guild
 
 from database.repositories.guild_repository import GuildRepository
 
 
-def get_prefix(bot, message: Union[Message, Context]) -> str:
+async def get_prefix(bot, message: Union[Message, Context]) -> str:
     """
     Get the prefix for the message.
 
@@ -42,4 +43,8 @@ def get_prefix(bot, message: Union[Message, Context]) -> str:
     """
     if message.guild:
         guild_repository = GuildRepository(bot.db_session)
-        guild = guild_repository.find(message.guild.id)
+        guild = await guild_repository.find_by_id(message.guild.id)
+        if guild is None:
+            guild = await guild_repository.create(message.guild.id)
+        return guild.prefix
+    return bot.configs.default_prefix
