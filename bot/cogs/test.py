@@ -24,12 +24,13 @@ from disnake.ext import commands
 
 
 class Test(commands.Cog):
-    @commands.slash_command(
-        name='foo',
-        description='Foo Bar'
-    )
-    async def _foo(self, inter):
-        await inter.response.send_message("bar")
+    ...
+    # @commands.slash_command(
+    #     name='foo',
+    #     description='Foo Bar'
+    # )
+    # async def _foo(self, inter):
+    #     await inter.response.send_message("bar")
 
 
 def setup(bot):
