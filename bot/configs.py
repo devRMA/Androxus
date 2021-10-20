@@ -26,25 +26,27 @@ from typing import List
 from disnake import Permissions
 
 
-class Config:
+class Configs:
     """
     This class is used to store the configuration of the bot.
 
     Attributes:
-        DEFAULT_PREFIX (str): The default prefix for the bot.
-        REQUIRED_PERMISSIONS (disnake.Permissions): The permissions
+        default_prefix (str): The default prefix for the bot.
+        prefix (str): An alias for default_prefix.
+        required_permissions (disnake.Permissions): The permissions
         necessary for all bot commands to work.
-        OWNER_ID (int): The ID of the bot owner.
-        TEST_GUILDS (List[int]): The ids of the servers you want to test the
+        owner_id (int): The ID of the bot owner.
+        test_guilds (List[int]): The ids of the servers you want to test the
         slash commands
 
     """
-    DEFAULT_PREFIX: str = getenv('DEFAULT_PREFIX')
-    REQUIRED_PERMISSIONS: Permissions = Permissions(8)
-    OWNER_ID: int = int(getenv('OWNER_ID'))
+    default_prefix: str = getenv('DEFAULT_PREFIX')
+    prefix: str = default_prefix
+    required_permissions: Permissions = Permissions(8)
+    owner_id: int = int(getenv('OWNER_ID'))
 
     @property
-    def TEST_GUILDS() -> List[int]:
+    def test_guilds(self) -> List[int]:
         """
         The IDs of the test guilds.
 
