@@ -26,6 +26,7 @@ from os import getenv, listdir
 from os.path import abspath
 
 from aiohttp.client import ClientSession
+from configs import Configs
 from database import bootstrap as db_bootstrap
 from database.factories.connection_factory import ConnectionFactory
 from disnake import Game, Intents
@@ -72,6 +73,7 @@ class Bot(commands.Bot):
     db_engine: AsyncEngine = None
     db_session: AsyncSession = None
     http_session: ClientSession = None
+    configs: Configs = Configs()
     _status = cycle((
         'V3 online',
         'Androxus V3'
@@ -84,13 +86,13 @@ class Bot(commands.Bot):
             prefix = await get_prefix(bot, message)
             return commands.when_mentioned_or(prefix)(bot, message)
 
-        kwargs['command_prefix'] = getenv('DEFAULT_PREFIX')
-        kwargs['owner_id'] = getenv('OWNER_ID')
+        kwargs['command_prefix'] = self.configs.default_prefix
+        kwargs['owner_id'] = self.configs.owner_id
         kwargs['case_insensitive'] = True
         kwargs['intents'] = Intents.all()
         kwargs['strip_after_prefix'] = True
         kwargs['activity'] = Game(name='😴 Starting ...')
-        kwargs['test_guilds'] = getenv('TEST_GUILDS')
+        kwargs['test_guilds'] = self.configs.test_guilds
         super().__init__(*args, **kwargs)
         _load_cogs(self)
 
