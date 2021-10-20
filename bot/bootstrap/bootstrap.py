@@ -20,8 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from .logging import setup_logging
 from dotenv import load_dotenv
+
+from .logging import setup_logging
 
 
 def init():

@@ -1,2 +1,2 @@
-from .log import *
 from .colors import *
+from .log import *
