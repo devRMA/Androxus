@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from os import getenv
+from typing import List
 
 from disnake import Permissions
 
@@ -31,8 +32,34 @@ class Config:
 
     Attributes:
         DEFAULT_PREFIX (str): The default prefix for the bot.
-        REQUIRED_PERMISSIONS (disnake.Permissions): The permissions necessary for all bot commands to work.
+        REQUIRED_PERMISSIONS (disnake.Permissions): The permissions
+        necessary for all bot commands to work.
+        OWNER_ID (int): The ID of the bot owner.
+        TEST_GUILDS (List[int]): The ids of the servers you want to test the
+        slash commands
 
     """
-    DEFAULT_PREFIX = getenv('DEFAULT_PREFIX', '!')
-    REQUIRED_PERMISSIONS = Permissions(8)
+    DEFAULT_PREFIX: str = getenv('DEFAULT_PREFIX')
+    REQUIRED_PERMISSIONS: Permissions = Permissions(8)
+    OWNER_ID: int = int(getenv('OWNER_ID'))
+
+    @property
+    def TEST_GUILDS() -> List[int]:
+        """
+        The IDs of the test guilds.
+
+        Returns:
+            List[int]: The list of test guild IDs.
+
+        """
+        test_guilds = getenv('TEST_GUILDS')
+        if test_guilds != '':
+            if test_guilds.count(',') > 0:
+                if test_guilds.count('[') == 1 and test_guilds.count(']') == 1:
+                    return [
+                        int(_id.replace(' ', ''))
+                        for _id in test_guilds.replace(
+                            '[', '').replace(
+                            ']', '').split(',')
+                    ]
+        return []
