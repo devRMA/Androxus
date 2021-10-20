@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 from config import Config
+from database.models.model import Model
 from sqlalchemy import BigInteger, Column, String
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from sqlalchemy.ext.declarative import declarative_base
@@ -30,7 +31,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class Guild(Base):
+class Guild(Base, Model):
     """
     Represents a guild in the database.
 
