@@ -25,6 +25,12 @@ class Model:
     The base model class.
     """
 
+    def __str__(self) -> str:
+        return f'<{self.__class__.__name__} ID: {self.id}>'
+
+    def __repr__(self) -> str:
+        return f'<{self.__class__.__name__} ID: {self.id}>'
+
     def diff_in_dict(self, other) -> dict:
         """
         Returns a dictionary representation of the difference between the
