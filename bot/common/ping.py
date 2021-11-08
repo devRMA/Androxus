@@ -32,8 +32,12 @@ from language import Translator
 async def ping(context: Union[Context, Interaction]):
     send = context.send if isinstance(
         context, Context) else context.response.send_message
-    translator = await Translator(context).init()
-    embed = Embed(title=translator.get('Ping'),
-                  description=translator.get('Pong'),
-                  timestamp=utcnow())
-    await send(embed=embed)
+
+    lang = await Translator(context).init()
+    embed = Embed(
+        title=lang.get('Translation test'),
+        description=lang.get('Latency'),
+        timestamp=utcnow()
+    )
+
+    await send(lang.get('hello', {'user': str(context.author)}))
