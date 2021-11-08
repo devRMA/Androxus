@@ -36,6 +36,8 @@ class Configs:
         required_permissions (disnake.Permissions): The permissions
         necessary for all bot commands to work.
         owner_id (int): The ID of the bot owner.
+        default_language (str): The default language for the bot commands.
+        language (str): An alias for default_language.
         test_guilds (List[int]): The ids of the servers you want to test the
         slash commands
 
@@ -44,6 +46,8 @@ class Configs:
     prefix: str = default_prefix
     required_permissions: Permissions = Permissions(8)
     owner_id: int = int(getenv('OWNER_ID'))
+    default_language: str = getenv('DEFAULT_LANGUAGE')
+    language: str = default_language
 
     @property
     def test_guilds(self) -> List[int]:
