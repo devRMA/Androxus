@@ -46,12 +46,14 @@ def _load_cogs(bot):
         bot (Bot): The bot instance.
 
     """
-    bot.remove_command('help')
+    # bot.remove_command('help')
     bot.load_extension('jishaku')
-    for file in listdir(abspath('./') + '/cogs'):
-        if file.endswith('.py'):
-            filename = file.removesuffix('.py')
-            bot.load_extension(f'cogs.{filename}')
+    paths = ['message', 'normal', 'slash', 'user']
+    for path in paths:
+        for file in listdir(abspath('./') + '/commands/' + path):
+            if file.endswith('.py'):
+                filename = file.removesuffix('.py')
+                bot.load_extension(f'commands.{path}.{filename}')
 
 
 class Bot(commands.Bot):
