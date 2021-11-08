@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from json import load
 from os.path import abspath
 from typing import Optional, Union
 
@@ -52,7 +53,7 @@ class Translator:
         """
         Initializes the translator.
 
-        returns:
+        Returns:
             self
 
         """
@@ -62,21 +63,27 @@ class Translator:
             repository = GuildRepository(self.bot.db_session)
             db_guild = await repository.find_or_create(self.guild.id)
             self.language = db_guild.language
-        print(abspath('./'))
+        path_to_json = abspath('./') + f'/language/json/{self.language}.json'
+        with open(path_to_json) as file:
+            self.texts = load(file)
         return self
 
-    def translate(self, text: str) -> str:
+    def translate(self, text: str, placeholders: dict = {}) -> str:
         """
         Translates the text.
 
         Args:
             text (str): The text to be translated.
+            placeholders (dict): The words that will be replaced.
 
         Returns:
             str: The translated text.
 
         """
-        return text
+        translated_text = self.texts.get(text, text)
+        for key, value in placeholders.items():
+            translated_text = translated_text.replace(f':{key}', value)
+        return translated_text
 
     """
     ------------------------------------------------------------
@@ -84,15 +91,16 @@ class Translator:
     ------------------------------------------------------------
     """
 
-    def get(self, text: str) -> str:
+    def get(self, text: str, placeholders: dict = {}) -> str:
         """
         Translates the text.
 
         Args:
             text (str): The text to be translated.
+            placeholders (dict): The words that will be replaced.
 
         Returns:
             str: The translated text.
 
         """
-        return self.translate(text)
+        return self.translate(text, placeholders)
