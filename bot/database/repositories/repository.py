@@ -95,6 +95,22 @@ class Repository:
         async with self.session() as session:
             return await self.__get_by_id(session, model_id)
 
+    async def find_or_create(self, model_id: int) -> Model:
+        """
+        Get a model by id, or create it if it doesn't exist
+
+        Args:
+            model_id (int): The id of the model to get.
+
+        Returns:
+            database.models.Model: The model object.
+
+        """
+        model = await self.find(model_id)
+        if model is None:
+            model = await self.create(model_id)
+        return model
+
     async def all(self) -> List[Model]:
         """
         Get all models
@@ -250,6 +266,19 @@ class Repository:
         """
         return await self.find(model_id)
 
+    async def find_by_id_or_create(self, model_id: int) -> Model:
+        """
+        Get a model by id, or create it if it doesn't exist
+
+        Args:
+            model_id (int): The id of the model to get.
+
+        Returns:
+            database.models.Model: The model object.
+
+        """
+        return await self.find_or_create(model_id)
+
     async def get_by_id(self, model_id: int) -> Optional[Model]:
         """
         Get a model by id
@@ -262,6 +291,19 @@ class Repository:
 
         """
         return await self.find(model_id)
+
+    async def get_by_id_or_create(self, model_id: int) -> Model:
+        """
+        Get a model by id, or create it if it doesn't exist
+
+        Args:
+            model_id (int): The id of the model to get.
+
+        Returns:
+            database.models.Model: The model object.
+
+        """
+        return await self.find_or_create(model_id)
 
     async def get(self, model_id: int) -> Optional[Model]:
         """
@@ -276,6 +318,19 @@ class Repository:
         """
         return await self.find(model_id)
     
+    async def get_or_create(self, model_id: int) -> Model:
+        """
+        Get a model by id, or create it if it doesn't exist
+
+        Args:
+            model_id (int): The id of the model to get.
+
+        Returns:
+            database.models.Model: The model object.
+
+        """
+        return await self.find_or_create(model_id)
+
     async def sync(self, model: Model):
         """
         Save a model to the database
