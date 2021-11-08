@@ -22,7 +22,7 @@
 
 from datetime import datetime
 from itertools import cycle
-from os import getenv, listdir
+from os import listdir
 from os.path import abspath
 
 from aiohttp.client import ClientSession
