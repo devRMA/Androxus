@@ -38,10 +38,12 @@ class Guild(Base, Model):
     Args:
         id (int): The guild id
         prefix (str, optional): The guild prefix.
+        language (str, optional): The guild language.
 
     Attributes:
         id (int): The guild's ID.
         prefix (str): The guild's prefix.
+        language (str): The guild's language.
 
     """
     __tablename__ = 'guilds'
@@ -52,10 +54,12 @@ class Guild(Base, Model):
         nullable=False
     )
     prefix = Column(String(10), nullable=False)
+    language = Column(String(255), nullable=False)
 
-    def __init__(self, id_, prefix=None):
+    def __init__(self, id_, prefix=None, language=None):
         self.id = id_
         self.prefix = prefix or Configs.default_prefix
+        self.language = language or Configs.default_language
 
     def __eq__(self, other):
         return isinstance(other, Guild) and (self.id == other.id)
@@ -94,5 +98,6 @@ class Guild(Base, Model):
         """
         return {
             'id': self.id,
-            'prefix': self.prefix
+            'prefix': self.prefix,
+            'language': self.language
         }
