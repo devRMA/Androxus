@@ -26,10 +26,14 @@ from disnake import ApplicationCommandInteraction as Interaction
 from disnake import Embed
 from disnake.ext.commands.context import Context
 from disnake.utils import utcnow
+from language import Translator
 
 
 async def ping(context: Union[Context, Interaction]):
     send = context.send if isinstance(
         context, Context) else context.response.send_message
-    embed = Embed(title='Ping', description='Pong', timestamp=utcnow())
+    translator = await Translator(context).init()
+    embed = Embed(title=translator.get('Ping'),
+                  description=translator.get('Pong'),
+                  timestamp=utcnow())
     await send(embed=embed)
