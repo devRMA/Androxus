@@ -1,4 +1,5 @@
 {
-    "Latency": "Latência",
-    "hello": "Hello :user!"
+    "apples": "{0} Não há maçãs!|[1,5] Há entre uma e 5 maçãs!|[5,*] Há mais de 5 maçãs!",
+    "cars": "Tem 1 carro só, po|Eita, tem varios carros",
+    "minutes": "{1} Há um minuto.|[2,*] Há :value minutos!"
 }

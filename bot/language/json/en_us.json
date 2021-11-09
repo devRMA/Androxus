@@ -1,0 +1,5 @@
+{
+    "apples": "{0} Não há maçãs!|[1,5] Há entre uma e 5 maçãs!|[6,*] Há mais de 5 maçãs!",
+    "cars": "{0} Não tem carro carro|[1,2] Tem 1 ou 2 carros|[3,*] Eita, tem mais de 3 carros",
+    "minutes": "{1} Há um minuto.|[2,*] Há :value minutos!"
+}
