@@ -27,6 +27,7 @@ from disnake import Embed
 from disnake.ext.commands.context import Context
 from disnake.utils import utcnow
 from language import Translator
+from random import randint
 
 
 async def ping(context: Union[Context, Interaction]):
@@ -40,4 +41,6 @@ async def ping(context: Union[Context, Interaction]):
         timestamp=utcnow()
     )
 
-    await send(lang.get('hello', {'user': str(context.author)}))
+    minutes = randint(2, 50)
+    await send(f'{lang.choice("minutes", 1, {"value": 1})}\n'
+               f'{lang.choice("minutes", minutes, {"value": minutes})}\n')
