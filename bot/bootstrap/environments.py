@@ -20,13 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from dotenv import load_dotenv
-
-from .logging import setup_logging
-from .environments import setup_env
+from os import environ
 
 
-def init():
-    load_dotenv()
-    setup_logging()
-    setup_env()
+def setup_env():
+    environ['JISHAKU_HIDE'] = 'true'
+    environ['JISHAKU_NO_UNDERSCORE'] = 'true'
