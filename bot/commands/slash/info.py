@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from androxus import Bot
-from common import ping
+from common import InfoCommands
 from disnake import ApplicationCommandInteraction as Interaction
 from disnake.ext import commands
 
@@ -32,7 +32,8 @@ class InfoSlash(commands.Cog):
         """
         Get the bot latency
         """
-        return await ping(inter)
+        info_commands = await InfoCommands(inter).init()
+        return await info_commands.ping()
 
 
 def setup(bot: Bot):

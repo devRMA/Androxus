@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 from androxus import Bot
-from common import ping
+from common import InfoCommands
 from disnake.ext import commands
 from disnake.ext.commands.context import Context
 
@@ -32,7 +32,8 @@ class InfoNormal(commands.Cog):
         """
         Get the bot latency
         """
-        return await ping(ctx)
+        info_commands = await InfoCommands(ctx).init()
+        return await info_commands.ping()
 
 
 def setup(bot: Bot):
