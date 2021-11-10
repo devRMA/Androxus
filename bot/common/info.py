@@ -20,27 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Union
-
-from disnake import ApplicationCommandInteraction as Interaction
-from disnake import Embed
-from disnake.ext.commands.context import Context
-from disnake.utils import utcnow
-from language import Translator
 from random import randint
 
+from disnake import Embed, Message
+from disnake.utils import utcnow
 
-async def ping(context: Union[Context, Interaction]):
-    send = context.send if isinstance(
-        context, Context) else context.response.send_message
+from .base import Base
 
-    lang = await Translator(context).init()
-    embed = Embed(
-        title=lang.get('Translation test'),
-        description=lang.get('Latency'),
-        timestamp=utcnow()
-    )
 
-    minutes = randint(2, 50)
-    await send(f'{lang.choice("minutes", 1, {"value": 1})}\n'
-               f'{lang.choice("minutes", minutes, {"value": minutes})}\n')
+class InfoCommands(Base):
+    async def ping(self) -> Message:
+        embed = Embed(
+            title=self.__('Translation test'),
+            description=self.__('Latency'),
+            timestamp=utcnow()
+        )
+
+        minutes = randint(2, 50)
+        await self.send(f'{self._choice("{1} Há um minuto.|[2,*] Há :value minutos!", 1, {"value": 1})}\n'
+                        f'{self._choice("{1} Há um minuto.|[2,*] Há :value minutos!", minutes, {"value": minutes})}\n')

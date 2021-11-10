@@ -1,1 +1,1 @@
-from .ping import *
+from .info import *
