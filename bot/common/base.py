@@ -41,15 +41,22 @@ class Base:
     ctx: Union[Context, Interaction]
     translator: Translator
     send: Coroutine
+    is_interaction: bool
 
     def __init__(self, context: Union[Context, Interaction]) -> None:
         self.bot = context.bot
         self.ctx = context
-        self.send = context.send if isinstance(
-            context, Context) else context.response.send_message
+        if isinstance(context, Context):
+            self.send = context.send
+            self.is_interaction = False
+        else:
+            self.send = context.response.send_message
+            self.is_interaction = True
+        
 
     async def init(self) -> 'Base':
         self.translator = await Translator(self.ctx).init()
+        return self
 
     def __(self, key: str, placeholders: dict = {}) -> str:
         """
