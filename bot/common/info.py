@@ -20,22 +20,53 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from random import randint
+from asyncio import sleep
 
-from disnake import Embed, Message
+from database.repositories import GuildRepository
+from disnake import Colour, Embed, Message
 from disnake.utils import utcnow
+from stopwatch import Stopwatch
 
 from .base import Base
 
 
 class InfoCommands(Base):
     async def ping(self) -> Message:
-        embed = Embed(
-            title=self.__('Translation test'),
-            description=self.__('Latency'),
-            timestamp=utcnow()
-        )
+        """
+        Get the bot latency
+        """
+        # getting latency with the database
+        guild_repo = GuildRepository(self.bot.db_session)
+        stopwatch_db = Stopwatch()
+        await guild_repo.find(0)
+        stopwatch_db.stop()
 
-        minutes = randint(2, 50)
-        await self.send(f'{self._choice("{1} Há um minuto.|[2,*] Há :value minutos!", 1, {"value": 1})}\n'
-                        f'{self._choice("{1} Há um minuto.|[2,*] Há :value minutos!", minutes, {"value": minutes})}\n')
+        # getting the latency to send a message
+        stopwatch_message = Stopwatch()
+        bot_message = await self.send(
+            embed=Embed(
+                title=self.__('Calculating latency...') +
+                f' {self.bot.get_emoji(756715436149702806)}',
+                timestamp=utcnow(),
+                color=Colour.random()
+            )
+        )
+        stopwatch_message.stop()
+
+        if self.is_interaction:
+            bot_message = await self.ctx.original_message()
+
+        embed_title = '\uD83C\uDFD3 ' + self.__('API latency:') + \
+            f' {int(self.bot.latency * 1000)}ms!\n' + \
+            f'{self.bot.get_emoji(756712226303508530)} ' + \
+            self.__('Database response time:') + \
+            f' {stopwatch_db}!\n' + \
+            '\ud83d\udce8 ' + \
+            self.__('Discord response time:') + \
+            f' {stopwatch_message}'
+        await sleep(stopwatch_message.duration * 2)
+        return await bot_message.edit(embed=Embed(
+            title=embed_title,
+            timestamp=utcnow(),
+            color=Colour.random()
+        ))
