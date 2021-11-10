@@ -24,8 +24,10 @@ from datetime import datetime
 from itertools import cycle
 from os import listdir
 from os.path import abspath
+from sys import version
 
 from aiohttp.client import ClientSession
+from disnake import __version__ as disnake_version
 from configs import Configs
 from database import bootstrap as db_bootstrap
 from database.factories.connection_factory import ConnectionFactory
@@ -35,6 +37,8 @@ from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from stopwatch import Stopwatch
+from utils import log
+from utils.colors import LBLUE, LGREEN, LYELLOW
 from utils.database import get_prefix
 
 
@@ -80,9 +84,11 @@ class Bot(commands.Bot):
         'V3 online',
         'Androxus V3'
     ))
+    _startup_timer: Stopwatch = None
 
     def __init__(self, *args, **kwargs):
         self._startup_timer = Stopwatch()
+        log('BOT', 'STARTING BOT...', first_color=LYELLOW)
 
         async def _prefix_or_mention(bot, message):
             prefix = await get_prefix(bot, message)
@@ -98,12 +104,24 @@ class Bot(commands.Bot):
         super().__init__(*args, **kwargs)
         _load_cogs(self)
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         if self.db_session is None or self.db_engine is None:
-            # Todo : Mostrar o tempo que demorou para iniciar
             self._startup_timer.stop()
             self.db_engine = ConnectionFactory.get_engine()
             self.db_session = ConnectionFactory.get_session(self.db_engine)
             self.start_date = utcnow()
             await db_bootstrap(self.db_engine)
-            print(f'Logged in as: {self.user}')
+            log('BOT', f'LOGGED IN {self.user}', first_color=LGREEN)
+            log('BOT', f'ID: {self.user.id}', first_color=LGREEN)
+            log('INFO', f'{len(set(self.get_all_members()))} USERS!',
+                first_color=LBLUE)
+            log('INFO', f'{len(self.guilds)} GUILDS!',
+                first_color=LBLUE)
+            log('INFO', f'BOT VERSION: {self.__version__}',
+                first_color=LBLUE)
+            log('INFO', f'PYTHON VERSION: {version.split(" (")[0]}',
+                first_color=LBLUE)
+            log('INFO', f'DISNAKE VERSION: {disnake_version}',
+                first_color=LBLUE)
+            log('INFO', f'TIME TO START: {self._startup_timer}',
+                first_color=LBLUE)
