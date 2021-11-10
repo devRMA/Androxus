@@ -4,7 +4,8 @@ networks:
   redis:
 services:
   database:
-    image: postgres:13.4
+    image: postgres:14.0
+    restart: unless-stopped
     volumes:
       - ./database_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
@@ -13,11 +14,13 @@ services:
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASS}"
   cache:
-    image: redis:6.2.5
+    image: redis:6.2.6
+    restart: unless-stopped
     networks:
       - redis
   bot:
     build: ./bot
+    restart: unless-stopped
     volumes:
       - ./bot:/usr/src/bot/
     networks:
