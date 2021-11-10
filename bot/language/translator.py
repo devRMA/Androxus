@@ -53,7 +53,7 @@ class Translator:
     texts: dict = {}
     _selector: MessageSelector = None
 
-    def __init__(self, context: Union[Context, Interaction, None]):
+    def __init__(self, context: Union[Context, Interaction, None]) -> None:
         # if context is None, will be used the default language
         if context is None:
             self.language = Configs.language
@@ -62,12 +62,12 @@ class Translator:
             self.bot = context.bot
             self.guild = context.guild
 
-    async def init(self):
+    async def init(self) -> 'Translator':
         """
         Initializes the translator.
 
         Returns:
-            self
+            Translator: The translator instance.
 
         """
         if self.bot is not None:
@@ -209,3 +209,37 @@ class Translator:
         for key, value in should_replace.items():
             line = line.replace(str(key), str(value))
         return line
+
+    """
+    ------------------------------------------------------------
+                            Aliases
+    ------------------------------------------------------------
+    """
+
+    def translate(self, key: str, placeholders: dict = {}) -> str:
+        """
+        Get the translation for the given key.
+
+        Args:
+            key (str): The key of the text to be translated.
+            placeholders (dict): The words that will be replaced.
+
+        Returns:
+            str: The translated text.
+
+        """
+        return self.get(key, placeholders)
+
+    def __(self, key: str, placeholders: dict = {}) -> str:
+        """
+        Get the translation for the given key.
+
+        Args:
+            key (str): The key of the text to be translated.
+            placeholders (dict): The words that will be replaced.
+
+        Returns:
+            str: The translated text.
+
+        """
+        return self.get(key, placeholders)
