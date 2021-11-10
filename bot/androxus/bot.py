@@ -22,9 +22,8 @@
 
 from datetime import datetime
 from itertools import cycle
-from os import listdir
+from os import listdir, getenv
 from os.path import abspath
-from sys import version
 
 from aiohttp.client import ClientSession
 from disnake import __version__ as disnake_version
@@ -119,7 +118,7 @@ class Bot(commands.Bot):
                 first_color=LBLUE)
             log('INFO', f'BOT VERSION: {self.__version__}',
                 first_color=LBLUE)
-            log('INFO', f'PYTHON VERSION: {version.split(" (")[0]}',
+            log('INFO', 'PYTHON VERSION: ' + getenv('PYTHON_VERSION'),
                 first_color=LBLUE)
             log('INFO', f'DISNAKE VERSION: {disnake_version}',
                 first_color=LBLUE)
