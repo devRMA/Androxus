@@ -4,7 +4,7 @@ networks:
   redis:
 services:
   database:
-    image: postgres:14.0
+    image: postgres:14.1
     volumes:
       - ./database_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
@@ -43,4 +43,4 @@ services:
       DB_TEST_PORT: "${DB_TEST_PORT}"
       DB_TEST_USER: "${DB_TEST_USER}"
       DB_TEST_PASS: "${DB_TEST_PASS}"
-      DO_TESTS: "${DO_TESTS}"
+      DEVELOPMENT: "${DEVELOPMENT}"
