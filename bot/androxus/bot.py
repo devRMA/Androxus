@@ -39,6 +39,7 @@ from stopwatch import Stopwatch
 from utils import log
 from utils.colors import LBLUE, LGREEN, LYELLOW
 from utils.database import get_prefix
+from toml import load
 
 
 def _load_cogs(bot):
@@ -72,7 +73,6 @@ class Bot(commands.Bot):
         http_session (ClientSession): The aiohttp session.
 
     """
-    __version__ = '3.0a'
     start_date: datetime = None
     maintenance: bool = False
     db_engine: AsyncEngine = None
@@ -102,6 +102,12 @@ class Bot(commands.Bot):
         kwargs['test_guilds'] = self.configs.test_guilds
         super().__init__(*args, **kwargs)
         _load_cogs(self)
+
+    @property
+    def __version__(self):
+        path = f'{abspath("./")}/pyproject.toml'
+        with open(path, 'r', encoding='utf-8') as file:
+            return load(file)['tool']['poetry']['version']
 
     async def on_ready(self) -> None:
         if self.db_session is None or self.db_engine is None:
