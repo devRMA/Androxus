@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "Androxus"
+version = "3.0.0a"
+description = "An open source bot made in python"
+authors = ["Rafael"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+"asyncpg" = "^0.25.0"
+"colorama" = "^0.4.4"
+"disnake" = {git = "https://github.com/DisnakeDev/disnake.git"}
+"disnake-jishaku" = "^2.6.5"
+"python-dotenv" = "^0.19.2"
+"SQLAlchemy" = "^1.4.28"
+"stopwatch.py" = "^1.0.1"
+"toml" = "^0.10.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
