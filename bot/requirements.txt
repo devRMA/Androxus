@@ -1,7 +1,0 @@
-python-dotenv==0.19.2
-disnake@git+https://github.com/DisnakeDev/disnake.git@master
-disnake-jishaku==2.6.5
-SQLAlchemy==1.4.27
-asyncpg==0.25.0
-colorama==0.4.4
-stopwatch.py==1.0.1
