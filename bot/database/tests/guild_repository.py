@@ -52,7 +52,7 @@ class GuildRepositoryTest(Test):
         self.assert_equal(guild.id, GUILD_ID_TEST)
         self.assert_equal(guild.prefix, DEFAULT_PREFIX)
 
-    async def test_4_guild_get_fail(self):
+    async def test_04_guild_get_fail(self):
         result = await self.repository.find(GUILD_ID_TEST + 2)
         self.assert_is_none(result)
 
