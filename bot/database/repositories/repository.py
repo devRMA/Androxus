@@ -20,6 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 from typing import List, Optional, Union
 
 from database.models.model import Model
@@ -317,7 +318,7 @@ class Repository:
 
         """
         return await self.find(model_id)
-    
+
     async def get_or_create(self, model_id: int) -> Model:
         """
         Get a model by id, or create it if it doesn't exist

@@ -22,8 +22,8 @@
 
 from dotenv import load_dotenv
 
-from .logging import setup_logging
 from .environments import setup_env
+from .logging import setup_logging
 
 
 def init():

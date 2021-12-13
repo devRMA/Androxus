@@ -52,7 +52,6 @@ class Base:
         else:
             self.send = context.response.send_message
             self.is_interaction = True
-        
 
     async def init(self) -> 'Base':
         self.translator = await Translator(self.ctx).init()
