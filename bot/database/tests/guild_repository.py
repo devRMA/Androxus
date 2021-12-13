@@ -23,7 +23,7 @@
 from configs import Configs as ConfigsBot
 
 from ..models import Guild
-from ..repositories import GuildRepository
+from ..repositories.guild_repository import GuildRepository
 from . import Configs, Test
 
 GUILD_ID_TEST = 123456789
