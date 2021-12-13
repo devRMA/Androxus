@@ -22,24 +22,24 @@
 
 from datetime import datetime
 from itertools import cycle
-from os import listdir, getenv
+from os import getenv, listdir
 from os.path import abspath
 
 from aiohttp.client import ClientSession
-from disnake import __version__ as disnake_version
 from configs import Configs
 from database import bootstrap as db_bootstrap
-from database.factories.connection_factory import ConnectionFactory
+from database.connection import ConnectionFactory
 from disnake import Game, Intents
+from disnake import __version__ as disnake_version
 from disnake.ext import commands
 from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from stopwatch import Stopwatch
-from utils import log
+from toml import load
+from utils import SingletonMeta, log
 from utils.colors import LBLUE, LGREEN, LYELLOW
 from utils.database import get_prefix
-from toml import load
 
 
 def _load_cogs(bot):
@@ -60,7 +60,7 @@ def _load_cogs(bot):
                 bot.load_extension(f'commands.{path}.{filename}')
 
 
-class Bot(commands.Bot):
+class Bot(commands.Bot, metaclass=SingletonMeta):
     """
     The main class of the bot.
 
