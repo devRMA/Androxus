@@ -20,13 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 from typing import Union
 
 from disnake import Message
 from disnake.ext.commands import Context
-from database.models.guild import Guild
+from enums import RepositoryType
 
-from database.repositories.guild_repository import GuildRepository
+from database.repositories import RepositoryFactory
 
 
 async def get_prefix(bot, message: Union[Message, Context]) -> str:
@@ -42,9 +43,7 @@ async def get_prefix(bot, message: Union[Message, Context]) -> str:
 
     """
     if message.guild:
-        guild_repository = GuildRepository(bot.db_session)
-        guild = await guild_repository.find_by_id(message.guild.id)
-        if guild is None:
-            guild = await guild_repository.create(message.guild.id)
+        guild_repository = RepositoryFactory.create(RepositoryType.GUILD, bot)
+        guild = await guild_repository.find_by_id_or_create(message.guild.id)
         return guild.prefix
     return bot.configs.default_prefix

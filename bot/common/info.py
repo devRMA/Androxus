@@ -22,9 +22,10 @@
 
 from asyncio import sleep
 
-from database.repositories import GuildRepository
+from database.repositories import RepositoryFactory
 from disnake import Colour, Embed, Message
 from disnake.utils import utcnow
+from enums import RepositoryType
 from stopwatch import Stopwatch
 
 from .base import Base
@@ -36,7 +37,7 @@ class InfoCommands(Base):
         Get the bot latency
         """
         # getting latency with the database
-        guild_repo = GuildRepository(self.bot.db_session)
+        guild_repo = RepositoryFactory.create(RepositoryType.GUILD)
         stopwatch_db = Stopwatch()
         await guild_repo.find(0)
         stopwatch_db.stop()
