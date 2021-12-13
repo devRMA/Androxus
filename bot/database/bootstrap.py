@@ -20,11 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from enums import ModelType
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from utils import CYAN, LYELLOW, WHITE, log
-
-from database.models import __models__
 
 
 async def check_tables(engine: AsyncEngine):
@@ -38,7 +37,7 @@ async def check_tables(engine: AsyncEngine):
     log('BOOTSTRAPPING DB', 'CHECKING TABLES',
         first_color=CYAN, second_color=LYELLOW)
     async with engine.connect() as conn:
-        for model in __models__:
+        for model in ModelType:
             table_name = model.__tablename__
             if not await conn.run_sync(
                     lambda con: inspect(con).has_table(table_name)
