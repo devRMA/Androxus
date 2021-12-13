@@ -26,7 +26,7 @@ from database import bootstrap as db_bootstrap
 from database.models import __models__
 from utils import CYAN, LGREEN, LRED, LYELLOW, RED, log
 
-from ..factories import ConnectionFactory
+from ..connection import ConnectionFactory
 
 
 class Configs:
