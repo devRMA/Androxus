@@ -1,1 +1,1 @@
-from .guild_repository import GuildRepository
+from .factory import RepositoryFactory
