@@ -23,9 +23,8 @@
 from asyncio import get_running_loop, new_event_loop
 from os import getenv
 
-from androxus.bot import Bot
-from bootstrap import init
-from bootstrap import make_tests
+from androxus import Bot
+from bootstrap import init, make_tests
 
 if __name__ == '__main__':
     # bootstrapping all the things
