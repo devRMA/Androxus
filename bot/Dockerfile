@@ -23,13 +23,11 @@ RUN apt-get update; \
 
 WORKDIR /usr/src/androxus
 
-# Setting up proper permissions
-RUN groupadd -r androxus; \
-    useradd -d /usr/src/androxus -r -g androxus androxus; \
-    chown androxus:androxus -R /usr/src/androxus;
+# Setting up the user
+RUN useradd -ms /bin/bash androxus;
 
 # Copy only requirements, to cache them in docker layer
-COPY --chown=androxus:androxus ./poetry.lock ./pyproject.toml /usr/src/androxus/
+COPY ./poetry.lock ./pyproject.toml /usr/src/androxus/
 
 # Project initialization
 RUN poetry config virtualenvs.create false; \
@@ -38,6 +36,6 @@ RUN poetry config virtualenvs.create false; \
 USER androxus
 
 # Creating folders, and files for a project
-COPY --chown=androxus:androxus . /usr/src/androxus/
+COPY . .
 
 ENTRYPOINT ["python", "main.py"]
