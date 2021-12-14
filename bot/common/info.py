@@ -24,7 +24,7 @@ from asyncio import sleep
 
 from database.repositories import RepositoryFactory
 from disnake import Colour, Embed, Message
-from disnake.utils import utcnow
+from disnake.utils import format_dt, utcnow
 from enums import RepositoryType
 from stopwatch import Stopwatch
 
@@ -71,6 +71,20 @@ class InfoCommands(Base):
         await sleep(stopwatch_message.duration * 2)
         return await bot_message.edit(embed=Embed(
             title=embed_title,
+            timestamp=utcnow(),
+            color=Colour.random()
+        ).set_footer(
+            text=str(self.author),
+            icon_url=self.author.display_avatar.url
+        ))
+
+    async def uptime(self) -> Message:
+        """
+        Get the bot uptime
+        """
+        return await self.send(embed=Embed(
+            title='\u23f2\ufe0f ' + self.__('When I started:'),
+            description=format_dt(self.bot.start_date, 'R'),
             timestamp=utcnow(),
             color=Colour.random()
         ).set_footer(

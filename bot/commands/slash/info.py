@@ -35,6 +35,14 @@ class InfoSlash(commands.Cog):
         info_commands = await InfoCommands(inter).init()
         return await info_commands.ping()
 
+    @commands.slash_command()
+    async def uptime(self, inter: Interaction):
+        """
+        Get the bot uptime
+        """
+        info_commands = await InfoCommands(inter).init()
+        return await info_commands.uptime()
+
 
 def setup(bot: Bot):
     bot.add_cog(InfoSlash(bot))

@@ -35,6 +35,14 @@ class InfoNormal(commands.Cog):
         info_commands = await InfoCommands(ctx).init()
         return await info_commands.ping()
 
+    @commands.command(aliases=['ut'])
+    async def uptime(self, ctx: Context):
+        """
+        Get the bot uptime
+        """
+        info_commands = await InfoCommands(ctx).init()
+        return await info_commands.uptime()
+
 
 def setup(bot: Bot):
     bot.add_cog(InfoNormal(bot))
