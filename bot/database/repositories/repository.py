@@ -23,9 +23,10 @@
 
 from typing import List, Optional, Union
 
-from database.models.model import Model
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
+from ..models.model import Model
 
 
 class Repository:

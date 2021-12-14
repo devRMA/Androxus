@@ -22,11 +22,11 @@
 
 from os import getenv
 
-from database import bootstrap as db_bootstrap
-from database.models import __models__
 from utils import CYAN, LGREEN, LRED, LYELLOW, RED, log
 
+from ..bootstrap import bootstrap as db_bootstrap
 from ..connection import ConnectionFactory
+from ..models import __models__
 
 
 class Configs:

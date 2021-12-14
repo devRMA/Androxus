@@ -23,9 +23,10 @@
 from inspect import iscoroutinefunction
 from traceback import format_exc
 
-from database.tests import Configs
-from database.tests.guild_repository import GuildRepositoryTest
 from utils import CYAN, MAGENTA, log
+
+from .configs import Configs
+from .guild_repository import GuildRepositoryTest
 
 
 async def make_tests():

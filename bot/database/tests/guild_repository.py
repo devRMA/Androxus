@@ -24,7 +24,8 @@ from configs import Configs as ConfigsBot
 
 from ..models import Guild
 from ..repositories.guild_repository import GuildRepository
-from . import Configs, Test
+from .configs import Configs
+from .test import Test
 
 GUILD_ID_TEST = 123456789
 DEFAULT_PREFIX = ConfigsBot.default_prefix
