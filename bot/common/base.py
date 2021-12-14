@@ -33,7 +33,7 @@ class Base:
     The base class, for commands.
 
     Args:
-        context (Context or ApplicationCommandInteraction or None): The context of
+        context (Context or ApplicationCommandInteraction): The context of
         the command.
 
     """
@@ -46,6 +46,7 @@ class Base:
     def __init__(self, context: Union[Context, Interaction]) -> None:
         self.bot = context.bot
         self.ctx = context
+        self.author = context.author
         if isinstance(context, Context):
             self.send = context.send
             self.is_interaction = False
