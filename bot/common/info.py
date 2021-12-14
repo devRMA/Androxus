@@ -50,6 +50,9 @@ class InfoCommands(Base):
                 f' {self.bot.get_emoji(756715436149702806)}',
                 timestamp=utcnow(),
                 color=Colour.random()
+            ).set_footer(
+                text=str(self.author),
+                icon_url=self.author.display_avatar.url
             )
         )
         stopwatch_message.stop()
@@ -70,4 +73,7 @@ class InfoCommands(Base):
             title=embed_title,
             timestamp=utcnow(),
             color=Colour.random()
+        ).set_footer(
+            text=str(self.author),
+            icon_url=self.author.display_avatar.url
         ))
