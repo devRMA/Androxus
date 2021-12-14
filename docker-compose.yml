@@ -20,7 +20,7 @@ services:
     build: ./bot
     restart: unless-stopped
     volumes:
-      - ./bot:/usr/src/bot/
+      - ./bot:/usr/src/androxus/
     networks:
       - postgresql
       - redis
