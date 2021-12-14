@@ -22,8 +22,6 @@
 
 from enum import Enum
 
-from database.repositories.guild_repository import GuildRepository
-
 
 class RepositoryType(Enum):
     """
@@ -33,4 +31,4 @@ class RepositoryType(Enum):
         GUILD: Guild repository
 
     """
-    GUILD = GuildRepository
+    GUILD = 'Guild'
