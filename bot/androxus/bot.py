@@ -31,15 +31,17 @@ from database import bootstrap as db_bootstrap
 from database.connection import ConnectionFactory
 from disnake import Game, Intents
 from disnake import __version__ as disnake_version
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from stopwatch import Stopwatch
 from toml import load
-from utils import SingletonMeta, get_cogs, log
+from utils import SingletonMeta, log
 from utils.colors import LBLUE, LGREEN, LYELLOW
 from utils.database import get_prefix
+from utils.numbers import format_numbers
+from utils.others import get_cogs
 
 
 class Bot(commands.Bot, metaclass=SingletonMeta):
@@ -62,8 +64,9 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
     http_session: ClientSession = None
     configs: Configs = Configs()
     _status = cycle((
-        'V3 online',
-        'Androxus V3'
+        'Androxus V3',
+        '{users} Users!',
+        '{servers} Guilds!'
     ))
     _startup_timer: Stopwatch = None
 
@@ -80,7 +83,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         kwargs['case_insensitive'] = True
         kwargs['intents'] = Intents.all()
         kwargs['strip_after_prefix'] = True
-        kwargs['activity'] = Game(name='😴 Starting ...')
+        kwargs['activity'] = Game(name='\N{SLEEPING FACE} Starting ...')
         kwargs['test_guilds'] = self.configs.test_guilds
         super().__init__(*args, **kwargs)
         # Loads all cogs of the bot.
@@ -115,3 +118,16 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
                 first_color=LBLUE)
             log('INFO', f'TIME TO START: {self._startup_timer}',
                 first_color=LBLUE)
+            try:
+                # starts loop to change status
+                self._change_status.start()
+            except RuntimeError:
+                pass
+
+    @tasks.loop(minutes=1)
+    async def _change_status(self):
+        status_name = str(next(self._status)).format(
+            servers=format_numbers(len(self.guilds)),
+            users=format_numbers(len(self.users))
+        )
+        await self.change_presence(activity=Game(name=status_name))
