@@ -11,6 +11,7 @@ python = "^3.10"
 "colorama" = "^0.4.4"
 "disnake" = {git = "https://github.com/DisnakeDev/disnake.git"}
 "disnake-jishaku" = "^2.6.5"
+"pipe" = "^1.6.0"
 "python-dotenv" = "^0.19.2"
 "SQLAlchemy" = "^1.4.28"
 "stopwatch.py" = "^1.0.1"
