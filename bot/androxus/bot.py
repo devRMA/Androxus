@@ -22,7 +22,7 @@
 
 from datetime import datetime
 from itertools import cycle
-from os import getenv, listdir
+from os import getenv
 from os.path import abspath
 
 from aiohttp.client import ClientSession
@@ -37,27 +37,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from stopwatch import Stopwatch
 from toml import load
-from utils import SingletonMeta, log
+from utils import SingletonMeta, get_cogs, log
 from utils.colors import LBLUE, LGREEN, LYELLOW
 from utils.database import get_prefix
-
-
-def _load_cogs(bot):
-    """
-    Loads all cogs of the bot.
-
-    Args:
-        bot (Bot): The bot instance.
-
-    """
-    # bot.remove_command('help')
-    bot.load_extension('jishaku')
-    paths = ['message', 'normal', 'slash', 'user']
-    for path in paths:
-        for file in listdir(abspath('./') + '/commands/' + path):
-            if file.endswith('.py'):
-                filename = file.removesuffix('.py')
-                bot.load_extension(f'commands.{path}.{filename}')
 
 
 class Bot(commands.Bot, metaclass=SingletonMeta):
@@ -101,7 +83,10 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         kwargs['activity'] = Game(name='😴 Starting ...')
         kwargs['test_guilds'] = self.configs.test_guilds
         super().__init__(*args, **kwargs)
-        _load_cogs(self)
+        # Loads all cogs of the bot.
+        # bot.remove_command('help')
+        for cog in get_cogs():
+            self.load_extension(cog)
 
     @property
     def __version__(self):
