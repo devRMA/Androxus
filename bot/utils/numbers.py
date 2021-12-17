@@ -20,6 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from re import sub
+
+
 def is_number(string) -> bool:
     """
     Check if a string is a number.
