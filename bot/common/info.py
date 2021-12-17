@@ -23,7 +23,7 @@
 from asyncio import sleep
 
 from database.repositories import RepositoryFactory
-from disnake import Colour, Embed, Message
+from disnake import Colour, Embed, Message, User
 from disnake.utils import format_dt, utcnow
 from enums import RepositoryType
 from stopwatch import Stopwatch
@@ -92,3 +92,21 @@ class InfoCommands(Base):
             text=str(self.author),
             icon_url=self.author.display_avatar.url
         ))
+
+    async def avatar(self, user: User) -> Message:
+        """
+        Get the user avatar
+        """
+        embed_description = '\N{WHITE RIGHT POINTING BACKHAND INDEX} ' + \
+            self.__('Click') + \
+            f' [{self.__("here")}]({user.display_avatar.url}) ' + \
+            self.__('to see the avatar')
+        return await self.send(embed=Embed(
+            title='\N{EYE} ' + self.__('Avatar of') + f' {user.name}',
+            description=embed_description,
+            timestamp=utcnow(),
+            color=Colour.random()
+        ).set_footer(
+            text=str(self.author),
+            icon_url=self.author.display_avatar.url
+        ).set_image(user.display_avatar.url))

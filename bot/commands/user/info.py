@@ -27,39 +27,15 @@ from disnake import User
 from disnake.ext import commands
 
 
-class InfoSlash(commands.Cog):
-    @commands.slash_command()
-    async def ping(self, inter: Interaction):
+class InfoUser(commands.Cog):
+    @commands.user_command()
+    async def avatar(self, inter: Interaction, user: User):
         """
-        Get the bot latency
-        """
-        info_commands = await InfoCommands(inter).init()
-        return await info_commands.ping()
-
-    @commands.slash_command()
-    async def uptime(self, inter: Interaction):
-        """
-        Get the bot uptime
-        """
-        info_commands = await InfoCommands(inter).init()
-        return await info_commands.uptime()
-
-    @commands.slash_command()
-    async def avatar(
-        self,
-        inter: Interaction,
-        user: User = commands.Param(lambda inter: inter.author)
-    ):
-        """Get the user avatar
-
-        Parameters
-        ----------
-        user: The user to get the avatar from, defaults to the author
-
+        Get the user avatar
         """
         info_commands = await InfoCommands(inter).init()
         return await info_commands.avatar(user)
 
 
 def setup(bot: Bot):
-    bot.add_cog(InfoSlash(bot))
+    bot.add_cog(InfoUser(bot))
