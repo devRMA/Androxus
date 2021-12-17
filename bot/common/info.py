@@ -60,12 +60,13 @@ class InfoCommands(Base):
         if self.is_interaction:
             bot_message = await self.ctx.original_message()
 
-        embed_title = '\uD83C\uDFD3 ' + self.__('API latency:') + \
+        embed_title = '\N{TABLE TENNIS PADDLE AND BALL} ' + \
+            self.__('API latency:') + \
             f' {int(self.bot.latency * 1000)}ms!\n' + \
             f'{self.bot.get_emoji(756712226303508530)} ' + \
             self.__('Database response time:') + \
             f' {stopwatch_db}!\n' + \
-            '\ud83d\udce8 ' + \
+            '\N{INCOMING ENVELOPE} ' + \
             self.__('Discord response time:') + \
             f' {stopwatch_message}'
         await sleep(stopwatch_message.duration * 2)
@@ -83,7 +84,7 @@ class InfoCommands(Base):
         Get the bot uptime
         """
         return await self.send(embed=Embed(
-            title='\u23f2\ufe0f ' + self.__('When I started:'),
+            title='\N{TIMER CLOCK} ' + self.__('When I started:'),
             description=format_dt(self.bot.start_date, 'R'),
             timestamp=utcnow(),
             color=Colour.random()
