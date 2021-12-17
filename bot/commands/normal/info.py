@@ -56,4 +56,4 @@ class InfoNormal(commands.Cog):
 
 
 def setup(bot: Bot):
-    bot.add_cog(InfoNormal(bot))
+    bot.add_cog(InfoNormal())

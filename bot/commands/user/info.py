@@ -38,4 +38,4 @@ class InfoUser(commands.Cog):
 
 
 def setup(bot: Bot):
-    bot.add_cog(InfoUser(bot))
+    bot.add_cog(InfoUser())

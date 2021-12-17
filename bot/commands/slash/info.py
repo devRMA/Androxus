@@ -62,4 +62,4 @@ class InfoSlash(commands.Cog):
 
 
 def setup(bot: Bot):
-    bot.add_cog(InfoSlash(bot))
+    bot.add_cog(InfoSlash())

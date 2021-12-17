@@ -38,4 +38,4 @@ class DevNormal(commands.Cog):
 
 
 def setup(bot: Bot):
-    bot.add_cog(DevNormal(bot))
+    bot.add_cog(DevNormal())
