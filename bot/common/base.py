@@ -47,6 +47,7 @@ class Base:
         self.bot = context.bot
         self.ctx = context
         self.author = context.author
+        self.guild = context.guild
         if isinstance(context, Context):
             self.send = context.send
             self.is_interaction = False
