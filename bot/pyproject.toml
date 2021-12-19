@@ -15,9 +15,11 @@ python = "^3.10"
 "python-dotenv" = "^0.19.2"
 "SQLAlchemy" = "^1.4.28"
 "stopwatch.py" = "^1.0.1"
+"tabulate" = "^0.8.9"
 "toml" = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
+ipython = "^7.30.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
