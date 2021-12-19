@@ -1,7 +1,10 @@
 FROM python:3.10.1
 
-# python
-ENV PYTHONFAULTHANDLER=1 \
+ARG DEVELOPMENT
+
+ENV DEVELOPMENT=${DEVELOPMENT} \
+    # python
+    PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONHASHSEED=random \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -31,7 +34,7 @@ COPY ./poetry.lock ./pyproject.toml /usr/src/androxus/
 
 # Project initialization
 RUN poetry config virtualenvs.create false; \
-    poetry install --no-interaction --no-ansi;
+    poetry install $(test "$DEVELOPMENT" == false && echo "--no-dev") --no-interaction --no-ansi;
 
 USER androxus
 
