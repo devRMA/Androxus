@@ -98,11 +98,13 @@ class InfoCommands(Base):
         Get the user avatar
         """
         embed_description = '\N{WHITE RIGHT POINTING BACKHAND INDEX} ' + \
-            self.__('Click') + \
-            f' [{self.__("here")}]({user.display_avatar.url}) ' + \
-            self.__('to see the avatar')
+            self.__('Click [here](:link) to see the avatar', {
+                'link': user.display_avatar.url
+            })
         return await self.send(embed=Embed(
-            title='\N{EYE} ' + self.__('Avatar of') + f' {user.name}',
+            title='\N{EYE} ' + self.__('Avatar of :username', {
+                'username': user.display_name
+            }),
             description=embed_description,
             timestamp=utcnow(),
             color=Colour.random()
