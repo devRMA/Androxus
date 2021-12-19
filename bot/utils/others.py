@@ -23,6 +23,7 @@
 from os import listdir
 from os.path import abspath
 from typing import List
+from pipe import select
 
 
 def get_cogs() -> List[str]:
@@ -33,10 +34,37 @@ def get_cogs() -> List[str]:
         List[str]: The list with the names of the cogs
 
     """
+
+    def _get_python_files(path: str) -> List[str]:
+        """
+        Get all Python files from a path.
+
+        Args:
+            path (str): The path to search.
+
+        Returns:
+            List[str]: The list with the names of the Python files without
+            the extension.
+
+        """
+        python_files = []
+        for file in listdir(path):
+            if file.endswith(".py"):
+                python_files.append(file.removesuffix('.py'))
+        return python_files
+
     cogs = ['jishaku']
-    for path in ['message', 'normal', 'slash', 'user']:
-        for file in listdir(abspath('./') + '/commands/' + path):
-            if file.endswith('.py'):
-                filename = file.removesuffix('.py')
-                cogs.append(f'commands.{path}.{filename}')
+    commands_path = ['message', 'normal', 'slash', 'user']
+    events_path = ['events']
+
+    # getting cogs from the commands path
+    for path in commands_path:
+        cogs.extend(_get_python_files(
+            f'{abspath("./")}/commands/{path}'
+        ) | select(lambda file: f'commands.{path}.{file}'))
+    # getting cogs from events
+    for path in events_path:
+        cogs.extend(_get_python_files(
+            f'{abspath("./")}/{path}'
+        ) | select(lambda file: f'{path}.{file}'))
     return cogs
