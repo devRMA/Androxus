@@ -1,7 +1,7 @@
 version: '3.9'
 networks:
-  postgresql:
-  redis:
+  postgresql: null
+  redis: null
 services:
   database:
     image: postgres:14.1
@@ -17,7 +17,11 @@ services:
     networks:
       - redis
   bot:
-    build: ./bot
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+      args:
+        DEVELOPMENT: "${DEVELOPMENT}"
     restart: unless-stopped
     volumes:
       - ./bot:/usr/src/androxus/
