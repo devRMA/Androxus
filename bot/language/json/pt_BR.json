@@ -5,7 +5,8 @@
     "Discord response time:": "Tempo de resposta no discord:",
     "When I started:": "Quando eu iniciei:",
     "Reloaded all cogs": "Cogs recarregados",
-    "Click": "Clique",
-    "here": "aqui",
-    "to see the avatar": "para ver o avatar"
+    "Click [here](:link) to see the avatar": "Clique [aqui](:link) para ver o avatar",
+    "Avatar of :username": "Avatar de :username",
+    "You are not my creator!": "Você não é meu criador!",
+    "User `:user` was not found": "Usuário `:user` não foi encontrado"
 }
