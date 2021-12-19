@@ -25,6 +25,7 @@ from traceback import format_exception
 from disnake import Colour, Embed, Message
 from disnake.utils import utcnow
 from stopwatch import Stopwatch
+from tabulate import tabulate
 from utils import get_cogs
 
 from .base import Base
@@ -35,9 +36,9 @@ class DevCommands(Base):
         """
         Reloads all cogs
         """
-        message = ''
         successfully_icon = '\N{WHITE HEAVY CHECK MARK}'
-        unsuccessfully_icon = '\N{WARNING SIGN}'
+        unsuccessfully_icon = '\N{CROSS MARK}'
+        table = []
         for cog in get_cogs():
             cog_name = str(cog).removeprefix('commands.')
             cog_stopwatch = Stopwatch()
@@ -51,14 +52,27 @@ class DevCommands(Base):
                     exc.__traceback__,
                     1
                 ))
-                message += f'{unsuccessfully_icon} `{cog_name}`\n' \
-                    f'```py\n{traceback_data}\n```\n'
+                await self.bot.get_user(self.bot.owner_id).send(
+                    f'ERROR {cog_name}```py\n{traceback_data}\n```'
+                )
+                table.append([
+                    unsuccessfully_icon,
+                    cog_name,
+                    str(cog_stopwatch)
+                ])
             else:
                 cog_stopwatch.stop()
-                message += f'{successfully_icon} `{cog_name} - {cog_stopwatch}`\n'
+                table.append([
+                    successfully_icon,
+                    cog_name,
+                    str(cog_stopwatch)
+                ])
         return await self.send(embed=Embed(
             title=self.__('Reloaded all cogs'),
-            description=message,
+            description='```\n' + tabulate(
+                table,
+                tablefmt='pretty'
+            ) + '```',
             timestamp=utcnow(),
             color=Colour.random()
         ).set_footer(
