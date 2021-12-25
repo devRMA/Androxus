@@ -23,7 +23,7 @@
 from androxus import Bot
 from common import InfoCommands
 from disnake import ApplicationCommandInteraction as Interaction
-from disnake import User
+from disnake import Member, User
 from disnake.ext import commands
 
 
@@ -48,7 +48,7 @@ class InfoSlash(commands.Cog):
     async def avatar(
         self,
         inter: Interaction,
-        user: User = commands.Param(lambda inter: inter.author)
+        user: Member | User = commands.Param(lambda inter: inter.author)
     ):
         """Get the user avatar
 

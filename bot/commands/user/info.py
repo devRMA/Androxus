@@ -23,13 +23,13 @@
 from androxus import Bot
 from common import InfoCommands
 from disnake import ApplicationCommandInteraction as Interaction
-from disnake import User
+from disnake import Member, User
 from disnake.ext import commands
 
 
 class InfoUser(commands.Cog):
     @commands.user_command()
-    async def avatar(self, inter: Interaction, user: User):
+    async def avatar(self, inter: Interaction, user: Member | User):
         """
         Get the user avatar
         """

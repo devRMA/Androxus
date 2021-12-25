@@ -22,7 +22,7 @@
 
 from androxus import Bot
 from common import InfoCommands
-from disnake import User
+from disnake import Member, User
 from disnake.ext import commands
 from disnake.ext.commands.context import Context
 
@@ -45,7 +45,7 @@ class InfoNormal(commands.Cog):
         return await info_commands.uptime()
 
     @commands.command(aliases=['av'])
-    async def avatar(self, ctx: Context, user: User = None):
+    async def avatar(self, ctx: Context, user: Member | User = None):
         """
         Get the user avatar
         """
