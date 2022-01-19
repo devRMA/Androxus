@@ -159,7 +159,7 @@ voice = ["PyNaCl (>=1.3.0,<1.5)"]
 type = "git"
 url = "https://github.com/DisnakeDev/disnake.git"
 reference = "master"
-resolved_reference = "d1bc1454ab21e6eacccc0c0e9a457eab80ca63e8"
+resolved_reference = "27bd861767e861524b5051ec237502544ddfbd1c"
 
 [[package]]
 name = "disnake-jishaku"
