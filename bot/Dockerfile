@@ -34,7 +34,8 @@ COPY ./poetry.lock ./pyproject.toml /usr/src/androxus/
 
 # Project initialization
 RUN poetry config virtualenvs.create false; \
-    poetry install $(test "$DEVELOPMENT" == false && echo "--no-dev") --no-interaction --no-ansi;
+    poetry install $(test "$DEVELOPMENT" == false && echo "--no-dev") --no-interaction --no-ansi; \
+    poetry update;
 
 USER androxus
 
