@@ -22,8 +22,9 @@
 
 from datetime import datetime
 from itertools import cycle
-from os import getenv
+from os import getenv, listdir
 from os.path import abspath
+from typing import List
 
 from aiohttp.client import ClientSession
 from configs import Configs
@@ -92,7 +93,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             self.load_extension(cog)
 
     @property
-    def __version__(self):
+    def __version__(self) -> str:
         path = f'{abspath("./")}/pyproject.toml'
         with open(path, 'r', encoding='utf-8') as file:
             return load(file)['tool']['poetry']['version']
@@ -125,9 +126,17 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
                 pass
 
     @tasks.loop(minutes=1)
-    async def _change_status(self):
+    async def _change_status(self) -> None:
         status_name = str(next(self._status)).format(
             servers=format_numbers(len(self.guilds)),
             users=format_numbers(len(self.users))
         )
         await self.change_presence(activity=Game(name=status_name))
+
+    def get_languages(self) -> List[str]:
+        languages = []
+        languages.append(self.configs.default_language)
+        for language in listdir(abspath('./') + '/language/json/'):
+            if language.endswith('.json'):
+                languages.append(language.removesuffix('.json'))
+        return languages
