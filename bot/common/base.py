@@ -20,10 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Coroutine, Iterable, Union
+from typing import Coroutine, Iterable, Optional, Union
 
 from androxus import Bot
 from disnake import ApplicationCommandInteraction as Interaction
+from disnake import Guild, Member, User
 from disnake.ext.commands.context import Context
 from language import Translator
 
@@ -36,9 +37,21 @@ class Base:
         context (Context or ApplicationCommandInteraction): The context of
         the command.
 
+    Attributes:
+        bot (Bot): The bot instance.
+        ctx (Context or ApplicationCommandInteraction): The context of the
+            command.
+        author (Member or User): The author of the command.
+        guild (Guild or None): The guild in which the command was used.
+        translator (Translator): The translator instance.
+        send (Coroutine): The coroutine to send messages.
+        is_interaction (bool): If the context is an interaction.
+
     """
     bot: Bot
     ctx: Union[Context, Interaction]
+    author: Union[Member, User]
+    guild: Optional[Guild]
     translator: Translator
     send: Coroutine
     is_interaction: bool
@@ -56,6 +69,13 @@ class Base:
             self.is_interaction = True
 
     async def init(self) -> 'Base':
+        """
+        Initialize the class.
+
+        Returns:
+            Base: The self instance.
+
+        """
         self.translator = await Translator(self.ctx).init()
         return self
 
