@@ -216,30 +216,5 @@ class Translator:
     ------------------------------------------------------------
     """
 
-    def translate(self, key: str, placeholders: dict = {}) -> str:
-        """
-        Get the translation for the given key.
-
-        Args:
-            key (str): The key of the text to be translated.
-            placeholders (dict): The words that will be replaced.
-
-        Returns:
-            str: The translated text.
-
-        """
-        return self.get(key, placeholders)
-
-    def __(self, key: str, placeholders: dict = {}) -> str:
-        """
-        Get the translation for the given key.
-
-        Args:
-            key (str): The key of the text to be translated.
-            placeholders (dict): The words that will be replaced.
-
-        Returns:
-            str: The translated text.
-
-        """
-        return self.get(key, placeholders)
+    translate = get
+    __ = get
