@@ -46,36 +46,27 @@ class DevCommands(Base):
                 self.bot.reload_extension(cog)
             except Exception as exc:
                 cog_stopwatch.stop()
-                traceback_data = ''.join(format_exception(
-                    type(exc),
-                    exc,
-                    exc.__traceback__,
-                    1
-                ))
-                await self.bot.get_user(self.bot.owner_id).send(
-                    f'ERROR {cog_name}```py\n{traceback_data}\n```'
+                traceback_data = ''.join(
+                    format_exception(type(exc), exc, exc.__traceback__, 1)
                 )
-                table.append([
-                    unsuccessfully_icon,
-                    cog_name,
-                    str(cog_stopwatch)
-                ])
+                await self.bot.get_user(
+                    self.bot.owner_id
+                ).send(f'ERROR {cog_name}```py\n{traceback_data}\n```')
+                table.append(
+                    [unsuccessfully_icon, cog_name,
+                     str(cog_stopwatch)]
+                )
             else:
                 cog_stopwatch.stop()
-                table.append([
-                    successfully_icon,
-                    cog_name,
-                    str(cog_stopwatch)
-                ])
-        return await self.send(embed=Embed(
-            title=self.__('Reloaded all cogs'),
-            description='```\n' + tabulate(
-                table,
-                tablefmt='pretty'
-            ) + '```',
-            timestamp=utcnow(),
-            color=Colour.random()
-        ).set_footer(
-            text=str(self.author),
-            icon_url=self.author.display_avatar.url
-        ))
+                table.append([successfully_icon, cog_name, str(cog_stopwatch)])
+        return await self.send(
+            embed=Embed(
+                title=self.__('Reloaded all cogs'),
+                description='```\n' + tabulate(table, tablefmt='pretty') +
+                '```',
+                timestamp=utcnow(),
+                color=Colour.random()
+            ).set_footer(
+                text=str(self.author), icon_url=self.author.display_avatar.url
+            )
+        )

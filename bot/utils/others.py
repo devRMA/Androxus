@@ -34,7 +34,6 @@ def get_cogs() -> List[str]:
         List[str]: The list with the names of the cogs
 
     """
-
     def _get_python_files(path: str) -> List[str]:
         """
         Get all Python files from a path.
@@ -59,12 +58,14 @@ def get_cogs() -> List[str]:
 
     # getting cogs from the commands path
     for path in commands_path:
-        cogs.extend(_get_python_files(
-            f'{abspath("./")}/commands/{path}'
-        ) | select(lambda file: f'commands.{path}.{file}'))
+        cogs.extend(
+            _get_python_files(f'{abspath("./")}/commands/{path}') |
+            select(lambda file: f'commands.{path}.{file}')
+        )
     # getting cogs from events
     for path in events_path:
-        cogs.extend(_get_python_files(
-            f'{abspath("./")}/{path}'
-        ) | select(lambda file: f'{path}.{file}'))
+        cogs.extend(
+            _get_python_files(f'{abspath("./")}/{path}') |
+            select(lambda file: f'{path}.{file}')
+        )
     return cogs

@@ -20,7 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
 from androxus import Bot
 from disnake import AllowedMentions
 from disnake.ext import commands
@@ -30,9 +29,7 @@ from language import Translator
 class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(
-        self,
-        ctx: commands.Context,
-        error: commands.CommandError
+        self, ctx: commands.Context, error: commands.CommandError
     ):
         """
         The event triggered when an error is raised while invoking a command.
@@ -70,15 +67,12 @@ class ErrorHandler(commands.Cog):
 
         if isinstance(error, commands.errors.NotOwner):
             return await ctx.send(
-                f'{ctx.author.mention} ' +
-                trans.__('You are not my creator!')
+                f'{ctx.author.mention} ' + trans.__('You are not my creator!')
             )
         elif isinstance(error, commands.errors.UserNotFound):
             return await ctx.send(
-                f'{ctx.author.mention} ' +
-                trans.__('User `:user` was not found', {
-                    'user': error.argument
-                }),
+                f'{ctx.author.mention} ' + trans.
+                __('User `:user` was not found', {'user': error.argument}),
                 allowed_mentions=AllowedMentions.none()
             )
         else:

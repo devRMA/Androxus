@@ -51,8 +51,7 @@ class InfoCommands(Base):
                 timestamp=utcnow(),
                 color=Colour.random()
             ).set_footer(
-                text=str(self.author),
-                icon_url=self.author.display_avatar.url
+                text=str(self.author), icon_url=self.author.display_avatar.url
             )
         )
         stopwatch_message.stop()
@@ -70,28 +69,28 @@ class InfoCommands(Base):
             self.__('Discord response time:') + \
             f' {stopwatch_message}'
         await sleep(stopwatch_message.duration * 2)
-        return await bot_message.edit(embed=Embed(
-            title=embed_title,
-            timestamp=utcnow(),
-            color=Colour.random()
-        ).set_footer(
-            text=str(self.author),
-            icon_url=self.author.display_avatar.url
-        ))
+        return await bot_message.edit(
+            embed=Embed(
+                title=embed_title, timestamp=utcnow(), color=Colour.random()
+            ).set_footer(
+                text=str(self.author), icon_url=self.author.display_avatar.url
+            )
+        )
 
     async def uptime(self) -> Message:
         """
         Get the bot uptime
         """
-        return await self.send(embed=Embed(
-            title='\N{TIMER CLOCK} ' + self.__('When I started:'),
-            description=format_dt(self.bot.start_date, 'R'),
-            timestamp=utcnow(),
-            color=Colour.random()
-        ).set_footer(
-            text=str(self.author),
-            icon_url=self.author.display_avatar.url
-        ))
+        return await self.send(
+            embed=Embed(
+                title='\N{TIMER CLOCK} ' + self.__('When I started:'),
+                description=format_dt(self.bot.start_date, 'R'),
+                timestamp=utcnow(),
+                color=Colour.random()
+            ).set_footer(
+                text=str(self.author), icon_url=self.author.display_avatar.url
+            )
+        )
 
     async def avatar(self, user: User) -> Message:
         """
@@ -101,14 +100,14 @@ class InfoCommands(Base):
             self.__('Click [here](:link) to see the avatar', {
                 'link': user.display_avatar.url
             })
-        return await self.send(embed=Embed(
-            title='\N{EYE} ' + self.__('Avatar of :username', {
-                'username': user.display_name
-            }),
-            description=embed_description,
-            timestamp=utcnow(),
-            color=Colour.random()
-        ).set_footer(
-            text=str(self.author),
-            icon_url=self.author.display_avatar.url
-        ).set_image(user.display_avatar.url))
+        return await self.send(
+            embed=Embed(
+                title='\N{EYE} ' +
+                self.__('Avatar of :username', {'username': user.display_name}),
+                description=embed_description,
+                timestamp=utcnow(),
+                color=Colour.random()
+            ).set_footer(
+                text=str(self.author), icon_url=self.author.display_avatar.url
+            ).set_image(user.display_avatar.url)
+        )

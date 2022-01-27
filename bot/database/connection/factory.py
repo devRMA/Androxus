@@ -31,7 +31,6 @@ class ConnectionFactory:
     """
     Class that creates a connection to the database.
     """
-
     @staticmethod
     def get_engine(dsn: str = None) -> AsyncEngine:
         """

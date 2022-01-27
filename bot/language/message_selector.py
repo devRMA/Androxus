@@ -143,266 +143,55 @@ class MessageSelector:
 
         """
         if locale in [
-            'az',
-            'az_AZ',
-            'bo',
-            'bo_CN',
-            'bo_IN',
-            'dz',
-            'dz_BT',
-            'id',
-            'id_ID',
-            'ja',
-            'ja_JP',
-            'jv',
-            'ka',
-            'ka_GE',
-            'km',
-            'km_KH',
-            'kn',
-            'kn_IN',
-            'ko',
-            'ko_KR',
-            'ms',
-            'ms_MY',
-            'th',
-            'th_TH',
-            'tr',
-            'tr_CY',
-            'tr_TR',
-            'vi',
-            'vi_VN',
-            'zh',
-            'zh_CN',
-            'zh_HK',
-            'zh_SG',
-            'zh_TW'
+            'az', 'az_AZ', 'bo', 'bo_CN', 'bo_IN', 'dz', 'dz_BT', 'id', 'id_ID',
+            'ja', 'ja_JP', 'jv', 'ka', 'ka_GE', 'km', 'km_KH', 'kn', 'kn_IN',
+            'ko', 'ko_KR', 'ms', 'ms_MY', 'th', 'th_TH', 'tr', 'tr_CY', 'tr_TR',
+            'vi', 'vi_VN', 'zh', 'zh_CN', 'zh_HK', 'zh_SG', 'zh_TW'
         ]:
             return 0
         elif locale in [
-            'af',
-            'af_ZA',
-            'bn',
-            'bn_BD',
-            'bn_IN',
-            'bg',
-            'bg_BG',
-            'ca',
-            'ca_AD',
-            'ca_ES',
-            'ca_FR',
-            'ca_IT',
-            'da',
-            'da_DK',
-            'de',
-            'de_AT',
-            'de_BE',
-            'de_CH',
-            'de_DE',
-            'de_LI',
-            'de_LU',
-            'el',
-            'el_CY',
-            'el_GR',
-            'en',
-            'en_AG',
-            'en_AU',
-            'en_BW',
-            'en_CA',
-            'en_DK',
-            'en_GB',
-            'en_HK',
-            'en_IE',
-            'en_IN',
-            'en_NG',
-            'en_NZ',
-            'en_PH',
-            'en_SG',
-            'en_US',
-            'en_ZA',
-            'en_ZM',
-            'en_ZW',
-            'eo',
-            'eo_US',
-            'es',
-            'es_AR',
-            'es_BO',
-            'es_CL',
-            'es_CO',
-            'es_CR',
-            'es_CU',
-            'es_DO',
-            'es_EC',
-            'es_ES',
-            'es_GT',
-            'es_HN',
-            'es_MX',
-            'es_NI',
-            'es_PA',
-            'es_PE',
-            'es_PR',
-            'es_PY',
-            'es_SV',
-            'es_US',
-            'es_UY',
-            'es_VE',
-            'et',
-            'et_EE',
-            'eu',
-            'eu_ES',
-            'eu_FR',
-            'fa',
-            'fa_IR',
-            'fi',
-            'fi_FI',
-            'fo',
-            'fo_FO',
-            'fur',
-            'fur_IT',
-            'fy',
-            'fy_DE',
-            'fy_NL',
-            'gl',
-            'gl_ES',
-            'gu',
-            'gu_IN',
-            'ha',
-            'ha_NG',
-            'he',
-            'he_IL',
-            'hu',
-            'hu_HU',
-            'is',
-            'is_IS',
-            'it',
-            'it_CH',
-            'it_IT',
-            'ku',
-            'ku_TR',
-            'lb',
-            'lb_LU',
-            'ml',
-            'ml_IN',
-            'mn',
-            'mn_MN',
-            'mr',
-            'mr_IN',
-            'nah',
-            'nb',
-            'nb_NO',
-            'ne',
-            'ne_NP',
-            'nl',
-            'nl_AW',
-            'nl_BE',
-            'nl_NL',
-            'nn',
-            'nn_NO',
-            'no',
-            'om',
-            'om_ET',
-            'om_KE',
-            'or',
-            'or_IN',
-            'pa',
-            'pa_IN',
-            'pa_PK',
-            'pap',
-            'pap_AN',
-            'pap_AW',
-            'pap_CW',
-            'ps',
-            'ps_AF',
-            'pt',
-            'pt_BR',
-            'pt_PT',
-            'so',
-            'so_DJ',
-            'so_ET',
-            'so_KE',
-            'so_SO',
-            'sq',
-            'sq_AL',
-            'sq_MK',
-            'sv',
-            'sv_FI',
-            'sv_SE',
-            'sw',
-            'sw_KE',
-            'sw_TZ',
-            'ta',
-            'ta_IN',
-            'ta_LK',
-            'te',
-            'te_IN',
-            'tk',
-            'tk_TM',
-            'ur',
-            'ur_IN',
-            'ur_PK',
-            'zu',
-            'zu_ZA'
+            'af', 'af_ZA', 'bn', 'bn_BD', 'bn_IN', 'bg', 'bg_BG', 'ca', 'ca_AD',
+            'ca_ES', 'ca_FR', 'ca_IT', 'da', 'da_DK', 'de', 'de_AT', 'de_BE',
+            'de_CH', 'de_DE', 'de_LI', 'de_LU', 'el', 'el_CY', 'el_GR', 'en',
+            'en_AG', 'en_AU', 'en_BW', 'en_CA', 'en_DK', 'en_GB', 'en_HK',
+            'en_IE', 'en_IN', 'en_NG', 'en_NZ', 'en_PH', 'en_SG', 'en_US',
+            'en_ZA', 'en_ZM', 'en_ZW', 'eo', 'eo_US', 'es', 'es_AR', 'es_BO',
+            'es_CL', 'es_CO', 'es_CR', 'es_CU', 'es_DO', 'es_EC', 'es_ES',
+            'es_GT', 'es_HN', 'es_MX', 'es_NI', 'es_PA', 'es_PE', 'es_PR',
+            'es_PY', 'es_SV', 'es_US', 'es_UY', 'es_VE', 'et', 'et_EE', 'eu',
+            'eu_ES', 'eu_FR', 'fa', 'fa_IR', 'fi', 'fi_FI', 'fo', 'fo_FO',
+            'fur', 'fur_IT', 'fy', 'fy_DE', 'fy_NL', 'gl', 'gl_ES', 'gu',
+            'gu_IN', 'ha', 'ha_NG', 'he', 'he_IL', 'hu', 'hu_HU', 'is', 'is_IS',
+            'it', 'it_CH', 'it_IT', 'ku', 'ku_TR', 'lb', 'lb_LU', 'ml', 'ml_IN',
+            'mn', 'mn_MN', 'mr', 'mr_IN', 'nah', 'nb', 'nb_NO', 'ne', 'ne_NP',
+            'nl', 'nl_AW', 'nl_BE', 'nl_NL', 'nn', 'nn_NO', 'no', 'om', 'om_ET',
+            'om_KE', 'or', 'or_IN', 'pa', 'pa_IN', 'pa_PK', 'pap', 'pap_AN',
+            'pap_AW', 'pap_CW', 'ps', 'ps_AF', 'pt', 'pt_BR', 'pt_PT', 'so',
+            'so_DJ', 'so_ET', 'so_KE', 'so_SO', 'sq', 'sq_AL', 'sq_MK', 'sv',
+            'sv_FI', 'sv_SE', 'sw', 'sw_KE', 'sw_TZ', 'ta', 'ta_IN', 'ta_LK',
+            'te', 'te_IN', 'tk', 'tk_TM', 'ur', 'ur_IN', 'ur_PK', 'zu', 'zu_ZA'
         ]:
             return 0 if number == 1 else 1
         elif locale in [
-            'am',
-            'am_ET',
-            'bh',
-            'fil',
-            'fil_PH',
-            'fr',
-            'fr_BE',
-            'fr_CA',
-            'fr_CH',
-            'fr_FR',
-            'fr_LU',
-            'gun',
-            'hi',
-            'hi_IN',
-            'hy',
-            'hy_AM',
-            'ln',
-            'ln_CD',
-            'mg',
-            'mg_MG',
-            'nso',
-            'nso_ZA',
-            'ti',
-            'ti_ER',
-            'ti_ET',
-            'wa',
-            'wa_BE',
-            'xbr'
+            'am', 'am_ET', 'bh', 'fil', 'fil_PH', 'fr', 'fr_BE', 'fr_CA',
+            'fr_CH', 'fr_FR', 'fr_LU', 'gun', 'hi', 'hi_IN', 'hy', 'hy_AM',
+            'ln', 'ln_CD', 'mg', 'mg_MG', 'nso', 'nso_ZA', 'ti', 'ti_ER',
+            'ti_ET', 'wa', 'wa_BE', 'xbr'
         ]:
             return 0 if (number == 0 or number == 1) else 1
         elif locale in [
-            'be',
-            'be_BY',
-            'bs',
-            'bs_BA',
-            'hr',
-            'hr_HR',
-            'ru',
-            'ru_RU',
-            'ru_UA',
-            'sr',
-            'sr_ME',
-            'sr_RS',
-            'uk',
-            'uk_UA'
+            'be', 'be_BY', 'bs', 'bs_BA', 'hr', 'hr_HR', 'ru', 'ru_RU', 'ru_UA',
+            'sr', 'sr_ME', 'sr_RS', 'uk', 'uk_UA'
         ]:
             if (number % 10 == 1) and (number % 100 != 11):
                 return 0
-            elif (number % 10 >= 2) and (number % 10 <= 4) and ((number % 100 < 10) or (number % 100 >= 20)):
+            elif (number % 10 >= 2) and (number % 10 <= 4) and (
+                (number % 100 < 10) or (number % 100 >= 20)
+            ):
                 return 1
             else:
                 return 2
-        elif locale in [
-            'cs',
-            'cs_CZ',
-            'sk',
-            'sk_SK'
-        ]:
+        elif locale in ['cs', 'cs_CZ', 'sk', 'sk_SK']:
             if number == 1:
                 return 0
             elif number >= 2 and number <= 4:
@@ -410,30 +199,22 @@ class MessageSelector:
             else:
                 return 2
             return 0
-        elif locale in [
-            'ga',
-            'ga_IE'
-        ]:
+        elif locale in ['ga', 'ga_IE']:
             if number == 1:
                 return 0
             elif number == 2:
                 return 1
             else:
                 return 2
-        elif locale in [
-            'lt',
-            'lt_LT'
-        ]:
+        elif locale in ['lt', 'lt_LT']:
             if (number % 10 == 1) and (number % 100 != 11):
                 return 0
-            elif (number % 10 >= 2) and (number % 100 < 10) or (number % 100 >= 20):
+            elif (number % 10 >= 2) and (number % 100 <
+                                         10) or (number % 100 >= 20):
                 return 1
             else:
                 return 2
-        elif locale in [
-            'sl',
-            'sl_SI'
-        ]:
+        elif locale in ['sl', 'sl_SI']:
             if number % 100 == 1:
                 return 0
             elif number % 100 == 2:
@@ -442,15 +223,9 @@ class MessageSelector:
                 return 2
             else:
                 return 3
-        elif locale in [
-            'mk',
-            'mk_MK'
-        ]:
+        elif locale in ['mk', 'mk_MK']:
             return 0 if number % 10 == 1 else 1
-        elif locale in [
-            'mt',
-            'mt_MT'
-        ]:
+        elif locale in ['mt', 'mt_MT']:
             if number == 1:
                 return 0
             elif (number == 0) or ((number % 100 > 1) and (number % 100 < 11)):
@@ -459,30 +234,23 @@ class MessageSelector:
                 return 2
             else:
                 return 3
-        elif locale in [
-            'lv',
-            'lv_LV'
-        ]:
+        elif locale in ['lv', 'lv_LV']:
             if number == 0:
                 return 0
             elif (number % 10 == 1) and (number % 100 != 11):
                 return 1
             else:
                 return 2
-        elif locale in [
-            'pl',
-            'pl_PL'
-        ]:
+        elif locale in ['pl', 'pl_PL']:
             if number == 1:
                 return 0
-            elif (number % 10 >= 2) and (number % 10 <= 4) and ((number % 100 < 12) or (number % 100 > 14)):
+            elif (number % 10 >= 2) and (number % 10 <= 4) and (
+                (number % 100 < 12) or (number % 100 > 14)
+            ):
                 return 1
             else:
                 return 2
-        elif locale in [
-            'cy',
-            'cy_GB'
-        ]:
+        elif locale in ['cy', 'cy_GB']:
             if number == 1:
                 return 0
             elif number == 2:
@@ -491,10 +259,7 @@ class MessageSelector:
                 return 2
             else:
                 return 3
-        elif locale in [
-            'ro',
-            'ro_RO'
-        ]:
+        elif locale in ['ro', 'ro_RO']:
             if number == 1:
                 return 0
             elif (number == 0) or ((number % 100 > 0) and (number % 100 < 20)):
@@ -502,26 +267,9 @@ class MessageSelector:
             else:
                 return 2
         elif locale in [
-            'ar',
-            'ar_AE',
-            'ar_BH',
-            'ar_DZ',
-            'ar_EG',
-            'ar_IN',
-            'ar_IQ',
-            'ar_JO',
-            'ar_KW',
-            'ar_LB',
-            'ar_LY',
-            'ar_MA',
-            'ar_OM',
-            'ar_QA',
-            'ar_SA',
-            'ar_SD',
-            'ar_SS',
-            'ar_SY',
-            'ar_TN',
-            'ar_YE'
+            'ar', 'ar_AE', 'ar_BH', 'ar_DZ', 'ar_EG', 'ar_IN', 'ar_IQ', 'ar_JO',
+            'ar_KW', 'ar_LB', 'ar_LY', 'ar_MA', 'ar_OM', 'ar_QA', 'ar_SA',
+            'ar_SD', 'ar_SS', 'ar_SY', 'ar_TN', 'ar_YE'
         ]:
             if number == 0:
                 return 0

@@ -94,8 +94,12 @@ class Base:
         """
         return self.translator.get(key, placeholders)
 
-    def _choice(self, key: str, number: int | Iterable[Any],
-                placeholders: Dict[str, Any] = {}) -> str:
+    def _choice(
+        self,
+        key: str,
+        number: int | Iterable[Any],
+        placeholders: Dict[str, Any] = {}
+    ) -> str:
         """
         Get a translation according to an integer value.
 

@@ -46,7 +46,9 @@ class InfoNormal(commands.Cog):
         return await info_commands.uptime()
 
     @commands.command(aliases=['av'])
-    async def avatar(self, ctx: Context[Bot], user: Optional[Member | User]) -> Message:
+    async def avatar(
+        self, ctx: Context[Bot], user: Optional[Member | User]
+    ) -> Message:
         """
         Get the user avatar
         """

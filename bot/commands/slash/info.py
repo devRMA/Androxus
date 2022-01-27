@@ -32,7 +32,6 @@ def _return_author(inter: Interaction) -> Member | User:
 
 
 class InfoSlash(commands.Cog):
-
     @commands.slash_command()  # type: ignore
     async def ping(self, inter: Interaction) -> Message:
         """

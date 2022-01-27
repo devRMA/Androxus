@@ -25,10 +25,18 @@ from logging import getLogger
 from .colors import BRIGHT, CYAN, LBLUE, RESET
 
 
-def log(tag: str, text: str, level: str = 'info', *,
-        first_color: str = CYAN, second_color: str = LBLUE):
-    print(f'{BRIGHT}{first_color}[{tag:^16}]' +
-          f'{second_color}{text}{RESET}'.rjust(60))
+def log(
+    tag: str,
+    text: str,
+    level: str = 'info',
+    *,
+    first_color: str = CYAN,
+    second_color: str = LBLUE
+):
+    print(
+        f'{BRIGHT}{first_color}[{tag:^16}]' +
+        f'{second_color}{text}{RESET}'.rjust(60)
+    )
     logger = getLogger('androxus')
     match level:
         case 'info':

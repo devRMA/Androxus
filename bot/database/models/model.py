@@ -20,11 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 class Model:
     """
     The base model class.
     """
-
     def __str__(self) -> str:
         return f'<{self.__class__.__name__} ID: {self.id}>'
 

@@ -49,10 +49,7 @@ class Guild(Base, Model):
     """
     __tablename__ = 'guilds'
     id = Column(
-        BigInteger,
-        primary_key=True,
-        autoincrement=False,
-        nullable=False
+        BigInteger, primary_key=True, autoincrement=False, nullable=False
     )
     prefix = Column(String(10), nullable=False)
     language = Column(String(255), nullable=False)
@@ -97,8 +94,4 @@ class Guild(Base, Model):
             dict: The guild's dictionary representation.
 
         """
-        return {
-            'id': self.id,
-            'prefix': self.prefix,
-            'language': self.language
-        }
+        return {'id': self.id, 'prefix': self.prefix, 'language': self.language}

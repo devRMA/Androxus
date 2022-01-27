@@ -29,7 +29,6 @@ class RepositoryFactory:
     """
     Class that creates a repository instance.
     """
-
     @staticmethod
     def create(repository_type: RepositoryType, bot=None) -> Repository:
         """

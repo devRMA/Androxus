@@ -63,9 +63,7 @@ class Configs:
             if test_guilds.count(',') > 0:
                 if test_guilds.count('[') == 1 and test_guilds.count(']') == 1:
                     return [
-                        int(_id.replace(' ', ''))
-                        for _id in test_guilds.replace(
-                            '[', '').replace(
-                            ']', '').split(',')
+                        int(_id.replace(' ', '')) for _id in test_guilds.
+                        replace('[', '').replace(']', '').split(',')
                     ]
         return []

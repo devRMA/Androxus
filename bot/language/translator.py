@@ -118,13 +118,14 @@ class Translator:
             str: The translated text.
 
         """
-        return self._make_replacements(
-            self.texts.get(key, key),
-            placeholders
-        )
+        return self._make_replacements(self.texts.get(key, key), placeholders)
 
-    def choice(self, key: str, number: int | Sized,
-               placeholders: Dict[str, Any] = {}) -> str:
+    def choice(
+        self,
+        key: str,
+        number: int | Sized,
+        placeholders: Dict[str, Any] = {}
+    ) -> str:
         """
         Get a translation according to an integer value.
 
@@ -201,10 +202,9 @@ class Translator:
         """
         should_replace: Dict[str, Any] = {}
         for key, value in placeholders.items():
-            should_replace[':' + str(key).capitalize()
-                           ] = str(value).capitalize()
-            should_replace[':' + str(key).upper()
-                           ] = str(value).upper()
+            should_replace[':' +
+                           str(key).capitalize()] = str(value).capitalize()
+            should_replace[':' + str(key).upper()] = str(value).upper()
             should_replace[':' + key] = value
         for key, value in should_replace.items():
             line = line.replace(str(key), str(value))

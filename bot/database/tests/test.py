@@ -20,11 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+
 class Test:
     """
     Class to make tests
     """
-
     @staticmethod
     def assert_equal(a, b):
         assert a == b
