@@ -25,7 +25,7 @@ from itertools import cycle
 from os import listdir
 from os.path import abspath
 from platform import python_version
-from typing import Any, List, MutableMapping
+from typing import Any, Dict, List, MutableMapping
 
 from aiohttp.client import ClientSession
 from configs import Configs
@@ -76,7 +76,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             prefix = await get_prefix(bot, message)
             return commands.when_mentioned_or(prefix)(bot, message)
 
-        kwargs = {}
+        kwargs: Dict[str, Any] = {}
         kwargs['command_prefix'] = _prefix_or_mention
         kwargs['owner_id'] = self.configs.owner_id
         kwargs['case_insensitive'] = True
