@@ -22,11 +22,11 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Any, Dict
 
 
-class Model(ABC):
+class Model:
     """
     The base model class.
     """
