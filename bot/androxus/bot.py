@@ -102,7 +102,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
     async def on_ready(self) -> None:
         if (not hasattr(self,
                         'db_session')) or (not hasattr(self, 'db_engine')):
-            self._startup_timer.stop()  # type: ignore
+            self._startup_timer.stop()
             setattr(self, 'db_engine', ConnectionFactory.get_engine())
             setattr(
                 self, 'db_session',
@@ -131,7 +131,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             )
             log(
                 'INFO',
-                f'TIME TO START: {self._startup_timer}',  # type: ignore
+                f'TIME TO START: {self._startup_timer}',
                 first_color=LBLUE
             )
             try:
