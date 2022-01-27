@@ -25,7 +25,7 @@ from itertools import cycle
 from os import listdir
 from os.path import abspath
 from platform import python_version
-from typing import Any, Dict, List
+from typing import Any, List, MutableMapping
 
 from aiohttp.client import ClientSession
 from configs import Configs
@@ -37,7 +37,7 @@ from disnake.ext import commands, tasks
 from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
-from stopwatch import Stopwatch  # type: ignore
+from stopwatch import Stopwatch
 from toml import load
 from utils import SingletonMeta, log
 from utils.colors import LBLUE, LGREEN, LYELLOW
@@ -96,7 +96,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
     def __version__(self) -> str:
         path = f'{abspath("./")}/pyproject.toml'
         with open(path, 'r', encoding='utf-8') as file:
-            data: Dict[str, Any] = load(file)
+            data: MutableMapping[str, Any] = load(file)
             return data['tool']['poetry']['version']
 
     async def on_ready(self) -> None:
