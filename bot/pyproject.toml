@@ -14,7 +14,7 @@ python = "^3.10"
 "pipe" = "^1.6.0"
 "python-dotenv" = "^0.19.2"
 "SQLAlchemy" = "^1.4.28"
-"stopwatch.py" = "^1.0.1"
+"stopwatch.py" = {git = "https://github.com/devRMA/stopwatch.py.git"}
 "tabulate" = "^0.8.9"
 "toml" = "^0.10.2"
 
