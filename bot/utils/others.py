@@ -48,7 +48,7 @@ def get_cogs() -> Tuple[str, ...]:
         """
         python_files: List[str] = []
         for file in listdir(path):
-            if file.endswith(".py"):
+            if file.endswith(".py") and not file.startswith("_"):
                 python_files.append(file.removesuffix('.py'))
         return tuple(python_files)
 
