@@ -21,9 +21,10 @@
 # SOFTWARE.
 
 from re import sub
+from typing import Any
 
 
-def is_number(string) -> bool:
+def is_number(string: Any) -> bool:
     """
     Check if a string is a number.
 
@@ -51,7 +52,7 @@ def is_number(string) -> bool:
             return False
 
 
-def format_numbers(number, br=True, truncate=False) -> str:
+def format_numbers(number: Any, br: bool = True, truncate: bool = False) -> str:
     """
     Format a number to a human-readable format.
 

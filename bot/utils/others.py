@@ -46,7 +46,7 @@ def get_cogs() -> List[str]:
             the extension.
 
         """
-        python_files = []
+        python_files: List[str] = []
         for file in listdir(path):
             if file.endswith(".py"):
                 python_files.append(file.removesuffix('.py'))
