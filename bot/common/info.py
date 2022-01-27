@@ -103,11 +103,7 @@ class InfoCommands(Base):
         return await self.send(
             embed=Embed(
                 title='\N{EYE} ' +
-                self.__(
-                    'Avatar of :username', {
-                        'username': user.display_name
-                    }
-                ),
+                self.__('Avatar of :username', {'username': user.display_name}),
                 description=embed_description,
                 timestamp=utcnow(),
                 color=Colour.random()

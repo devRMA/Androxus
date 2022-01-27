@@ -1,7 +1,6 @@
 # class taken from the site:
 # https://refactoring.guru/design-patterns/singleton/python/example
 
-
 from typing import Any, Dict
 
 
