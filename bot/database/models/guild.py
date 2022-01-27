@@ -94,4 +94,5 @@ class Guild(Base, Model):
             dict: The guild's dictionary representation.
 
         """
-        return {'id': self.id, 'prefix': self.prefix, 'language': self.language}
+        return {'id': self.id, 'prefix': self.prefix,
+                'language': self.language}

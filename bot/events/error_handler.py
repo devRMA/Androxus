@@ -39,7 +39,8 @@ class ErrorHandler(commands.Cog):
             error (commands.CommandError): The Exception raised.
 
         """
-        # source: https://gist.github.com/EvieePy/7822af90858ef65012ea500bcecf1612
+        # source:
+        # https://gist.github.com/EvieePy/7822af90858ef65012ea500bcecf1612
 
         # This prevents any commands with local handlers being handled
         # here in on_command_error.
@@ -57,7 +58,8 @@ class ErrorHandler(commands.Cog):
 
         # Allows us to check for original exceptions raised and sent to
         # CommandInvokeError.
-        # If nothing is found. We keep the exception passed to on_command_error.
+        # If nothing is found. We keep the exception passed to
+        # on_command_error.
         error = getattr(error, 'original', error)
 
         if isinstance(error, ignored):
