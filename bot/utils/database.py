@@ -20,17 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Union
-
 from disnake import Message
+from disnake.ext.commands import Bot as DisnakeBot  # type: ignore
 from disnake.ext.commands import Context  # type: ignore
-from androxus import Bot
 from enums import RepositoryType
 
 from database.repositories import RepositoryFactory
 
 
-async def get_prefix(bot: Bot, message: Union[Message, Context[Bot]]) -> str:
+async def get_prefix(
+    bot: DisnakeBot, message: Message | Context[DisnakeBot]
+) -> str:
     """
     Get the prefix for the message.
 
@@ -46,4 +46,4 @@ async def get_prefix(bot: Bot, message: Union[Message, Context[Bot]]) -> str:
         guild_repository = RepositoryFactory.create(RepositoryType.GUILD, bot)
         guild = await guild_repository.find_by_id_or_create(message.guild.id)
         return guild.prefix
-    return bot.configs.default_prefix
+    return bot.configs.default_prefix  # type: ignore

@@ -22,8 +22,8 @@
 
 from typing import Optional
 
-from androxus import Bot
 from database.models import Guild
+from disnake.ext.commands import Bot as DisnakeBot  # type: ignore
 from enums import RepositoryType
 
 from .repository import Repository
@@ -36,7 +36,7 @@ class RepositoryFactory:
     @staticmethod
     def create(  # type: ignore
         repository_type: RepositoryType,
-        bot: Optional[Bot] = None
+        bot: Optional[DisnakeBot] = None
     ) -> Repository[Guild]:
         """
         Creates a repository instance.
@@ -54,4 +54,4 @@ class RepositoryFactory:
             bot = Bot()
         if repository_type == RepositoryType.GUILD:
             from .guild_repository import GuildRepository
-            return GuildRepository(bot.db_session)
+            return GuildRepository(bot.db_session)  # type: ignore
