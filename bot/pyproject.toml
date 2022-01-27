@@ -19,7 +19,11 @@ python = "^3.10"
 "toml" = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
-ipython = "^7.30.1"
+"ipython" = "^7.30.1"
+"mypy" = "^0.931"
+"flake8" = "^4.0.1"
+"types-toml" = "^0.10.3"
+"types-tabulate" = "^0.8.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
