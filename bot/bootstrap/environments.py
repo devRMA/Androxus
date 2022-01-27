@@ -23,6 +23,7 @@
 from os import environ
 
 
-def setup_env():
+def setup_env() -> None:
     environ['JISHAKU_HIDE'] = 'true'
     environ['JISHAKU_NO_UNDERSCORE'] = 'true'
+    environ['JISHAKU_FORCE_PAGINATOR'] = 'true'
