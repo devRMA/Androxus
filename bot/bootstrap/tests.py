@@ -23,5 +23,5 @@
 from database.tests import make_tests as tests_database
 
 
-async def make_tests():
+async def make_tests() -> None:
     await tests_database()

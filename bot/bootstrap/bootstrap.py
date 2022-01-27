@@ -26,7 +26,7 @@ from .environments import setup_env
 from .logging import setup_logging
 
 
-def init():
+def init() -> None:
     load_dotenv()
     setup_logging()
     setup_env()
