@@ -65,11 +65,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
     db_session: AsyncSession
     http_session: ClientSession
     configs = Configs()
-    _status = cycle((
-        'Androxus V3',
-        '{users} Users!',
-        '{servers} Guilds!'
-    ))
+    _status = cycle(('Androxus V3', '{users} Users!', '{servers} Guilds!'))
     _startup_timer: Stopwatch
 
     def __init__(self) -> None:
@@ -104,27 +100,40 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             return data['tool']['poetry']['version']
 
     async def on_ready(self) -> None:
-        if (not hasattr(self, 'db_session')) or (not hasattr(self, 'db_engine')):
+        if (not hasattr(self,
+                        'db_session')) or (not hasattr(self, 'db_engine')):
             self._startup_timer.stop()  # type: ignore
             setattr(self, 'db_engine', ConnectionFactory.get_engine())
-            setattr(self, 'db_session',
-                    ConnectionFactory.get_session(self.db_engine))
+            setattr(
+                self, 'db_session',
+                ConnectionFactory.get_session(self.db_engine)
+            )
             setattr(self, 'start_date', utcnow())
             await db_bootstrap(self.db_engine)
             log('BOT', f'LOGGED IN {self.user}', first_color=LGREEN)
             log('BOT', f'ID: {self.user.id}', first_color=LGREEN)
-            log('INFO', f'{len(set(self.get_all_members()))} USERS!',
-                first_color=LBLUE)
-            log('INFO', f'{len(self.guilds)} GUILDS!',
-                first_color=LBLUE)
-            log('INFO', f'BOT VERSION: {self.__version__}',
-                first_color=LBLUE)
-            log('INFO', f'PYTHON VERSION: {python_version()}',
-                first_color=LBLUE)
-            log('INFO', f'DISNAKE VERSION: {disnake_version}',
-                first_color=LBLUE)
-            log('INFO', f'TIME TO START: {self._startup_timer}',  # type: ignore
-                first_color=LBLUE)
+            log(
+                'INFO',
+                f'{len(set(self.get_all_members()))} USERS!',
+                first_color=LBLUE
+            )
+            log('INFO', f'{len(self.guilds)} GUILDS!', first_color=LBLUE)
+            log('INFO', f'BOT VERSION: {self.__version__}', first_color=LBLUE)
+            log(
+                'INFO',
+                f'PYTHON VERSION: {python_version()}',
+                first_color=LBLUE
+            )
+            log(
+                'INFO',
+                f'DISNAKE VERSION: {disnake_version}',
+                first_color=LBLUE
+            )
+            log(
+                'INFO',
+                f'TIME TO START: {self._startup_timer}',  # type: ignore
+                first_color=LBLUE
+            )
             try:
                 # starts loop to change status
                 self._change_status.start()
