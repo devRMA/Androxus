@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from __future__ import annotations
+from typing import Any, Dict, Optional
 
 from configs import Configs
 from sqlalchemy import BigInteger, Column, String
@@ -29,10 +29,10 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from .model import Model
 
-Base = declarative_base()
+Base = declarative_base()  # type: ignore
 
 
-class Guild(Base, Model):
+class Guild(Model, Base):  # type: ignore
     """
     Represents a guild in the database.
 
@@ -50,17 +50,19 @@ class Guild(Base, Model):
     __tablename__ = 'guilds'
     id = Column(
         BigInteger, primary_key=True, autoincrement=False, nullable=False
-    )
+    )  # type: ignore
     prefix = Column(String(10), nullable=False)
     language = Column(String(255), nullable=False)
 
-    def __init__(self, id_, prefix=None, language=None):
+    def __init__(
+        self,
+        id_: int,
+        prefix: Optional[str] = None,
+        language: Optional[str] = None
+    ) -> None:
         self.id = id_
         self.prefix = prefix or Configs.default_prefix
         self.language = language or Configs.default_language
-
-    def __eq__(self, other):
-        return isinstance(other, Guild) and (self.id == other.id)
 
     @staticmethod
     async def create_table(engine: AsyncEngine):
@@ -71,8 +73,9 @@ class Guild(Base, Model):
             engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
 
         """
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+        #
+        async with engine.begin() as conn:  # type: ignore
+            await conn.run_sync(Base.metadata.create_all)  # type: ignore
 
     @staticmethod
     async def drop_table(engine: AsyncEngine):
@@ -83,15 +86,15 @@ class Guild(Base, Model):
             engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
 
         """
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
+        async with engine.begin() as conn:  # type: ignore
+            await conn.run_sync(Base.metadata.drop_all)  # type: ignore
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the guild.
 
         Returns:
-            dict: The guild's dictionary representation.
+            Dict[str, Any]: The guild's dictionary representation.
 
         """
         return {'id': self.id, 'prefix': self.prefix, 'language': self.language}

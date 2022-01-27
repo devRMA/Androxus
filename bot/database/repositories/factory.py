@@ -20,6 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Optional
+
+from androxus import Bot
+from database.models import Guild
 from enums import RepositoryType
 
 from .repository import Repository
@@ -30,7 +34,10 @@ class RepositoryFactory:
     Class that creates a repository instance.
     """
     @staticmethod
-    def create(repository_type: RepositoryType, bot=None) -> Repository:
+    def create(  # type: ignore
+        repository_type: RepositoryType,
+        bot: Optional[Bot] = None
+    ) -> Repository[Guild]:
         """
         Creates a repository instance.
 
@@ -45,7 +52,6 @@ class RepositoryFactory:
         if bot is None:
             from androxus import Bot
             bot = Bot()
-        match repository_type:
-            case RepositoryType.GUILD:
-                from .guild_repository import GuildRepository
-                return GuildRepository(bot.db_session)
+        if repository_type == RepositoryType.GUILD:
+            from .guild_repository import GuildRepository
+            return GuildRepository(bot.db_session)

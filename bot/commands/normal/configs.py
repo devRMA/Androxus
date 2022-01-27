@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Optional
+
 from androxus import Bot
 from common import ConfigsCommands
 from disnake import Message
@@ -29,11 +31,12 @@ from disnake.ext.commands.context import Context  # type: ignore
 
 class ConfigsNormal(commands.Cog):
     @commands.command(aliases=['lang'])
-    async def language(self, ctx: Context[Bot]) -> Message:
+    async def language(self, ctx: Context[Bot]) -> Optional[Message]:
         """
         Changes the language of the bot, for the current guild
         """
-        configs_commands = await ConfigsCommands(ctx).init()
+        configs_commands = ConfigsCommands(ctx)
+        await configs_commands.init()
         return await configs_commands.language()
 
 

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Callable, List, Union
+from typing import Any, Callable, Dict, List, Union, Optional
 
 from database.repositories import RepositoryFactory
 from disnake import (
@@ -34,15 +34,20 @@ from .base import Base
 
 
 class ConfigsCommands(Base):
-    async def language(self) -> Message:
+    async def language(self) -> Optional[Message]:
         """
         Changes the language of the bot, for the current guild
         """
+        if self.guild is None:
+            return None
         repo = RepositoryFactory.create(RepositoryType.GUILD)
-        guild_db = await repo.find_by_id(self.guild.id)
+        guild_db = await repo.find_or_create(self.guild.id)
 
-        class LanguageSelect(Select):
-            def __init__(self, *, languages: List[str], __: Callable):
+        class LanguageSelect(Select[View]):
+            def __init__(
+                self, *, languages: List[str],
+                __: Callable[[str, Optional[Dict[str, Any]]], str]
+            ):
                 self.__ = __
 
                 options = [
@@ -54,44 +59,48 @@ class ConfigsCommands(Base):
                 ]
 
                 super().__init__(
-                    placeholder=self.__("Languages:"),
+                    placeholder=self.__('Languages:', {}),
                     min_values=1,
                     max_values=1,
                     options=options,
                 )
 
-            async def callback(self, inter: MessageInteraction):
+            async def callback(self, interaction: MessageInteraction):
                 guild_db.language = self.values[0]
                 await repo.save(guild_db)
 
                 message = self.__(
                     ':userMention Language changed to **:language**', {
                         'language': self.values[0],
-                        'userMention': inter.user.mention
+                        'userMention': interaction.author.mention
                     }
                 )
-                await inter.response.send_message(content=message)
+                await interaction.send(content=message)  # type: ignore
 
         class LanguageView(View):
             def __init__(
                 self, *, author: Union[Member, User], languages: List[str],
-                __: Callable
+                __: Callable[[str, Optional[Dict[str, Any]]], str]
             ):
                 self.author = author
                 self.__ = __
 
                 super().__init__(timeout=60.0)
 
-                self.add_item(LanguageSelect(languages=languages, __=self.__))
+                self.add_item(  # type: ignore
+                    LanguageSelect(languages=languages, __=self.__)
+                )
 
             async def interaction_check(
-                self, inter: MessageInteraction
+                self, interaction: MessageInteraction
             ) -> bool:
                 # will be check if the user can interact with message
-                can_use = self.author.id == inter.user.id
+                can_use = self.author.id == interaction.author.id
                 if not can_use:
-                    message = self.__('You can\'t interact with this message')
-                    await inter.response.send_message(
+                    message = self.__(
+                        'You can\'t interact with this message', {}
+                    )
+                    await interaction.send(  # type: ignore
                         content=message, ephemeral=True
                     )
                 return can_use
@@ -100,7 +109,7 @@ class ConfigsCommands(Base):
         view = LanguageView(
             author=self.author, languages=self.bot.get_languages(), __=self.__
         )
-        return await self.send(
+        return await self.ctx.send(  # type: ignore
             view=view,
             embed=Embed(
                 title=self.__('Select the language I will use:'),

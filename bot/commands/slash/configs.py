@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Optional
+
 from androxus import Bot
 from common import ConfigsCommands
 from disnake import CommandInteraction as Interaction
@@ -29,11 +31,12 @@ from disnake.ext import commands
 
 class ConfigsSlash(commands.Cog):
     @commands.slash_command()  # type: ignore
-    async def language(self, inter: Interaction) -> Message:
+    async def language(self, inter: Interaction) -> Optional[Message]:
         """
         Changes the language of the bot, for the current guild
         """
-        configs_commands = await ConfigsCommands(inter).init()
+        configs_commands = ConfigsCommands(inter)
+        await configs_commands.init()
         return await configs_commands.language()
 
 

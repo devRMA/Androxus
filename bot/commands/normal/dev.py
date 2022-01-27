@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Optional
+
 from androxus import Bot
 from common import DevCommands
 from disnake import Message
@@ -30,11 +32,12 @@ from disnake.ext.commands.context import Context  # type: ignore
 class DevNormal(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def reload(self, ctx: Context[Bot]) -> Message:
+    async def reload(self, ctx: Context[Bot]) -> Optional[Message]:
         """
         Reloads all cogs
         """
-        dev_commands = await DevCommands(ctx).init()
+        dev_commands = DevCommands(ctx)
+        await dev_commands.init()
         return await dev_commands.reload()
 
 

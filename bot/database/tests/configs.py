@@ -70,7 +70,7 @@ class Configs:
         if Configs.session is not None:
             Configs.session = None
         if Configs.engine is not None:
-            await Configs.engine.dispose()
+            await Configs.engine.dispose()  # type: ignore
             Configs.engine = None
         log(
             'TEST CONFIGS',
@@ -88,7 +88,8 @@ class Configs:
             second_color=RED
         )
         for model in __models__:
-            await model.drop_table(Configs.engine)
+            if Configs.engine is not None:
+                await model.drop_table(Configs.engine)
         log(
             'TEST CONFIGS',
             'TABLES SUCCESSFULLY DELETED',

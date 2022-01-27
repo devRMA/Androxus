@@ -22,11 +22,11 @@
 
 from os import listdir
 from os.path import abspath
-from typing import List
+from typing import List, Tuple
 from pipe import select
 
 
-def get_cogs() -> List[str]:
+def get_cogs() -> Tuple[str, ...]:
     """
     Get all Cogs from the bot
 
@@ -34,7 +34,7 @@ def get_cogs() -> List[str]:
         List[str]: The list with the names of the cogs
 
     """
-    def _get_python_files(path: str) -> List[str]:
+    def _get_python_files(path: str) -> Tuple[str, ...]:
         """
         Get all Python files from a path.
 
@@ -42,7 +42,7 @@ def get_cogs() -> List[str]:
             path (str): The path to search.
 
         Returns:
-            List[str]: The list with the names of the Python files without
+            Tuple[str]: The tuple with the names of the Python files without
             the extension.
 
         """
@@ -50,7 +50,7 @@ def get_cogs() -> List[str]:
         for file in listdir(path):
             if file.endswith(".py"):
                 python_files.append(file.removesuffix('.py'))
-        return python_files
+        return tuple(python_files)
 
     cogs = ['jishaku']
     commands_path = ['message', 'normal', 'slash', 'user']
@@ -68,4 +68,4 @@ def get_cogs() -> List[str]:
             _get_python_files(f'{abspath("./")}/{path}') |
             select(lambda file: f'{path}.{file}')
         )
-    return cogs
+    return tuple(cogs)

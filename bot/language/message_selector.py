@@ -71,6 +71,7 @@ class MessageSelector:
             line = self._extract_from_string(part, number)
             if line is not None:
                 return line
+        return None
 
     @staticmethod
     def _extract_from_string(part: str, number: int) -> Optional[str]:

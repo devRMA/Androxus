@@ -20,18 +20,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import annotations
 
-class Model:
+from abc import ABC, abstractmethod
+from typing import Any, Dict
+
+
+class Model(ABC):
     """
     The base model class.
     """
+    id: int
+
+    def __init__(self, id: int) -> None:
+        self.id = id
+
     def __str__(self) -> str:
         return f'<{self.__class__.__name__} ID: {self.id}>'
 
-    def __repr__(self) -> str:
-        return f'<{self.__class__.__name__} ID: {self.id}>'
+    def __hash__(self) -> int:
+        return hash(self.id)
 
-    def diff_in_dict(self, other) -> dict:
+    def __eq__(self, other: Any) -> bool:
+        return isinstance(other, self.__class__) and self.id == other.id
+
+    @abstractmethod
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Returns a dictionary representation of the guild.
+
+        Returns:
+            Dict[str, Any]: The guild's dictionary representation.
+
+        """
+
+    def diff_in_dict(self, other: Model) -> Dict[str, Any]:
         """
         Returns a dictionary representation of the difference between the
         model and another model.
@@ -40,26 +63,27 @@ class Model:
             other (database.models.Model): The model to compare to.
 
         Returns:
-            dict: The model's dictionary representation.
+            Dict[str, Any]: The model's dictionary representation.
 
         """
-        # check if it has the same id and is of the same class
-        if self != other:
+        # will only be compared if the other model is of the same class
+        if not isinstance(other, self.__class__):
             return {}
+
         other_dict = other.to_dict()
         self_dict = self.to_dict()
-        diff_dict = {}
+        diff_dict: Dict[str, Any] = {}
         for key in other_dict.keys():
             if self_dict[key] != other_dict[key]:
                 diff_dict[key] = other_dict[key]
         return diff_dict
 
-    def fill(self, params: dict):
+    def fill(self, params: Dict[str, Any]) -> None:
         """
         Update the model with the given parameters.
 
         Args:
-            params (dict): The parameters to update the model with.
+            params (Dict[str, Any]): The parameters to update the model with.
 
         """
         for key, value in params.items():
@@ -67,7 +91,7 @@ class Model:
                 continue
             setattr(self, key, value)
 
-    def merge(self, other):
+    def merge(self, other: Model) -> None:
         """
         Merge the model with another model.
 

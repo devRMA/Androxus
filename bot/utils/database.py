@@ -23,13 +23,14 @@
 from typing import Union
 
 from disnake import Message
-from disnake.ext.commands import Context
+from disnake.ext.commands import Context  # type: ignore
+from androxus import Bot
 from enums import RepositoryType
 
 from database.repositories import RepositoryFactory
 
 
-async def get_prefix(bot, message: Union[Message, Context]) -> str:
+async def get_prefix(bot: Bot, message: Union[Message, Context[Bot]]) -> str:
     """
     Get the prefix for the message.
 

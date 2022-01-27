@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from traceback import format_exception
+from typing import List, Optional
 
 from disnake import Colour, Embed, Message
 from disnake.utils import utcnow
@@ -32,13 +33,13 @@ from .base import Base
 
 
 class DevCommands(Base):
-    async def reload(self) -> Message:
+    async def reload(self) -> Optional[Message]:
         """
         Reloads all cogs
         """
         successfully_icon = '\N{WHITE HEAVY CHECK MARK}'
         unsuccessfully_icon = '\N{CROSS MARK}'
-        table = []
+        table: List[List[str]] = []
         for cog in get_cogs():
             cog_name = str(cog).removeprefix('commands.')
             cog_stopwatch = Stopwatch()
@@ -49,9 +50,9 @@ class DevCommands(Base):
                 traceback_data = ''.join(
                     format_exception(type(exc), exc, exc.__traceback__, 1)
                 )
-                await self.bot.get_user(
-                    self.bot.owner_id
-                ).send(f'ERROR {cog_name}```py\n{traceback_data}\n```')
+                await self.bot.get_user(self.bot.owner_id).send(  # type: ignore
+                    f'ERROR {cog_name}```py\n{traceback_data}\n```'
+                )
                 table.append(
                     [unsuccessfully_icon, cog_name,
                      str(cog_stopwatch)]
@@ -59,7 +60,7 @@ class DevCommands(Base):
             else:
                 cog_stopwatch.stop()
                 table.append([successfully_icon, cog_name, str(cog_stopwatch)])
-        return await self.send(
+        return await self.ctx.send(  # type: ignore
             embed=Embed(
                 title=self.__('Reloaded all cogs'),
                 description='```\n' + tabulate(table, tablefmt='pretty') +

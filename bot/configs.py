@@ -42,11 +42,11 @@ class Configs:
         slash commands
 
     """
-    default_prefix: str = getenv('DEFAULT_PREFIX')
+    default_prefix: str = getenv('DEFAULT_PREFIX', '')
     prefix: str = default_prefix
     required_permissions: Permissions = Permissions(8)
-    owner_id: int = int(getenv('OWNER_ID'))
-    default_language: str = getenv('DEFAULT_LANGUAGE')
+    owner_id: int = int(getenv('OWNER_ID', 0))
+    default_language: str = getenv('DEFAULT_LANGUAGE', '')
     language: str = default_language
 
     @property
@@ -58,7 +58,7 @@ class Configs:
             List[int]: The list of test guild IDs.
 
         """
-        test_guilds = getenv('TEST_GUILDS')
+        test_guilds = getenv('TEST_GUILDS', '')
         if test_guilds != '':
             if test_guilds.count(',') > 0:
                 if test_guilds.count('[') == 1 and test_guilds.count(']') == 1:

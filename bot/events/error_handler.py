@@ -1,4 +1,5 @@
-# MIT License
+# type: ignore
+# # MIT License
 
 # Copyright(c) 2021 Rafael
 
@@ -29,7 +30,7 @@ from language import Translator
 class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_error(
-        self, ctx: commands.Context, error: commands.CommandError
+        self, ctx: commands.Context[Bot], error: commands.CommandError
     ):
         """
         The event triggered when an error is raised while invoking a command.
@@ -51,7 +52,9 @@ class ErrorHandler(commands.Cog):
         # being handled here.
         cog = ctx.cog
         if cog:
-            if cog._get_overridden_method(cog.cog_command_error) is not None:
+            if cog._get_overridden_method(
+                cog.cog_command_error
+            ) is not None:
                 return
 
         ignored = (commands.CommandNotFound, )

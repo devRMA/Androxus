@@ -21,40 +21,42 @@
 # SOFTWARE.
 
 from typing import Optional
+
 from androxus import Bot
 from common import InfoCommands
-from disnake import Member, User, Message
+from disnake import Member, Message, User
 from disnake.ext import commands
 from disnake.ext.commands.context import Context  # type: ignore
 
 
 class InfoNormal(commands.Cog):
     @commands.command(aliases=['latency'])
-    async def ping(self, ctx: Context[Bot]) -> Message:
+    async def ping(self, ctx: Context[Bot]) -> Optional[Message]:
         """
         Get the bot latency
         """
-        info_commands = await InfoCommands(ctx).init()
+        info_commands = InfoCommands(ctx)
+        await info_commands.init()
         return await info_commands.ping()
 
     @commands.command(aliases=['ut'])
-    async def uptime(self, ctx: Context[Bot]) -> Message:
+    async def uptime(self, ctx: Context[Bot]) -> Optional[Message]:
         """
         Get the bot uptime
         """
-        info_commands = await InfoCommands(ctx).init()
+        info_commands = InfoCommands(ctx)
+        await info_commands.init()
         return await info_commands.uptime()
 
     @commands.command(aliases=['av'])
-    async def avatar(
-        self, ctx: Context[Bot], user: Optional[Member | User]
-    ) -> Message:
+    async def avatar(self, ctx: Context[Bot],
+                     user: Optional[Member | User]) -> Optional[Message]:
         """
         Get the user avatar
         """
-        if user is None:
-            user = ctx.author
-        info_commands = await InfoCommands(ctx).init()
+        user = user or ctx.author
+        info_commands = InfoCommands(ctx)
+        await info_commands.init()
         return await info_commands.avatar(user)
 
 

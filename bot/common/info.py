@@ -1,4 +1,4 @@
-# MIT License
+# # MIT License
 
 # Copyright(c) 2021 Rafael
 
@@ -21,9 +21,10 @@
 # SOFTWARE.
 
 from asyncio import sleep
+from typing import Optional
 
 from database.repositories import RepositoryFactory
-from disnake import Colour, Embed, Message, User
+from disnake import CmdInter, Colour, Embed, Member, Message, User
 from disnake.utils import format_dt, utcnow
 from enums import RepositoryType
 from stopwatch import Stopwatch
@@ -32,7 +33,7 @@ from .base import Base
 
 
 class InfoCommands(Base):
-    async def ping(self) -> Message:
+    async def ping(self) -> Optional[Message]:
         """
         Get the bot latency
         """
@@ -44,7 +45,7 @@ class InfoCommands(Base):
 
         # getting the latency to send a message
         stopwatch_message = Stopwatch()
-        bot_message = await self.send(
+        bot_message = await self.ctx.send(  # type: ignore
             embed=Embed(
                 title=self.__('Calculating latency...') +
                 f' {self.bot.get_emoji(756715436149702806)}',
@@ -56,7 +57,7 @@ class InfoCommands(Base):
         )
         stopwatch_message.stop()
 
-        if self.is_interaction:
+        if isinstance(self.ctx, CmdInter):
             bot_message = await self.ctx.original_message()
 
         embed_title = '\N{TABLE TENNIS PADDLE AND BALL} ' + \
@@ -69,7 +70,7 @@ class InfoCommands(Base):
             self.__('Discord response time:') + \
             f' {stopwatch_message}'
         await sleep(stopwatch_message.duration * 2)
-        return await bot_message.edit(
+        return await bot_message.edit(  # type: ignore
             embed=Embed(
                 title=embed_title, timestamp=utcnow(), color=Colour.random()
             ).set_footer(
@@ -77,11 +78,11 @@ class InfoCommands(Base):
             )
         )
 
-    async def uptime(self) -> Message:
+    async def uptime(self) -> Optional[Message]:
         """
         Get the bot uptime
         """
-        return await self.send(
+        return await self.ctx.send(  # type: ignore
             embed=Embed(
                 title='\N{TIMER CLOCK} ' + self.__('When I started:'),
                 description=format_dt(self.bot.start_date, 'R'),
@@ -92,7 +93,7 @@ class InfoCommands(Base):
             )
         )
 
-    async def avatar(self, user: User) -> Message:
+    async def avatar(self, user: Member | User) -> Optional[Message]:
         """
         Get the user avatar
         """
@@ -100,7 +101,7 @@ class InfoCommands(Base):
             self.__('Click [here](:link) to see the avatar', {
                 'link': user.display_avatar.url
             })
-        return await self.send(
+        return await self.ctx.send(  # type: ignore
             embed=Embed(
                 title='\N{EYE} ' +
                 self.__('Avatar of :username', {'username': user.display_name}),

@@ -106,7 +106,9 @@ class Translator:
         """
         return exists(self._get_json_path(locale))
 
-    def get(self, key: str, placeholders: Dict[str, Any] = {}) -> str:
+    def get(
+        self, key: str, placeholders: Optional[Dict[str, Any]] = None
+    ) -> str:
         """
         Get the translation for the given key.
 
@@ -118,13 +120,14 @@ class Translator:
             str: The translated text.
 
         """
+        placeholders = placeholders or {}
         return self._make_replacements(self.texts.get(key, key), placeholders)
 
     def choice(
         self,
         key: str,
         number: int | Sized,
-        placeholders: Dict[str, Any] = {}
+        placeholders: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         Get a translation according to an integer value.
@@ -133,12 +136,13 @@ class Translator:
             key (str): The key of the text to be translated.
             number (int or Sized): The amount of items, to get the text
             according to the correct plural or the iterable of items.
-            placeholders (dict): The words that will be replaced.
+            placeholders (Dict[str, Any], optional): The words that will be replaced.
 
         Returns:
             str: The translated text, with the plural or singular, correct.
 
         """
+        placeholders = placeholders or {}
         line = self.get(key, placeholders)
 
         if isinstance(number, Sized):

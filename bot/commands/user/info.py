@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Optional
+
 from androxus import Bot
 from common import InfoCommands
 from disnake import ApplicationCommandInteraction as Interaction
@@ -29,11 +31,13 @@ from disnake.ext import commands
 
 class InfoUser(commands.Cog):
     @commands.user_command()  # type: ignore
-    async def avatar(self, inter: Interaction, user: Member | User) -> Message:
+    async def avatar(self, inter: Interaction,
+                     user: Member | User) -> Optional[Message]:
         """
         Get the user avatar
         """
-        info_commands = await InfoCommands(inter).init()
+        info_commands = InfoCommands(inter)
+        await info_commands.init()
         return await info_commands.avatar(user)
 
 

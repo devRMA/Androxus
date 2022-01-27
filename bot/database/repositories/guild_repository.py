@@ -24,7 +24,7 @@ from ..models import Guild
 from .repository import Repository
 
 
-class GuildRepository(Repository):
+class GuildRepository(Repository[Guild]):
     """
     Class to manipulate the "guilds" table
 

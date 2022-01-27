@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Optional
+
 from androxus import Bot
 from common import InfoCommands
 from disnake import CommandInteraction as Interaction
@@ -33,19 +35,21 @@ def _return_author(inter: Interaction) -> Member | User:
 
 class InfoSlash(commands.Cog):
     @commands.slash_command()  # type: ignore
-    async def ping(self, inter: Interaction) -> Message:
+    async def ping(self, inter: Interaction) -> Optional[Message]:
         """
         Get the bot latency
         """
-        info_commands = await InfoCommands(inter).init()
+        info_commands = InfoCommands(inter)
+        await info_commands.init()
         return await info_commands.ping()
 
     @commands.slash_command()  # type: ignore
-    async def uptime(self, inter: Interaction) -> Message:
+    async def uptime(self, inter: Interaction) -> Optional[Message]:
         """
         Get the bot uptime
         """
-        info_commands = await InfoCommands(inter).init()
+        info_commands = InfoCommands(inter)
+        await info_commands.init()
         return await info_commands.uptime()
 
     @commands.slash_command()  # type: ignore
@@ -53,7 +57,7 @@ class InfoSlash(commands.Cog):
         self,
         inter: Interaction,
         user: Member | User = commands.Param(_return_author),
-    ) -> Message:
+    ) -> Optional[Message]:
         """Get the user avatar
 
         Parameters
@@ -61,7 +65,8 @@ class InfoSlash(commands.Cog):
         user: The user to get the avatar from, defaults to the author
 
         """
-        info_commands = await InfoCommands(inter).init()
+        info_commands = InfoCommands(inter)
+        await info_commands.init()
         return await info_commands.avatar(user)
 
 

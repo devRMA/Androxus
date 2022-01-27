@@ -1,3 +1,5 @@
-from .info import *
-from .dev import *
-from .configs import *
+from .info import InfoCommands
+from .dev import DevCommands
+from .configs import ConfigsCommands
+
+__all__ = ['InfoCommands', 'DevCommands', 'ConfigsCommands']

@@ -38,14 +38,13 @@ def log(
         f'{second_color}{text}{RESET}'.rjust(60)
     )
     logger = getLogger('androxus')
-    match level:
-        case 'info':
-            logger.info(text)
-        case 'warning':
-            logger.warning(text)
-        case 'error':
-            logger.error(text)
-        case 'critical':
-            logger.critical(text)
-        case _:
-            logger.debug(text)
+    if level == 'info':
+        logger.info(text)
+    elif level == 'warning':
+        logger.warning(text)
+    elif level == 'error':
+        logger.error(text)
+    elif level == 'critical':
+        logger.critical(text)
+    else:
+        logger.debug(text)

@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from os import getenv
+from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
@@ -32,7 +33,7 @@ class ConnectionFactory:
     Class that creates a connection to the database.
     """
     @staticmethod
-    def get_engine(dsn: str = None) -> AsyncEngine:
+    def get_engine(dsn: Optional[str] = None) -> AsyncEngine:
         """
         Creates a engine to the database.
 
@@ -50,10 +51,10 @@ class ConnectionFactory:
             port = getenv('DB_PORT')
             db_name = getenv('DB_NAME')
             dsn = f'postgresql+asyncpg://{user}:{pw}@{host}:{port}/{db_name}'
-        return create_async_engine(dsn)
+        return create_async_engine(dsn)  # type: ignore
 
     @staticmethod
-    def get_session(engine: AsyncEngine = None) -> AsyncSession:
+    def get_session(engine: Optional[AsyncEngine]) -> AsyncSession:
         """
         Creates a session to the database.
 
@@ -72,4 +73,4 @@ class ConnectionFactory:
             autocommit=False,
             expire_on_commit=False,
             class_=AsyncSession
-        )
+        )  # type: ignore

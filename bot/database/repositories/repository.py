@@ -20,15 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import List, Optional, Union
+from typing import Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 
+from database.models import Model
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ..models.model import Model
+ModelT = TypeVar('ModelT', bound=Model)
 
 
-class Repository:
+class Repository(Generic[ModelT]):
     """
     The base repository class.
 
@@ -38,14 +39,14 @@ class Repository:
 
     """
 
-    model = Model
+    model: Type[ModelT]
+    session: AsyncSession
 
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    @classmethod
-    async def __get_by_id(cls, session: AsyncSession,
-                          model_id: int) -> Optional[Model]:
+    async def __get_by_id(self, session: AsyncSession,
+                          model_id: int) -> Optional[ModelT]:
         """
         Get a model by its id
 
@@ -55,12 +56,12 @@ class Repository:
             model_id (int): The id of the model to get.
 
         Returns:
-            database.models.Model: The model object.
+            database.models.Model or None: The model object.
 
         """
-        model = cls.model
+        model = self.model
         stmt = select(model).where(model.id == model_id)
-        return (await session.execute(stmt)).scalars().first()
+        return (await session.execute(stmt)).scalars().first()  # type: ignore
 
     async def __exists(self, model_id: int) -> bool:
         """
@@ -82,7 +83,7 @@ class Repository:
     ------------------------------------------------------------
     """
 
-    async def find(self, model_id: int) -> Optional[Model]:
+    async def find(self, model_id: int) -> Optional[ModelT]:
         """
         Get a model by id
 
@@ -93,10 +94,10 @@ class Repository:
             Optional[database.models.Model]: The model object.
 
         """
-        async with self.session() as session:
-            return await self.__get_by_id(session, model_id)
+        async with self.session() as session:  # type: ignore
+            return await self.__get_by_id(session, model_id)  # type: ignore
 
-    async def find_or_create(self, model_id: int) -> Model:
+    async def find_or_create(self, model_id: int) -> ModelT:
         """
         Get a model by id, or create it if it doesn't exist
 
@@ -107,22 +108,22 @@ class Repository:
             database.models.Model: The model object.
 
         """
-        model = await self.find(model_id)
-        if model is None:
-            model = await self.create(model_id)
-        return model
+        # the create method will return the model if it exists
+        return await self.create(model_id)
 
-    async def all(self) -> List[Model]:
+    async def all(self) -> Tuple[ModelT, ...]:
         """
         Get all models
 
         Returns:
-            List[database.models.Model]: The models.
+            Tuple[database.models.Model]: The models.
 
         """
-        async with self.session() as session:
+        async with self.session() as session:  # type: ignore
             stmt = select(self.model)
-            return tuple((await session.execute(stmt)).scalars())
+            return tuple(
+                (await session.execute(stmt)).scalars()  # type: ignore
+            )
 
     """
     ------------------------------------------------------------
@@ -130,7 +131,7 @@ class Repository:
     ------------------------------------------------------------
     """
 
-    async def create(self, model_id: int) -> Optional[Model]:
+    async def create(self, model_id: int) -> ModelT:
         """
         Create a new model with default values
 
@@ -142,29 +143,32 @@ class Repository:
 
         """
         if await self.__exists(model_id):
-            return await self.find(model_id)
-        else:
-            model = self.model(model_id)
-            await self.save(model)
-            return model
+            model = await self.find(model_id)
+            if model:
+                return model
+        model = self.model(model_id)
+        await self.save(model)
+        return model
 
-    async def create_many(self, model_ids: List[int]) -> List[Model]:
+    async def create_many(self, model_ids: Iterable[int]) -> Tuple[ModelT, ...]:
         """
         Create many models
 
         Args:
-            model_ids (List[int]): The ids of the models to create.
+            model_ids (Iterable[int]): The ids of the models to create.
 
         Returns:
-            List[Model]: The models created.
+            Tuple[Model]: The models created.
 
         """
-        models = []
+        models: List[ModelT] = []
         for model_id in model_ids:
-            models.append(await self.create(model_id))
-        return models
+            model = await self.create(model_id)
+            if model:
+                models.append(model)
+        return tuple(models)
 
-    async def save(self, model: Model):
+    async def save(self, model: ModelT) -> None:
         """
         Save a model to the database
 
@@ -174,19 +178,19 @@ class Repository:
         """
         if not (await self.__exists(model.id)):
             # if not exists, create
-            async with self.session() as session:
-                session.add(model)
-                await session.commit()
+            async with self.session() as session:  # type: ignore
+                session.add(model)  # type: ignore
+                await session.commit()  # type: ignore
         else:
             # if exists, update
             await self.update(model)
 
-    async def save_many(self, models: List[Model]):
+    async def save_many(self, models: Iterable[ModelT]) -> None:
         """
         Save many models
 
         Args:
-            models (List[database.models.Model]): The models to save.
+            models (Iterable[database.models.Model]): The models to save.
 
         """
         for model in models:
@@ -198,7 +202,7 @@ class Repository:
     ------------------------------------------------------------
     """
 
-    async def update(self, model: Model):
+    async def update(self, model: ModelT) -> None:
         """
         Update a model in the database
 
@@ -207,10 +211,14 @@ class Repository:
 
         """
         if await self.__exists(model.id):
-            async with self.session() as session:
-                db_model = await self.__get_by_id(session, model.id)
-                db_model.merge(model)
-                await session.commit()
+            async with self.session() as session:  # type: ignore
+                db_model = await self.__get_by_id(
+                    session,  # type: ignore
+                    model.id
+                )
+                if db_model:
+                    db_model.merge(model)
+                    await session.commit()  # type: ignore
         else:
             await self.save(model)
 
@@ -220,7 +228,7 @@ class Repository:
     ------------------------------------------------------------
     """
 
-    async def delete(self, model: Union[Model, int]) -> bool:
+    async def delete(self, model: ModelT | int) -> bool:
         """
         Delete a model
 
@@ -236,16 +244,14 @@ class Repository:
                 model_to_delete = await self.find(model)
             else:
                 return False
-        elif isinstance(model, Model):
+        else:
             if await self.__exists(model.id):
                 model_to_delete = model
             else:
                 return False
-        else:
-            return False
-        async with self.session() as session:
-            await session.delete(model_to_delete)
-            await session.commit()
+        async with self.session() as session:  # type: ignore
+            await session.delete(model_to_delete)  # type: ignore
+            await session.commit()  # type: ignore
             return True
 
     """
