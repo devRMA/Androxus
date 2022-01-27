@@ -25,10 +25,23 @@
 
 from collections.abc import Iterable
 from re import compile as re_compile
+from typing import Any, List, Optional
 
 
 class MessageSelector:
     def choose(self, line: str, number: int, locale: str) -> str:
+        """
+        Select a proper translation string based on the given number.
+
+        Args:
+            line (str): The line with propers translations.
+            number (int): The number of items.
+            locale (str): The locale to use.
+
+        Returns:
+            str: The selected translation string.
+
+        """
         segments = line.split('|')
         value = self._extract(segments, number)
         if value is not None:
@@ -42,16 +55,16 @@ class MessageSelector:
 
         return segments[plural_index].strip()
 
-    def _extract(self, segments: Iterable, number: int) -> str:
+    def _extract(self, segments: Iterable[Any], number: int) -> Optional[str]:
         """
         Extract a translation string using inline conditions.
 
         Args:
-            segments (Iterable): The segments of the message.
+            segments (Iterable[Any]): The segments of the message.
             number (int): The number of items, used to determine the plural.
 
         Returns:
-            str: [description]
+            Optional[str]: The extracted translation string.
 
         """
         for part in segments:
@@ -60,7 +73,7 @@ class MessageSelector:
                 return line
 
     @staticmethod
-    def _extract_from_string(part: str, number: int) -> str:
+    def _extract_from_string(part: str, number: int) -> Optional[str]:
         """
         Get the translation string if the condition matches.
 
@@ -69,7 +82,7 @@ class MessageSelector:
             number (int): The number of items.
 
         Returns:
-            str: The translation string.
+            Optional[str]: The translation string.
 
         """
         regex = re_compile(r"^[\{\[]([^\[\]\{\}]*)[\}\]](.*)")
@@ -102,15 +115,15 @@ class MessageSelector:
         return value if condition == number else None
 
     @staticmethod
-    def _strip_conditions(segments: Iterable) -> list:
+    def _strip_conditions(segments: Iterable[Any]) -> List[str]:
         """
         Strip the inline conditions from each segment, just leaving the text.
 
         Args:
-            segments (Iterable): The segments of the message.
+            segments (Iterable[Any]): The segments of the message.
 
         Returns:
-            list: The segments without the conditions.
+            List[str]: The segments without the conditions.
 
         """
         regex = re_compile(r"^[\{\[]([^\[\]\{\}]*)[\}\]]")

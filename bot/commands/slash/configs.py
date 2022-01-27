@@ -28,7 +28,8 @@ from disnake.ext import commands
 
 
 class ConfigsSlash(commands.Cog):
-    @commands.slash_command()
+
+    @commands.slash_command() # type: ignore
     async def language(self, inter: Interaction) -> Message:
         """
         Changes the language of the bot, for the current guild

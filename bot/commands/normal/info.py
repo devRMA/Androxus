@@ -20,16 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import Optional
 from androxus import Bot
 from common import InfoCommands
-from disnake import Member, User
+from disnake import Member, User, Message
 from disnake.ext import commands
-from disnake.ext.commands.context import Context
+from disnake.ext.commands.context import Context  # type: ignore
 
 
 class InfoNormal(commands.Cog):
     @commands.command(aliases=['latency'])
-    async def ping(self, ctx: Context):
+    async def ping(self, ctx: Context[Bot]) -> Message:
         """
         Get the bot latency
         """
@@ -37,7 +38,7 @@ class InfoNormal(commands.Cog):
         return await info_commands.ping()
 
     @commands.command(aliases=['ut'])
-    async def uptime(self, ctx: Context):
+    async def uptime(self, ctx: Context[Bot]) -> Message:
         """
         Get the bot uptime
         """
@@ -45,7 +46,7 @@ class InfoNormal(commands.Cog):
         return await info_commands.uptime()
 
     @commands.command(aliases=['av'])
-    async def avatar(self, ctx: Context, user: Member | User = None):
+    async def avatar(self, ctx: Context[Bot], user: Optional[Member | User]) -> Message:
         """
         Get the user avatar
         """

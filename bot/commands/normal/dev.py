@@ -22,14 +22,15 @@
 
 from androxus import Bot
 from common import DevCommands
+from disnake import Message
 from disnake.ext import commands
-from disnake.ext.commands.context import Context
+from disnake.ext.commands.context import Context  # type: ignore
 
 
 class DevNormal(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def reload(self, ctx: Context):
+    async def reload(self, ctx: Context[Bot]) -> Message:
         """
         Reloads all cogs
         """

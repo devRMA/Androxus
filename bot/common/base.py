@@ -20,12 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Coroutine, Iterable, Optional, Union
+from typing import Any, Coroutine, Dict, Iterable, Optional, Union
 
 from androxus import Bot
 from disnake import ApplicationCommandInteraction as Interaction
-from disnake import Guild, Member, User
-from disnake.ext.commands.context import Context
+from disnake import Guild, Member, Message, User
+from disnake.ext.commands.bot_base import BotBase  # type: ignore
+from disnake.ext.commands.context import Context  # type: ignore
 from language import Translator
 
 
@@ -48,24 +49,24 @@ class Base:
         is_interaction (bool): If the context is an interaction.
 
     """
-    bot: Bot
-    ctx: Union[Context, Interaction]
+    bot: BotBase
+    ctx: Union[Context[Bot], Interaction]
     author: Union[Member, User]
     guild: Optional[Guild]
     translator: Translator
-    send: Coroutine
+    send: Coroutine[Any, Any, Message]
     is_interaction: bool
 
-    def __init__(self, context: Union[Context, Interaction]) -> None:
+    def __init__(self, context: Context[Bot] | Interaction) -> None:
         self.bot = context.bot
         self.ctx = context
         self.author = context.author
         self.guild = context.guild
         if isinstance(context, Context):
-            self.send = context.send
+            self.send = context.send  # type: ignore
             self.is_interaction = False
         else:
-            self.send = context.response.send_message
+            self.send = context.response.send_message  # type: ignore
             self.is_interaction = True
 
     async def init(self) -> 'Base':
@@ -79,7 +80,7 @@ class Base:
         self.translator = await Translator(self.ctx).init()
         return self
 
-    def __(self, key: str, placeholders: dict = {}) -> str:
+    def __(self, key: str, placeholders: Dict[str, Any] = {}) -> str:
         """
         Get the translation for the given key.
 
@@ -93,8 +94,8 @@ class Base:
         """
         return self.translator.get(key, placeholders)
 
-    def _choice(self, key: str, number: Union[int, Iterable],
-                placeholders: dict = {}) -> str:
+    def _choice(self, key: str, number: int | Iterable[Any],
+                placeholders: Dict[str, Any] = {}) -> str:
         """
         Get a translation according to an integer value.
 

@@ -23,33 +23,38 @@
 from androxus import Bot
 from common import InfoCommands
 from disnake import CommandInteraction as Interaction
-from disnake import Member, User
+from disnake import Member, Message, User
 from disnake.ext import commands
 
 
+def _return_author(inter: Interaction) -> Member | User:
+    return inter.author
+
+
 class InfoSlash(commands.Cog):
-    @commands.slash_command()
-    async def ping(self, inter: Interaction):
+
+    @commands.slash_command()  # type: ignore
+    async def ping(self, inter: Interaction) -> Message:
         """
         Get the bot latency
         """
         info_commands = await InfoCommands(inter).init()
         return await info_commands.ping()
 
-    @commands.slash_command()
-    async def uptime(self, inter: Interaction):
+    @commands.slash_command()  # type: ignore
+    async def uptime(self, inter: Interaction) -> Message:
         """
         Get the bot uptime
         """
         info_commands = await InfoCommands(inter).init()
         return await info_commands.uptime()
 
-    @commands.slash_command()
+    @commands.slash_command()  # type: ignore
     async def avatar(
         self,
         inter: Interaction,
-        user: Member | User = commands.Param(lambda inter: inter.author),
-    ):
+        user: Member | User = commands.Param(_return_author),
+    ) -> Message:
         """Get the user avatar
 
         Parameters

@@ -23,17 +23,17 @@
 # Credits to Taylor Otwell. Original PHP code, translated to Python by me
 # https://github.com/laravel/framework/blob/8e2d72728d6911816a97843ec3341e28c92af120/src/Illuminate/Translation/Translator.php
 
-from collections.abc import Iterable
+from collections.abc import Sized
 from json import load
 from os.path import abspath, exists
-from typing import Optional, Union
+from typing import Any, Dict, Optional
 
 from androxus import Bot
 from configs import Configs
 from database.repositories.guild_repository import GuildRepository
 from disnake import ApplicationCommandInteraction as Interaction
 from disnake import Guild
-from disnake.ext.commands.context import Context
+from disnake.ext.commands.context import Context  # type: ignore
 
 from .message_selector import MessageSelector
 
@@ -50,16 +50,16 @@ class Translator:
     bot: Optional[Bot] = None
     guild: Optional[Guild] = None
     language: str = Configs.language
-    texts: dict = {}
-    _selector: MessageSelector = None
+    texts: Dict[str, Any] = {}
+    _selector: MessageSelector
 
-    def __init__(self, context: Union[Context, Interaction, None]) -> None:
+    def __init__(self, context: Optional[Context[Bot] | Interaction]) -> None:
         # if context is None, will be used the default language
         if context is None:
             self.language = Configs.language
             self._load_texts()
         else:
-            self.bot = context.bot
+            self.bot = context.bot  # type: ignore
             self.guild = context.guild
 
     async def init(self) -> 'Translator':
@@ -106,7 +106,7 @@ class Translator:
         """
         return exists(self._get_json_path(locale))
 
-    def get(self, key: str, placeholders: dict = {}) -> str:
+    def get(self, key: str, placeholders: Dict[str, Any] = {}) -> str:
         """
         Get the translation for the given key.
 
@@ -123,14 +123,14 @@ class Translator:
             placeholders
         )
 
-    def choice(self, key: str, number: Union[int, Iterable],
-               placeholders: dict = {}) -> str:
+    def choice(self, key: str, number: int | Sized,
+               placeholders: Dict[str, Any] = {}) -> str:
         """
         Get a translation according to an integer value.
 
         Args:
             key (str): The key of the text to be translated.
-            number (int or Iterable): The amount of items, to get the text
+            number (int or Sized): The amount of items, to get the text
             according to the correct plural or the iterable of items.
             placeholders (dict): The words that will be replaced.
 
@@ -140,7 +140,7 @@ class Translator:
         """
         line = self.get(key, placeholders)
 
-        if isinstance(number, Iterable):
+        if isinstance(number, Sized):
             number = len(number)
         else:
             number = int(number)
@@ -187,7 +187,7 @@ class Translator:
         return f'{abspath("./")}/language/json/{locale}.json'
 
     @staticmethod
-    def _make_replacements(line: str, placeholders: dict) -> str:
+    def _make_replacements(line: str, placeholders: Dict[str, Any]) -> str:
         """
         Replaces the placeholders in the line.
 
@@ -199,7 +199,7 @@ class Translator:
             str: The line with the placeholders replaced.
 
         """
-        should_replace = {}
+        should_replace: Dict[str, Any] = {}
         for key, value in placeholders.items():
             should_replace[':' + str(key).capitalize()
                            ] = str(value).capitalize()

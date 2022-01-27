@@ -22,13 +22,14 @@
 
 from androxus import Bot
 from common import ConfigsCommands
+from disnake import Message
 from disnake.ext import commands
-from disnake.ext.commands.context import Context
+from disnake.ext.commands.context import Context  # type: ignore
 
 
 class ConfigsNormal(commands.Cog):
     @commands.command(aliases=['lang'])
-    async def language(self, ctx: Context):
+    async def language(self, ctx: Context[Bot]) -> Message:
         """
         Changes the language of the bot, for the current guild
         """
