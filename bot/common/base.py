@@ -22,11 +22,10 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Sized, Union
+from typing import Any, Dict, Optional, Sized
 
 from androxus import Bot
-from disnake import CmdInter
-from disnake import Guild, Member, User
+from disnake import CmdInter, Guild, Member, User
 from disnake.ext.commands.context import Context  # type: ignore
 from language import Translator
 
@@ -51,8 +50,8 @@ class Base:
 
     """
     bot: Bot
-    ctx: Union[Context[Bot], CmdInter]
-    author: Union[Member, User]
+    ctx: Context[Bot] | CmdInter
+    author: Member | User
     guild: Optional[Guild]
     translator: Translator
     is_interaction: bool

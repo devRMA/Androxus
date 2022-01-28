@@ -36,7 +36,7 @@ async def get_prefix(
 
     Args:
         bot (androxus.Bot): The bot instance.
-        message (Union[Message, Context]): The message or context, instance.
+        message (Message or Context): The message or context, instance.
 
     Returns:
         str: The prefix.
