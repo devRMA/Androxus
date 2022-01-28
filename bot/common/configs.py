@@ -20,13 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Any, Callable, Dict, List, Union, Optional
+from typing import Any, Callable, Dict, List, Optional
 
+from database.models import Guild
 from database.repositories import RepositoryFactory
+from database.repositories.guild_repository import GuildRepository
 from disnake import (
-    Colour, Embed, Member, Message, MessageInteraction, SelectOption, User
+    ButtonStyle, Colour, Embed, Member, Message, MessageInteraction, User
 )
-from disnake.ui import Select, View
+from disnake.ui import Button, Item, View, button
 from disnake.utils import utcnow
 from enums import RepositoryType
 
@@ -40,56 +42,34 @@ class ConfigsCommands(Base):
         """
         if self.guild is None:
             return None
-        repo = RepositoryFactory.create(RepositoryType.GUILD)
-        guild_db = await repo.find_or_create(self.guild.id)
 
-        class LanguageSelect(Select[View]):
-            def __init__(
-                self, *, languages: List[str],
-                __: Callable[[str, Optional[Dict[str, Any]]], str]
-            ):
-                self.__ = __
-
-                options = [
-                    SelectOption(
-                        label=language,
-                        value=language,
-                        default=language == guild_db.language
-                    ) for language in languages
-                ]
-
-                super().__init__(
-                    placeholder=self.__('Languages:', {}),
-                    min_values=1,
-                    max_values=1,
-                    options=options,
-                )
-
-            async def callback(self, interaction: MessageInteraction):
-                guild_db.language = self.values[0]
-                await repo.save(guild_db)
-
-                message = self.__(
-                    ':userMention Language changed to **:language**', {
-                        'language': self.values[0],
-                        'userMention': interaction.author.mention
-                    }
-                )
-                await interaction.send(content=message)  # type: ignore
+        def get_embed(guild: Guild) -> Embed:
+            return Embed(
+                title=self.__('Select the language I will use:'),
+                description=self.__(
+                    'Current language: **:language**',
+                    {'language': guild.language}
+                ),
+                timestamp=utcnow(),
+                color=Colour.random()
+            ).set_footer(
+                text=str(self.author), icon_url=self.author.display_avatar.url
+            )
 
         class LanguageView(View):
+            children: List[Item[View]]
+
             def __init__(
-                self, *, author: Union[Member, User], languages: List[str],
-                __: Callable[[str, Optional[Dict[str, Any]]], str]
+                self, *, author: Member | User,
+                __: Callable[[str, Optional[Dict[str, Any]]], str],
+                guild_repository: GuildRepository, guild: Guild
             ):
                 self.author = author
                 self.__ = __
+                self.guild_repository = guild_repository
+                self.guild = guild
 
                 super().__init__(timeout=60.0)
-
-                self.add_item(  # type: ignore
-                    LanguageSelect(languages=languages, __=self.__)
-                )
 
             async def interaction_check(
                 self, interaction: MessageInteraction
@@ -100,26 +80,83 @@ class ConfigsCommands(Base):
                     message = self.__(
                         'You can\'t interact with this message', {}
                     )
-                    await interaction.send(  # type: ignore
+                    await interaction.send(
                         content=message, ephemeral=True
                     )
                 return can_use
 
-        # creating the view and sending the message
-        view = LanguageView(
-            author=self.author, languages=self.bot.get_languages(), __=self.__
-        )
-        return await self.ctx.send(  # type: ignore
-            view=view,
-            embed=Embed(
-                title=self.__('Select the language I will use:'),
-                description=self.__(
-                    'Current language: **:language**',
-                    {'language': guild_db.language}
-                ),
-                timestamp=utcnow(),
-                color=Colour.random()
-            ).set_footer(
-                text=str(self.author), icon_url=self.author.display_avatar.url
+            def _select_button(self, button: Button[View]) -> None:
+                for child in self.children:
+                    if isinstance(
+                        child, Button
+                    ) and child.style != ButtonStyle.grey:
+                        child.style = ButtonStyle.grey
+                        child.disabled = False
+                button.style = ButtonStyle.blurple
+                button.disabled = True
+
+            async def _change_language(self, new_language: str) -> None:
+                self.guild.language = new_language
+                await self.guild_repository.update(self.guild)
+
+            async def _on_button_click(
+                self, button: Button[View], interaction: MessageInteraction,
+                new_language: str
+            ) -> None:
+                self._select_button(button)
+                await self._change_language(new_language)
+                await interaction.response.edit_message(
+                    content=self.__(
+                        ':userMention Language changed to **:language**', {
+                            'language': self.guild.language,
+                            'userMention': interaction.author.mention
+                        }
+                    ),
+                    view=self,
+                    embed=get_embed(self.guild)
+                )
+
+            @button(
+                style=ButtonStyle.gray,
+                emoji='\U0001f1e7\U0001f1f7',
+                label="Português"
             )
+            async def portuguese(
+                self, button: Button[View], interaction: MessageInteraction
+            ):
+                await self._on_button_click(button, interaction, 'pt_BR')
+
+            @button(
+                style=ButtonStyle.blurple,
+                emoji='\U0001f1fa\U0001f1f8',
+                label="English",
+                disabled=True
+            )
+            async def english(
+                self, button: Button[View], interaction: MessageInteraction
+            ):
+                await self._on_button_click(button, interaction, 'en_US')
+
+        repo = RepositoryFactory.create(RepositoryType.GUILD)
+        guild_db = await repo.find_or_create(self.guild.id)
+        view = LanguageView(
+            author=self.author,
+            __=self.__,
+            guild_repository=repo,
+            guild=guild_db
+        )
+        for child in view.children:
+            if isinstance(child, Button):
+                if child.label == 'Português' and guild_db.language == 'pt_BR':
+                    child.style = ButtonStyle.blurple
+                    child.disabled = True
+                elif child.label == 'English' and guild_db.language == 'en_US':
+                    child.style = ButtonStyle.blurple
+                    child.disabled = True
+                else:
+                    child.style = ButtonStyle.gray
+                    child.disabled = False
+        return await self.ctx.send(
+            view=view,
+            embed=get_embed(guild_db)
         )
