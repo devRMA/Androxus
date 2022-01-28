@@ -60,12 +60,12 @@ def get_cogs() -> Tuple[str, ...]:
     for path in commands_path:
         cogs.extend(
             _get_python_files(f'{abspath("./")}/commands/{path}') |
-            select(lambda file: f'commands.{path}.{file}')
+            select(lambda file: f'commands.{path}.{file}')  # type: ignore
         )
     # getting cogs from events
     for path in events_path:
         cogs.extend(
             _get_python_files(f'{abspath("./")}/{path}') |
-            select(lambda file: f'{path}.{file}')
+            select(lambda file: f'{path}.{file}')  # type: ignore
         )
     return tuple(cogs)
