@@ -33,7 +33,7 @@ from database import bootstrap as db_bootstrap
 from database.connection import ConnectionFactory
 from disnake import Game, Intents, Message
 from disnake import __version__ as disnake_version
-from disnake.ext import commands, tasks
+from disnake.ext import commands, tasks  # type: ignore
 from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
