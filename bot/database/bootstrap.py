@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from sqlalchemy import inspect  # type: ignore
+from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
 from utils import CYAN, LYELLOW, WHITE, log
 
 from database.models import __models__

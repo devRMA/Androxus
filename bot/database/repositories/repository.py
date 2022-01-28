@@ -23,8 +23,8 @@
 from typing import Generic, Iterable, List, Optional, Tuple, Type, TypeVar
 
 from database.models import Model
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
+from sqlalchemy.future import select  # type: ignore
 
 ModelT = TypeVar('ModelT', bound=Model)
 

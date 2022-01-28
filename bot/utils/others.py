@@ -23,7 +23,7 @@
 from os import listdir
 from os.path import abspath
 from typing import List, Tuple
-from pipe import select
+from pipe import select  # type: ignore
 
 
 def get_cogs() -> Tuple[str, ...]:

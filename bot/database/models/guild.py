@@ -23,9 +23,9 @@
 from typing import Any, Dict, Optional
 
 from configs import Configs
-from sqlalchemy import BigInteger, Column, String
-from sqlalchemy.ext.asyncio.engine import AsyncEngine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import BigInteger, Column, String  # type: ignore
+from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
+from sqlalchemy.ext.declarative import declarative_base  # type: ignore
 
 from .model import Model
 

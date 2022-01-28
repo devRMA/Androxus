@@ -35,8 +35,8 @@ from disnake import Game, Intents, Message
 from disnake import __version__ as disnake_version
 from disnake.ext import commands, tasks
 from disnake.utils import utcnow
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
+from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
 from stopwatch import Stopwatch
 from toml import load
 from utils import SingletonMeta, log
