@@ -60,7 +60,7 @@ class DevCommands(Base):
             else:
                 cog_stopwatch.stop()
                 table.append([successfully_icon, cog_name, str(cog_stopwatch)])
-        return await self.ctx.send(  # type: ignore
+        return await self.ctx.send(
             embed=Embed(
                 title=self.__('Reloaded all cogs'),
                 description='```\n' + tabulate(table, tablefmt='pretty') +

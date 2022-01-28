@@ -45,7 +45,7 @@ class InfoCommands(Base):
 
         # getting the latency to send a message
         stopwatch_message = Stopwatch()
-        bot_message = await self.ctx.send(  # type: ignore
+        bot_message = await self.ctx.send(
             embed=Embed(
                 title=self.__('Calculating latency...') +
                 f' {self.bot.get_emoji(756715436149702806)}',
@@ -82,7 +82,7 @@ class InfoCommands(Base):
         """
         Get the bot uptime
         """
-        return await self.ctx.send(  # type: ignore
+        return await self.ctx.send(
             embed=Embed(
                 title='\N{TIMER CLOCK} ' + self.__('When I started:'),
                 description=format_dt(self.bot.start_date, 'R'),
@@ -101,7 +101,7 @@ class InfoCommands(Base):
             self.__('Click [here](:link) to see the avatar', {
                 'link': user.display_avatar.url
             })
-        return await self.ctx.send(  # type: ignore
+        return await self.ctx.send(
             embed=Embed(
                 title='\N{EYE} ' +
                 self.__('Avatar of :username', {'username': user.display_name}),
