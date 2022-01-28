@@ -25,15 +25,23 @@
 
 from collections.abc import Sized
 from json import load
-from os.path import abspath, exists
-from typing import Any, Dict, Optional
+from os.path import (
+    abspath,
+    exists
+)
+from typing import (
+    Any,
+    Dict,
+    Optional
+)
+
+from disnake import ApplicationCommandInteraction as Interaction
+from disnake import Guild
+from disnake.ext.commands.context import Context  # type: ignore
 
 from androxus import Bot
 from configs import Configs
 from database.repositories.guild_repository import GuildRepository
-from disnake import ApplicationCommandInteraction as Interaction
-from disnake import Guild
-from disnake.ext.commands.context import Context  # type: ignore
 
 from .message_selector import MessageSelector
 

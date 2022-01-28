@@ -22,7 +22,14 @@
 
 from os import getenv
 
-from utils import CYAN, LGREEN, LRED, LYELLOW, RED, log
+from utils import (
+    CYAN,
+    LGREEN,
+    LRED,
+    LYELLOW,
+    RED,
+    log
+)
 
 from ..bootstrap import bootstrap as db_bootstrap
 from ..connection import ConnectionFactory

@@ -20,11 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Generic, Iterable, List, Optional, Tuple, Type, TypeVar
+from typing import (
+    Generic,
+    Iterable,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar
+)
 
-from database.models import Model
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
+
+from database.models import Model
+
 
 ModelT = TypeVar('ModelT', bound=Model)
 

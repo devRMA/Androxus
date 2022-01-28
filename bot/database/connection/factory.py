@@ -23,7 +23,8 @@
 from os import getenv
 from typing import Optional
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 

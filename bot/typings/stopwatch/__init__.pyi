@@ -1,5 +1,6 @@
 from .stopwatch import Stopwatch
 
+
 __all__ = ['Stopwatch']
 __license__: str = ...
 __author__: str = ...

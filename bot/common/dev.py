@@ -21,12 +21,20 @@
 # SOFTWARE.
 
 from traceback import format_exception
-from typing import List, Optional
+from typing import (
+    List,
+    Optional
+)
 
-from disnake import Colour, Embed, Message
+from disnake import (
+    Colour,
+    Embed,
+    Message
+)
 from disnake.utils import utcnow
 from stopwatch import Stopwatch
 from tabulate import tabulate
+
 from utils import get_cogs
 
 from .base import Base

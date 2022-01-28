@@ -23,6 +23,7 @@
 from typing import Optional
 
 from disnake.ext.commands import Bot as DisnakeBot  # type: ignore
+
 from enums import RepositoryType
 
 from .guild_repository import GuildRepository

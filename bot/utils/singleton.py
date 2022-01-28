@@ -1,7 +1,10 @@
 # class taken from the site:
 # https://refactoring.guru/design-patterns/singleton/python/example
 
-from typing import Any, Dict
+from typing import (
+    Any,
+    Dict
+)
 
 
 class SingletonMeta(type):

@@ -21,9 +21,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from androxus import Bot
 from disnake import AllowedMentions
 from disnake.ext import commands
+
+from androxus import Bot
 from language import Translator
 
 

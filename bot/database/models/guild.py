@@ -20,14 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Any, Dict, Optional
+from typing import (
+    Any,
+    Dict,
+    Optional
+)
 
-from configs import Configs
-from sqlalchemy import BigInteger, Column, String  # type: ignore
+from sqlalchemy import String  # type: ignore
+from sqlalchemy import (
+    BigInteger,
+    Column
+)
 from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
 from sqlalchemy.ext.declarative import declarative_base  # type: ignore
 
+from configs import Configs
+
 from .model import Model
+
 
 Base = declarative_base()  # type: ignore
 

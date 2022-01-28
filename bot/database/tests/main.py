@@ -23,7 +23,11 @@
 from inspect import iscoroutinefunction
 from traceback import format_exc
 
-from utils import CYAN, MAGENTA, log
+from utils import (
+    CYAN,
+    MAGENTA,
+    log
+)
 
 from .configs import Configs
 from .guild_repository import GuildRepositoryTest

@@ -22,9 +22,14 @@
 
 from sqlalchemy import inspect  # type: ignore
 from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
-from utils import CYAN, LYELLOW, WHITE, log
 
 from database.models import __models__
+from utils import (
+    CYAN,
+    LYELLOW,
+    WHITE,
+    log
+)
 
 
 async def check_tables(engine: AsyncEngine):

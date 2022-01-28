@@ -22,11 +22,12 @@
 
 from typing import Optional
 
-from androxus import Bot
-from common import ConfigsCommands
 from disnake import CommandInteraction as Interaction
 from disnake import Message
 from disnake.ext import commands
+
+from androxus import Bot
+from common import ConfigsCommands
 
 
 class ConfigsSlash(commands.Cog):

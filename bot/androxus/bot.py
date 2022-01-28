@@ -25,22 +25,40 @@ from itertools import cycle
 from os import listdir
 from os.path import abspath
 from platform import python_version
-from typing import Any, Dict, List, MutableMapping
+from typing import (
+    Any,
+    Dict,
+    List,
+    MutableMapping
+)
 
 from aiohttp.client import ClientSession
-from configs import Configs
-from database import bootstrap as db_bootstrap
-from database.connection import ConnectionFactory
-from disnake import Game, Intents, Message
+from disnake import (
+    Game,
+    Intents,
+    Message
+)
 from disnake import __version__ as disnake_version
-from disnake.ext import commands, tasks  # type: ignore
+from disnake.ext import tasks  # type: ignore
+from disnake.ext import commands
 from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
 from stopwatch import Stopwatch
 from toml import load
-from utils import SingletonMeta, log
-from utils.colors import LBLUE, LGREEN, LYELLOW
+
+from configs import Configs
+from database import bootstrap as db_bootstrap
+from database.connection import ConnectionFactory
+from utils import (
+    SingletonMeta,
+    log
+)
+from utils.colors import (
+    LBLUE,
+    LGREEN,
+    LYELLOW
+)
 from utils.database import get_prefix
 from utils.numbers import format_numbers
 from utils.others import get_cogs

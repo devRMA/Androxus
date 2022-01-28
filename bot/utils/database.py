@@ -23,9 +23,9 @@
 from disnake import Message
 from disnake.ext.commands import Bot as DisnakeBot  # type: ignore
 from disnake.ext.commands import Context  # type: ignore
-from enums import RepositoryType
 
 from database.repositories import RepositoryFactory
+from enums import RepositoryType
 
 
 async def get_prefix(

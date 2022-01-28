@@ -22,11 +22,16 @@
 
 from typing import Optional
 
-from androxus import Bot
-from common import InfoCommands
-from disnake import Member, Message, User
+from disnake import (
+    Member,
+    Message,
+    User
+)
 from disnake.ext import commands
 from disnake.ext.commands.context import Context  # type: ignore
+
+from androxus import Bot
+from common import InfoCommands
 
 
 class InfoNormal(commands.Cog):

@@ -22,11 +22,12 @@
 
 from typing import Optional
 
-from androxus import Bot
-from common import ConfigsCommands
 from disnake import Message
 from disnake.ext import commands
 from disnake.ext.commands.context import Context  # type: ignore
+
+from androxus import Bot
+from common import ConfigsCommands
 
 
 class ConfigsNormal(commands.Cog):

@@ -22,7 +22,12 @@
 
 from logging import getLogger
 
-from .colors import BRIGHT, CYAN, LBLUE, RESET
+from .colors import (
+    BRIGHT,
+    CYAN,
+    LBLUE,
+    RESET
+)
 
 
 def log(

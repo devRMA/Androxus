@@ -22,11 +22,16 @@
 
 from typing import Optional
 
+from disnake import CommandInteraction as Interaction
+from disnake import (
+    Member,
+    Message,
+    User
+)
+from disnake.ext import commands
+
 from androxus import Bot
 from common import InfoCommands
-from disnake import CommandInteraction as Interaction
-from disnake import Member, Message, User
-from disnake.ext import commands
 
 
 def _return_author(inter: Interaction) -> Member | User:

@@ -22,11 +22,22 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Sized
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Sized
+)
+
+from disnake import (
+    CmdInter,
+    Guild,
+    Member,
+    User
+)
+from disnake.ext.commands.context import Context  # type: ignore
 
 from androxus import Bot
-from disnake import CmdInter, Guild, Member, User
-from disnake.ext.commands.context import Context  # type: ignore
 from language import Translator
 
 

@@ -24,6 +24,7 @@ from logging.handlers import RotatingFileHandler
 from os.path import abspath
 from pathlib import Path
 
+
 # credits to Caio Alexandre
 # https://github.com/webkaiyo/eris/blob/59f2fce4f40bf953065fa357d18a9065d26653a3/bot/launcher.py#L60
 
