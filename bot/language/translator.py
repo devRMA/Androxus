@@ -34,7 +34,7 @@ from typing import (
     Optional
 )
 
-from disnake import ApplicationCommandInteraction as Interaction
+from disnake import CmdInter
 from disnake import Guild
 from disnake.ext.commands.context import Context  # type: ignore
 
@@ -50,7 +50,7 @@ class Translator:
     The class responsible for translations.
 
     Args:
-        context (Context or ApplicationCommandInteraction or None): The context of
+        context (Context or CmdInter or None): The context of
         the command.
 
     """
@@ -60,7 +60,7 @@ class Translator:
     texts = dict[str, Any]()
     _selector: MessageSelector
 
-    def __init__(self, context: Optional[Context[Bot] | Interaction]) -> None:
+    def __init__(self, context: Optional[Context[Bot] | CmdInter]) -> None:
         # if context is None, will be used the default language
         if context is None:
             self.language = Configs.language
@@ -220,11 +220,9 @@ class Translator:
             line = line.replace(str(key), str(value))
         return line
 
-    """
-    ------------------------------------------------------------
-                            Aliases
-    ------------------------------------------------------------
-    """
+    # ------------------------------------------------------------
+    #                         Aliases
+    # ------------------------------------------------------------
 
     translate = get
     __ = get
