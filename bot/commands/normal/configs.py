@@ -20,8 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional
-
 from disnake import Message
 from disnake.ext import commands
 from disnake.ext.commands.context import Context  # type: ignore
@@ -32,7 +30,7 @@ from common import ConfigsCommands
 
 class ConfigsNormal(commands.Cog):
     @commands.command(aliases=['lang'])
-    async def language(self, ctx: Context[Bot]) -> Optional[Message]:
+    async def language(self, ctx: Context[Bot]) -> Message | None:
         """
         Changes the language of the bot, for the current guild
         """

@@ -24,7 +24,6 @@ from __future__ import annotations
 
 from typing import (
     Any,
-    Dict,
     Optional,
     Sized
 )
@@ -86,14 +85,14 @@ class Base:
         return self
 
     def __(
-        self, key: str, placeholders: Optional[Dict[str, Any]] = None
+        self, key: str, placeholders: Optional[dict[str, Any]] = None
     ) -> str:
         """
         Get the translation for the given key.
 
         Args:
             key (str): The key of the text to be translated.
-            placeholders (Dict[str, Any], optional): The words that will be replaced.
+            placeholders (dict[str, Any], optional): The words that will be replaced.
 
         Returns:
             str: The translated text.
@@ -105,7 +104,7 @@ class Base:
         self,
         key: str,
         number: int | Sized,
-        placeholders: Optional[Dict[str, Any]] = None
+        placeholders: Optional[dict[str, Any]] = None
     ) -> str:
         """
         Get a translation according to an integer value.
@@ -114,7 +113,7 @@ class Base:
             key (str): The key of the text to be translated.
             number (int or Sized): The amount of items, to get the text
             according to the correct plural or the iterable of items.
-            placeholders (Dict[str, Any], optional): The words that will be replaced.
+            placeholders (dict[str, Any], optional): The words that will be replaced.
 
         Returns:
             str: The translated text, with the plural or singular, correct.

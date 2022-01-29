@@ -27,8 +27,6 @@ from os.path import abspath
 from platform import python_version
 from typing import (
     Any,
-    Dict,
-    List,
     MutableMapping
 )
 
@@ -94,7 +92,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             prefix = await get_prefix(bot, message)
             return commands.when_mentioned_or(prefix)(bot, message)
 
-        kwargs: Dict[str, Any] = {}
+        kwargs = dict[str, Any]()
         kwargs['command_prefix'] = _prefix_or_mention
         kwargs['owner_id'] = self.configs.owner_id
         kwargs['case_insensitive'] = True
@@ -166,8 +164,8 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         )
         await self.change_presence(activity=Game(name=status_name))
 
-    def get_languages(self) -> List[str]:
-        languages: List[str] = []
+    def get_languages(self) -> list[str]:
+        languages = list[str]()
         languages.append(self.configs.default_language)
         for language in listdir(abspath('./') + '/language/json/'):
             if language.endswith('.json'):

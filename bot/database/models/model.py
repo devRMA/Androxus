@@ -23,10 +23,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from typing import (
-    Any,
-    Dict
-)
+from typing import Any
 
 
 class Model:
@@ -35,8 +32,8 @@ class Model:
     """
     id: int
 
-    def __init__(self, id: int) -> None:
-        self.id = id
+    def __init__(self, id_: int) -> None:
+        self.id = id_
 
     def __str__(self) -> str:
         return f'<{self.__class__.__name__} ID: {self.id}>'
@@ -48,16 +45,16 @@ class Model:
         return isinstance(other, self.__class__) and self.id == other.id
 
     @abstractmethod
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Returns a dictionary representation of the guild.
 
         Returns:
-            Dict[str, Any]: The guild's dictionary representation.
+            dict[str, Any]: The guild's dictionary representation.
 
         """
 
-    def diff_in_dict(self, other: Model) -> Dict[str, Any]:
+    def diff_in_dict(self, other: Model) -> dict[str, Any]:
         """
         Returns a dictionary representation of the difference between the
         model and another model.
@@ -66,7 +63,7 @@ class Model:
             other (database.models.Model): The model to compare to.
 
         Returns:
-            Dict[str, Any]: The model's dictionary representation.
+            dict[str, Any]: The model's dictionary representation.
 
         """
         # will only be compared if the other model is of the same class
@@ -75,18 +72,18 @@ class Model:
 
         other_dict = other.to_dict()
         self_dict = self.to_dict()
-        diff_dict: Dict[str, Any] = {}
+        diff_dict = dict[str, Any]()
         for key in other_dict.keys():
             if self_dict[key] != other_dict[key]:
                 diff_dict[key] = other_dict[key]
         return diff_dict
 
-    def fill(self, params: Dict[str, Any]) -> None:
+    def fill(self, params: dict[str, Any]) -> None:
         """
         Update the model with the given parameters.
 
         Args:
-            params (Dict[str, Any]): The parameters to update the model with.
+            params (dict[str, Any]): The parameters to update the model with.
 
         """
         for key, value in params.items():

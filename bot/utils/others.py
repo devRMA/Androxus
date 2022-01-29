@@ -22,23 +22,19 @@
 
 from os import listdir
 from os.path import abspath
-from typing import (
-    List,
-    Tuple
-)
 
 from pipe import select  # type: ignore
 
 
-def get_cogs() -> Tuple[str, ...]:
+def get_cogs() -> tuple[str, ...]:
     """
     Get all Cogs from the bot
 
     Returns:
-        List[str]: The list with the names of the cogs
+        list[str]: The list with the names of the cogs
 
     """
-    def _get_python_files(path: str) -> Tuple[str, ...]:
+    def _get_python_files(path: str) -> tuple[str, ...]:
         """
         Get all Python files from a path.
 
@@ -46,11 +42,11 @@ def get_cogs() -> Tuple[str, ...]:
             path (str): The path to search.
 
         Returns:
-            Tuple[str]: The tuple with the names of the Python files without
+            tuple[str]: The tuple with the names of the Python files without
             the extension.
 
         """
-        python_files: List[str] = []
+        python_files = list[str]()
         for file in listdir(path):
             if file.endswith(".py") and not file.startswith("_"):
                 python_files.append(file.removesuffix('.py'))

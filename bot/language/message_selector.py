@@ -27,7 +27,6 @@ from collections.abc import Iterable
 from re import compile as re_compile
 from typing import (
     Any,
-    List,
     Optional
 )
 
@@ -47,8 +46,7 @@ class MessageSelector:
 
         """
         segments = line.split('|')
-        value = self._extract(segments, number)
-        if value is not None:
+        if (value := self._extract(segments, number)) is not None:
             return value.strip()
 
         segments = self._strip_conditions(segments)
@@ -72,8 +70,7 @@ class MessageSelector:
 
         """
         for part in segments:
-            line = self._extract_from_string(part, number)
-            if line is not None:
+            if (line := self._extract_from_string(part, number)) is not None:
                 return line
         return None
 
@@ -120,7 +117,7 @@ class MessageSelector:
         return value if condition == number else None
 
     @staticmethod
-    def _strip_conditions(segments: Iterable[Any]) -> List[str]:
+    def _strip_conditions(segments: Iterable[Any]) -> list[str]:
         """
         Strip the inline conditions from each segment, just leaving the text.
 
@@ -128,7 +125,7 @@ class MessageSelector:
             segments (Iterable[Any]): The segments of the message.
 
         Returns:
-            List[str]: The segments without the conditions.
+            list[str]: The segments without the conditions.
 
         """
         regex = re_compile(r"^[\{\[]([^\[\]\{\}]*)[\}\]]")
@@ -183,7 +180,7 @@ class MessageSelector:
             'ln', 'ln_CD', 'mg', 'mg_MG', 'nso', 'nso_ZA', 'ti', 'ti_ER',
             'ti_ET', 'wa', 'wa_BE', 'xbr'
         ]:
-            return 0 if (number == 0 or number == 1) else 1
+            return 0 if (number in [0, 1]) else 1
         elif locale in [
             'be', 'be_BY', 'bs', 'bs_BA', 'hr', 'hr_HR', 'ru', 'ru_RU', 'ru_UA',
             'sr', 'sr_ME', 'sr_RS', 'uk', 'uk_UA'
@@ -260,7 +257,7 @@ class MessageSelector:
                 return 0
             elif number == 2:
                 return 1
-            elif (number == 8) or (number == 11):
+            elif number in [8, 11]:
                 return 2
             else:
                 return 3

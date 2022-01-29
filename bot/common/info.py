@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 from asyncio import sleep
-from typing import Optional
 
 from disnake import (
     CmdInter,
@@ -44,7 +43,7 @@ from .base import Base
 
 
 class InfoCommands(Base):
-    async def ping(self) -> Optional[Message]:
+    async def ping(self) -> Message | None:
         """
         Get the bot latency
         """
@@ -89,7 +88,7 @@ class InfoCommands(Base):
             )
         )
 
-    async def uptime(self) -> Optional[Message]:
+    async def uptime(self) -> Message | None:
         """
         Get the bot uptime
         """
@@ -104,7 +103,7 @@ class InfoCommands(Base):
             )
         )
 
-    async def avatar(self, user: Member | User) -> Optional[Message]:
+    async def avatar(self, user: Member | User) -> Message | None:
         """
         Get the user avatar
         """

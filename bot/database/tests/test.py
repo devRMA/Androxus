@@ -28,49 +28,49 @@ class Test:
     Class to make tests
     """
     @staticmethod
-    def assert_equal(a: Any, b: Any):
-        assert a == b
+    def assert_equal(value: Any, other: Any):
+        assert value == other
 
     @staticmethod
-    def assert_not_equal(a: Any, b: Any):
-        assert a != b
+    def assert_not_equal(value: Any, other: Any):
+        assert value != other
 
     @staticmethod
-    def assert_true(x: Any):
-        assert x is True
+    def assert_true(value: Any):
+        assert value is True
 
     @staticmethod
-    def assert_false(x: Any):
-        assert x is False
+    def assert_false(value: Any):
+        assert value is False
 
     @staticmethod
-    def assert_is(a: Any, b: Any):
-        assert a is b
+    def assert_is(value: Any, other: Any):
+        assert value is other
 
     @staticmethod
-    def assert_is_not(a: Any, b: Any):
-        assert a is not b
+    def assert_is_not(value: Any, other: Any):
+        assert value is not other
 
     @staticmethod
-    def assert_is_none(x: Any):
-        assert x is None
+    def assert_is_none(value: Any):
+        assert value is None
 
     @staticmethod
-    def assert_is_not_none(x: Any):
-        assert x is not None
+    def assert_is_not_none(value: Any):
+        assert value is not None
 
     @staticmethod
-    def assert_in(a: Any, b: Any):
-        assert a in b
+    def assert_in(value: Any, other: Any):
+        assert value in other
 
     @staticmethod
-    def assert_not_in(a: Any, b: Any):
-        assert a not in b
+    def assert_not_in(value: Any, other: Any):
+        assert value not in other
 
     @staticmethod
-    def assert_is_instance(a: Any, b: Any):
-        assert isinstance(a, b)
+    def assert_is_instance(value: Any, other: Any):
+        assert isinstance(value, other)
 
     @staticmethod
-    def assert_not_is_instance(a: Any, b: Any):
-        assert not isinstance(a, b)
+    def assert_not_is_instance(value: Any, other: Any):
+        assert not isinstance(value, other)

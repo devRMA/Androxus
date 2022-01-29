@@ -57,7 +57,7 @@ async def make_tests():
                 else:
                     method()
                 log('TESTING', f'{test} SUCCESS')
-            except BaseException:
+            except Exception:
                 log('TESTING', f'{test} ERROR')
                 print(format_exc())
     await Configs.teardown()

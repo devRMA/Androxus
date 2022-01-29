@@ -23,8 +23,6 @@
 from typing import (
     Any,
     Callable,
-    Dict,
-    List,
     Optional
 )
 
@@ -54,7 +52,7 @@ from .base import Base
 
 
 class ConfigsCommands(Base):
-    async def language(self) -> Optional[Message]:
+    async def language(self) -> Message | None:
         """
         Changes the language of the bot, for the current guild
         """
@@ -75,11 +73,11 @@ class ConfigsCommands(Base):
             )
 
         class LanguageView(View):
-            children: List[Item[View]]
+            children: list[Item[View]]
 
             def __init__(
                 self, *, author: Member | User,
-                __: Callable[[str, Optional[Dict[str, Any]]], str],
+                __: Callable[[str, Optional[dict[str, Any]]], str],
                 guild_repository: GuildRepository, guild: Guild
             ):
                 self.author = author
@@ -93,14 +91,11 @@ class ConfigsCommands(Base):
                 self, interaction: MessageInteraction
             ) -> bool:
                 # will be check if the user can interact with message
-                can_use = self.author.id == interaction.author.id
-                if not can_use:
+                if not (can_use := self.author.id == interaction.author.id):
                     message = self.__(
                         'You can\'t interact with this message', {}
                     )
-                    await interaction.send(
-                        content=message, ephemeral=True
-                    )
+                    await interaction.send(content=message, ephemeral=True)
                 return can_use
 
             def _select_button(self, button: Button[View]) -> None:
@@ -174,7 +169,4 @@ class ConfigsCommands(Base):
                 else:
                     child.style = ButtonStyle.gray
                     child.disabled = False
-        return await self.ctx.send(
-            view=view,
-            embed=get_embed(guild_db)
-        )
+        return await self.ctx.send(view=view, embed=get_embed(guild_db))

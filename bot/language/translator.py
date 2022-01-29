@@ -31,7 +31,6 @@ from os.path import (
 )
 from typing import (
     Any,
-    Dict,
     Optional
 )
 
@@ -58,7 +57,7 @@ class Translator:
     bot: Optional[Bot] = None
     guild: Optional[Guild] = None
     language: str = Configs.language
-    texts: Dict[str, Any] = {}
+    texts = dict[str, Any]()
     _selector: MessageSelector
 
     def __init__(self, context: Optional[Context[Bot] | Interaction]) -> None:
@@ -115,7 +114,7 @@ class Translator:
         return exists(self._get_json_path(locale))
 
     def get(
-        self, key: str, placeholders: Optional[Dict[str, Any]] = None
+        self, key: str, placeholders: Optional[dict[str, Any]] = None
     ) -> str:
         """
         Get the translation for the given key.
@@ -135,7 +134,7 @@ class Translator:
         self,
         key: str,
         number: int | Sized,
-        placeholders: Optional[Dict[str, Any]] = None
+        placeholders: Optional[dict[str, Any]] = None
     ) -> str:
         """
         Get a translation according to an integer value.
@@ -144,7 +143,7 @@ class Translator:
             key (str): The key of the text to be translated.
             number (int or Sized): The amount of items, to get the text
             according to the correct plural or the iterable of items.
-            placeholders (Dict[str, Any], optional): The words that will be replaced.
+            placeholders (dict[str, Any], optional): The words that will be replaced.
 
         Returns:
             str: The translated text, with the plural or singular, correct.
@@ -153,10 +152,7 @@ class Translator:
         placeholders = placeholders or {}
         line = self.get(key, placeholders)
 
-        if isinstance(number, Sized):
-            number = len(number)
-        else:
-            number = int(number)
+        number = len(number) if isinstance(number, Sized) else int(number)
 
         placeholders['count'] = number
         return self._make_replacements(
@@ -170,7 +166,9 @@ class Translator:
 
         """
         if self.has_locale(self.language):
-            with open(self._get_json_path(self.language)) as file:
+            with open(
+                self._get_json_path(self.language), encoding='utf-8'
+            ) as file:
                 self.texts = load(file)
 
     def _get_selector(self) -> MessageSelector:
@@ -200,7 +198,7 @@ class Translator:
         return f'{abspath("./")}/language/json/{locale}.json'
 
     @staticmethod
-    def _make_replacements(line: str, placeholders: Dict[str, Any]) -> str:
+    def _make_replacements(line: str, placeholders: dict[str, Any]) -> str:
         """
         Replaces the placeholders in the line.
 
@@ -212,7 +210,7 @@ class Translator:
             str: The line with the placeholders replaced.
 
         """
-        should_replace: Dict[str, Any] = {}
+        should_replace = dict[str, Any]()
         for key, value in placeholders.items():
             should_replace[':' +
                            str(key).capitalize()] = str(value).capitalize()

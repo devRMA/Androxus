@@ -20,8 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional
-
 from disnake import ApplicationCommandInteraction as Interaction
 from disnake import (
     Member,
@@ -36,8 +34,9 @@ from common import InfoCommands
 
 class InfoUser(commands.Cog):
     @commands.user_command()  # type: ignore
-    async def avatar(self, inter: Interaction,
-                     user: Member | User) -> Optional[Message]:
+    async def avatar(
+        self, inter: Interaction, user: Member | User
+    ) -> Message | None:
         """
         Get the user avatar
         """

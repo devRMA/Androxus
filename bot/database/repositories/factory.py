@@ -34,7 +34,7 @@ class RepositoryFactory:
     Class that creates a repository instance.
     """
     @staticmethod
-    def create(  # type: ignore
+    def create(
         repository_type: RepositoryType,
         bot: Optional[DisnakeBot] = None
     ) -> GuildRepository:
@@ -54,3 +54,6 @@ class RepositoryFactory:
             bot = Bot()
         if repository_type == RepositoryType.GUILD:
             return GuildRepository(bot.db_session)  # type: ignore
+        raise TypeError(
+            'The repository type must be a RepositoryType instance.'
+        )

@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 from os import getenv
-from typing import List
 
 from disnake import Permissions
 
@@ -38,7 +37,7 @@ class Configs:
         owner_id (int): The ID of the bot owner.
         default_language (str): The default language for the bot commands.
         language (str): An alias for default_language.
-        test_guilds (List[int]): The ids of the servers you want to test the
+        test_guilds (list[int]): The ids of the servers you want to test the
         slash commands
 
     """
@@ -50,16 +49,15 @@ class Configs:
     language: str = default_language
 
     @property
-    def test_guilds(self) -> List[int]:
+    def test_guilds(self) -> list[int]:
         """
         The IDs of the test guilds.
 
         Returns:
-            List[int]: The list of test guild IDs.
+            list[int]: The list of test guild IDs.
 
         """
-        test_guilds = getenv('TEST_GUILDS', '')
-        if test_guilds != '':
+        if len(test_guilds := getenv('TEST_GUILDS', '')) > 0:
             if test_guilds.count(',') > 0:
                 if test_guilds.count('[') == 1 and test_guilds.count(']') == 1:
                     return [

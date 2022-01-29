@@ -23,9 +23,7 @@
 from typing import (
     Generic,
     Iterable,
-    List,
     Optional,
-    Tuple,
     Type,
     TypeVar
 )
@@ -121,12 +119,12 @@ class Repository(Generic[ModelT]):
         # the create method will return the model if it exists
         return await self.create(model_id)
 
-    async def all(self) -> Tuple[ModelT, ...]:
+    async def all(self) -> tuple[ModelT, ...]:
         """
         Get all models
 
         Returns:
-            Tuple[database.models.Model]: The models.
+            tuple[database.models.Model]: The models.
 
         """
         async with self.session() as session:  # type: ignore
@@ -153,14 +151,13 @@ class Repository(Generic[ModelT]):
 
         """
         if await self.__exists(model_id):
-            model = await self.find(model_id)
-            if model:
+            if (model := await self.find(model_id)):
                 return model
         model = self.model(model_id)
         await self.save(model)
         return model
 
-    async def create_many(self, model_ids: Iterable[int]) -> Tuple[ModelT, ...]:
+    async def create_many(self, model_ids: Iterable[int]) -> tuple[ModelT, ...]:
         """
         Create many models
 
@@ -168,13 +165,12 @@ class Repository(Generic[ModelT]):
             model_ids (Iterable[int]): The ids of the models to create.
 
         Returns:
-            Tuple[Model]: The models created.
+            tuple[Model]: The models created.
 
         """
-        models: List[ModelT] = []
+        models = list[ModelT]()
         for model_id in model_ids:
-            model = await self.create(model_id)
-            if model:
+            if (model := await self.create(model_id)):
                 models.append(model)
         return tuple(models)
 
@@ -186,7 +182,7 @@ class Repository(Generic[ModelT]):
             model (database.models.Model): The model to save.
 
         """
-        if not (await self.__exists(model.id)):
+        if not await self.__exists(model.id):
             # if not exists, create
             async with self.session() as session:  # type: ignore
                 session.add(model)  # type: ignore
@@ -254,11 +250,10 @@ class Repository(Generic[ModelT]):
                 model_to_delete = await self.find(model)
             else:
                 return False
+        elif await self.__exists(model.id):
+            model_to_delete = model
         else:
-            if await self.__exists(model.id):
-                model_to_delete = model
-            else:
-                return False
+            return False
         async with self.session() as session:  # type: ignore
             await session.delete(model_to_delete)  # type: ignore
             await session.commit()  # type: ignore

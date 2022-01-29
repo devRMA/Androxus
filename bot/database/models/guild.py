@@ -22,7 +22,6 @@
 
 from typing import (
     Any,
-    Dict,
     Optional
 )
 
@@ -70,7 +69,7 @@ class Guild(Model, Base):  # type: ignore
         prefix: Optional[str] = None,
         language: Optional[str] = None
     ) -> None:
-        self.id = id_
+        super().__init__(id_)
         self.prefix = prefix or Configs.default_prefix
         self.language = language or Configs.default_language
 
@@ -83,7 +82,6 @@ class Guild(Model, Base):  # type: ignore
             engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
 
         """
-        #
         async with engine.begin() as conn:  # type: ignore
             await conn.run_sync(Base.metadata.create_all)  # type: ignore
 
@@ -99,12 +97,12 @@ class Guild(Model, Base):  # type: ignore
         async with engine.begin() as conn:  # type: ignore
             await conn.run_sync(Base.metadata.drop_all)  # type: ignore
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Returns a dictionary representation of the guild.
 
         Returns:
-            Dict[str, Any]: The guild's dictionary representation.
+            dict[str, Any]: The guild's dictionary representation.
 
         """
         return {'id': self.id, 'prefix': self.prefix, 'language': self.language}

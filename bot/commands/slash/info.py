@@ -20,8 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional
-
 from disnake import CommandInteraction as Interaction
 from disnake import (
     Member,
@@ -40,7 +38,7 @@ def _return_author(inter: Interaction) -> Member | User:
 
 class InfoSlash(commands.Cog):
     @commands.slash_command()  # type: ignore
-    async def ping(self, inter: Interaction) -> Optional[Message]:
+    async def ping(self, inter: Interaction) -> Message | None:
         """
         Get the bot latency
         """
@@ -49,7 +47,7 @@ class InfoSlash(commands.Cog):
         return await info_commands.ping()
 
     @commands.slash_command()  # type: ignore
-    async def uptime(self, inter: Interaction) -> Optional[Message]:
+    async def uptime(self, inter: Interaction) -> Message | None:
         """
         Get the bot uptime
         """
@@ -62,7 +60,7 @@ class InfoSlash(commands.Cog):
         self,
         inter: Interaction,
         user: Member | User = commands.Param(_return_author),
-    ) -> Optional[Message]:
+    ) -> Message | None:
         """Get the user avatar
 
         Parameters

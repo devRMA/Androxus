@@ -36,7 +36,7 @@ from common import InfoCommands
 
 class InfoNormal(commands.Cog):
     @commands.command(aliases=['latency'])
-    async def ping(self, ctx: Context[Bot]) -> Optional[Message]:
+    async def ping(self, ctx: Context[Bot]) -> Message | None:
         """
         Get the bot latency
         """
@@ -45,7 +45,7 @@ class InfoNormal(commands.Cog):
         return await info_commands.ping()
 
     @commands.command(aliases=['ut'])
-    async def uptime(self, ctx: Context[Bot]) -> Optional[Message]:
+    async def uptime(self, ctx: Context[Bot]) -> Message | None:
         """
         Get the bot uptime
         """
@@ -55,7 +55,7 @@ class InfoNormal(commands.Cog):
 
     @commands.command(aliases=['av'])
     async def avatar(self, ctx: Context[Bot],
-                     user: Optional[Member | User]) -> Optional[Message]:
+                     user: Optional[Member | User]) -> Message | None:
         """
         Get the user avatar
         """

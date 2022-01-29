@@ -20,8 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional
-
 from disnake import Message
 from disnake.ext import commands
 from disnake.ext.commands.context import Context  # type: ignore
@@ -33,7 +31,7 @@ from common import DevCommands
 class DevNormal(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
-    async def reload(self, ctx: Context[Bot]) -> Optional[Message]:
+    async def reload(self, ctx: Context[Bot]) -> Message | None:
         """
         Reloads all cogs
         """

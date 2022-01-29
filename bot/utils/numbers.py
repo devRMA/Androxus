@@ -35,7 +35,7 @@ def is_number(string: Any) -> bool:
         bool: True if it is a number, False otherwise.
 
     """
-    if len(string) == 0:
+    if not len(string) >= 1:
         return False
     if not isinstance(string, str):
         string = str(string)
@@ -43,13 +43,15 @@ def is_number(string: Any) -> bool:
         return True
     try:
         float(string)
-        return True
     except ValueError:
         try:
             float(string.replace(',', '.'))
-            return True
         except ValueError:
             return False
+        else:
+            return True
+    else:
+        return True
 
 
 def format_numbers(number: Any, br: bool = True, truncate: bool = False) -> str:
@@ -90,7 +92,7 @@ def format_numbers(number: Any, br: bool = True, truncate: bool = False) -> str:
     separator = '.' if br else ','
     decimal_separator = ''
 
-    if decimal != '':
+    if len(decimal) > 0:
         decimal_separator = ',' if br else '.'
 
     number = f'{int(number):_}'.replace('_', separator)

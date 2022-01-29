@@ -21,10 +21,6 @@
 # SOFTWARE.
 
 from traceback import format_exception
-from typing import (
-    List,
-    Optional
-)
 
 from disnake import (
     Colour,
@@ -41,13 +37,13 @@ from .base import Base
 
 
 class DevCommands(Base):
-    async def reload(self) -> Optional[Message]:
+    async def reload(self) -> Message | None:
         """
         Reloads all cogs
         """
         successfully_icon = '\N{WHITE HEAVY CHECK MARK}'
         unsuccessfully_icon = '\N{CROSS MARK}'
-        table: List[List[str]] = []
+        table = list[list[str]]()
         for cog in get_cogs():
             cog_name = str(cog).removeprefix('commands.')
             cog_stopwatch = Stopwatch()
