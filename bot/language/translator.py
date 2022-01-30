@@ -34,8 +34,10 @@ from typing import (
     Optional
 )
 
-from disnake import CmdInter
-from disnake import Guild
+from disnake import (
+    CmdInter,
+    Guild
+)
 from disnake.ext.commands.context import Context  # type: ignore
 
 from androxus import Bot
