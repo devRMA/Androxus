@@ -1,4 +1,0 @@
-# match case bug
-# https://github.com/google/yapf/issues/983
-database/repositories/factory.py
-utils/log.py
