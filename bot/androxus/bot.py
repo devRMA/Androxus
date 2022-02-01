@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import annotations
+
 from datetime import datetime
 from itertools import cycle
 from os import listdir
@@ -40,8 +42,7 @@ from disnake import __version__ as disnake_version
 from disnake.ext import tasks  # type: ignore
 from disnake.ext import commands
 from disnake.utils import utcnow
-from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
-from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
+from sqlalchemy.ext.asyncio.engine import AsyncEngine
 from stopwatch import Stopwatch
 from toml import load
 
@@ -71,14 +72,12 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         start_date (datetime): The date when the bot was started.
         maintenance (bool): Whether the bot is in maintenance mode.
         db_engine (AsyncEngine): The database engine.
-        db_session (AsyncSession): The database session.
         http_session (ClientSession): The aiohttp session.
 
     """
     maintenance: bool = False
     start_date: datetime
     db_engine: AsyncEngine
-    db_session: AsyncSession
     http_session: ClientSession
     configs = Configs()
     _status = cycle(('Androxus V3', '{users} Users!', '{servers} Guilds!'))
@@ -88,20 +87,19 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         self._startup_timer = Stopwatch()
         log('BOT', 'STARTING BOT...', first_color=LYELLOW)
 
-        async def _prefix_or_mention(bot: 'Bot', message: Message):
+        async def _prefix_or_mention(bot: Bot, message: Message):
             prefix = await get_prefix(bot, message)
             return commands.when_mentioned_or(prefix)(bot, message)
 
-        kwargs = dict[str, Any]()
-        kwargs['command_prefix'] = _prefix_or_mention
-        kwargs['owner_id'] = self.configs.owner_id
-        kwargs['case_insensitive'] = True
-        kwargs['intents'] = Intents.all()
-        kwargs['strip_after_prefix'] = True
-        kwargs['activity'] = Game(name='\N{SLEEPING FACE} Starting ...')
-        kwargs['test_guilds'] = self.configs.test_guilds
-
-        super().__init__(**kwargs)  # type: ignore
+        super().__init__(  # type: ignore
+            command_prefix=_prefix_or_mention,
+            owner_id=self.configs.owner_id,
+            case_insensitive=True,
+            intents=Intents.all(),
+            strip_after_prefix=True,
+            activity=Game(name='\N{SLEEPING FACE} Starting ...'),
+            test_guilds=self.configs.test_guilds
+        )
 
         # Loads all cogs of the bot.
         # bot.remove_command('help')
@@ -116,14 +114,10 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             return data['tool']['poetry']['version']
 
     async def on_ready(self) -> None:
-        if (not hasattr(self,
-                        'db_session')) or (not hasattr(self, 'db_engine')):
+        if not hasattr(self, 'db_engine'):
             self._startup_timer.stop()
             setattr(self, 'db_engine', ConnectionFactory.get_engine())
-            setattr(
-                self, 'db_session',
-                ConnectionFactory.get_session(self.db_engine)
-            )
+            print(f'db_engine: {self.db_engine}')
             setattr(self, 'start_date', utcnow())
             await db_bootstrap(self.db_engine)
             log('BOT', f'LOGGED IN {self.user}', first_color=LGREEN)
