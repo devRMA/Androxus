@@ -30,16 +30,16 @@ from pathlib import Path
 
 
 class RemoveNoise(logging.Filter):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__(name='disnake.state')
 
-    def filter(self, record: logging.LogRecord):
+    def filter(self, record: logging.LogRecord) -> bool:
         if record.levelname == 'WARNING' and 'referencing an unknown' in record.msg:
             return False
         return True
 
 
-def setup_logging():
+def setup_logging() -> None:
     # creating the "logs" folder if it doesn't exist
     path = Path(abspath('./') + '/logs')
     if not path.exists():
@@ -57,12 +57,13 @@ def setup_logging():
     dt_format = r'%Y-%m-%d %H:%M:%S'
     log_format = '[{asctime}] [{levelname}] {name}: {message}'
 
-    kwargs = {
-        'filename': abspath('./') + '/logs/androxus.log',
-        'encoding': 'utf-8',
-        'mode': 'w'
-    }
-    handler = RotatingFileHandler(**kwargs, maxBytes=max_bytes, backupCount=5)
+    handler = RotatingFileHandler(
+        filename=abspath('./') + '/logs/androxus.log',
+        encoding='utf-8',
+        mode='w',
+        maxBytes=max_bytes,
+        backupCount=5
+    )
     formatter = logging.Formatter(log_format, dt_format, style='{')
 
     handler.setFormatter(formatter)

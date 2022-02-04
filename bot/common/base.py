@@ -34,7 +34,7 @@ from disnake import (
     Member,
     User
 )
-from disnake.ext.commands.context import Context  # type: ignore
+from disnake.ext.commands import Context  # type: ignore
 
 from androxus import Bot
 from language import Translator

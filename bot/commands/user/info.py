@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from disnake import ApplicationCommandInteraction as Interaction
 from disnake import (
+    CmdInter,
     Member,
     Message,
     User
@@ -35,7 +35,7 @@ from common import InfoCommands
 class InfoUser(commands.Cog):
     @commands.user_command()  # type: ignore
     async def avatar(
-        self, inter: Interaction, user: Member | User
+        self, inter: CmdInter, user: Member | User
     ) -> Message | None:
         """
         Get the user avatar
@@ -45,5 +45,5 @@ class InfoUser(commands.Cog):
         return await info_commands.avatar(user)
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
     bot.add_cog(InfoUser())

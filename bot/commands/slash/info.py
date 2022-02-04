@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from disnake import CommandInteraction as Interaction
 from disnake import (
+    CmdInter,
     Member,
     Message,
     User
@@ -32,13 +32,13 @@ from androxus import Bot
 from common import InfoCommands
 
 
-def _return_author(inter: Interaction) -> Member | User:
+def _return_author(inter: CmdInter) -> Member | User:
     return inter.author
 
 
 class InfoSlash(commands.Cog):
     @commands.slash_command()  # type: ignore
-    async def ping(self, inter: Interaction) -> Message | None:
+    async def ping(self, inter: CmdInter) -> Message | None:
         """
         Get the bot latency
         """
@@ -47,7 +47,7 @@ class InfoSlash(commands.Cog):
         return await info_commands.ping()
 
     @commands.slash_command()  # type: ignore
-    async def uptime(self, inter: Interaction) -> Message | None:
+    async def uptime(self, inter: CmdInter) -> Message | None:
         """
         Get the bot uptime
         """
@@ -58,7 +58,7 @@ class InfoSlash(commands.Cog):
     @commands.slash_command()  # type: ignore
     async def avatar(
         self,
-        inter: Interaction,
+        inter: CmdInter,
         user: Member | User = commands.Param(_return_author),
     ) -> Message | None:
         """Get the user avatar
@@ -73,5 +73,5 @@ class InfoSlash(commands.Cog):
         return await info_commands.avatar(user)
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
     bot.add_cog(InfoSlash())

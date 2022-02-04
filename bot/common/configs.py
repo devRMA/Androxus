@@ -95,7 +95,10 @@ class ConfigsCommands(Base):
                     message = self.__(
                         'You can\'t interact with this message', {}
                     )
-                    await interaction.send(content=message, ephemeral=True)
+                    await interaction.send(  # type: ignore
+                        content=message,
+                        ephemeral=True
+                    )
                 return can_use
 
             def _select_button(self, button: Button[View]) -> None:
@@ -118,7 +121,7 @@ class ConfigsCommands(Base):
             ) -> None:
                 self._select_button(button)
                 await self._change_language(new_language)
-                await interaction.response.edit_message(
+                await interaction.response.edit_message(  # type: ignore
                     content=self.__(
                         ':userMention Language changed to **:language**', {
                             'language': self.guild.language,
@@ -169,4 +172,7 @@ class ConfigsCommands(Base):
                 else:
                     child.style = ButtonStyle.gray
                     child.disabled = False
-        return await self.ctx.send(view=view, embed=get_embed(guild_db))
+        return await self.ctx.send(  # type: ignore
+            view=view,
+            embed=get_embed(guild_db)
+        )

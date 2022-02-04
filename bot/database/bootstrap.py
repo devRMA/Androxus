@@ -20,19 +20,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from sqlalchemy import inspect  # type: ignore
-from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
+from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 from database.models import __models__
-from utils import (
+from utils import log
+from utils.colors import (
     CYAN,
     LYELLOW,
-    WHITE,
-    log
+    WHITE
 )
 
 
-async def check_tables(engine: AsyncEngine):
+async def check_tables(engine: AsyncEngine) -> None:
     """
     Check if tables exist, if not create them
 
@@ -46,11 +46,11 @@ async def check_tables(engine: AsyncEngine):
         first_color=CYAN,
         second_color=LYELLOW
     )
-    async with engine.connect() as conn:  # type: ignore
+    async with engine.connect() as conn:
         for model in __models__:
             table_name = model.__tablename__
-            if not await conn.run_sync(  # type: ignore
-                lambda con: inspect(con).has_table(table_name)  # type: ignore
+            if not await conn.run_sync(
+                lambda con: inspect(con).has_table(table_name)
             ):
                 log(
                     'BOOTSTRAPPING DB',
@@ -67,7 +67,7 @@ async def check_tables(engine: AsyncEngine):
     )
 
 
-async def bootstrap(engine: AsyncEngine):
+async def bootstrap(engine: AsyncEngine) -> None:
     """
     Bootstrap the database.
 

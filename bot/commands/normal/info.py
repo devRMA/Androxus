@@ -28,7 +28,7 @@ from disnake import (
     User
 )
 from disnake.ext import commands
-from disnake.ext.commands.context import Context  # type: ignore
+from disnake.ext.commands import Context  # type: ignore
 
 from androxus import Bot
 from common import InfoCommands
@@ -54,8 +54,9 @@ class InfoNormal(commands.Cog):
         return await info_commands.uptime()
 
     @commands.command(aliases=['av'])
-    async def avatar(self, ctx: Context[Bot],
-                     user: Optional[Member | User]) -> Message | None:
+    async def avatar(
+        self, ctx: Context[Bot], user: Optional[Member | User]
+    ) -> Message | None:
         """
         Get the user avatar
         """
@@ -65,5 +66,5 @@ class InfoNormal(commands.Cog):
         return await info_commands.avatar(user)
 
 
-def setup(bot: Bot):
+def setup(bot: Bot) -> None:
     bot.add_cog(InfoNormal())

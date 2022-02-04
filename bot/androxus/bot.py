@@ -28,8 +28,10 @@ from os import listdir
 from os.path import abspath
 from platform import python_version
 from typing import (
+    TYPE_CHECKING,
     Any,
-    MutableMapping
+    MutableMapping,
+    TypeAlias
 )
 
 from aiohttp.client import ClientSession
@@ -42,7 +44,9 @@ from disnake import __version__ as disnake_version
 from disnake.ext import tasks  # type: ignore
 from disnake.ext import commands
 from disnake.utils import utcnow
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from sqlalchemy.orm import sessionmaker
 from stopwatch import Stopwatch
 from toml import load
 
@@ -63,7 +67,16 @@ from utils.numbers import format_numbers
 from utils.others import get_cogs
 
 
-class Bot(commands.Bot, metaclass=SingletonMeta):
+if TYPE_CHECKING:
+    TSession: TypeAlias = sessionmaker[AsyncSession]
+else:
+    TSession: TypeAlias = AsyncSession
+
+
+class Bot(
+    commands.Bot,  # type: ignore
+    metaclass=SingletonMeta
+):
     """
     The main class of the bot.
 
@@ -72,12 +85,14 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         start_date (datetime): The date when the bot was started.
         maintenance (bool): Whether the bot is in maintenance mode.
         db_engine (AsyncEngine): The database engine.
+        db_session (sessionmaker[AsyncSession]): The database session.
         http_session (ClientSession): The aiohttp session.
 
     """
     maintenance: bool = False
     start_date: datetime
     db_engine: AsyncEngine
+    db_session: TSession
     http_session: ClientSession
     configs = Configs()
     _status = cycle(('Androxus V3', '{users} Users!', '{servers} Guilds!'))
@@ -111,13 +126,19 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         path = f'{abspath("./")}/pyproject.toml'
         with open(path, 'r', encoding='utf-8') as file:
             data: MutableMapping[str, Any] = load(file)
-            return data['tool']['poetry']['version']
+            tool = data.get('tool', dict[str, Any]())
+            poetry = tool.get('poetry', dict[str, Any]())
+            return poetry.get('version', '')
 
     async def on_ready(self) -> None:
-        if not hasattr(self, 'db_engine'):
+        if (not hasattr(self,
+                        'db_session')) or (not hasattr(self, 'db_engine')):
             self._startup_timer.stop()
             setattr(self, 'db_engine', ConnectionFactory.get_engine())
-            print(f'db_engine: {self.db_engine}')
+            setattr(
+                self, 'db_session',
+                ConnectionFactory.get_session(self.db_engine)
+            )
             setattr(self, 'start_date', utcnow())
             await db_bootstrap(self.db_engine)
             log('BOT', f'LOGGED IN {self.user}', first_color=LGREEN)
