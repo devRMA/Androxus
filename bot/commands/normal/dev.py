@@ -26,11 +26,12 @@ from disnake.ext.commands.context import Context  # type: ignore
 
 from androxus import Bot
 from common import DevCommands
+from utils.permissions import is_owner
 
 
 class DevNormal(commands.Cog):
     @commands.command(hidden=True)
-    @commands.is_owner()
+    @commands.check(is_owner)
     async def reload(self, ctx: Context[Bot]) -> Message | None:
         """
         Reloads all cogs
@@ -39,6 +40,16 @@ class DevNormal(commands.Cog):
         await dev_commands.init()
         return await dev_commands.reload()
 
+    @commands.command(hidden=True, aliases=['logout', 'sd'])
+    @commands.check(is_owner)
+    async def shutdown(self, ctx: Context[Bot]) -> Message | None:
+        """
+        Reloads all cogs
+        """
+        dev_commands = DevCommands(ctx)
+        await dev_commands.init()
+        return await dev_commands.shutdown()
 
-def setup(bot: Bot):
+
+def setup(bot: Bot) -> None:
     bot.add_cog(DevNormal())

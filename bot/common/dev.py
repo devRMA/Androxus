@@ -37,6 +37,16 @@ from .base import Base
 
 
 class DevCommands(Base):
+    async def shutdown(self) -> Message | None:
+        """
+        Shutdown the bot
+        """
+        msg = await self.ctx.send(  # type: ignore
+            content=self.__('Shutting down...')
+        )
+        await self.bot.close()
+        return msg
+
     async def reload(self) -> Message | None:
         """
         Reloads all cogs
