@@ -34,6 +34,7 @@ from common import InfoCommands
 
 class InfoUser(commands.Cog):
     @commands.user_command()  # type: ignore
+    @commands.guild_only()
     async def avatar(
         self, inter: CmdInter, user: Member | User
     ) -> Message | None:

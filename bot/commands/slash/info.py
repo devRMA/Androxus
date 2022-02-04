@@ -38,6 +38,7 @@ def _return_author(inter: CmdInter) -> Member | User:
 
 class InfoSlash(commands.Cog):
     @commands.slash_command()  # type: ignore
+    @commands.guild_only()
     async def ping(self, inter: CmdInter) -> Message | None:
         """
         Get the bot latency
@@ -47,6 +48,7 @@ class InfoSlash(commands.Cog):
         return await info_commands.ping()
 
     @commands.slash_command()  # type: ignore
+    @commands.guild_only()
     async def uptime(self, inter: CmdInter) -> Message | None:
         """
         Get the bot uptime
@@ -56,6 +58,7 @@ class InfoSlash(commands.Cog):
         return await info_commands.uptime()
 
     @commands.slash_command()  # type: ignore
+    @commands.guild_only()
     async def avatar(
         self,
         inter: CmdInter,
