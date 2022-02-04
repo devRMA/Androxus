@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from colorama import Style  # type: ignore
-from colorama import Fore
+from colorama import (  # type: ignore
+    Fore,
+    Style
+)
 
 
 BRIGHT = Style.BRIGHT

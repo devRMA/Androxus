@@ -33,5 +33,4 @@ class GuildRepository(Repository[Guild]):
         interact with the database.
 
     """
-
     model = Guild

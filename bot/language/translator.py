@@ -38,7 +38,7 @@ from disnake import (
     CmdInter,
     Guild
 )
-from disnake.ext.commands.context import Context  # type: ignore
+from disnake.ext.commands import Context  # type: ignore
 
 from androxus import Bot
 from configs import Configs
@@ -85,7 +85,7 @@ class Translator:
             else:
                 repository = GuildRepository(self.bot.db_session)
                 db_guild = await repository.find_or_create(self.guild.id)
-                self.language = db_guild.language
+                self.language = db_guild.language  # type: ignore
             self._load_texts()
         return self
 

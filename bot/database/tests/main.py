@@ -23,17 +23,17 @@
 from inspect import iscoroutinefunction
 from traceback import format_exc
 
-from utils import (
+from utils import log
+from utils.colors import (
     CYAN,
-    MAGENTA,
-    log
+    MAGENTA
 )
 
 from .configs import Configs
 from .guild_repository import GuildRepositoryTest
 
 
-async def make_tests():
+async def make_tests() -> None:
     await Configs.setup()
     tests_class = [GuildRepositoryTest]
     log('TESTING', 'STARTING DATABASE TESTS')

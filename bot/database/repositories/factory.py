@@ -20,13 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional
-
-from disnake.ext.commands import Bot as DisnakeBot  # type: ignore
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    TypeAlias
+)
 
 from enums import RepositoryType
 
 from .guild_repository import GuildRepository
+
+
+if TYPE_CHECKING:
+    from androxus import Bot
+    TBot: TypeAlias = Bot
+else:
+    TBot: TypeAlias = None
 
 
 class RepositoryFactory:
@@ -34,10 +43,7 @@ class RepositoryFactory:
     Class that creates a repository instance.
     """
     @staticmethod
-    def create(
-        repository_type: RepositoryType,
-        bot: Optional[DisnakeBot] = None
-    ) -> GuildRepository:
+    def create(repository_type: RepositoryType, bot: Optional[TBot] = None):
         """
         Creates a repository instance.
 
@@ -53,7 +59,7 @@ class RepositoryFactory:
             from androxus import Bot
             bot = Bot()
         if repository_type == RepositoryType.GUILD:
-            return GuildRepository(bot.db_session)  # type: ignore
+            return GuildRepository(bot.db_session)
         raise TypeError(
             'The repository type must be a RepositoryType instance.'
         )

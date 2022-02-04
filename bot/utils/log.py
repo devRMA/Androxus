@@ -37,7 +37,7 @@ def log(
     *,
     first_color: str = CYAN,
     second_color: str = LBLUE
-):
+) -> None:
     print(
         f'{BRIGHT}{first_color}[{tag:^16}]' +
         f'{second_color}{text}{RESET}'.rjust(60)

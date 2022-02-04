@@ -21,46 +21,54 @@
 # SOFTWARE.
 
 from typing import (
+    TYPE_CHECKING,
     Generic,
     Iterable,
     Optional,
     Type,
+    TypeAlias,
     TypeVar
 )
 
-from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
-from sqlalchemy.future import select  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import sessionmaker
 
 from database.models import Model
 
 
-ModelT = TypeVar('ModelT', bound=Model)
+if TYPE_CHECKING:
+    TSession: TypeAlias = sessionmaker[AsyncSession]
+else:
+    TSession: TypeAlias = AsyncSession
+
+TModel = TypeVar('TModel', bound=Model)
 
 
-class Repository(Generic[ModelT]):
+class Repository(Generic[TModel]):
     """
     The base repository class.
 
     Args:
-        session (sqlalchemy.ext.asyncio.AsyncSession): The session to use to
-        interact with the database.
+        session (sessionmaker[sqlalchemy.ext.asyncio.AsyncSession]): The session
+            to use to interact with the database.
 
     """
 
-    model: Type[ModelT]
-    session: AsyncSession
+    model: Type[TModel]
+    session: TSession
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: TSession):
         self.session = session
 
     async def __get_by_id(self, session: AsyncSession,
-                          model_id: int) -> Optional[ModelT]:
+                          model_id: int) -> Optional[TModel]:
         """
         Get a model by its id
 
         Args:
-            session (sqlalchemy.ext.asyncio.AsyncSession): The session to use
-            to interact with the database.
+            session (sqlalchemy.ext.asyncio.AsyncSession): The
+                session to use to interact with the database.
             model_id (int): The id of the model to get.
 
         Returns:
@@ -69,7 +77,7 @@ class Repository(Generic[ModelT]):
         """
         model = self.model
         stmt = select(model).where(model.id == model_id)
-        return (await session.execute(stmt)).scalars().first()  # type: ignore
+        return (await session.execute(stmt)).scalars().first()
 
     async def __exists(self, model_id: int) -> bool:
         """
@@ -89,7 +97,7 @@ class Repository(Generic[ModelT]):
     #                     Read methods
     # ------------------------------------------------------------
 
-    async def find(self, model_id: int) -> Optional[ModelT]:
+    async def find(self, model_id: int) -> Optional[TModel]:
         """
         Get a model by id
 
@@ -100,10 +108,10 @@ class Repository(Generic[ModelT]):
             Optional[database.models.Model]: The model object.
 
         """
-        async with self.session() as session:  # type: ignore
-            return await self.__get_by_id(session, model_id)  # type: ignore
+        async with self.session() as session:
+            return await self.__get_by_id(session, model_id)
 
-    async def find_or_create(self, model_id: int) -> ModelT:
+    async def find_or_create(self, model_id: int) -> TModel:
         """
         Get a model by id, or create it if it doesn't exist
 
@@ -117,7 +125,7 @@ class Repository(Generic[ModelT]):
         # the create method will return the model if it exists
         return await self.create(model_id)
 
-    async def all(self) -> tuple[ModelT, ...]:
+    async def all(self) -> tuple[TModel, ...]:
         """
         Get all models
 
@@ -125,17 +133,15 @@ class Repository(Generic[ModelT]):
             tuple[database.models.Model]: The models.
 
         """
-        async with self.session() as session:  # type: ignore
+        async with self.session() as session:
             stmt = select(self.model)
-            return tuple(
-                (await session.execute(stmt)).scalars()  # type: ignore
-            )
+            return tuple((await session.execute(stmt)).scalars())
 
     # ------------------------------------------------------------
     #                     Create methods
     # ------------------------------------------------------------
 
-    async def create(self, model_id: int) -> ModelT:
+    async def create(self, model_id: int) -> TModel:
         """
         Create a new model with default values
 
@@ -153,7 +159,7 @@ class Repository(Generic[ModelT]):
         await self.save(model)
         return model
 
-    async def create_many(self, model_ids: Iterable[int]) -> tuple[ModelT, ...]:
+    async def create_many(self, model_ids: Iterable[int]) -> tuple[TModel, ...]:
         """
         Create many models
 
@@ -164,13 +170,13 @@ class Repository(Generic[ModelT]):
             tuple[Model]: The models created.
 
         """
-        models = list[ModelT]()
+        models = list[TModel]()
         for model_id in model_ids:
             if (model := await self.create(model_id)):
                 models.append(model)
         return tuple(models)
 
-    async def save(self, model: ModelT) -> None:
+    async def save(self, model: TModel) -> None:
         """
         Save a model to the database
 
@@ -180,14 +186,14 @@ class Repository(Generic[ModelT]):
         """
         if not await self.__exists(model.id):
             # if not exists, create
-            async with self.session() as session:  # type: ignore
-                session.add(model)  # type: ignore
-                await session.commit()  # type: ignore
+            async with self.session() as session:
+                session.add(model)
+                await session.commit()
         else:
             # if exists, update
             await self.update(model)
 
-    async def save_many(self, models: Iterable[ModelT]) -> None:
+    async def save_many(self, models: Iterable[TModel]) -> None:
         """
         Save many models
 
@@ -202,7 +208,7 @@ class Repository(Generic[ModelT]):
     #                     Update methods
     # ------------------------------------------------------------
 
-    async def update(self, model: ModelT) -> None:
+    async def update(self, model: TModel) -> None:
         """
         Update a model in the database
 
@@ -211,14 +217,11 @@ class Repository(Generic[ModelT]):
 
         """
         if await self.__exists(model.id):
-            async with self.session() as session:  # type: ignore
-                db_model = await self.__get_by_id(
-                    session,  # type: ignore
-                    model.id
-                )
+            async with self.session() as session:
+                db_model = await self.__get_by_id(session, model.id)
                 if db_model:
                     db_model.merge(model)
-                    await session.commit()  # type: ignore
+                    await session.commit()
         else:
             await self.save(model)
 
@@ -226,7 +229,7 @@ class Repository(Generic[ModelT]):
     #                     Delete methods
     # ------------------------------------------------------------
 
-    async def delete(self, model: ModelT | int) -> bool:
+    async def delete(self, model: TModel | int) -> bool:
         """
         Delete a model
 
@@ -246,9 +249,9 @@ class Repository(Generic[ModelT]):
             model_to_delete = model
         else:
             return False
-        async with self.session() as session:  # type: ignore
-            await session.delete(model_to_delete)  # type: ignore
-            await session.commit()  # type: ignore
+        async with self.session() as session:
+            await session.delete(model_to_delete)
+            await session.commit()
             return True
 
     # ------------------------------------------------------------

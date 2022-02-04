@@ -25,23 +25,26 @@ from typing import (
     Optional
 )
 
-from sqlalchemy import String  # type: ignore
 from sqlalchemy import (
     BigInteger,
-    Column
+    Column,
+    String
 )
-from sqlalchemy.ext.asyncio.engine import AsyncEngine  # type: ignore
-from sqlalchemy.ext.declarative import declarative_base  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.orm import declarative_base
 
 from configs import Configs
 
 from .model import Model
 
 
-Base = declarative_base()  # type: ignore
+Base = declarative_base()
 
 
-class Guild(Model, Base):  # type: ignore
+class Guild(
+    Model,
+    Base  # type: ignore
+):
     """
     Represents a guild in the database.
 
@@ -59,7 +62,7 @@ class Guild(Model, Base):  # type: ignore
     __tablename__ = 'guilds'
     id = Column(
         BigInteger, primary_key=True, autoincrement=False, nullable=False
-    )  # type: ignore
+    )
     prefix = Column(String(10), nullable=False)
     language = Column(String(255), nullable=False)
 
@@ -74,27 +77,29 @@ class Guild(Model, Base):  # type: ignore
         self.language = language or Configs.default_language
 
     @staticmethod
-    async def create_table(engine: AsyncEngine):
+    async def create_table(engine: AsyncEngine) -> None:
         """
         Creates the "guilds" table.
 
         Args:
-            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
+            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database
+                engine.
 
         """
-        async with engine.begin() as conn:  # type: ignore
+        async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)  # type: ignore
 
     @staticmethod
-    async def drop_table(engine: AsyncEngine):
+    async def drop_table(engine: AsyncEngine) -> None:
         """
         Drops the "guilds" table.
 
         Args:
-            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
+            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database
+                engine.
 
         """
-        async with engine.begin() as conn:  # type: ignore
+        async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)  # type: ignore
 
     def to_dict(self) -> dict[str, Any]:

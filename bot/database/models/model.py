@@ -30,7 +30,7 @@ class Model:
     """
     The base model class.
     """
-    id: int
+    id: Any
 
     def __init__(self, id_: int) -> None:
         self.id = id_

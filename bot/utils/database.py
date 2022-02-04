@@ -20,17 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from typing import (
+    TYPE_CHECKING,
+    TypeAlias
+)
+
 from disnake import Message
-from disnake.ext.commands import Bot as DisnakeBot  # type: ignore
 from disnake.ext.commands import Context  # type: ignore
 
 from database.repositories import RepositoryFactory
 from enums import RepositoryType
 
 
-async def get_prefix(
-    bot: DisnakeBot, message: Message | Context[DisnakeBot]
-) -> str:
+if TYPE_CHECKING:
+    from androxus import Bot
+    TBot: TypeAlias = Bot
+else:
+    TBot: TypeAlias = None
+
+
+async def get_prefix(bot: TBot, message: Message | Context[TBot]) -> str:
     """
     Get the prefix for the message.
 
@@ -45,5 +54,5 @@ async def get_prefix(
     if message.guild:
         guild_repository = RepositoryFactory.create(RepositoryType.GUILD, bot)
         guild = await guild_repository.find_by_id_or_create(message.guild.id)
-        return guild.prefix
-    return bot.configs.default_prefix  # type: ignore
+        return guild.prefix  # type: ignore
+    return bot.configs.default_prefix

@@ -79,7 +79,7 @@ def format_numbers(number: Any, br: bool = True, truncate: bool = False) -> str:
 
     """
     if not is_number(str(number)):
-        return number
+        return str(number)
 
     if truncate:
         number = sub(r'^(\d+\.\d{,2})\d*$', r'\1', str(number))
