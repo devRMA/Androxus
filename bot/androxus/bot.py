@@ -171,6 +171,12 @@ class Bot(
             except RuntimeError:
                 pass
 
+    async def on_message(self, message: Message) -> None:
+        if (not hasattr(self,
+                        'db_session')) or (not hasattr(self, 'db_engine')):
+            return None
+        await self.process_commands(message)
+
     @tasks.loop(minutes=1)
     async def _change_status(self) -> None:
         status_name = str(next(self._status)).format(
