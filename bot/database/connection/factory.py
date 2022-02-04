@@ -21,10 +21,24 @@
 # SOFTWARE.
 
 from os import getenv
-from typing import Optional
+from typing import (
+    TYPE_CHECKING,
+    Optional,
+    TypeAlias
+)
 
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.ext.asyncio.engine import AsyncEngine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    create_async_engine
+)
+from sqlalchemy.orm import sessionmaker
+
+
+if TYPE_CHECKING:
+    Session: TypeAlias = sessionmaker[AsyncSession]
+else:
+    Session: TypeAlias = AsyncSession
 
 
 class ConnectionFactory:
@@ -44,10 +58,32 @@ class ConnectionFactory:
 
         """
         if dsn is None:
-            user = getenv('DB_USER')
-            pw = getenv('DB_PASS')
-            host = getenv('DB_HOST')
-            port = getenv('DB_PORT')
-            db_name = getenv('DB_NAME')
+            user = getenv('DB_USER', '')
+            pw = getenv('DB_PASS', '')
+            host = getenv('DB_HOST', '')
+            port = getenv('DB_PORT', '')
+            db_name = getenv('DB_NAME', '')
             dsn = f'postgresql+asyncpg://{user}:{pw}@{host}:{port}/{db_name}'
         return create_async_engine(dsn)
+
+    @staticmethod
+    def get_session(engine: Optional[AsyncEngine]) -> Session:
+        """
+        Creates a session to the database.
+
+        Args:
+            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine, optional):
+            An AsyncEngine object.
+
+        Returns:
+            sessionmaker[sqlalchemy.ext.asyncio.AsyncSession]: The session.
+
+        """
+        if engine is None:
+            engine = ConnectionFactory.get_engine()
+        return sessionmaker(
+            engine,
+            autocommit=False,
+            expire_on_commit=False,
+            class_=AsyncSession
+        )
