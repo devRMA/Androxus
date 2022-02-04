@@ -38,6 +38,7 @@ def log(
     first_color: str = CYAN,
     second_color: str = LBLUE
 ) -> None:
+    # TODO : Adicionar um if, para fazer um print melhor, caso o texto seja muito grande
     print(
         f'{BRIGHT}{first_color}[{tag:^16}]' +
         f'{second_color}{text}{RESET}'.rjust(60)
