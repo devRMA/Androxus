@@ -6,7 +6,7 @@ authors = ["Rafael"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+"python" = "^3.10"
 "asyncpg" = "^0.25.0"
 "colorama" = "^0.4.4"
 "disnake" = {git = "https://github.com/DisnakeDev/disnake.git"}
@@ -14,7 +14,7 @@ python = "^3.10"
 "pipe" = "^1.6.0"
 "python-dotenv" = "^0.19.2"
 "SQLAlchemy" = "^1.4.28"
-"stopwatch.py" = {git = "https://github.com/devRMA/stopwatch.py.git"}
+"python-stopwatch" = {git = "https://github.com/devRMA/python-stopwatch.git", branch = "main"}
 "tabulate" = "^0.8.9"
 "toml" = "^0.10.2"
 
