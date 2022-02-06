@@ -39,3 +39,7 @@ py_version = "310"
 [tool.mypy]
 namespace_packages = "True"
 plugins = "sqlalchemy.ext.mypy.plugin"
+
+[tool.yapf]
+based_on_style = "facebook"
+indent_width = 4
