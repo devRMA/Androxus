@@ -83,9 +83,7 @@ class Base:
         self.translator = await Translator(self.ctx).init()
         return self
 
-    def __(
-        self, key: str, placeholders: dict[str, Any] = {}
-    ) -> str:
+    def __(self, key: str, placeholders: dict[str, Any] = {}) -> str:
         """
         Get the translation for the given key.
 

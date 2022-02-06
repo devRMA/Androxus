@@ -116,9 +116,7 @@ class Translator:
         """
         return exists(self._get_json_path(locale))
 
-    def get(
-        self, key: str, placeholders: dict[str, Any] = {}
-    ) -> str:
+    def get(self, key: str, placeholders: dict[str, Any] = {}) -> str:
         """
         Get the translation for the given key.
 
