@@ -1,78 +1,79 @@
-"""
-MIT License
-
-Copyright (c) 2018 Free TNT
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"""
 from __future__ import annotations
 
-from typing import Optional
+from contextlib import contextmanager
+from typing import Any, Iterator, List, Optional
 
 
-class Stopwatch:
+class Lap:
+    _running: bool
     _start: float
-    _end: Optional[float]
+    _fractions: List[float]
 
     def __init__(self) -> None:
         ...
 
-    @property
-    def duration(self) -> float:
-        """
-        The duration of this stopwatch since start or start to end if this
-        stopwatch has stopped.
-
-        Returns:
-            float: The duration of the stopwatch in seconds.
-
-        """
+    def __repr__(self) -> str:
         ...
 
     @property
-    def running(self) -> bool:
+    def elapsed(self) -> float:
+        """`float`: Return the elapsed time in seconds."""
+        ...
+
+    def start(self) -> None:
         """
-        Check if the stopwatch is running or not.
-
-        Returns:
-            bool: True if the stopwatch is running, False if stopped.
-
+        Start the lap timer.
         """
         ...
 
-    def restart(self) -> Stopwatch:
+    def stop(self) -> None:
         """
-        Reset and start the stopwatch.
-
-        Returns:
-            Stopwatch: The restarted stopwatch.
-
+        Stop the lap timer.
         """
         ...
 
-    def reset(self) -> Stopwatch:
+
+class Stopwatch:
+    _name: Optional[str]
+    _laps: List[Lap]
+    _lap: Optional[Lap]
+
+    def __init__(self, name: Optional[str] = ...) -> None:
+        ...
+
+    def __enter__(self) -> Stopwatch:
+        ...
+
+    def __exit__(
+        self, exc_type: Any, exc_value: Any, exc_traceback: Any
+    ) -> None:
+        ...
+
+    def __str__(self) -> str:
+        ...
+
+    def __repr__(self) -> str:
+        ...
+
+    @property
+    def name(self) -> Optional[str]:
+        """Optional[`str`]: The name of the stopwatch."""
+        ...
+
+    @property
+    def laps(self) -> List[float]:
+        """List[`float`]: The list of laps."""
+        ...
+
+    @property
+    def elapsed(self) -> float:
+        """`float`: The elapsed time in seconds."""
+        ...
+
+    @contextmanager
+    def lap(self) -> Iterator[None]:
         """
-        Resets the Stopwatch to 0 duration.
-
-        Returns:
-            Stopwatch: The resetted stopwatch.
-
+        Context manager for add a new lap.
         """
         ...
 
@@ -80,9 +81,10 @@ class Stopwatch:
         """
         Starts the stopwatch.
 
-        Returns:
-            Stopwatch: The started stopwatch.
-
+        Returns
+        -------
+        `Stopwatch`
+            The started stopwatch instance.
         """
         ...
 
@@ -90,11 +92,31 @@ class Stopwatch:
         """
         Stops the stopwatch, freezing the duration.
 
-        Returns:
-            Stopwatch: The stopped stopwatch.
-
+        Returns
+        -------
+        `Stopwatch`
+            The stopped stopwatch instance.
         """
         ...
 
-    def __str__(self) -> str:
+    def reset(self) -> Stopwatch:
+        """
+        Resets the Stopwatch to 0 duration.
+
+        Returns
+        -------
+        `Stopwatch`
+            The resetted stopwatch instance.
+        """
+        ...
+
+    def report(self) -> str:
+        """
+        Return a report of the stopwatch statistics.
+
+        Returns
+        -------
+        `str`
+            The report.
+        """
         ...
