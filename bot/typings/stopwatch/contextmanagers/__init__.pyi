@@ -1,6 +1,5 @@
 from typing import NamedTuple
 
-
 class Caller(NamedTuple):
     module: str
     function: str

@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-
 class Statistics:
     _values: List[float]
 

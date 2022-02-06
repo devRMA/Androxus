@@ -3,7 +3,6 @@ from typing import Any, Optional
 from ..stopwatch import Stopwatch
 from . import Caller
 
-
 class stopwatch:
     _message: Optional[str]
     _caller: Caller
