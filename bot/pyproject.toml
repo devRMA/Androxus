@@ -45,6 +45,9 @@ based_on_style = "facebook"
 indent_width = 4
 
 [tool.taskipy.tasks]
-check = { cmd = "task mypy && task flake8", help = "Run mypy and flake8 on the project" }
+lint = { cmd = "task mypy && task flake8", help = "Run mypy and flake8 on the project" }
+format = { cmd = "task yapf && task isort", help = "Run yapf and isort on the project" }
 mypy = { cmd = "mypy --pretty .", help = "Run mypy on the project" }
 flake8 = { cmd = "flake8 --benchmark .", help = "Run flake8 on the project" }
+yapf = { cmd = "yapf -r -i -vv .", help = "Run yapf on the project" }
+isort = { cmd = "isort .", help = "Run isort on the project" }
