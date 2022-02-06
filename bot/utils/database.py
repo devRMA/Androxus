@@ -20,17 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import (
-    TYPE_CHECKING,
-    TypeAlias
-)
+from typing import TYPE_CHECKING, TypeAlias
 
 from disnake import Message
 from disnake.ext.commands import Context  # type: ignore
 
 from database.repositories import RepositoryFactory
 from enums import RepositoryType
-
 
 if TYPE_CHECKING:
     from androxus import Bot

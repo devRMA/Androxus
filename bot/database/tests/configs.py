@@ -21,32 +21,17 @@
 # SOFTWARE.
 
 from os import getenv
-from typing import (
-    TYPE_CHECKING,
-    ClassVar,
-    Optional,
-    TypeAlias
-)
+from typing import TYPE_CHECKING, ClassVar, Optional, TypeAlias
 
-from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
-    AsyncSession
-)
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 
 from utils import log
-from utils.colors import (
-    CYAN,
-    LGREEN,
-    LRED,
-    LYELLOW,
-    RED
-)
+from utils.colors import CYAN, LGREEN, LRED, LYELLOW, RED
 
 from ..bootstrap import bootstrap as db_bootstrap
 from ..connection import ConnectionFactory
 from ..models import __models__
-
 
 if TYPE_CHECKING:
     TSession: TypeAlias = sessionmaker[AsyncSession]

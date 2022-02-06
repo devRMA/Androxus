@@ -20,23 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import (
-    Any,
-    Optional
-)
+from typing import Any, Optional
 
-from sqlalchemy import (
-    BigInteger,
-    Column,
-    String
-)
+from sqlalchemy import BigInteger, Column, String
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.orm import declarative_base
 
 from configs import Configs
 
 from .model import Model
-
 
 Base = declarative_base()
 

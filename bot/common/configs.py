@@ -20,11 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import (
-    Any,
-    Callable,
-    Optional
-)
+from typing import Any, Callable, Optional
 
 from disnake import (
     ButtonStyle,
@@ -33,14 +29,9 @@ from disnake import (
     Member,
     Message,
     MessageInteraction,
-    User
+    User,
 )
-from disnake.ui import (
-    Button,
-    Item,
-    View,
-    button
-)
+from disnake.ui import Button, Item, View, button
 from disnake.utils import utcnow
 
 from database.models import Guild

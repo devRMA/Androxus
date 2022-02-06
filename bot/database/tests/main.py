@@ -24,10 +24,7 @@ from inspect import iscoroutinefunction
 from traceback import format_exc
 
 from utils import log
-from utils.colors import (
-    CYAN,
-    MAGENTA
-)
+from utils.colors import CYAN, MAGENTA
 
 from .configs import Configs
 from .guild_repository import GuildRepositoryTest

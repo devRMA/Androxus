@@ -27,7 +27,6 @@ from ..repositories.guild_repository import GuildRepository
 from .configs import Configs
 from .test import Test
 
-
 GUILD_ID_TEST = 123456789
 DEFAULT_PREFIX = ConfigsBot.default_prefix
 CHANGED_PREFIX = DEFAULT_PREFIX + '..'

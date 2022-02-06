@@ -21,19 +21,10 @@
 # SOFTWARE.
 
 from os import getenv
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    TypeAlias
-)
+from typing import TYPE_CHECKING, Optional, TypeAlias
 
-from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
-    AsyncSession,
-    create_async_engine
-)
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-
 
 if TYPE_CHECKING:
     Session: TypeAlias = sessionmaker[AsyncSession]

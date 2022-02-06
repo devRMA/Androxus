@@ -24,18 +24,13 @@
 from traceback import format_exception
 from typing import Final
 
-from disnake import (
-    AllowedMentions,
-    CmdInter,
-    Message
-)
+from disnake import AllowedMentions, CmdInter, Message
 from disnake.ext import commands
 
 from androxus import Bot
 from language import Translator
 from utils import log
 from utils.colors import LRED
-
 
 IGNORED: Final = (commands.CommandNotFound, )
 

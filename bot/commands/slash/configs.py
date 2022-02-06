@@ -20,10 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from disnake import (
-    CmdInter,
-    Message
-)
+from disnake import CmdInter, Message
 from disnake.ext import commands
 
 from androxus import Bot

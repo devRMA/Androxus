@@ -20,19 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import (
-    Callable,
-    Iterable
-)
+from typing import Callable, Iterable
 
-from disnake import (
-    CmdInter,
-    Member
-)
+from disnake import CmdInter, Member
 from disnake.ext import commands
 
 from configs import Configs
-
 
 # source:
 # https://github.com/AlexFlipnote/discord_bot.py/blob/106cc68decf698f577088784c57f1fbee5bbc3f0/utils/permissions.py

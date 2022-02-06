@@ -20,16 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import (
-    TYPE_CHECKING,
-    Optional,
-    TypeAlias
-)
+from typing import TYPE_CHECKING, Optional, TypeAlias
 
 from enums import RepositoryType
 
 from .guild_repository import GuildRepository
-
 
 if TYPE_CHECKING:
     from androxus import Bot

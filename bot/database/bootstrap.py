@@ -25,11 +25,7 @@ from sqlalchemy.ext.asyncio.engine import AsyncEngine
 
 from database.models import __models__
 from utils import log
-from utils.colors import (
-    CYAN,
-    LYELLOW,
-    WHITE
-)
+from utils.colors import CYAN, LYELLOW, WHITE
 
 
 async def check_tables(engine: AsyncEngine) -> None:

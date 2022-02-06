@@ -27,19 +27,10 @@ from itertools import cycle
 from os import listdir
 from os.path import abspath
 from platform import python_version
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    MutableMapping,
-    TypeAlias
-)
+from typing import TYPE_CHECKING, Any, MutableMapping, TypeAlias
 
 from aiohttp.client import ClientSession
-from disnake import (
-    Game,
-    Intents,
-    Message
-)
+from disnake import Game, Intents, Message
 from disnake import __version__ as disnake_version
 from disnake.ext import tasks  # type: ignore
 from disnake.ext import commands
@@ -53,19 +44,11 @@ from toml import load
 from configs import Configs
 from database import bootstrap as db_bootstrap
 from database.connection import ConnectionFactory
-from utils import (
-    SingletonMeta,
-    log
-)
-from utils.colors import (
-    LBLUE,
-    LGREEN,
-    LYELLOW
-)
+from utils import SingletonMeta, log
+from utils.colors import LBLUE, LGREEN, LYELLOW
 from utils.database import get_prefix
 from utils.numbers import format_numbers
 from utils.others import get_cogs
-
 
 if TYPE_CHECKING:
     TSession: TypeAlias = sessionmaker[AsyncSession]
@@ -73,10 +56,7 @@ else:
     TSession: TypeAlias = AsyncSession
 
 
-class Bot(
-    commands.Bot,  # type: ignore
-    metaclass=SingletonMeta
-):
+class Bot(commands.Bot, metaclass=SingletonMeta):
     """
     The main class of the bot.
 
@@ -99,7 +79,7 @@ class Bot(
     _startup_timer: Stopwatch
 
     def __init__(self) -> None:
-        self._startup_timer = Stopwatch()
+        self._startup_timer = Stopwatch().start()
         log('BOT', 'STARTING BOT...', first_color=LYELLOW)
 
         async def _prefix_or_mention(bot: Bot, message: Message):

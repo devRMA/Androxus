@@ -22,11 +22,7 @@
 
 from traceback import format_exception
 
-from disnake import (
-    Colour,
-    Embed,
-    Message
-)
+from disnake import Colour, Embed, Message
 from disnake.utils import utcnow
 from stopwatch import Stopwatch
 from tabulate import tabulate
@@ -56,24 +52,20 @@ class DevCommands(Base):
         table = list[list[str]]()
         for cog in get_cogs():
             cog_name = str(cog).removeprefix('commands.')
-            cog_stopwatch = Stopwatch()
-            try:
-                self.bot.reload_extension(cog)
-            except Exception as exc:
-                cog_stopwatch.stop()
-                traceback_data = ''.join(
-                    format_exception(type(exc), exc, exc.__traceback__, 1)
-                )
-                await self.bot.get_user(self.bot.owner_id).send(  # type: ignore
-                    f'ERROR {cog_name}```py\n{traceback_data}\n```'
-                )
-                table.append(
-                    [unsuccessfully_icon, cog_name,
-                     str(cog_stopwatch)]
-                )
-            else:
-                cog_stopwatch.stop()
-                table.append([successfully_icon, cog_name, str(cog_stopwatch)])
+            with Stopwatch() as cog_stopwatch:
+                try:
+                    self.bot.reload_extension(cog)
+                except Exception as exc:
+                    traceback_data = ''.join(
+                        format_exception(type(exc), exc, exc.__traceback__, 1)
+                    )
+                    await self.bot.get_user(self.bot.owner_id).send(  # type: ignore
+                        f'ERROR {cog_name}```py\n{traceback_data}\n```'
+                    )
+                    icon = unsuccessfully_icon
+                else:
+                    icon = successfully_icon
+            table.append([icon, cog_name, str(cog_stopwatch)])
         return await self.ctx.send(  # type: ignore
             embed=Embed(
                 title=self.__('Reloaded all cogs'),

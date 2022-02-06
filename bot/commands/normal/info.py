@@ -22,11 +22,7 @@
 
 from typing import Optional
 
-from disnake import (
-    Member,
-    Message,
-    User
-)
+from disnake import Member, Message, User
 from disnake.ext import commands
 from disnake.ext.commands import Context  # type: ignore
 

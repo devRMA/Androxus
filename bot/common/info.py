@@ -22,18 +22,8 @@
 
 from asyncio import sleep
 
-from disnake import (
-    CmdInter,
-    Colour,
-    Embed,
-    Member,
-    Message,
-    User
-)
-from disnake.utils import (
-    format_dt,
-    utcnow
-)
+from disnake import CmdInter, Colour, Embed, Member, Message, User
+from disnake.utils import format_dt, utcnow
 from stopwatch import Stopwatch
 
 from database.repositories import RepositoryFactory
@@ -49,23 +39,21 @@ class InfoCommands(Base):
         """
         # getting latency with the database
         guild_repo = RepositoryFactory.create(RepositoryType.GUILD)
-        stopwatch_db = Stopwatch()
-        await guild_repo.find(0)
-        stopwatch_db.stop()
+        with Stopwatch() as stopwatch_db:
+            await guild_repo.find(0)
 
         # getting the latency to send a message
-        stopwatch_message = Stopwatch()
-        bot_message = await self.ctx.send(  # type: ignore
-            embed=Embed(
-                title=self.__('Calculating latency...') +
-                f' {self.bot.get_emoji(756715436149702806)}',
-                timestamp=utcnow(),
-                color=Colour.random()
-            ).set_footer(
-                text=str(self.author), icon_url=self.author.display_avatar.url
+        with Stopwatch() as stopwatch_message:
+            bot_message = await self.ctx.send(  # type: ignore
+                embed=Embed(
+                    title=self.__('Calculating latency...') +
+                    f' {self.bot.get_emoji(756715436149702806)}',
+                    timestamp=utcnow(),
+                    color=Colour.random()
+                ).set_footer(
+                    text=str(self.author), icon_url=self.author.display_avatar.url
+                )
             )
-        )
-        stopwatch_message.stop()
 
         if isinstance(self.ctx, CmdInter):
             bot_message = await self.ctx.original_message()
@@ -79,7 +67,7 @@ class InfoCommands(Base):
             '\N{INCOMING ENVELOPE} ' + \
             self.__('Discord response time:') + \
             f' {stopwatch_message}'
-        await sleep(stopwatch_message.duration * 2)
+        await sleep(stopwatch_message.elapsed * 2)
         return await bot_message.edit(  # type: ignore
             embed=Embed(
                 title=embed_title, timestamp=utcnow(), color=Colour.random()

@@ -22,18 +22,9 @@
 
 from __future__ import annotations
 
-from typing import (
-    Any,
-    Optional,
-    Sized
-)
+from typing import Any, Optional, Sized
 
-from disnake import (
-    CmdInter,
-    Guild,
-    Member,
-    User
-)
+from disnake import CmdInter, Guild, Member, User
 from disnake.ext.commands import Context  # type: ignore
 
 from androxus import Bot

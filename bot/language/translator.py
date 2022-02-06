@@ -25,19 +25,10 @@
 
 from collections.abc import Sized
 from json import load
-from os.path import (
-    abspath,
-    exists
-)
-from typing import (
-    Any,
-    Optional
-)
+from os.path import abspath, exists
+from typing import Any, Optional
 
-from disnake import (
-    CmdInter,
-    Guild
-)
+from disnake import CmdInter, Guild
 from disnake.ext.commands import Context  # type: ignore
 
 from androxus import Bot

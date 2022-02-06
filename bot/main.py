@@ -20,18 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from asyncio import (
-    get_running_loop,
-    new_event_loop
-)
+from asyncio import get_running_loop, new_event_loop
 from os import getenv
 
 from androxus import Bot
-from bootstrap import (
-    init,
-    make_tests
-)
-
+from bootstrap import init, make_tests
 
 if __name__ == '__main__':
     # bootstrapping all the things

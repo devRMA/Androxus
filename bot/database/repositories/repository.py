@@ -20,22 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import (
-    TYPE_CHECKING,
-    Generic,
-    Iterable,
-    Optional,
-    Type,
-    TypeAlias,
-    TypeVar
-)
+from typing import TYPE_CHECKING, Generic, Iterable, Optional, Type, TypeAlias, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
 
 from database.models import Model
-
 
 if TYPE_CHECKING:
     TSession: TypeAlias = sessionmaker[AsyncSession]

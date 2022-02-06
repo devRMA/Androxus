@@ -25,10 +25,7 @@
 
 from collections.abc import Iterable
 from re import compile as re_compile
-from typing import (
-    Any,
-    Optional
-)
+from typing import Any, Optional
 
 
 class MessageSelector:
