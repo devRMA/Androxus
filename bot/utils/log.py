@@ -33,11 +33,16 @@ def log(
     first_color: str = CYAN,
     second_color: str = LBLUE
 ) -> None:
-    # TODO : Adicionar um if, para fazer um print melhor, caso o texto seja muito grande
-    print(
-        f'{BRIGHT}{first_color}[{tag:^16}]' +
-        f'{second_color}{text}{RESET}'.rjust(60)
-    )
+    if len(text) < 60:
+        print(
+            f'{BRIGHT}{first_color}[{tag:^16}]' +
+            f'{second_color}{text}{RESET}'.rjust(60)
+        )
+    else:
+        print(
+            f'{BRIGHT}{first_color}[{tag:^67}]\n' +
+            f'{second_color}{text}{RESET}'
+        )
     logger = getLogger('androxus')
     if level == 'info':
         logger.info(text)
