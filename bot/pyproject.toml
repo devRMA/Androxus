@@ -43,3 +43,8 @@ plugins = "sqlalchemy.ext.mypy.plugin"
 [tool.yapf]
 based_on_style = "facebook"
 indent_width = 4
+
+[tool.taskipy.tasks]
+check = { cmd = "task mypy && task flake8", help = "Run mypy and flake8 on the project" }
+mypy = { cmd = "mypy --pretty .", help = "Run mypy on the project" }
+flake8 = { cmd = "flake8 --benchmark .", help = "Run flake8 on the project" }
