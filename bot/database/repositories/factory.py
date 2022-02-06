@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import TYPE_CHECKING, Optional, TypeAlias
+from typing import TYPE_CHECKING, Final, Optional, TypeAlias
 
 from enums import RepositoryType
 
@@ -32,6 +32,8 @@ if TYPE_CHECKING:
 else:
     TBot: TypeAlias = None
 
+SUPPORTED_REPOSITORIES: Final = {RepositoryType.GUILD: GuildRepository}
+
 
 class RepositoryFactory:
     """
@@ -42,19 +44,24 @@ class RepositoryFactory:
         """
         Creates a repository instance.
 
-        Args:
-            repository_type (RepositoryType): The repository type.
-            bot (Bot, optional): The bot instance.
+        Parameters
+        ----------
+            repository_type :  `RepositoryType`
+                The repository type.
+            bot : `Bot`, optional
+                The bot instance.
 
-        Returns:
-            Repository: The repository instance.
+        Returns
+        -------
+            `Repository`
+                The repository instance.
 
         """
         if bot is None:
             from androxus import Bot
             bot = Bot()
-        if repository_type == RepositoryType.GUILD:
-            return GuildRepository(bot.db_session)
+        if repository_type in SUPPORTED_REPOSITORIES:
+            return SUPPORTED_REPOSITORIES[repository_type](bot.db_session)
         raise TypeError(
             'The repository type must be a RepositoryType instance.'
         )
