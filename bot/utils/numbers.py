@@ -28,12 +28,15 @@ def is_number(string: Any) -> bool:
     """
     Check if a string is a number.
 
-    Args:
-        string (str): The string to check.
+    Parameters
+    ----------
+    string : `Any`
+        The string to check.
 
-    Returns:
-        bool: True if it is a number, False otherwise.
-
+    Returns
+    -------
+    `bool`
+        True if it is a number, False otherwise.
     """
     if not len(string) >= 1:
         return False
@@ -58,25 +61,30 @@ def format_numbers(number: Any, br: bool = True, truncate: bool = False) -> str:
     """
     Format a number to a human-readable format.
 
-    Args:
-        number (Any): The number to format.
-        br (bool): Flag that will activate or not the Brazilian
-            format: "100,000.00". If it has been disabled, it will
-            output like this "100,000.00".
-        truncate (bool): It will define whether or not to cut the
-            decimal places.
+    Parameters
+    ----------
+    number : `Any`
+        The number to format.
+    br : `bool`, optional
+        Flag that will activate or not the Brazilian format: "100,000.00".
+        If it has been disabled, it will output like this "100,000.00".
+        By default True
+    truncate : `bool`, optional
+        It will define whether or not to cut the decimal places. By default False
 
-    Returns:
-        str: The formatted number.
+    Returns
+    -------
+    `str`
+        The formatted number.
 
-    Examples:
-        >>> format_numbers(123456789)
-        '123.456.789'
-        >>> format_numbers(3.141592)
-        '3,1415'
-        >>> format_numbers(3.141592, truncate=True)
-        '3,14'
-
+    Examples
+    --------
+    >>> format_numbers(123456789)
+    '123.456.789'
+    >>> format_numbers(3.141592)
+    '3,1415'
+    >>> format_numbers(3.141592, truncate=True)
+    '3,14'
     """
     if not is_number(str(number)):
         return str(number)

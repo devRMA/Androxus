@@ -36,10 +36,12 @@ class OnCommandError(commands.Cog):
         """
         The event triggered when an error is raised while invoking a command.
 
-        Args:
-            ctx (commands.Context): The context used for command invocation.
-            exception (commands.CommandError): The Exception raised.
-
+        Parameters
+        ----------
+        ctx : `disnake.ext.commands.Context`
+            The context used for command invocation.
+        exception : `disnake.ext.commands.CommandError`
+            The Exception raised.
         """
         await error_handler(ctx, exception)
 

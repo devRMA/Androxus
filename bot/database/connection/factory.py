@@ -41,11 +41,15 @@ class ConnectionFactory:
         """
         Creates a engine to the database.
 
-        Args:
-            dsn (str, optional): The database connection string.
+        Parameters
+        ----------
+            dsn `str`, optional
+                The database connection string.
 
-        Returns:
-            sqlalchemy.ext.asyncio.AsyncEngine: An AsyncEngine object.
+        Returns
+        ----------
+            `sqlalchemy.ext.asyncio.AsyncEngine`
+                An AsyncEngine object.
 
         """
         if dsn is None:
@@ -62,12 +66,15 @@ class ConnectionFactory:
         """
         Creates a session to the database.
 
-        Args:
-            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine, optional):
-            An AsyncEngine object.
+        Parameters
+        ----------
+            engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`, optional
+                An AsyncEngine object.
 
-        Returns:
-            sessionmaker[sqlalchemy.ext.asyncio.AsyncSession]: The session.
+        Returns
+        ----------
+            sessionmaker[`sqlalchemy.ext.asyncio.AsyncSession`]
+                The session.
 
         """
         if engine is None:

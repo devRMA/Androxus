@@ -30,7 +30,7 @@ class Configs:
     """
     This class is used to store the configuration of the bot.
 
-    Attributes:
+    Attributes
     -----------
         default_prefix: `str`
             The default prefix for the bot.

@@ -29,12 +29,14 @@ from utils.colors import CYAN, LYELLOW, WHITE
 
 
 async def check_tables(engine: AsyncEngine) -> None:
-    """
+    """|coro|
+
     Check if tables exist, if not create them
 
-    Args:
-        engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
-
+    Parameters
+    ----------
+        engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`
+            The database engine.
     """
     log(
         'BOOTSTRAPPING DB',
@@ -64,11 +66,14 @@ async def check_tables(engine: AsyncEngine) -> None:
 
 
 async def bootstrap(engine: AsyncEngine) -> None:
-    """
+    """|coro|
+
     Bootstrap the database.
 
-    Args:
-        engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database engine.
+    Parameters
+    ----------
+        engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`
+            The database engine.
 
     """
     log('BOOTSTRAPPING DB', 'STARTING', first_color=CYAN, second_color=WHITE)

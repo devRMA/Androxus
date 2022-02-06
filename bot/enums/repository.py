@@ -20,15 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from enum import Enum
+from enum import Enum, auto
 
 
 class RepositoryType(Enum):
     """
     Enum for repository types
 
-    Attributes:
-        GUILD: Guild repository
+    Attributes
+    ----------
+        GUILD : `int`
+            Guild repository
 
     """
-    GUILD = 'Guild'
+    GUILD = auto()

@@ -102,6 +102,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
 
     @property
     def __version__(self) -> str:
+        """`str`: The current version of the bot."""
         path = f'{abspath("./")}/pyproject.toml'
         with open(path, 'r', encoding='utf-8') as file:
             data: MutableMapping[str, Any] = load(file)
@@ -110,6 +111,10 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             return poetry.get('version', '')
 
     async def on_ready(self) -> None:
+        """|coro|
+
+        The event triggered when the bot is ready.
+        """
         if (not hasattr(self,
                         'db_session')) or (not hasattr(self, 'db_engine')):
             self._startup_timer.stop()
@@ -151,6 +156,10 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
                 pass
 
     async def on_message(self, message: Message) -> None:
+        """|coro|
+
+        The event triggered when a message is received.
+        """
         if (not hasattr(self,
                         'db_session')) or (not hasattr(self, 'db_engine')):
             return None
@@ -165,6 +174,14 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         await self.change_presence(activity=Game(name=status_name))
 
     def get_languages(self) -> list[str]:
+        """
+        Returns a list of languages supported by the bot.
+
+        Returns
+        -------
+            list[`str`]
+                The list of languages supported by the bot.
+        """
         languages = list[str]()
         languages.append(self.configs.default_language)
         for language in listdir(abspath('./') + '/language/json/'):

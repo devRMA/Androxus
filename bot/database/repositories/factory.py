@@ -55,7 +55,6 @@ class RepositoryFactory:
         -------
             `Repository`
                 The repository instance.
-
         """
         if bot is None:
             from androxus import Bot

@@ -33,14 +33,19 @@ class MessageSelector:
         """
         Select a proper translation string based on the given number.
 
-        Args:
-            line (str): The line with propers translations.
-            number (int): The number of items.
-            locale (str): The locale to use.
+        Parameters
+        ----------
+        line : `str`
+            The line with propers translations.
+        number : `int`
+            The number of items.
+        locale : `str`
+            The locale to use.
 
-        Returns:
-            str: The selected translation string.
-
+        Returns
+        -------
+        `str`
+            The selected translation string.
         """
         segments = line.split('|')
         if (value := self._extract(segments, number)) is not None:
@@ -57,14 +62,6 @@ class MessageSelector:
     def _extract(self, segments: Iterable[Any], number: int) -> Optional[str]:
         """
         Extract a translation string using inline conditions.
-
-        Args:
-            segments (Iterable[Any]): The segments of the message.
-            number (int): The number of items, used to determine the plural.
-
-        Returns:
-            Optional[str]: The extracted translation string.
-
         """
         for part in segments:
             if (line := self._extract_from_string(part, number)) is not None:
@@ -75,14 +72,6 @@ class MessageSelector:
     def _extract_from_string(part: str, number: int) -> Optional[str]:
         """
         Get the translation string if the condition matches.
-
-        Args:
-            part (str): The part of the segments.
-            number (int): The number of items.
-
-        Returns:
-            Optional[str]: The translation string.
-
         """
         regex = re_compile(r"^[\{\[]([^\[\]\{\}]*)[\}\]](.*)")
         matches = regex.findall(part)
@@ -117,13 +106,6 @@ class MessageSelector:
     def _strip_conditions(segments: Iterable[Any]) -> list[str]:
         """
         Strip the inline conditions from each segment, just leaving the text.
-
-        Args:
-            segments (Iterable[Any]): The segments of the message.
-
-        Returns:
-            list[str]: The segments without the conditions.
-
         """
         regex = re_compile(r"^[\{\[]([^\[\]\{\}]*)[\}\]]")
         return [regex.sub('', part) for part in segments]
@@ -132,14 +114,6 @@ class MessageSelector:
     def _get_plural_index(locale: str, number: int) -> int:
         """
         Get the index to use for pluralization.
-
-        Args:
-            locale (str): The locale to use.
-            number (int): The number of items.
-
-        Returns:
-            int: The plural index.
-
         """
         if locale in [
             'az', 'az_AZ', 'bo', 'bo_CN', 'bo_IN', 'dz', 'dz_BT', 'id', 'id_ID',

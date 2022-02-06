@@ -49,9 +49,10 @@ class Model:
         """
         Returns a dictionary representation of the guild.
 
-        Returns:
-            dict[str, Any]: The guild's dictionary representation.
-
+        Returns
+        -------
+            dict[`str`, `Any`]
+                The guild's dictionary representation.
         """
 
     def diff_in_dict(self, other: Model) -> dict[str, Any]:
@@ -59,12 +60,15 @@ class Model:
         Returns a dictionary representation of the difference between the
         model and another model.
 
-        Args:
-            other (database.models.Model): The model to compare to.
+        Parameters
+        ----------
+            other : `database.models.Model`
+                The model to compare to.
 
-        Returns:
-            dict[str, Any]: The model's dictionary representation.
-
+        Returns
+        -------
+            dict[`str`, `Any`]
+                The model's dictionary representation.
         """
         # will only be compared if the other model is of the same class
         if not isinstance(other, self.__class__):
@@ -82,9 +86,10 @@ class Model:
         """
         Update the model with the given parameters.
 
-        Args:
-            params (dict[str, Any]): The parameters to update the model with.
-
+        Parameters
+        ----------
+            params : dict[`str`, `Any`]
+                The parameters to update the model with.
         """
         for key, value in params.items():
             if key == 'id':
@@ -95,8 +100,9 @@ class Model:
         """
         Merge the model with another model.
 
-        Args:
-            other (database.models.Model): The model to merge with.
-
+        Parameters
+        ----------
+            other : `database.models.Model`
+                The model to merge with.
         """
         self.fill(self.diff_in_dict(other))

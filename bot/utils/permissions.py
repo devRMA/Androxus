@@ -49,15 +49,19 @@ async def check_permissions(
     """
     Check if the user has the permissions to run the command.
 
-    Args:
-        ctx (Context or CmdInter): The context of the command.
-        perms (dict[str, bool]): The permissions to check.
-        check (Callable[[Iterable[object]], bool], optional): The function to
-        use to check the permissions. Defaults is all().
+    Parameters
+    ----------
+    ctx : `disnake.ext.commands.Context` or `disnake.CmdInter`
+        The context of the command.
+    perms : dict[`str`, `bool`]
+        The permissions to check.
+    check : Callable[[Iterable[`object`]], `bool`], optional
+        The function to use to check the permissions. By default all()
 
-    Returns:
-        bool: True if the user has the permissions, False otherwise.
-
+    Returns
+    -------
+    `bool`
+        True if the user has the permissions, False otherwise.
     """
     try:
         return is_owner(ctx)
@@ -80,10 +84,10 @@ def has_permissions(
     """
     Check if the user has the permissions to run the command.
 
-    Args:
-        check (Callable[[Iterable[object]], bool], optional): The function to
-        use to check the permissions. Defaults is all().
-
+    Parameters
+    ----------
+    check : Callable[[Iterable[`object`]], `bool`], optional
+        The function to use to check the permissions. By default all()
     """
     async def pred(ctx: commands.Context[commands.Bot] | CmdInter) -> bool:
         return await check_permissions(ctx, perms, check=check)

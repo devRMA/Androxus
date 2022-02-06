@@ -38,14 +38,22 @@ IGNORED: Final = (commands.CommandNotFound, )
 async def error_handler(
     ctx: commands.Context[Bot] | CmdInter, error: commands.CommandError
 ) -> Message | None:
-    """
+    """|coro|
+
     The function will be handler erros raised while invoking a command or
     interaction.
 
-    Args:
-        ctx (commands.Context or CmdInter): The context of the command or
-            interaction.
-        error (commands.CommandError): The Exception raised.
+    Parameters
+    -----------
+    ctx : `disnake.ext.commands.Context` or `disnake.CmdInter`
+        The context of the command or interaction.
+    error : `disnake.ext.commands.CommandError`
+        The Exception raised.
+
+    Returns
+    -------
+    `disnake.Message` or `None`
+        The message that was sent.
     """
     # source:
     # https://gist.github.com/EvieePy/7822af90858ef65012ea500bcecf1612

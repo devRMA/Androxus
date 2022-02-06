@@ -28,9 +28,9 @@ class GuildRepository(Repository[Guild]):
     """
     Class to manipulate the "guilds" table
 
-    Args:
-        session (sqlalchemy.ext.asyncio.AsyncSession): The session to use to
-        interact with the database.
-
+    Parameters
+    ----------
+        session : `sqlalchemy.ext.asyncio.AsyncSession`
+            The session to use to interact with the database.
     """
     model = Guild

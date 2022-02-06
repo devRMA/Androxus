@@ -38,10 +38,12 @@ class OnSlashCommandError(commands.Cog):
         The event triggered when an error is raised while invoking a slash
         command.
 
-        Args:
-            interaction (CmdInter): The interaction used for command invocation.
-            exception (commands.CommandError): The Exception raised.
-
+        Parameters
+        ----------
+        interaction : `disnake.CmdInter`
+            The interaction used for command invocation.
+        exception : `disnake.ext.commands.CommandError`
+            The Exception raised.
         """
         await error_handler(interaction, exception)
 

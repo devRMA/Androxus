@@ -28,24 +28,14 @@ from pipe import select  # type: ignore
 
 def get_cogs() -> tuple[str, ...]:
     """
-    Get all Cogs from the bot
+    Get all Cogs from the bot.
 
-    Returns:
-        list[str]: The list with the names of the cogs
-
+    Returns
+    -------
+    tuple[`str`, ...]
+        The tuple with the names of the cogs.
     """
     def _get_python_files(path: str) -> tuple[str, ...]:
-        """
-        Get all Python files from a path.
-
-        Args:
-            path (str): The path to search.
-
-        Returns:
-            tuple[str]: The tuple with the names of the Python files without
-            the extension.
-
-        """
         python_files = list[str]()
         for file in listdir(path):
             if file.endswith(".py") and not file.startswith("_"):

@@ -63,8 +63,8 @@ class InfoSlash(commands.Cog):
 
         Parameters
         ----------
-        user: The user to get the avatar from, defaults to the author
-
+        user : `Member` or `User`
+            The user to get the avatar from, defaults to the author
         """
         info_commands = InfoCommands(inter)
         await info_commands.init()

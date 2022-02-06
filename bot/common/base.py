@@ -35,19 +35,25 @@ class Base:
     """
     The base class, for commands.
 
-    Args:
-        context (Context or CmdInter): The context of
-        the command.
+    Parameters
+    -------
+        context : `disnake.ext.commands.Context` or `disnake.CmdInter`
+            The context of the command.
 
-    Attributes:
-        bot (Bot): The bot instance.
-        ctx (Context or CmdInter): The context of the
-            command.
-        author (Member or User): The author of the command.
-        guild (Guild or None): The guild in which the command was used.
-        translator (Translator): The translator instance.
-        send (Coroutine): The coroutine to send messages.
-        is_interaction (bool): If the context is an interaction.
+    Attributes
+    -------
+        bot : `Bot`
+            The bot instance.
+        ctx : `disnake.ext.commands.Context` or `disnake.CmdInter`
+            The context of the command.
+        author : `disnake.Member` or `disnake.User`
+            The author of the command.
+        guild : `Guild`, optional
+            The guild in which the command was used.
+        translator : `Translator`
+            The translator instance.
+        is_interaction : `bool`
+            If the context is an interaction.
 
     """
     bot: Bot
@@ -68,24 +74,30 @@ class Base:
         """
         Initialize the class.
 
-        Returns:
-            Base: The self instance.
+        Returns
+        -------
+            `Base`
+                The self instance.
 
         """
         self.translator = await Translator(self.ctx).init()
         return self
 
     def __(
-        self, key: str, placeholders: Optional[dict[str, Any]] = None
+        self, key: str, placeholders: dict[str, Any] = {}
     ) -> str:
         """
         Get the translation for the given key.
 
-        Args:
-            key (str): The key of the text to be translated.
-            placeholders (dict[str, Any], optional): The words that will be replaced.
+        Parameters
+        -------
+            key : `str`
+                The key of the text to be translated.
+            placeholders : dict[`str`, `Any`], optional
+                The words that will be replaced.
 
-        Returns:
+        Returns
+        -------
             str: The translated text.
 
         """
@@ -95,18 +107,23 @@ class Base:
         self,
         key: str,
         number: int | Sized,
-        placeholders: Optional[dict[str, Any]] = None
+        placeholders: dict[str, Any] = {}
     ) -> str:
         """
         Get a translation according to an integer value.
 
-        Args:
-            key (str): The key of the text to be translated.
-            number (int or Sized): The amount of items, to get the text
-            according to the correct plural or the iterable of items.
-            placeholders (dict[str, Any], optional): The words that will be replaced.
+        Parameters
+        -------
+            key : `str`
+                The key of the text to be translated.
+            number : `int` or `Sized`
+                The amount of items, to get the text according to the correct
+                plural or the iterable of items.
+            placeholders : dict[`str`, `Any`], optional
+                The words that will be replaced.
 
-        Returns:
+        Returns
+        -------
             str: The translated text, with the plural or singular, correct.
 
         """

@@ -33,6 +33,22 @@ def log(
     first_color: str = CYAN,
     second_color: str = LBLUE
 ) -> None:
+    """
+    Print a colored message and log it.
+
+    Parameters
+    ----------
+    tag : `str`
+        The tag to print.
+    text : `str`
+        The text to print and log.
+    level : `str`, optional
+        The log level, by default 'info'
+    first_color : `str`, optional
+        The first color to print, by default 'CYAN'
+    second_color : `str`, optional
+        The secondary color to print, by default 'BLUE'
+    """
     if len(text) < 60:
         print(
             f'{BRIGHT}{first_color}[{tag:^16}]' +

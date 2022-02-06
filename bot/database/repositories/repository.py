@@ -40,10 +40,10 @@ class Repository(Generic[TModel]):
     """
     The base repository class.
 
-    Args:
-        session (sessionmaker[sqlalchemy.ext.asyncio.AsyncSession]): The session
-            to use to interact with the database.
-
+    Parameters
+    ----------
+        session : sessionmaker[`sqlalchemy.ext.asyncio.AsyncSession`]
+            The session to use to interact with the database.
     """
 
     model: Type[TModel]
@@ -57,14 +57,17 @@ class Repository(Generic[TModel]):
         """
         Get a model by its id
 
-        Args:
-            session (sqlalchemy.ext.asyncio.AsyncSession): The
-                session to use to interact with the database.
-            model_id (int): The id of the model to get.
+        Parameters
+        ----------
+            session : `sqlalchemy.ext.asyncio.AsyncSession`
+                The session to use to interact with the database.
+            model_id : `int`
+                The id of the model to get.
 
-        Returns:
-            database.models.Model or None: The model object.
-
+        Returns
+        -------
+            `database.models.Model` or `None`
+                The model object.
         """
         model = self.model
         stmt = select(model).where(model.id == model_id)
@@ -74,12 +77,15 @@ class Repository(Generic[TModel]):
         """
         Check if a model exists
 
-        Args:
-            model_id (int): The id of the model to check.
+        Parameters
+        ----------
+            model_id : `int`
+                The id of the model to check.
 
-        Returns:
-            bool: True if the model exists, False otherwise.
-
+        Returns
+        -------
+            `bool`
+                True if the model exists, False otherwise.
         """
         model = await self.find(model_id)
         return model is not None
@@ -92,12 +98,15 @@ class Repository(Generic[TModel]):
         """
         Get a model by id
 
-        Args:
-            model_id (int): The id of the model to get.
+        Parameters
+        ----------
+            model_id : `int`
+                The id of the model to get.
 
-        Returns:
-            Optional[database.models.Model]: The model object.
-
+        Returns
+        -------
+            Optional[`database.models.Model`]
+                The model object.
         """
         async with self.session() as session:
             return await self.__get_by_id(session, model_id)
@@ -106,12 +115,14 @@ class Repository(Generic[TModel]):
         """
         Get a model by id, or create it if it doesn't exist
 
-        Args:
-            model_id (int): The id of the model to get.
+        Parameters
+        ----------
+            model_id : `int`
+                The id of the model to get.
 
-        Returns:
+        Returns
+        -------
             database.models.Model: The model object.
-
         """
         # the create method will return the model if it exists
         return await self.create(model_id)
@@ -120,9 +131,9 @@ class Repository(Generic[TModel]):
         """
         Get all models
 
-        Returns:
+        Returns
+        -------
             tuple[database.models.Model]: The models.
-
         """
         async with self.session() as session:
             stmt = select(self.model)
@@ -136,12 +147,15 @@ class Repository(Generic[TModel]):
         """
         Create a new model with default values
 
-        Args:
-            model_id (int): The id of the model to create.
+        Parameters
+        ----------
+            model_id : `int`
+                The id of the model to create.
 
-        Returns:
-            database.models.Model: The model instance.
-
+        Returns
+        -------
+            `database.models.Model`
+                The model instance.
         """
         if await self.__exists(model_id):
             if (model := await self.find(model_id)):
@@ -154,12 +168,15 @@ class Repository(Generic[TModel]):
         """
         Create many models
 
-        Args:
-            model_ids (Iterable[int]): The ids of the models to create.
+        Parameters
+        ----------
+            model_ids : Iterable[`int`]
+                The ids of the models to create.
 
-        Returns:
-            tuple[Model]: The models created.
-
+        Returns
+        -------
+            tuple[`Model`, ...]
+                The models created.
         """
         models = list[TModel]()
         for model_id in model_ids:
@@ -171,9 +188,10 @@ class Repository(Generic[TModel]):
         """
         Save a model to the database
 
-        Args:
-            model (database.models.Model): The model to save.
-
+        Parameters
+        ----------
+            model : `database.models.Model`
+                The model to save.
         """
         if not await self.__exists(model.id):
             # if not exists, create
@@ -188,9 +206,10 @@ class Repository(Generic[TModel]):
         """
         Save many models
 
-        Args:
-            models (Iterable[database.models.Model]): The models to save.
-
+        Parameters
+        ----------
+            models : Iterable[`database.models.Model`]
+                The models to save.
         """
         for model in models:
             await self.save(model)
@@ -203,9 +222,10 @@ class Repository(Generic[TModel]):
         """
         Update a model in the database
 
-        Args:
-            model (database.models.Model): The model to update.
-
+        Parameters
+        ----------
+            model :  `database.models.Model`
+                The model to update.
         """
         if await self.__exists(model.id):
             async with self.session() as session:
@@ -224,12 +244,15 @@ class Repository(Generic[TModel]):
         """
         Delete a model
 
-        Args:
-            model (database.models.Model or int): The model (or id) to delete.
+        Parameters
+        ----------
+            model : `database.models.Model` or `int`
+                The model (or id) to delete.
 
-        Returns:
-            bool: True if the model was deleted, False otherwise.
-
+        Returns
+        -------
+            `bool`
+                True if the model was deleted, False otherwise.
         """
         if isinstance(model, int):
             if await self.__exists(model):

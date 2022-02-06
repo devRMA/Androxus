@@ -23,6 +23,8 @@
 # Credits to Taylor Otwell. Original PHP code, translated to Python by me
 # https://github.com/laravel/framework/blob/8e2d72728d6911816a97843ec3341e28c92af120/src/Illuminate/Translation/Translator.php
 
+from __future__ import annotations
+
 from collections.abc import Sized
 from json import load
 from os.path import abspath, exists
@@ -42,10 +44,10 @@ class Translator:
     """
     The class responsible for translations.
 
-    Args:
-        context (Context or CmdInter or None): The context of
-        the command.
-
+    Parameters
+    -------
+    context : `disnake.ext.commands.Context` or `disnake.CmdInter`, optional
+        The context of the command.
     """
     bot: Optional[Bot] = None
     guild: Optional[Guild] = None
@@ -62,13 +64,15 @@ class Translator:
             self.bot = context.bot  # type: ignore
             self.guild = context.guild
 
-    async def init(self) -> 'Translator':
-        """
+    async def init(self) -> Translator:
+        """|coro|
+
         Initializes the translator.
 
-        Returns:
-            Translator: The translator instance.
-
+        Returns
+        -------
+        `Translator`
+            The translator instance.
         """
         if self.bot is not None:
             if self.guild is None:
@@ -84,12 +88,15 @@ class Translator:
         """
         Determine if a translation exists.
 
-        Args:
-            key (str): The key of the text to be translated.
+        Parameters
+        ----------
+        key : `str`
+            The key of the text to be translated.
 
-        Returns:
-            bool: True if the translation exists, False otherwise.
-
+        Returns
+        -------
+        `bool`
+            True if the translation exists, False otherwise.
         """
         return self.get(key) != key
 
@@ -97,50 +104,61 @@ class Translator:
         """
         Determine if exists a json file for the given locale.
 
-        Args:
-            locale (str): The locale to be checked.
+        Parameters
+        ----------
+        locale : `str`
+            The locale to be checked.
 
-        Returns:
-            bool: True if the locale exists, False otherwise.
-
+        Returns
+        -------
+        `bool`
+            True if the locale exists, False otherwise.
         """
         return exists(self._get_json_path(locale))
 
     def get(
-        self, key: str, placeholders: Optional[dict[str, Any]] = None
+        self, key: str, placeholders: dict[str, Any] = {}
     ) -> str:
         """
         Get the translation for the given key.
 
-        Args:
-            key (str): The key of the text to be translated.
-            placeholders (dict): The words that will be replaced.
+        Parameters
+        ----------
+        key : `str`
+            The key of the text to be translated.
+        placeholders : dict[`str`, `Any`], optional
+            The words that will be replaced, by default {}
 
-        Returns:
-            str: The translated text.
-
+        Returns
+        -------
+        `str`
+            The translated text.
         """
-        placeholders = placeholders or {}
         return self._make_replacements(self.texts.get(key, key), placeholders)
 
     def choice(
         self,
         key: str,
         number: int | Sized,
-        placeholders: Optional[dict[str, Any]] = None
+        placeholders: dict[str, Any] = {}
     ) -> str:
         """
         Get a translation according to an integer value.
 
-        Args:
-            key (str): The key of the text to be translated.
-            number (int or Sized): The amount of items, to get the text
-            according to the correct plural or the iterable of items.
-            placeholders (dict[str, Any], optional): The words that will be replaced.
+        Parameters
+        ----------
+        key : `str`
+            The key of the text to be translated.
+        number : `int`
+            The amount of items, to get the text according to the correct
+            plural or the iterable of items.
+        placeholders : dict[`str`, `Any`], optional
+            The words that will be replaced, by default {}
 
-        Returns:
-            str: The translated text, with the plural or singular, correct.
-
+        Returns
+        -------
+        `str`
+            The translated text, with the plural or singular, correct.
         """
         placeholders = placeholders or {}
         line = self.get(key, placeholders)
@@ -156,7 +174,6 @@ class Translator:
     def _load_texts(self) -> None:
         """
         Loads the texts from the language file.
-
         """
         if self.has_locale(self.language):
             with open(
@@ -167,10 +184,6 @@ class Translator:
     def _get_selector(self) -> MessageSelector:
         """
         Get the selector of the language.
-
-        Returns:
-            MessageSelector: The selector of the language.
-
         """
         if self._selector is None:
             self._selector = MessageSelector()
@@ -180,13 +193,6 @@ class Translator:
     def _get_json_path(locale: str) -> str:
         """
         Get the path to the json file for the given locale.
-
-        Args:
-            locale (str): The locale.
-
-        Returns:
-            str: The path to the json file.
-
         """
         return f'{abspath("./")}/language/json/{locale}.json'
 
@@ -194,14 +200,6 @@ class Translator:
     def _make_replacements(line: str, placeholders: dict[str, Any]) -> str:
         """
         Replaces the placeholders in the line.
-
-        Args:
-            line (str): The line to be replaced.
-            placeholders (dict): The words that will be replaced.
-
-        Returns:
-            str: The line with the placeholders replaced.
-
         """
         should_replace = dict[str, Any]()
         for key, value in placeholders.items():

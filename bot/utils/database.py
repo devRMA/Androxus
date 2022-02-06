@@ -39,13 +39,17 @@ async def get_prefix(bot: TBot, message: Message | Context[TBot]) -> str:
     """
     Get the prefix for the message.
 
-    Args:
-        bot (androxus.Bot): The bot instance.
-        message (Message or Context): The message or context, instance.
+    Parameters
+    ----------
+    bot : `androxus.Bot`
+        The bot instance.
+    message : `disnake.Message` or `disnake.ext.commands.Context`
+        The message or context, instance.
 
-    Returns:
-        str: The prefix.
-
+    Returns
+    -------
+    `str`
+        The prefix.
     """
     if message.guild:
         guild_repository = RepositoryFactory.create(RepositoryType.GUILD, bot)

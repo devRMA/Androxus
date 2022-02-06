@@ -40,15 +40,23 @@ class Guild(
     """
     Represents a guild in the database.
 
-    Args:
-        id (int): The guild id
-        prefix (str, optional): The guild prefix.
-        language (str, optional): The guild language.
+    Parameters
+    ----------
+        id : `int`
+            The guild id
+        prefix : `str`, optional
+            The guild prefix.
+        language : `str`, optional
+            The guild language.
 
-    Attributes:
-        id (int): The guild's ID.
-        prefix (str): The guild's prefix.
-        language (str): The guild's language.
+    Attributes
+    ----------
+        id : `int`
+            The guild's ID.
+        prefix : `str`
+            The guild's prefix.
+        language : `str`
+            The guild's language.
 
     """
     __tablename__ = 'guilds'
@@ -73,9 +81,10 @@ class Guild(
         """
         Creates the "guilds" table.
 
-        Args:
-            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database
-                engine.
+        Parameters
+        ----------
+            engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`
+                The database engine.
 
         """
         async with engine.begin() as conn:
@@ -86,9 +95,10 @@ class Guild(
         """
         Drops the "guilds" table.
 
-        Args:
-            engine (sqlalchemy.ext.asyncio.engine.AsyncEngine): The database
-                engine.
+        Parameters
+        ----------
+            engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`
+                The database engine.
 
         """
         async with engine.begin() as conn:
@@ -98,8 +108,10 @@ class Guild(
         """
         Returns a dictionary representation of the guild.
 
-        Returns:
-            dict[str, Any]: The guild's dictionary representation.
+        Returns
+        ----------
+            dict[`str`, `Any`]
+                The guild's dictionary representation.
 
         """
         return {'id': self.id, 'prefix': self.prefix, 'language': self.language}
