@@ -6,27 +6,27 @@ authors = ["Rafael"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-"python" = "^3.10"
-"asyncpg" = "^0.25.0"
-"colorama" = "^0.4.4"
-"disnake" = {git = "https://github.com/DisnakeDev/disnake.git"}
-"disnake-jishaku" = "^2.6.5"
-"pipe" = "^1.6.0"
-"python-dotenv" = "^0.19.2"
-"SQLAlchemy" = "^1.4.28"
-"python-stopwatch" = {git = "https://github.com/devRMA/python-stopwatch.git", branch = "main"}
-"tabulate" = "^0.8.9"
-"toml" = "^0.10.2"
+python = "^3.10"
+asyncpg = "^0.25.0"
+colorama = "^0.4.4"
+disnake = { git = "https://github.com/DisnakeDev/disnake.git" }
+disnake-jishaku = "^2.6.5"
+pipe = "^1.6.0"
+python-dotenv = "^0.19.2"
+SQLAlchemy = "^1.4.28"
+python-stopwatch = { git = "https://github.com/devRMA/python-stopwatch.git", branch = "main" }
+tabulate = "^0.8.9"
+toml = "^0.10.2"
 
 [tool.poetry.dev-dependencies]
-"ipython" = "^7.30.1"
-"mypy" = "^0.931"
-"flake8" = "^4.0.1"
-"types-toml" = "^0.10.3"
-"types-tabulate" = "^0.8.5"
-"isort" = "^5.10.1"
-"sqlalchemy2-stubs" = "^0.0.2-alpha.19"
-"taskipy" = "^1.9.0"
+ipython = "^7.30.1"
+mypy = "^0.931"
+flake8 = "^4.0.1"
+typestoml = "^0.10.3"
+types-tabulate = "^0.8.5"
+isort = "^5.10.1"
+sqlalchemy2-stubs = "^0.0.2-alpha.19"
+taskipy = "^1.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
