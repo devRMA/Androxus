@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 from os import getenv
+from typing import ClassVar
 
 from disnake import Permissions
 
@@ -30,33 +31,32 @@ class Configs:
     This class is used to store the configuration of the bot.
 
     Attributes:
-        default_prefix (str): The default prefix for the bot.
-        prefix (str): An alias for default_prefix.
-        required_permissions (disnake.Permissions): The permissions
-        necessary for all bot commands to work.
-        owner_id (int): The ID of the bot owner.
-        default_language (str): The default language for the bot commands.
-        language (str): An alias for default_language.
-        test_guilds (list[int]): The ids of the servers you want to test the
-        slash commands
-
+    -----------
+        default_prefix: `str`
+            The default prefix for the bot.
+        prefix: `str`
+            An alias for default_prefix.
+        required_permissions: `disnake.Permissions`
+            The permissions required to use the bot.
+        owner_id: `int`
+            The ID of the bot's owner.
+        default_language: `str`
+            The default language for the bot.
+        language: `str`
+            An alias for default_language.
+        test_guilds: list[`int`]
+            The ids of the servers you want to test the slash commands
     """
-    default_prefix: str = getenv('DEFAULT_PREFIX', '')
-    prefix: str = default_prefix
-    required_permissions: Permissions = Permissions(8)
-    owner_id: int = int(getenv('OWNER_ID', 0))
-    default_language: str = getenv('DEFAULT_LANGUAGE', '')
-    language: str = default_language
+    default_prefix: ClassVar[str] = getenv('DEFAULT_PREFIX', '')
+    prefix: ClassVar[str] = default_prefix
+    required_permissions: ClassVar[Permissions] = Permissions(8)
+    owner_id: ClassVar[int] = int(getenv('OWNER_ID', 0))
+    default_language: ClassVar[str] = getenv('DEFAULT_LANGUAGE', '')
+    language: ClassVar[str] = default_language
 
     @property
     def test_guilds(self) -> list[int]:
-        """
-        The IDs of the test guilds.
-
-        Returns:
-            list[int]: The list of test guild IDs.
-
-        """
+        """list[`int`]: The list of test guild IDs."""
         if len(test_guilds := getenv('TEST_GUILDS', '')) > 0:
             if test_guilds.count(',') > 0:
                 if test_guilds.count('[') == 1 and test_guilds.count(']') == 1:
