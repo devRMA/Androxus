@@ -32,8 +32,7 @@ from typing import TYPE_CHECKING, Any, MutableMapping, TypeAlias
 from aiohttp.client import ClientSession
 from disnake import Game, Intents, Message
 from disnake import __version__ as disnake_version
-from disnake.ext import tasks  # type: ignore
-from disnake.ext import commands
+from disnake.ext import commands, tasks
 from disnake.utils import utcnow
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.engine import AsyncEngine
