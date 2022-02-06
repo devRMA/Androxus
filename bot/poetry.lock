@@ -463,7 +463,7 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "python-stopwatch"
-version = "1.0.5"
+version = "1.0.6"
 description = ""
 category = "main"
 optional = false
@@ -477,7 +477,7 @@ termcolor = "*"
 type = "git"
 url = "https://github.com/devRMA/python-stopwatch.git"
 reference = "main"
-resolved_reference = "93d693601634f4beba3c907aa88ba8420f15391a"
+resolved_reference = "92c8f521595cf475e76d53e1626b75c255cbacea"
 
 [[package]]
 name = "six"
