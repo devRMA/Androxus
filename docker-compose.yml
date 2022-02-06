@@ -1,21 +1,31 @@
 version: '3.9'
+
 networks:
   postgresql: null
   redis: null
+
+volumes:
+  db_data:
 services:
+
   database:
     image: postgres:14.1
+    restart: unless-stopped
     volumes:
+      - db_data:/var/lib/postgresql/data
       - ./database_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - postgresql
     environment:
       POSTGRES_USER: "${DB_USER}"
       POSTGRES_PASSWORD: "${DB_PASS}"
+  
   cache:
     image: redis:6.2.6
+    restart: unless-stopped
     networks:
       - redis
+  
   bot:
     build:
       context: ./bot
