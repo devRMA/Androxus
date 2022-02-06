@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from disnake import (
     ButtonStyle,
@@ -68,7 +68,7 @@ class ConfigsCommands(Base):
 
             def __init__(
                 self, *, author: Member | User,
-                __: Callable[[str, Optional[dict[str, Any]]], str],
+                __: Callable[[str, dict[str, Any]], str],
                 guild_repository: GuildRepository, guild: Guild
             ):
                 self.author = author
