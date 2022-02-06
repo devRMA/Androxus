@@ -85,4 +85,10 @@ async def error_handler(
         )
     elif isinstance(error, commands.errors.CheckFailure):
         return await ctx.send('nop')
-    log('ERROR', format_exception(error), 'error', first_color=LRED)
+    log(
+        'ERROR',
+        '\n'.join(format_exception(error)),
+        'error',
+        first_color=LRED,
+        second_color=LRED
+    )
