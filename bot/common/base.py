@@ -24,8 +24,8 @@ from __future__ import annotations
 
 from typing import Any, Optional, Sized
 
-from disnake import CmdInter, Guild, Member, User
-from disnake.ext.commands import Context  # type: ignore
+from discord import Client, Guild, Interaction, Member, User
+from discord.ext.commands import Context
 
 from androxus import Bot
 from language import Translator
@@ -37,16 +37,16 @@ class Base:
 
     Parameters
     -------
-        context : `disnake.ext.commands.Context` or `disnake.CmdInter`
+        context : `discord.ext.commands.Context` or `discord.Interaction`
             The context of the command.
 
     Attributes
     -------
-        bot : `Bot`
+        bot : `Client`
             The bot instance.
-        ctx : `disnake.ext.commands.Context` or `disnake.CmdInter`
+        ctx : `discord.ext.commands.Context` or `discord.Interaction`
             The context of the command.
-        author : `disnake.Member` or `disnake.User`
+        author : `discord.Member` or `discord.User`
             The author of the command.
         guild : `Guild`, optional
             The guild in which the command was used.
@@ -56,19 +56,23 @@ class Base:
             If the context is an interaction.
 
     """
-    bot: Bot
-    ctx: Context[Bot] | CmdInter
+    bot: Client
+    ctx: Context[Bot] | Interaction
     author: Member | User
     guild: Optional[Guild]
     translator: Translator
     is_interaction: bool
 
-    def __init__(self, context: Context[Bot] | CmdInter) -> None:
-        self.bot = context.bot  # type: ignore
+    def __init__(self, context: Context[Bot] | Interaction) -> None:
+        self.bot = context.bot if isinstance(
+            context, Context
+        ) else context.client
         self.ctx = context
-        self.author = context.author
+        self.author = context.author if isinstance(
+            context, Context
+        ) else context.user
         self.guild = context.guild
-        self.is_interaction = isinstance(context, CmdInter)
+        self.is_interaction = isinstance(context, Interaction)
 
     async def init(self) -> Base:
         """
