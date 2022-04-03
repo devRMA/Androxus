@@ -24,13 +24,13 @@ from re import sub
 from typing import Any
 
 
-def is_number(string: Any) -> bool:
+def is_number(string: str) -> bool:
     """
     Check if a string is a number.
 
     Parameters
     ----------
-    string : `Any`
+    string : `str`
         The string to check.
 
     Returns
@@ -38,23 +38,15 @@ def is_number(string: Any) -> bool:
     `bool`
         True if it is a number, False otherwise.
     """
-    if not len(string) >= 1:
+    if len(string) == 0:
         return False
-    if not isinstance(string, str):
-        string = str(string)
     if string.isdecimal() or string.isnumeric():
         return True
     try:
         float(string)
-    except ValueError:
-        try:
-            float(string.replace(',', '.'))
-        except ValueError:
-            return False
-        else:
-            return True
-    else:
         return True
+    except ValueError:
+        return False
 
 
 def format_numbers(number: Any, br: bool = True, truncate: bool = False) -> str:
