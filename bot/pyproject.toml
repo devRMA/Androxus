@@ -9,12 +9,11 @@ license = "MIT"
 python = "^3.10"
 asyncpg = "^0.25.0"
 colorama = "^0.4.4"
-disnake = { git = "https://github.com/DisnakeDev/disnake.git" }
-disnake-jishaku = "^2.6.5"
-pipe = "^1.6.0"
-python-dotenv = "^0.19.2"
+"discord.py" = { git = "https://github.com/Rapptz/discord.py.git" }
+jishaku = "^2.3.2"
+python-dotenv = "^0.20.0"
+python-stopwatch2 = "^1.1.1"
 SQLAlchemy = "^1.4.28"
-python-stopwatch = { git = "https://github.com/devRMA/python-stopwatch.git", branch = "main" }
 tabulate = "^0.8.9"
 toml = "^0.10.2"
 
@@ -26,8 +25,9 @@ types-colorama = "^0.4.8"
 types-toml = "^0.10.3"
 types-tabulate = "^0.8.5"
 isort = "^5.10.1"
-sqlalchemy2-stubs = "^0.0.2-alpha.19"
+sqlalchemy2-stubs = "^0.0.2-alpha.21"
 taskipy = "^1.9.0"
+yapf = "^0.32.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
