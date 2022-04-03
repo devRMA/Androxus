@@ -20,20 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from asyncio import get_running_loop, new_event_loop
+from asyncio import run
 from os import getenv
 
 from androxus import Bot
 from bootstrap import init, make_tests
 
-if __name__ == '__main__':
-    # bootstrapping all the things
+
+async def main():
     init()
-    if getenv('DEVELOPMENT') == 'true':
-        try:
-            loop = get_running_loop()
-        except RuntimeError:
-            loop = new_event_loop()
-        loop.run_until_complete(make_tests())
     androxus = Bot()
-    androxus.run(getenv('TOKEN'))
+    async with androxus:
+        if getenv('DEVELOPMENT') == 'true':
+            androxus.loop.run_until_complete(make_tests())
+        await androxus.start(getenv('TOKEN', ''))
+
+
+if __name__ == '__main__':
+    run(main())
