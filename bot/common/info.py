@@ -75,38 +75,3 @@ class InfoCommands(Base):
                 text=str(self.author), icon_url=self.author.display_avatar.url
             )
         )
-
-    async def uptime(self) -> Message | None:
-        """
-        Get the bot uptime
-        """
-        return await self.ctx.send(  # type: ignore
-            embed=Embed(
-                title='\N{TIMER CLOCK} ' + self.__('When I started:'),
-                description=format_dt(self.bot.start_date, 'R'),
-                timestamp=utcnow(),
-                color=Colour.random()
-            ).set_footer(
-                text=str(self.author), icon_url=self.author.display_avatar.url
-            )
-        )
-
-    async def avatar(self, user: Member | User) -> Message | None:
-        """
-        Get the user avatar
-        """
-        embed_description = '\N{WHITE RIGHT POINTING BACKHAND INDEX} ' + \
-            self.__('Click [here](:link) to see the avatar', {
-                'link': user.display_avatar.url
-            })
-        return await self.ctx.send(  # type: ignore
-            embed=Embed(
-                title='\N{EYE} ' +
-                self.__('Avatar of :username', {'username': user.display_name}),
-                description=embed_description,
-                timestamp=utcnow(),
-                color=Colour.random()
-            ).set_footer(
-                text=str(self.author), icon_url=self.author.display_avatar.url
-            ).set_image(user.display_avatar.url)
-        )
