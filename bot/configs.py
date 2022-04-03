@@ -60,11 +60,6 @@ class Configs:
     @property
     def test_guilds(self) -> list[int]:
         """list[`int`]: The list of test guild IDs."""
-        if len(test_guilds := getenv('TEST_GUILDS', '')) > 0:
-            if test_guilds.count(',') > 0:
-                if test_guilds.count('[') == 1 and test_guilds.count(']') == 1:
-                    return [
-                        int(_id.replace(' ', '')) for _id in test_guilds.
-                        replace('[', '').replace(']', '').split(',')
-                    ]
+        if len(test_guilds := eval(getenv('TEST_GUILDS', '[]'))) > 0:
+            return test_guilds
         return []
