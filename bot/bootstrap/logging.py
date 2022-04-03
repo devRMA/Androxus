@@ -30,7 +30,7 @@ from pathlib import Path
 
 class RemoveNoise(logging.Filter):
     def __init__(self) -> None:
-        super().__init__(name='disnake.state')
+        super().__init__(name='discord.state')
 
     def filter(self, record: logging.LogRecord) -> bool:
         if record.levelname == 'WARNING' and 'referencing an unknown' in record.msg:
@@ -46,9 +46,9 @@ def setup_logging() -> None:
 
     max_bytes = 32 * 1024 * 1024  # 32 MiB
 
-    logging.getLogger('disnake').setLevel(logging.INFO)
-    logging.getLogger('disnake.http').setLevel(logging.WARN)
-    logging.getLogger('disnake.state').addFilter(RemoveNoise())
+    logging.getLogger('discord').setLevel(logging.INFO)
+    logging.getLogger('discord.http').setLevel(logging.WARN)
+    logging.getLogger('discord.state').addFilter(RemoveNoise())
 
     logger = logging.getLogger('androxus')
     logger.setLevel(logging.INFO)

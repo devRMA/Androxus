@@ -36,7 +36,7 @@ class Configs:
             The default prefix for the bot.
         prefix: `str`
             An alias for default_prefix.
-        required_permissions: `disnake.Permissions`
+        required_permissions: `discord.Permissions`
             The permissions required to use the bot.
         owner_id: `int`
             The ID of the bot's owner.
