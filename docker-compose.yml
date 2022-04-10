@@ -1,0 +1,60 @@
+version: '3.9'
+
+networks:
+  postgresql: null
+  redis: null
+
+volumes:
+  db_data:
+services:
+
+  database:
+    image: postgres:14.1
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./database_scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - postgresql
+    environment:
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASS}"
+  
+  cache:
+    image: redis:6.2.6
+    restart: unless-stopped
+    networks:
+      - redis
+  
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+      args:
+        DEVELOPMENT: "${DEVELOPMENT}"
+    restart: unless-stopped
+    volumes:
+      - ./bot:/usr/src/androxus/
+    networks:
+      - postgresql
+      - redis
+    depends_on:
+      - database
+      - cache
+    environment:
+      TOKEN: "${TOKEN}"
+      OWNER_ID: "${OWNER_ID}"
+      TEST_GUILDS: "${TEST_GUILDS}"
+      DEFAULT_PREFIX: "${DEFAULT_PREFIX}"
+      DEFAULT_LANGUAGE: "${DEFAULT_LANGUAGE}"
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASS: "${DB_PASS}"
+      DB_TEST_HOST: "${DB_TEST_HOST}"
+      DB_TEST_NAME: "${DB_TEST_NAME}"
+      DB_TEST_PORT: "${DB_TEST_PORT}"
+      DB_TEST_USER: "${DB_TEST_USER}"
+      DB_TEST_PASS: "${DB_TEST_PASS}"
+      DEVELOPMENT: "${DEVELOPMENT}"

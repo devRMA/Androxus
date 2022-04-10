@@ -1,0 +1,54 @@
+[tool.poetry]
+name = "Androxus"
+version = "3.0.0a"
+description = "An open source bot made in python"
+authors = ["Rafael"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+asyncpg = "^0.25.0"
+colorama = "^0.4.4"
+"discord.py" = { git = "https://github.com/Rapptz/discord.py.git" }
+jishaku = "^2.3.2"
+python-dotenv = "^0.20.0"
+python-stopwatch2 = "^1.1.1"
+SQLAlchemy = "^1.4.28"
+tabulate = "^0.8.9"
+toml = "^0.10.2"
+
+[tool.poetry.dev-dependencies]
+ipython = "^7.30.1"
+mypy = "^0.931"
+flake8 = "^4.0.1"
+types-colorama = "^0.4.8"
+types-toml = "^0.10.3"
+types-tabulate = "^0.8.5"
+isort = "^5.10.1"
+sqlalchemy2-stubs = "^0.0.2-alpha.21"
+taskipy = "^1.9.0"
+yapf = "^0.32.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+py_version = "310"
+
+[tool.mypy]
+namespace_packages = "True"
+plugins = "sqlalchemy.ext.mypy.plugin"
+
+[tool.yapf]
+based_on_style = "facebook"
+indent_width = 4
+
+[tool.taskipy.tasks]
+lint = { cmd = "task mypy && task flake8", help = "Run mypy and flake8 on the project" }
+format = { cmd = "task yapf && task isort", help = "Run yapf and isort on the project" }
+mypy = { cmd = "mypy --pretty .", help = "Run mypy on the project" }
+flake8 = { cmd = "flake8 --benchmark .", help = "Run flake8 on the project" }
+yapf = { cmd = "yapf -r -i -vv .", help = "Run yapf on the project" }
+isort = { cmd = "isort .", help = "Run isort on the project" }

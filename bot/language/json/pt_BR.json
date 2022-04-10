@@ -1,0 +1,17 @@
+{
+    "Calculating latency...": "Calculando o ping...",
+    "API latency:": "Latência da API:",
+    "Database response time:": "Tempo de resposta do banco de dados:",
+    "Discord response time:": "Tempo de resposta no discord:",
+    "When I started:": "Quando eu iniciei:",
+    "Reloaded all cogs": "Cogs recarregados",
+    "Click [here](:link) to see the avatar": "Clique [aqui](:link) para ver o avatar",
+    "Avatar of :username": "Avatar de :username",
+    "You are not my creator!": "Você não é meu criador!",
+    "User `:user` was not found": "Usuário `:user` não foi encontrado",
+    "You can't interact with this message": "Você não pode interagir com esta mensagem",
+    "Select the language I will use:": "Selecione o idioma que eu irei usar:",
+    "Current language: **:language**": "Idioma atual: **:language**",
+    "Languages:": "Idiomas:",
+    ":userMention Language changed to **:language**": ":userMention Idioma alterado para **:language**"
+}
