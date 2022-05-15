@@ -1,4 +1,4 @@
-# Androxus
+# Androxus - Um bot feito 100% pelo Canas
 [![ReadMe Card](https://github-readme-stats.vercel.app/api/pin/?username=devRMA&repo=Androxus&theme=blue-green)](https://github.com/anuraghazra/github-readme-stats)
 <br>
 [![MIT License][license-shield]][license-url]
