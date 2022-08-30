@@ -4,5 +4,6 @@
     },
     "python.linting.flake8Enabled": true,
     "python.linting.mypyEnabled": true,
-    "python.terminal.activateEnvInCurrentTerminal": true
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "python.formatting.provider": "yapf"
 }
