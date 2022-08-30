@@ -1,15 +1,9 @@
 version: '3.9'
 
-networks:
-  postgresql: null
-  redis: null
-
-volumes:
-  db_data:
 services:
 
   database:
-    image: postgres:14.1
+    image: postgres:14.5
     restart: unless-stopped
     volumes:
       - db_data:/var/lib/postgresql/data
@@ -21,7 +15,7 @@ services:
       POSTGRES_PASSWORD: "${DB_PASS}"
   
   cache:
-    image: redis:6.2.6
+    image: redis:7.0.4
     restart: unless-stopped
     networks:
       - redis
@@ -58,3 +52,10 @@ services:
       DB_TEST_USER: "${DB_TEST_USER}"
       DB_TEST_PASS: "${DB_TEST_PASS}"
       DEVELOPMENT: "${DEVELOPMENT}"
+
+networks:
+  postgresql: null
+  redis: null
+
+volumes:
+  db_data:
