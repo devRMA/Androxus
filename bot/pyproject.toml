@@ -16,6 +16,7 @@ python-stopwatch2 = "^1.1.1"
 SQLAlchemy = "^1.4.40"
 tabulate = "^0.8.10"
 toml = "^0.10.2"
+python-i18n = "^0.3.9"
 
 [tool.poetry.dev-dependencies]
 ipython = "^8.4.0"

@@ -502,6 +502,17 @@ python-versions = ">=3.5"
 cli = ["click (>=5.0)"]
 
 [[package]]
+name = "python-i18n"
+version = "0.3.9"
+description = "Translation library for Python"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.extras]
+yaml = ["pyyaml (>=3.10)"]
+
+[[package]]
 name = "python-stopwatch2"
 version = "1.1.1"
 description = "A simple library to measure code performance."
@@ -694,7 +705,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "cc1163702a217528c4f3dab986c61b7f39a4ad67ccf20e471e4b1a494c9cafc0"
+content-hash = "ceb16fc8209ca5d80a3a5da5c3dcebeaaa869c59aa120240244a966faf0f2384"
 
 [metadata.files]
 aiohttp = [
@@ -1226,6 +1237,10 @@ pygments = [
 python-dotenv = [
     {file = "python-dotenv-0.20.0.tar.gz", hash = "sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f"},
     {file = "python_dotenv-0.20.0-py3-none-any.whl", hash = "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"},
+]
+python-i18n = [
+    {file = "python-i18n-0.3.9.tar.gz", hash = "sha256:df97f3d2364bf3a7ebfbd6cbefe8e45483468e52a9e30b909c6078f5f471e4e8"},
+    {file = "python_i18n-0.3.9-py3-none-any.whl", hash = "sha256:bda5b8d889ebd51973e22e53746417bd32783c9bd6780fd27cadbb733915651d"},
 ]
 python-stopwatch2 = [
     {file = "python-stopwatch2-1.1.1.tar.gz", hash = "sha256:5cf0676080fbc995d7d418f65617f3eac92a37f0e66d9e98016bfc8b6b1b293f"},
