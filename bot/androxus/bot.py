@@ -30,7 +30,7 @@ from platform import python_version
 from typing import TYPE_CHECKING, Any, ClassVar, MutableMapping, TypeAlias
 
 from aiohttp.client import ClientSession
-from discord import Game, Intents, Message
+from discord import Game, Message, Object
 from discord import __version__ as discord_version
 from discord.ext import commands, tasks
 from discord.utils import utcnow
@@ -43,6 +43,7 @@ from toml import load
 from configs import Configs
 from database import bootstrap as db_bootstrap
 from database.connection import ConnectionFactory
+from language.translator import Translator
 from utils import SingletonMeta, log
 from utils.colors import LBLUE, LGREEN, LYELLOW
 from utils.database import get_prefix
@@ -61,18 +62,22 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
 
     Attributes:
         __version__ (str): The current version of the bot.
-        started_at(datetime): When the bot was started.
-        maintenance (bool): Whether the bot is in maintenance mode.
-        http_session (ClientSession): The aiohttp session.
         configs (Configs): The configs of the bot.
+        db_engine: Engine used to connect to the database.
+        db_session: The session connected to the database.
+        http_session (ClientSession): The aiohttp session.
+        maintenance (bool): Whether the bot is in maintenance mode.
+        started_at(datetime): When the bot was started.
 
     """
-    started_at: datetime
-    maintenance: bool = False
-    http_session: ClientSession
-    configs: ClassVar = Configs()
-    _status = cycle(('Androxus V3', '{users} Users!', '{servers} Guilds!'))
     _startup_timer: Stopwatch
+    _status = cycle(('Androxus V3', '{users} Users!', '{servers} Guilds!'))
+    configs: ClassVar[Configs] = Configs()
+    db_engine: AsyncEngine
+    db_session: TSession
+    http_session: ClientSession
+    maintenance: ClassVar[bool] = False
+    started_at: datetime
 
     def __init__(self) -> None:
         self._startup_timer = Stopwatch()
@@ -89,13 +94,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             intents=self.configs.intents,
             strip_after_prefix=True,
             activity=Game(name='\N{SLEEPING FACE} Starting ...'),
-            test_guilds=self.configs.test_guilds
         )
-
-        # Loads all cogs of the bot.
-        # bot.remove_command('help')
-        for cog in get_cogs():
-            self.load_extension(cog)
 
     @property
     def __version__(self) -> str:
@@ -105,23 +104,40 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             data: MutableMapping[str, Any] = load(file)
             tool = data.get('tool', dict[str, Any]())
             poetry = tool.get('poetry', dict[str, Any]())
-            return poetry.get('version', '')
+            return str(poetry.get('version', ''))
 
-    async def on_ready(self) -> None:
+    async def setup_hook(self) -> None:
         """|coro|
 
-        The event triggered when the bot is ready.
+        The event that will fire when the bot is ready, but before connecting
+        to the Websocket.
         """
-        if (not hasattr(self,
-                        'db_session')) or (not hasattr(self, 'db_engine')):
-            self._startup_timer.stop()
-            setattr(self, 'db_engine', ConnectionFactory.get_engine())
-            setattr(
-                self, 'db_session',
-                ConnectionFactory.get_session(self.db_engine)
-            )
-            setattr(self, 'start_date', utcnow())
-            await db_bootstrap(self.db_engine)
+        self._startup_timer.stop()
+        self.started_at = utcnow()
+        self.db_engine = ConnectionFactory.get_engine()
+        self.db_session = ConnectionFactory.get_session(self.db_engine)
+
+        await db_bootstrap(self.db_engine)
+        await self.tree.set_translator(Translator())
+
+        # Loads all cogs of the bot.
+        # bot.remove_command('help')
+        for cog in get_cogs():
+            await self.load_extension(cog)
+
+        if len(self.configs.test_guilds) > 0:
+            for testing_guild_id in self.configs.test_guilds:
+                guild = Object(testing_guild_id)
+                self.tree.copy_global_to(guild=guild)
+                await self.tree.sync(guild=guild)
+
+        try:
+            self._change_status.start()
+        except RuntimeError:
+            pass
+
+    async def on_ready(self) -> None:
+        if self.user is not None:
             log('BOT', f'LOGGED IN {self.user}', first_color=LGREEN)
             log('BOT', f'ID: {self.user.id}', first_color=LGREEN)
             log(
@@ -138,7 +154,7 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
             )
             log(
                 'INFO',
-                f'DISNAKE VERSION: {discord_version}',
+                f'DISCORD.PY VERSION: {discord_version}',
                 first_color=LBLUE
             )
             log(
@@ -146,11 +162,6 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
                 f'TIME TO START: {self._startup_timer}',
                 first_color=LBLUE
             )
-            try:
-                # starts loop to change status
-                self._change_status.start()
-            except RuntimeError:
-                pass
 
     async def on_message(self, message: Message) -> None:
         """|coro|
