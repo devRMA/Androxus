@@ -33,10 +33,7 @@ from .model import Model
 Base = declarative_base()
 
 
-class Guild(
-    Model,
-    Base
-):
+class Guild(Model, Base):
     """
     Represents a guild in the database.
 
