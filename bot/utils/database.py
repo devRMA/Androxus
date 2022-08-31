@@ -22,8 +22,8 @@
 
 from typing import TYPE_CHECKING, TypeAlias
 
-from disnake import Message
-from disnake.ext.commands import Context  # type: ignore
+from discord import Message
+from discord.ext.commands import Context
 
 from database.repositories import RepositoryFactory
 from enums import RepositoryType
@@ -43,7 +43,7 @@ async def get_prefix(bot: TBot, message: Message | Context[TBot]) -> str:
     ----------
     bot : `androxus.Bot`
         The bot instance.
-    message : `disnake.Message` or `disnake.ext.commands.Context`
+    message : `discord.Message` or `discord.ext.commands.Context`
         The message or context, instance.
 
     Returns
