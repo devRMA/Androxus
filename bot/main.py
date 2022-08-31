@@ -29,10 +29,10 @@ from bootstrap import init, make_tests
 
 async def main():
     init()
-    androxus = Bot()
-    async with androxus:
+
+    async with Bot() as androxus:
         if getenv('DEVELOPMENT') == 'true':
-            androxus.loop.run_until_complete(make_tests())
+            await make_tests()
         await androxus.start(getenv('TOKEN', ''))
 
 
