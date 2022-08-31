@@ -1,3 +1,7 @@
 {
-    "ping": "latency"
+    "ping": "latency",
+    "latency-calculating": "Calculating latency...",
+    "latency-api": "API latency:",
+    "latency-database": "Database response time:",
+    "latency-discord": "Discord response time:"
 }

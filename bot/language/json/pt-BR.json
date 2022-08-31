@@ -1,3 +1,7 @@
 {
-    "ping": "latência"
+    "ping": "latência",
+    "latency-calculating": "Calculando o ping...",
+    "latency-api": "Latência da API:",
+    "latency-database": "Tempo de resposta do banco de dados:",
+    "latency-discord": "Tempo de resposta no discord:"
 }
