@@ -50,6 +50,8 @@ from utils.database import get_prefix
 from utils.numbers import format_numbers
 from utils.others import get_cogs
 
+from .context import Context
+
 if TYPE_CHECKING:
     TSession: TypeAlias = sessionmaker[AsyncSession]
 else:
@@ -181,18 +183,5 @@ class Bot(commands.Bot, metaclass=SingletonMeta):
         )
         await self.change_presence(activity=Game(name=status_name))
 
-    def get_languages(self) -> list[str]:
-        """
-        Returns a list of languages supported by the bot.
-
-        Returns
-        -------
-            list[`str`]
-                The list of languages supported by the bot.
-        """
-        languages = list[str]()
-        languages.append(self.configs.default_language)
-        for language in listdir(abspath('./') + '/language/json/'):
-            if language.endswith('.json'):
-                languages.append(language.removesuffix('.json'))
-        return languages
+    async def get_context(self, message, *, cls=Context):
+        return await super().get_context(message, cls=cls)
