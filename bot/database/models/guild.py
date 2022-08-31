@@ -35,7 +35,7 @@ Base = declarative_base()
 
 class Guild(
     Model,
-    Base  # type: ignore
+    Base
 ):
     """
     Represents a guild in the database.
@@ -46,8 +46,6 @@ class Guild(
             The guild id
         prefix : `str`, optional
             The guild prefix.
-        language : `str`, optional
-            The guild language.
 
     Attributes
     ----------
@@ -55,25 +53,20 @@ class Guild(
             The guild's ID.
         prefix : `str`
             The guild's prefix.
-        language : `str`
-            The guild's language.
     """
     __tablename__ = 'guilds'
     id = Column(
         BigInteger, primary_key=True, autoincrement=False, nullable=False
     )
     prefix = Column(String(10), nullable=False)
-    language = Column(String(255), nullable=False)
 
     def __init__(
         self,
         id_: int,
         prefix: Optional[str] = None,
-        language: Optional[str] = None
     ) -> None:
         super().__init__(id_)
         self.prefix = prefix or Configs.default_prefix
-        self.language = language or Configs.default_language
 
     @staticmethod
     async def create_table(engine: AsyncEngine) -> None:
@@ -86,7 +79,7 @@ class Guild(
                 The database engine.
         """
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)  # type: ignore
+            await conn.run_sync(Base.metadata.create_all)
 
     @staticmethod
     async def drop_table(engine: AsyncEngine) -> None:
@@ -99,7 +92,7 @@ class Guild(
                 The database engine.
         """
         async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)  # type: ignore
+            await conn.run_sync(Base.metadata.drop_all)
 
     def to_dict(self) -> dict[str, Any]:
         """
@@ -110,4 +103,4 @@ class Guild(
             dict[`str`, `Any`]
                 The guild's dictionary representation.
         """
-        return {'id': self.id, 'prefix': self.prefix, 'language': self.language}
+        return {'id': self.id, 'prefix': self.prefix}
