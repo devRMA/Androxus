@@ -20,16 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Optional
+from typing import Any, Optional
 
 import i18n
 from discord import Locale, app_commands
-from discord.app_commands import TranslationContext, locale_str
+from discord.app_commands import TranslationContextTypes, locale_str
 
 
 class Translator(app_commands.Translator):
     async def translate(
-        self, string: locale_str, locale: Locale, context: TranslationContext
+        self, string: locale_str, locale: Locale,
+        context: TranslationContextTypes
     ) -> Optional[str]:
         i18n.set('locale', str(locale))
 

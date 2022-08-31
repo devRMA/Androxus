@@ -23,12 +23,14 @@
 from discord.app_commands import locale_str as _
 from discord.ext import commands
 
+from androxus import Bot
+
 
 class InfoCommands(commands.Cog):
     @commands.hybrid_command(name=_('ping'))
-    async def ping(self, ctx: commands.Context):
-        return await ctx.send('pong')
+    async def ping(self, ctx: commands.Context[Bot]) -> None:
+        await ctx.send('pong')
 
 
-async def setup(bot):
+async def setup(bot: Bot) -> None:
     await bot.add_cog(InfoCommands())

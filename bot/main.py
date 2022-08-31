@@ -27,7 +27,7 @@ from androxus import Bot
 from bootstrap import init, make_tests
 
 
-async def main():
+async def main() -> None:
     init()
 
     async with Bot() as androxus:
