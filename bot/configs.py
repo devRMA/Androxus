@@ -23,7 +23,7 @@
 from os import getenv
 from typing import ClassVar
 
-from discord import Intents, Permissions
+from discord import Intents, Locale, Permissions
 
 
 class Configs:
@@ -52,7 +52,9 @@ class Configs:
     # TODO : Yse only the necessary permissions
     required_permissions: ClassVar[Permissions] = Permissions(8)
     owner_id: ClassVar[int] = int(getenv('OWNER_ID', 0))
-    default_language: ClassVar[str] = getenv('DEFAULT_LANGUAGE', '')
+    default_language: ClassVar[str] = str(
+        Locale[getenv('DEFAULT_LANGUAGE', 'american_english')]
+    )
     language: ClassVar[str] = default_language
     # TODO : Use only the necessary intents
     intents: ClassVar[Intents] = Intents.all()
