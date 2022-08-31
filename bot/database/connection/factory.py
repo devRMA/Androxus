@@ -50,7 +50,6 @@ class ConnectionFactory:
         ----------
             `sqlalchemy.ext.asyncio.AsyncEngine`
                 An AsyncEngine object.
-
         """
         if dsn is None:
             user = getenv('DB_USER', '')
@@ -75,7 +74,6 @@ class ConnectionFactory:
         ----------
             sessionmaker[`sqlalchemy.ext.asyncio.AsyncSession`]
                 The session.
-
         """
         if engine is None:
             engine = ConnectionFactory.get_engine()

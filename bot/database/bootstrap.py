@@ -74,7 +74,6 @@ async def bootstrap(engine: AsyncEngine) -> None:
     ----------
         engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`
             The database engine.
-
     """
     log('BOOTSTRAPPING DB', 'STARTING', first_color=CYAN, second_color=WHITE)
     await check_tables(engine)

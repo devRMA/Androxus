@@ -57,7 +57,6 @@ class Guild(
             The guild's prefix.
         language : `str`
             The guild's language.
-
     """
     __tablename__ = 'guilds'
     id = Column(
@@ -85,7 +84,6 @@ class Guild(
         ----------
             engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`
                 The database engine.
-
         """
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)  # type: ignore
@@ -99,7 +97,6 @@ class Guild(
         ----------
             engine : `sqlalchemy.ext.asyncio.engine.AsyncEngine`
                 The database engine.
-
         """
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)  # type: ignore
@@ -112,6 +109,5 @@ class Guild(
         ----------
             dict[`str`, `Any`]
                 The guild's dictionary representation.
-
         """
         return {'id': self.id, 'prefix': self.prefix, 'language': self.language}
