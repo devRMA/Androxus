@@ -20,18 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from typing import Callable, Iterable
+from typing import TYPE_CHECKING, Callable, Iterable, TypeAlias
 
-from disnake import CmdInter, Member
-from disnake.ext import commands
+from discord import Member
+from discord.ext import commands
 
 from configs import Configs
 
-# source:
+if TYPE_CHECKING:
+    from androxus import Bot
+    TBot: TypeAlias = Bot
+else:
+    TBot: TypeAlias = None
+
+# code based from:
 # https://github.com/AlexFlipnote/discord_bot.py/blob/106cc68decf698f577088784c57f1fbee5bbc3f0/utils/permissions.py
 
 
-def is_owner(ctx: commands.Context[commands.Bot] | CmdInter) -> bool:
+def is_owner(ctx: commands.Context[TBot]) -> bool:
     """
     Check if the user is the owner of the bot.
     """
@@ -41,7 +47,7 @@ def is_owner(ctx: commands.Context[commands.Bot] | CmdInter) -> bool:
 
 
 async def check_permissions(
-    ctx: commands.Context[commands.Bot] | CmdInter,
+    ctx: commands.Context[TBot],
     perms: dict[str, bool],
     *,
     check: Callable[[Iterable[object]], bool] = all
@@ -51,7 +57,7 @@ async def check_permissions(
 
     Parameters
     ----------
-    ctx : `disnake.ext.commands.Context` or `disnake.CmdInter`
+    ctx : `discord.ext.commands.Context`
         The context of the command.
     perms : dict[`str`, `bool`]
         The permissions to check.
@@ -68,9 +74,7 @@ async def check_permissions(
     except commands.errors.NotOwner:
         pass
     if isinstance(ctx.author, Member):
-        resolved = ctx.permissions if isinstance(
-            ctx, CmdInter
-        ) else ctx.channel.permissions_for(ctx.author)
+        resolved = ctx.channel.permissions_for(ctx.author)
         return check(
             getattr(resolved, name, None) == value
             for name, value in perms.items()
@@ -89,7 +93,7 @@ def has_permissions(
     check : Callable[[Iterable[`object`]], `bool`], optional
         The function to use to check the permissions. By default all()
     """
-    async def pred(ctx: commands.Context[commands.Bot] | CmdInter) -> bool:
+    async def pred(ctx: commands.Context[TBot]) -> bool:
         return await check_permissions(ctx, perms, check=check)
 
     return commands.check(pred)
