@@ -20,15 +20,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from dotenv import load_dotenv
+from os import listdir
+from os.path import abspath
 
-from .environments import setup_env
-from .logging import setup_logging
-from .translations import setup_i18n
+import i18n
+
+from configs import Configs
 
 
-def init() -> None:
-    load_dotenv()
-    setup_logging()
-    setup_env()
-    setup_i18n()
+def setup_i18n() -> None:
+    translations_path = f'{abspath("./")}/language/json'
+    available_locales = list[str]()
+
+    for file in listdir(translations_path):
+        if file.endswith(".json") and not file.startswith("_"):
+            available_locales.append(file.removesuffix('.json'))
+
+    i18n.load_path.append(translations_path)
+    i18n.set('available_locales', available_locales)
+    i18n.set('error_on_missing_translation', True)
+    i18n.set('fallback', Configs.default_language)
+    i18n.set('filename_format', '{locale}.{format}')
+    i18n.set('skip_locale_root_data', True)
