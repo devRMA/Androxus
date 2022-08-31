@@ -23,8 +23,6 @@
 from os import listdir
 from os.path import abspath
 
-from pipe import select  # type: ignore
-
 
 def get_cogs() -> tuple[str, ...]:
     """
@@ -43,19 +41,14 @@ def get_cogs() -> tuple[str, ...]:
         return tuple(python_files)
 
     cogs = ['jishaku']
-    commands_path = ['message', 'normal', 'slash', 'user']
-    events_path = ['events']
+    cog_folders = ['commands']
 
-    # getting cogs from the commands path
-    for path in commands_path:
+    for folder in cog_folders:
         cogs.extend(
-            _get_python_files(f'{abspath("./")}/commands/{path}') |
-            select(lambda file: f'commands.{path}.{file}')  # type: ignore
+            map(
+                lambda file: f'{folder}.{file}',
+                _get_python_files(f'{abspath("./")}/{folder}')
+            )
         )
-    # getting cogs from events
-    for path in events_path:
-        cogs.extend(
-            _get_python_files(f'{abspath("./")}/{path}') |
-            select(lambda file: f'{path}.{file}')  # type: ignore
-        )
+
     return tuple(cogs)
